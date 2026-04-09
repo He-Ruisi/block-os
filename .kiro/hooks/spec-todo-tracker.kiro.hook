@@ -1,14 +1,14 @@
 {
   "enabled": true,
   "name": "Spec & Todo Tracker",
-  "description": "每轮对话结束时提取新需求，按照功能分类添加到 docs/spec/PRD的需求文档下 ，并更新 todo.md 待办清单",
-  "version": "1",
+  "description": "每轮对话结束时提取新需求，按功能分类添加到 docs/spec/features/ 对应目录，并更新 todo.md 待办清单",
+  "version": "2",
   "when": {
-    "type": "promptSubmit"
+    "type": "agentStop"
   },
   "then": {
     "type": "askAgent",
-    "prompt": "分析本轮对话中的新需求和功能讨论。如果有新需求：1) 在 /Users/mac/Documents/Programming/Coda/block-os/docs/spec/ 创建详细需求文档（文件名：YYYY-MM-DD-feature-name.md）2) 在 /Users/mac/Documents/Programming/Coda/block-os/docs/spec/todo.md 中添加待办事项链接，按优先级排序（P0/P1/P2），保持简洁明了。如果没有新需求则跳过。"
+    "prompt": "分析本轮对话中的新需求和功能讨论。如果有新需求：\n1) 在 /Users/mac/Documents/Programming/Coda/block-os/docs/spec/features/<category>/ 下创建或更新需求文档（category 可选：editor/ai/block-system/storage），文件名：<feature-name>.md\n2) 在 /Users/mac/Documents/Programming/Coda/block-os/docs/todo.md 中添加或更新待办事项，按优先级排序（P0/P1/P2）\n3) 如果是重大功能变更，在 CHANGELOG.md 记录\n\n如果没有新需求则跳过。保持简洁明了。"
   },
   "workspaceFolderName": "Coda",
   "shortName": "spec-todo-tracker"

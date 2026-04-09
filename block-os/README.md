@@ -1,49 +1,27 @@
 # BlockOS - 写作优先的知识操作系统
 
-## 当前版本：v0.2 - AI 对话集成
+## 当前版本：v0.1 MVP
 
-这是 BlockOS 的第二个版本，集成了 AI 对话功能。
+这是 BlockOS 的第一个最小化版本，专注于核心写作功能。
 
 ### 已实现功能
 
 - ✅ 三栏布局（Activity Bar + 编辑器 + 右侧面板）
 - ✅ 基础 Markdown 编辑器（基于 TipTap）
 - ✅ 基础格式化工具栏（加粗、斜体、标题）
-- ✅ AI 对话面板（小米 MiMo API）
-- ✅ 流式响应支持
 - ✅ 简洁的 UI 设计
+- ✅ 完善的文档架构和自动化系统
 
 ### 待实现功能
 
-- ⏳ AI 输出写入编辑器
-- ⏳ 选中文字捕获为 Block
+- ⏳ AI 对话集成
 - ⏳ 块（Block）系统
 - ⏳ 双向链接 `[[]]`
 - ⏳ 块引用 `(())`
 - ⏳ Git 集成
 - ⏳ 本地文件存储
 
-## 配置
-
-### 1. 获取 MiMo API Key
-
-访问 [小米 MiMo 开放平台](https://mimo.xiaomi.com) 获取 API Key。
-
-### 2. 配置环境变量
-
-复制 `.env.example` 为 `.env`：
-
-```bash
-cp .env.example .env
-```
-
-编辑 `.env` 文件，填入你的 API Key：
-
-```
-VITE_MIMO_API_KEY=your_api_key_here
-```
-
-## 开发
+## 快速开始
 
 ```bash
 # 安装依赖
@@ -59,6 +37,40 @@ bun run type-check
 bun run build
 ```
 
+访问 http://localhost:5173 开始使用！
+
+## 📚 文档导航
+
+- **新手必读**
+  - [快速开始](docs/QUICK_START.md) - 5 分钟上手
+  - [项目架构](docs/ARCHITECTURE.md) - 深入了解结构
+  - [改进总结](docs/IMPROVEMENTS_SUMMARY.md) - 架构优化说明
+
+- **功能需求**
+  - [功能概览](docs/spec/features/README.md)
+  - [编辑器功能](docs/spec/features/editor/)
+  - [待办清单](docs/todo.md)
+
+- **开发日志**
+  - [今日日志](docs/logs/2026-04/2026-04-09.md)
+  - [月度索引](docs/logs/2026-04/index.md)
+
+## 项目特色
+
+### 🎯 写作优先
+编辑器永远是主角，占据最大空间，提供流畅的写作体验。
+
+### 🤖 AI 原生（规划中）
+AI 作为副驾驶，直接在文档中生成内容，而非传统的对话气泡。
+
+### 🧩 块系统（规划中）
+一切内容都是可复用的块（Block），支持双向链接和块引用。
+
+### 📁 完善的架构
+- 按功能分类的需求文档
+- 每天一个文件的工作日志
+- 自动化的文档和代码管理
+
 ## 技术栈
 
 - React 18
@@ -66,4 +78,48 @@ bun run build
 - Vite
 - TipTap (编辑器)
 - Bun (包管理器)
-- 小米 MiMo API (AI 对话)
+
+## 自动化功能
+
+项目配置了 3 个自动化 Hooks：
+
+1. **Daily Changelog Logger**: 每轮对话结束自动追加工作日志
+2. **Spec & Todo Tracker**: 自动提取需求并按功能分类
+3. **Auto Git Commit**: 自动提交代码变更
+
+配置文件在 `.kiro/hooks/`
+
+## 开发规范
+
+- **文档组织**: 按功能分类（editor/ai/block-system/storage）
+- **日志管理**: 每天一个文件，追加模式
+- **命名规范**: kebab-case (文件), PascalCase (组件)
+- **类型安全**: TypeScript Strict Mode
+
+详见 [ARCHITECTURE.md](docs/ARCHITECTURE.md)
+
+## 项目结构
+
+```
+block-os/
+├── src/                    # 源代码
+│   ├── components/         # React 组件
+│   └── styles/             # 样式文件
+├── docs/                   # 项目文档
+│   ├── spec/features/      # 功能需求（按模块分类）
+│   ├── logs/YYYY-MM/       # 工作日志（每天一个）
+│   └── guide/              # 使用指南
+├── .kiro/hooks/            # 自动化配置
+└── public/                 # 静态资源
+```
+
+## 里程碑
+
+- ✅ 2026-04-09: Phase 1 完成 - 基础编辑器
+- ✅ 2026-04-09: 项目架构优化
+- ⏳ Phase 2: AI 对话集成
+- ⏳ Phase 3: Block 系统
+
+## License
+
+MIT

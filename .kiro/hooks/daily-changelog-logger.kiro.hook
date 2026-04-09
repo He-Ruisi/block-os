@@ -1,14 +1,14 @@
 {
   "enabled": true,
   "name": "Daily Changelog Logger",
-  "description": "每轮对话结束时自动生成工作日志到 docs/logs 文件夹，每天共用一个当天的日志文件，并更新 CHANGELOG.md",
-  "version": "1",
+  "description": "每轮对话结束时追加工作日志到当天的日志文件（每天一个文件），如果是重要里程碑则更新 CHANGELOG.md",
+  "version": "2",
   "when": {
     "type": "agentStop"
   },
   "then": {
     "type": "askAgent",
-    "prompt": "总结本轮对话的工作内容，创建一个日志文件到 /Users/mac/Documents/Programming/Coda/block-os/docs/logs/ 目录下，文件名格式为 YYYY-MM-DD-HH-mm.md，包含：1) 完成的任务概述 2) 修改的文件列表 3) 关键变更说明。然后在 /Users/mac/Documents/Programming/Coda/block-os/docs/logs/CHANGELOG.md 文件开头添加本次日志的链接和简要说明。保持简洁，只记录实质性的工作内容。"
+    "prompt": "追加本轮工作日志到 /Users/mac/Documents/Programming/Coda/block-os/docs/logs/YYYY-MM/YYYY-MM-DD.md（如果文件不存在则创建，存在则追加到末尾）。格式：\n\n## HH:mm - 简短标题\n### 完成内容\n- 任务1\n- 任务2\n\n### 文件变更\n- 文件列表\n\n### 关键说明\n- 重要变更\n\n---\n\n如果本轮完成了重要里程碑（如完成某个 Phase），同时在 /Users/mac/Documents/Programming/Coda/block-os/docs/CHANGELOG.md 开头添加记录。保持简洁，只记录实质性工作。"
   },
   "workspaceFolderName": "Coda",
   "shortName": "daily-changelog-logger"

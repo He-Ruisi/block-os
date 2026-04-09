@@ -2,6 +2,16 @@
 
 ## P0 - 核心功能（当前优先）
 
+### 项目架构优化 🔧
+- [x] 设计新的文档组织结构 - [详细方案](./spec/2026-04-09-project-structure-improvement.md)
+- [x] 优化 Hooks 触发时机（改为 agentStop）
+- [x] 实现每天一个日志文件（追加模式）
+- [x] 创建新的目录结构（logs/YYYY-MM/, spec/features/）
+- [x] 更新 3 个 Hooks 配置文件
+- [x] 创建架构文档（ARCHITECTURE.md, QUICK_START.md 等）
+- [ ] 清理旧的分散日志文件
+- [ ] 移动现有需求文档到功能分类目录
+
 ### Phase 3: Block 系统 🚀
 - [ ] 隐式 Block 系统（段落自动识别）- [详细需求](./spec/PRD/2026-04-09-phase3-block-system.md)
 - [ ] Block 数据模型完善（添加 links 字段）
