@@ -7,6 +7,7 @@ import './App.css'
 
 function App() {
   const [editor, setEditor] = useState<TiptapEditor | null>(null)
+  const [selectedText, setSelectedText] = useState<string>('')
 
   const handleInsertAIContent = (content: string) => {
     if (editor) {
@@ -15,11 +16,27 @@ function App() {
     }
   }
 
+  const handleTextSelected = (text: string) => {
+    setSelectedText(text)
+  }
+
+  const handleTextSentToAI = () => {
+    // 清空选中文字状态
+    setSelectedText('')
+  }
+
   return (
     <div className="app">
       <ActivityBar />
-      <Editor onEditorReady={setEditor} />
-      <RightPanel onInsertContent={handleInsertAIContent} />
+      <Editor 
+        onEditorReady={setEditor}
+        onTextSelected={handleTextSelected}
+      />
+      <RightPanel 
+        onInsertContent={handleInsertAIContent}
+        selectedText={selectedText}
+        onTextSentToAI={handleTextSentToAI}
+      />
     </div>
   )
 }

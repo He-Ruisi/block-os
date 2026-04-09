@@ -14,6 +14,8 @@ interface Message {
 
 interface RightPanelProps {
   onInsertContent?: (content: string) => void
+  selectedText?: string
+  onTextSentToAI?: () => void
 }
 
 type PanelTab = 'chat' | 'blocks' | 'session'
@@ -23,7 +25,7 @@ const DEFAULT_SYSTEM_PROMPT = '你是MiMo，是小米公司研发的AI智能助�
 const MIMO_API_KEY = import.meta.env.VITE_MIMO_API_KEY || ''
 const MIMO_API_URL = 'https://api.xiaomimimo.com/v1/chat/completions'
 
-export function RightPanel({ onInsertContent }: RightPanelProps) {
+export function RightPanel({ onInsertContent, selectedText, onTextSentToAI }: RightPanelProps) {
   const [activeTab, setActiveTab] = useState<PanelTab>('chat')
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
@@ -43,6 +45,34 @@ export function RightPanel({ onInsertContent }: RightPanelProps) {
   useEffect(() => {
     blockStore.init().catch(console.error)
   }, [])
+
+  // 监听选中文字事件
+  useEffect(() => {
+    const handleSendToAI = (e: Event) => {
+      const customEvent = e as CustomEvent<string>
+      const text = customEvent.detail
+      if (text) {
+        // 切换到对话标签页
+        setActiveTab('chat')
+        // 设置输入框内容
+        setInput(`[上下文]\n${text}\n\n[我的问题]\n`)
+        // 通知 App 组件
+        onTextSentToAI?.()
+      }
+    }
+
+    window.addEventListener('sendToAI', handleSendToAI)
+    return () => window.removeEventListener('sendToAI', handleSendToAI)
+  }, [onTextSentToAI])
+
+  // 当 selectedText 变化时，自动填充到输入框
+  useEffect(() => {
+    if (selectedText && selectedText.trim()) {
+      setActiveTab('chat')
+      setInput(`[上下文]\n${selectedText}\n\n[我的问题]\n`)
+      onTextSentToAI?.()
+    }
+  }, [selectedText, onTextSentToAI])
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
