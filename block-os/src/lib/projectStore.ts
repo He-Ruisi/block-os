@@ -26,7 +26,7 @@ export interface Tab {
 export class ProjectStore {
   private dbName = 'blockos-db'
   private storeName = 'projects'
-  private version = 2
+  private version = 3 // 升级到 version 3 以创建 projects store
   private db: IDBDatabase | null = null
 
   // 初始化数据库

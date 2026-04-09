@@ -46,7 +46,7 @@ export interface BlockDerivative {
 export class BlockStore {
   private dbName = 'blockos-db'
   private storeName = 'blocks'
-  private version = 2 // 统一版本号，与 documentStore 保持一致
+  private version = 3 // 统一版本号
   private db: IDBDatabase | null = null
 
   // 初始化数据库
@@ -73,10 +73,17 @@ export class BlockStore {
           store.createIndex('type', 'type', { unique: false })
         }
 
-        // 创建 documents store（如果不存在）- 确保与 documentStore 兼容
+        // 创建 documents store（如果不存在）
         if (!db.objectStoreNames.contains('documents')) {
           const docStore = db.createObjectStore('documents', { keyPath: 'id' })
           docStore.createIndex('updatedAt', 'metadata.updatedAt', { unique: false })
+        }
+
+        // 创建 projects store（如果不存在）
+        if (!db.objectStoreNames.contains('projects')) {
+          const projStore = db.createObjectStore('projects', { keyPath: 'id' })
+          projStore.createIndex('createdAt', 'metadata.createdAt', { unique: false })
+          projStore.createIndex('updatedAt', 'metadata.updatedAt', { unique: false })
         }
       }
     })

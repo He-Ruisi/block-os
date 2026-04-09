@@ -1,5 +1,55 @@
 # BlockOS 更新日志
 
+## [v0.3.1] - 2026-04-09 📁 文档管理系统
+
+### Bug 修复
+- ✅ **创建项目无反应**: 添加详细日志和错误提示对话框
+
+### 核心功能
+- ✅ **文档管理系统**: 文档可以关联到项目，项目作为文件夹容器
+- ✅ **文档创建逻辑**:
+  - 在项目中创建文档：自动关联到当前项目
+  - 在今日创建文档：保持独立，不关联项目
+- ✅ **双向关系维护**: 自动更新项目的文档列表
+
+### 数据模型扩展
+```typescript
+// Document 添加项目关联
+interface Document {
+  projectId?: string  // 所属项目 ID
+}
+
+// Project 维护文档列表
+interface Project {
+  documents: string[]  // 文档 ID 列表
+}
+```
+
+### 新增方法
+- `documentStore.createDocument(title, projectId?)` - 创建文档并关联项目
+- `documentStore.getDocumentsByProject(projectId)` - 获取项目文档
+- `documentStore.getTodayDocuments()` - 获取今日文档
+- `documentStore.updateDocumentProject(docId, projectId)` - 更新文档归属
+- `projectStore.addDocumentToProject(projectId, docId)` - 添加文档到项目
+- `projectStore.removeDocumentFromProject(projectId, docId)` - 从项目移除文档
+
+### 使用方式
+1. 点击项目名称 → 点击 + 按钮 → 文档自动关联到项目
+2. 点击今日 → 点击 + 按钮 → 文档独立存在
+
+### 文件变更
+- 修改：`src/lib/documentStore.ts` - 扩展 Document 模型，添加项目相关方法
+- 修改：`src/components/Sidebar.tsx` - 添加详细日志和错误处理
+- 修改：`src/App.tsx` - 实现文档创建逻辑
+
+### 待实现功能
+- 项目视图显示文档列表
+- 点击文档名称打开编辑
+- 文档重命名和删除
+- 文档在项目间移动
+
+---
+
 ## [v0.3.0] - 2026-04-09 🚀 多项目工作区系统
 
 ### 重要里程碑

@@ -10,6 +10,7 @@ import './Editor.css'
 interface EditorProps {
   onEditorReady?: (editor: TiptapEditor) => void
   onTextSelected?: (text: string) => void
+  documentId?: string // 要加载的文档 ID
 }
 
 interface SuggestionItem {
@@ -18,7 +19,7 @@ interface SuggestionItem {
   content: string
 }
 
-export function Editor({ onEditorReady, onTextSelected }: EditorProps) {
+export function Editor({ onEditorReady, onTextSelected, documentId }: EditorProps) {
   const [showSuggestion, setShowSuggestion] = useState(false)
   const [suggestionItems, setSuggestionItems] = useState<SuggestionItem[]>([])
   const [suggestionPosition, setSuggestionPosition] = useState({ top: 0, left: 0 })
@@ -198,43 +199,61 @@ export function Editor({ onEditorReady, onTextSelected }: EditorProps) {
     setShowSuggestion(false)
   }
 
-  // 初始化文档
+  // 初始化文档或加载指定文档
   useEffect(() => {
-    const initDocument = async () => {
+    const loadDocument = async () => {
+      if (!editor) return
+
       try {
         await documentStore.init()
         
-        // 创建或加载默认文档
-        const docs = await documentStore.getAllDocuments()
         let doc
         
-        if (docs.length === 0) {
-          doc = await documentStore.createDocument('我的第一篇文档')
+        if (documentId) {
+          // 加载指定的文档
+          doc = await documentStore.getDocument(documentId)
+          if (!doc) {
+            console.error('[Editor] Document not found:', documentId)
+            return
+          }
+          console.log('[Editor] Loading document:', documentId)
         } else {
-          doc = docs[0] // 加载最近的文档
+          // 创建或加载默认文档
+          const docs = await documentStore.getAllDocuments()
+          
+          if (docs.length === 0) {
+            doc = await documentStore.createDocument('我的第一篇文档')
+          } else {
+            doc = docs[0] // 加载最近的文档
+          }
         }
         
         setCurrentDocumentId(doc.id)
         documentStore.setCurrentDocument(doc.id)
         
-        // 如果文档有内容，加载到编辑器
-        if (doc.content && editor) {
+        // 加载文档内容到编辑器
+        if (doc.content) {
           try {
             const content = JSON.parse(doc.content)
             editor.commands.setContent(content)
+            console.log('[Editor] Document content loaded')
           } catch (e) {
-            console.error('Failed to load document content:', e)
+            console.error('Failed to parse document content:', e)
+            // 如果解析失败，清空编辑器
+            editor.commands.setContent('')
           }
+        } else {
+          // 新文档，清空编辑器
+          editor.commands.setContent('')
+          console.log('[Editor] New document, editor cleared')
         }
       } catch (error) {
-        console.error('Failed to initialize document:', error)
+        console.error('Failed to load document:', error)
       }
     }
 
-    if (editor) {
-      initDocument()
-    }
-  }, [editor])
+    loadDocument()
+  }, [editor, documentId])
 
   useEffect(() => {
     if (editor && onEditorReady) {

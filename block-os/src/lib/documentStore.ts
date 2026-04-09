@@ -26,7 +26,7 @@ export interface DocumentBlock {
 export class DocumentStore {
   private dbName = 'blockos-db'
   private storeName = 'documents'
-  private version = 2 // 升级版本
+  private version = 3 // 统一版本号
   private db: IDBDatabase | null = null
   private currentDocumentId: string | null = null
 
@@ -44,7 +44,7 @@ export class DocumentStore {
       request.onupgradeneeded = (event) => {
         const db = (event.target as IDBOpenDBRequest).result
 
-        // 创建 blocks store（如果不存在）- 确保与 blockStore 兼容
+        // 创建 blocks store（如果不存在）
         if (!db.objectStoreNames.contains('blocks')) {
           const blockStore = db.createObjectStore('blocks', { keyPath: 'id' })
           blockStore.createIndex('tags', 'metadata.tags', { multiEntry: true })
@@ -56,6 +56,13 @@ export class DocumentStore {
         if (!db.objectStoreNames.contains(this.storeName)) {
           const store = db.createObjectStore(this.storeName, { keyPath: 'id' })
           store.createIndex('updatedAt', 'metadata.updatedAt', { unique: false })
+        }
+
+        // 创建 projects store（如果不存在）
+        if (!db.objectStoreNames.contains('projects')) {
+          const projStore = db.createObjectStore('projects', { keyPath: 'id' })
+          projStore.createIndex('createdAt', 'metadata.createdAt', { unique: false })
+          projStore.createIndex('updatedAt', 'metadata.updatedAt', { unique: false })
         }
       }
     })

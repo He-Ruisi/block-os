@@ -282,6 +282,7 @@ function App() {
         <Editor 
           onEditorReady={setEditor}
           onTextSelected={handleTextSelected}
+          documentId={tabs.find(t => t.id === activeTabId)?.documentId}
         />
       </div>
 
