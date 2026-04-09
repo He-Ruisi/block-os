@@ -32,7 +32,15 @@ export function BlockCaptureDialog({ content, onCapture, onCancel }: BlockCaptur
   }
 
   const handleCapture = () => {
+    console.log('handleCapture called', { title, tags })
     onCapture(title, tags)
+  }
+
+  const handleCaptureClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    console.log('Capture button clicked', { title, tags })
+    handleCapture()
   }
 
   return (
@@ -98,10 +106,18 @@ export function BlockCaptureDialog({ content, onCapture, onCancel }: BlockCaptur
         </div>
 
         <div className="dialog-footer">
-          <button className="btn-secondary" onClick={onCancel}>
+          <button 
+            type="button"
+            className="btn-secondary" 
+            onClick={onCancel}
+          >
             取消
           </button>
-          <button className="btn-primary" onClick={handleCapture}>
+          <button 
+            type="button"
+            className="btn-primary" 
+            onClick={handleCaptureClick}
+          >
             捕获
           </button>
         </div>
