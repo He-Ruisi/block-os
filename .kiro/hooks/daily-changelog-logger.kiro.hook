@@ -1,7 +1,7 @@
 {
   "enabled": true,
   "name": "Daily Changelog Logger",
-  "description": "每轮对话结束时自动生成工作日志到 docs/logs 文件夹，并更新 CHANGELOG.md",
+  "description": "每轮对话结束时自动生成工作日志到 docs/logs 文件夹，每天共用一个当天的日志文件，并更新 CHANGELOG.md",
   "version": "1",
   "when": {
     "type": "agentStop"

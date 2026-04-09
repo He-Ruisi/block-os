@@ -1,7 +1,7 @@
 {
   "enabled": true,
   "name": "Spec & Todo Tracker",
-  "description": "每轮对话结束时提取新需求，创建需求文档到 docs/spec/PRD 目录，并更新 todo.md 待办清单",
+  "description": "每轮对话结束时提取新需求，按照功能分类添加到 docs/spec/PRD的需求文档下 ，并更新 todo.md 待办清单",
   "version": "1",
   "when": {
     "type": "promptSubmit"
