@@ -347,3 +347,63 @@
   max-height: 200px;
   overflow-y: auto;
 }
+
+/* Panel Tabs */
+.panel-tabs {
+  display: flex;
+  gap: 4px;
+  flex: 1;
+}
+
+.panel-tab {
+  padding: 6px 12px;
+  background: transparent;
+  border: none;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-text-tertiary);
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.panel-tab:hover:not(:disabled) {
+  background: var(--color-bg-primary);
+  color: var(--color-text-secondary);
+}
+
+.panel-tab.active {
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
+}
+
+.panel-tab:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Message Actions */
+.message-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.capture-button {
+  align-self: flex-start;
+  padding: 4px 10px;
+  font-size: 11px;
+  background: transparent;
+  color: var(--color-purple);
+  border: 1px solid var(--color-purple);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.capture-button:hover {
+  background: var(--color-purple-light);
+}
