@@ -1,6 +1,8 @@
-import { useEffect } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useEditor, EditorContent, Editor as TiptapEditor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
+import { BlockLink, BlockReference, searchBlocks } from '../lib/tiptapExtensions'
+import { SuggestionMenu } from './SuggestionMenu'
 import './Editor.css'
 
 interface EditorProps {
@@ -8,9 +10,26 @@ interface EditorProps {
   onTextSelected?: (text: string) => void
 }
 
+interface SuggestionItem {
+  id: string
+  title: string
+  content: string
+}
+
 export function Editor({ onEditorReady, onTextSelected }: EditorProps) {
+  const [showSuggestion, setShowSuggestion] = useState(false)
+  const [suggestionItems, setSuggestionItems] = useState<SuggestionItem[]>([])
+  const [suggestionPosition, setSuggestionPosition] = useState({ top: 0, left: 0 })
+  const [suggestionType, setSuggestionType] = useState<'link' | 'reference' | null>(null)
+  const [suggestionRange, setSuggestionRange] = useState<{ from: number; to: number } | null>(null)
+  const editorRef = useRef<HTMLDivElement>(null)
+
   const editor = useEditor({
-    extensions: [StarterKit],
+    extensions: [
+      StarterKit,
+      BlockLink,
+      BlockReference,
+    ],
     content: `
       <h1>欢迎使用 BlockOS</h1>
       <p>这是一个写作优先的知识操作系统。</p>
@@ -21,6 +40,8 @@ export function Editor({ onEditorReady, onTextSelected }: EditorProps) {
         <li>使用 ** 加粗文字</li>
         <li>使用 * 创建斜体</li>
       </ul>
+      <h2>Block 系统</h2>
+      <p>使用 <code>[[</code> 创建双向链接，使用 <code>((</code> 引用其他 Block。</p>
       <p>现在就开始写作吧...</p>
       <h2>选中文字发送给 AI</h2>
       <p>选中任意文字，然后按 Cmd/Ctrl + Shift + A 发送给 AI，或者右键选择"发送给 AI"。</p>
@@ -40,7 +61,112 @@ export function Editor({ onEditorReady, onTextSelected }: EditorProps) {
         }
       }
     },
+    onUpdate: ({ editor }) => {
+      // 检测 [[ 或 (( 触发自动补全
+      const { selection } = editor.state
+      const { $from } = selection
+      const textBefore = $from.parent.textBetween(
+        Math.max(0, $from.parentOffset - 20),
+        $from.parentOffset,
+        null,
+        '\ufffc'
+      )
+
+      // 检测 [[
+      const linkMatch = textBefore.match(/\[\[([^\]]*)$/)
+      if (linkMatch) {
+        const query = linkMatch[1]
+        const from = $from.pos - query.length
+        const to = $from.pos
+        
+        setSuggestionType('link')
+        setSuggestionRange({ from: from - 2, to })
+        handleSearch(query)
+        updateSuggestionPosition(editor)
+        return
+      }
+
+      // 检测 ((
+      const refMatch = textBefore.match(/\(\(([^)]*)$/)
+      if (refMatch) {
+        const query = refMatch[1]
+        const from = $from.pos - query.length
+        const to = $from.pos
+        
+        setSuggestionType('reference')
+        setSuggestionRange({ from: from - 2, to })
+        handleSearch(query)
+        updateSuggestionPosition(editor)
+        return
+      }
+
+      // 没有匹配，关闭建议
+      setShowSuggestion(false)
+    },
   })
+
+  const handleSearch = async (query: string) => {
+    try {
+      const results = await searchBlocks(query)
+      setSuggestionItems(results)
+      setShowSuggestion(results.length > 0)
+    } catch (error) {
+      console.error('Search failed:', error)
+      setShowSuggestion(false)
+    }
+  }
+
+  const updateSuggestionPosition = (editor: TiptapEditor) => {
+    const { selection } = editor.state
+    const { $from } = selection
+    const coords = editor.view.coordsAtPos($from.pos)
+    
+    setSuggestionPosition({
+      top: coords.bottom + 5,
+      left: coords.left,
+    })
+  }
+
+  const handleSelectSuggestion = async (item: SuggestionItem) => {
+    if (!editor || !suggestionRange) return
+
+    const { from, to } = suggestionRange
+
+    if (suggestionType === 'link') {
+      // 插入双向链接
+      editor
+        .chain()
+        .focus()
+        .deleteRange({ from, to })
+        .insertContent({
+          type: 'blockLink',
+          attrs: {
+            blockId: item.id,
+            blockTitle: item.title,
+          },
+        })
+        .run()
+
+      // 建立链接关系（需要当前文档的 blockId）
+      // TODO: 实现文档级别的 Block 管理
+    } else if (suggestionType === 'reference') {
+      // 插入块引用
+      editor
+        .chain()
+        .focus()
+        .deleteRange({ from, to })
+        .insertContent({
+          type: 'blockReference',
+          attrs: {
+            blockId: item.id,
+            blockContent: item.content,
+          },
+        })
+        .run()
+    }
+
+    setShowSuggestion(false)
+  }
 
   useEffect(() => {
     if (editor && onEditorReady) {
@@ -72,8 +198,22 @@ export function Editor({ onEditorReady, onTextSelected }: EditorProps) {
     return () => document.removeEventListener('keydown', handleKeyDown)
   }, [editor, onTextSelected])
 
+  // 监听 Block 导航事件
+  useEffect(() => {
+    const handleNavigateToBlock = async (e: Event) => {
+      const customEvent = e as CustomEvent<string>
+      const blockId = customEvent.detail
+      
+      // 切换到 Block 空间并高亮该 Block
+      window.dispatchEvent(new CustomEvent('showBlockInSpace', { detail: blockId }))
+    }
+
+    window.addEventListener('navigateToBlock', handleNavigateToBlock)
+    return () => window.removeEventListener('navigateToBlock', handleNavigateToBlock)
+  }, [])
+
   return (
-    <div className="editor-container">
+    <div className="editor-container" ref={editorRef}>
       <div className="editor-toolbar">
         <button
           onClick={() => editor?.chain().focus().toggleBold().run()}
@@ -107,6 +247,15 @@ export function Editor({ onEditorReady, onTextSelected }: EditorProps) {
       <div className="editor-scroll">
         <EditorContent editor={editor} />
       </div>
+
+      {showSuggestion && (
+        <SuggestionMenu
+          items={suggestionItems}
+          onSelect={handleSelectSuggestion}
+          onClose={() => setShowSuggestion(false)}
+          position={suggestionPosition}
+        />
+      )}
     </div>
   )
 }

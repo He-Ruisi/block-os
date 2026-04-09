@@ -2,27 +2,14 @@
 
 ## P0 - 核心功能（当前优先）
 
-### Phase 2.5: Block 捕获与上下文传递 🚀
-- [ ] 选中文字发送给 AI - [详细需求](./spec/PRD/2026-04-09-phase2.5-block-capture.md)
-- [ ] AI 回复捕获为 Block
-- [ ] Block 空间基础 UI（右侧面板标签页）
-- [ ] IndexedDB 存储实现
-
-### Phase 2: AI 对话集成
-- [x] 接入 xiaomi mimo API - [详细需求](./spec/PRD/2026-04-09-phase2-ai-integration.md)
-- [x] 实现对话界面（右侧面板）
-- [x] AI 输出直接写入编辑器
-- [x] AI 回复内容分离
-- [x] 系统提示词自定义设置
-
-## P1 - 重要功能
-
-### Phase 3: Block 系统
-- [ ] 隐式 Block 系统（段落自动识别）
-- [ ] Block 数据模型完善 - [详细需求](./spec/PRD/2026-04-09-phase3-block-system.md)
+### Phase 3: Block 系统 🚀
+- [ ] 隐式 Block 系统（段落自动识别）- [详细需求](./spec/PRD/2026-04-09-phase3-block-system.md)
+- [ ] Block 数据模型完善（添加 links 字段）
 - [ ] 双向链接 `[[]]` 语法
 - [ ] 块引用 `(())` 语法
 - [ ] 块空间可视化界面（关系图谱）
+
+## P1 - 重要功能
 
 ### Phase 4: 本地存储
 - [ ] 文件系统读写 - [详细需求](./spec/PRD/2026-04-09-phase4-local-storage.md)
@@ -49,6 +36,14 @@
 
 ## 已完成 ✓
 
+### Phase 2.5: Block 捕获与上下文传递
+- [x] 选中文字发送给 AI（快捷键 Cmd/Ctrl + Shift + A）
+- [x] AI 回复捕获为 Block
+- [x] Block 空间基础 UI（右侧面板标签页）
+- [x] IndexedDB 存储实现
+- [x] Block 搜索和标签过滤
+- [x] Block 捕获对话框
+
 ### Phase 2: AI 对话集成
 - [x] 接入 xiaomi mimo API
 - [x] 实现对话界面
@@ -68,6 +63,6 @@
 
 ---
 
-**更新时间**: 2026-04-09 15:15  
-**当前阶段**: Phase 2.5 - Block 捕获与上下文传递  
-**下次评审**: Phase 2.5 完成后
+**更新时间**: 2026-04-09 16:30  
+**当前阶段**: Phase 3 - Block 系统  
+**下次评审**: Phase 3 完成后

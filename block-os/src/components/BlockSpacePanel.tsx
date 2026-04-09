@@ -9,6 +9,7 @@ export function BlockSpacePanel() {
   const [selectedTag, setSelectedTag] = useState<string>('all')
   const [allTags, setAllTags] = useState<string[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [highlightedBlockId, setHighlightedBlockId] = useState<string | null>(null)
 
   // 加载 Blocks
   const loadBlocks = async () => {
@@ -29,6 +30,33 @@ export function BlockSpacePanel() {
   // 初始化
   useEffect(() => {
     loadBlocks()
+  }, [])
+
+  // 监听显示 Block 事件
+  useEffect(() => {
+    const handleShowBlock = (e: Event) => {
+      const customEvent = e as CustomEvent<string>
+      const blockId = customEvent.detail
+      
+      // 高亮该 Block
+      setHighlightedBlockId(blockId)
+      
+      // 3秒后取消高亮
+      setTimeout(() => {
+        setHighlightedBlockId(null)
+      }, 3000)
+      
+      // 滚动到该 Block
+      setTimeout(() => {
+        const element = document.querySelector(`[data-block-id="${blockId}"]`)
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        }
+      }, 100)
+    }
+
+    window.addEventListener('showBlockInSpace', handleShowBlock)
+    return () => window.removeEventListener('showBlockInSpace', handleShowBlock)
   }, [])
 
   // 搜索和过滤
@@ -135,7 +163,11 @@ export function BlockSpacePanel() {
         ) : (
           <div className="blocks-list">
             {filteredBlocks.map(block => (
-              <div key={block.id} className="block-card">
+              <div 
+                key={block.id} 
+                className={`block-card ${highlightedBlockId === block.id ? 'highlighted' : ''}`}
+                data-block-id={block.id}
+              >
                 {block.metadata.title && (
                   <div className="block-title">{block.metadata.title}</div>
                 )}

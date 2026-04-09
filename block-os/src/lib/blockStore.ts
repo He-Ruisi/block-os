@@ -2,7 +2,7 @@
 export interface Block {
   id: string
   content: string
-  type: 'text' | 'ai-generated'
+  type: 'text' | 'ai-generated' | 'heading' | 'list' | 'code'
   source: {
     type: 'editor' | 'ai'
     documentId?: string
@@ -14,6 +14,10 @@ export interface Block {
     tags: string[]
     createdAt: Date
     updatedAt: Date
+  }
+  links?: {
+    outgoing: string[]  // 引用的其他 blocks
+    incoming: string[]  // 被哪些 blocks 引用
   }
 }
 
@@ -175,6 +179,72 @@ export class BlockStore {
     }
 
     await this.saveBlock(updatedBlock)
+  }
+
+  // 添加链接关系
+  async addLink(fromBlockId: string, toBlockId: string): Promise<void> {
+    const fromBlock = await this.getBlock(fromBlockId)
+    const toBlock = await this.getBlock(toBlockId)
+    
+    if (!fromBlock || !toBlock) throw new Error('Block not found')
+
+    // 初始化 links 对象
+    if (!fromBlock.links) {
+      fromBlock.links = { outgoing: [], incoming: [] }
+    }
+    if (!toBlock.links) {
+      toBlock.links = { outgoing: [], incoming: [] }
+    }
+
+    // 添加链接（避免重复）
+    if (!fromBlock.links.outgoing.includes(toBlockId)) {
+      fromBlock.links.outgoing.push(toBlockId)
+    }
+    if (!toBlock.links.incoming.includes(fromBlockId)) {
+      toBlock.links.incoming.push(fromBlockId)
+    }
+
+    // 保存更新
+    await this.saveBlock(fromBlock)
+    await this.saveBlock(toBlock)
+  }
+
+  // 移除链接关系
+  async removeLink(fromBlockId: string, toBlockId: string): Promise<void> {
+    const fromBlock = await this.getBlock(fromBlockId)
+    const toBlock = await this.getBlock(toBlockId)
+    
+    if (!fromBlock || !toBlock) return
+
+    if (fromBlock.links) {
+      fromBlock.links.outgoing = fromBlock.links.outgoing.filter(id => id !== toBlockId)
+    }
+    if (toBlock.links) {
+      toBlock.links.incoming = toBlock.links.incoming.filter(id => id !== fromBlockId)
+    }
+
+    await this.saveBlock(fromBlock)
+    await this.saveBlock(toBlock)
+  }
+
+  // 获取 Block 的所有链接
+  async getBlockLinks(blockId: string): Promise<{ outgoing: Block[]; incoming: Block[] }> {
+    const block = await this.getBlock(blockId)
+    if (!block || !block.links) {
+      return { outgoing: [], incoming: [] }
+    }
+
+    const outgoing = await Promise.all(
+      block.links.outgoing.map(id => this.getBlock(id))
+    )
+    const incoming = await Promise.all(
+      block.links.incoming.map(id => this.getBlock(id))
+    )
+
+    return {
+      outgoing: outgoing.filter((b): b is Block => b !== null),
+      incoming: incoming.filter((b): b is Block => b !== null)
+    }
   }
 }
 

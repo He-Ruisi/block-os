@@ -112,3 +112,63 @@
 .editor-content em {
   font-style: italic;
 }
+
+/* Block Link 样式 */
+.block-link {
+  color: var(--color-purple);
+  background: var(--color-purple-light);
+  padding: 2px 6px;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-weight: 500;
+}
+
+.block-link:hover {
+  background: rgba(139, 92, 246, 0.2);
+  text-decoration: underline;
+}
+
+/* Block Reference 样式 */
+.block-reference {
+  margin: 12px 0;
+  padding: 12px;
+  background: var(--color-bg-secondary);
+  border-left: 3px solid var(--color-purple);
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.block-reference:hover {
+  background: var(--color-bg-hover);
+  border-left-color: var(--color-purple);
+}
+
+.block-reference-label {
+  font-size: 11px;
+  color: var(--color-text-tertiary);
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+.block-reference-content {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+}
+
+/* Suggestion 激活状态 */
+.suggestion-active {
+  background: var(--color-purple-light);
+  border-radius: 3px;
+}
+
+.editor-content code {
+  font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+  font-size: 13px;
+  background: var(--color-bg-secondary);
+  padding: 2px 6px;
+  border-radius: 3px;
+  color: var(--color-purple);
+}

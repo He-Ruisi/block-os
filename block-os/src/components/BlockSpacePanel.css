@@ -169,3 +169,18 @@
 .block-time {
   white-space: nowrap;
 }
+
+.block-card.highlighted {
+  border-color: var(--color-purple);
+  background: var(--color-purple-light);
+  animation: highlight-pulse 0.5s ease-in-out;
+}
+
+@keyframes highlight-pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+}
