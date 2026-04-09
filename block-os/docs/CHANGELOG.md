@@ -1,5 +1,31 @@
 # BlockOS 更新日志
 
+## [v0.2.1] - 2026-04-09 🐛 Block 捕获功能重写
+
+### Bug 修复
+- ✅ **Block 捕获按钮无响应**: 完全重写 BlockCaptureDialog 组件，采用最简单可靠的实现
+- ✅ **事件处理优化**: 正确处理事件冒泡和默认行为，避免意外关闭
+- ✅ **状态管理简化**: 只保留 3 个必要状态，移除复杂逻辑
+
+### 技术改进
+- 简化状态管理（title, tags, tagInput）
+- 独立的事件处理函数（addTag, removeTag, handleCapture, handleCancel）
+- 正确的事件冒泡控制（overlay 点击关闭，content 阻止冒泡）
+- 明确的按钮类型声明（type="button"）
+- 完整的调试日志（[BlockCapture] 前缀）
+
+### 用户体验
+- 按钮立即响应，无延迟
+- Enter 键快速添加标签
+- 自动过滤重复标签
+- 内容预览截断（500 字符）
+
+### 文件变更
+- 重写：`src/components/BlockCaptureDialog.tsx` - 88 行简洁实现
+- 新增：`docs/logs/2026-04-09-17-45-block-capture-rewrite.md` - 完整重写文档
+
+---
+
 ## [v0.2.0] - 2026-04-09 🚀 Phase 3 完成 - Block 系统核心功能
 
 ### 重要里程碑

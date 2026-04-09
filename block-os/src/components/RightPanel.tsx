@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect } from 'react'
-import { BlockCaptureDialog } from './BlockCaptureDialog'
 import { BlockSpacePanel } from './BlockSpacePanel'
 import { DocumentBlocksPanel } from './DocumentBlocksPanel'
 import { blockStore, generateUUID, Block } from '../lib/blockStore'
@@ -35,10 +34,7 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI }: Ri
   const [systemPrompt, setSystemPrompt] = useState(DEFAULT_SYSTEM_PROMPT)
   const [tempSystemPrompt, setTempSystemPrompt] = useState(DEFAULT_SYSTEM_PROMPT)
   
-  // Block 捕获相关
-  const [showCaptureDialog, setShowCaptureDialog] = useState(false)
-  const [captureContent, setCaptureContent] = useState('')
-  const [captureMessageId, setCaptureMessageId] = useState('')
+  // Block 捕获相关（已移除对话框，直接保存）
   
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
@@ -95,44 +91,37 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI }: Ri
     }
   }
 
-  // 打开捕获对话框
-  const openCaptureDialog = (messageId: string) => {
+  // 直接捕获 Block（不弹出对话框）
+  const captureBlock = async (messageId: string) => {
     const message = messages.find(m => m.id === messageId)
-    if (message?.role === 'assistant') {
-      const content = message.editorContent || message.content
-      setCaptureContent(content)
-      setCaptureMessageId(messageId)
-      setShowCaptureDialog(true)
-    }
-  }
+    if (!message || message.role !== 'assistant') return
 
-  // 捕获 Block
-  const handleCaptureBlock = async (title: string, tags: string[]) => {
     try {
+      const content = message.editorContent || message.content
       const block: Block = {
         id: generateUUID(),
-        content: captureContent,
+        content: content,
         type: 'ai-generated',
         source: {
           type: 'ai',
-          aiMessageId: captureMessageId,
+          aiMessageId: messageId,
           capturedAt: new Date()
         },
         metadata: {
-          title: title || undefined,
-          tags,
+          title: `AI 回复 - ${new Date().toLocaleString()}`,
+          tags: ['AI回复', '手动捕获'],
           createdAt: new Date(),
           updatedAt: new Date()
         }
       }
 
       await blockStore.saveBlock(block)
-      setShowCaptureDialog(false)
+      console.log('[Block Capture] Block saved successfully:', block.id)
       
       // 切换到 Block 空间标签页
       setActiveTab('blocks')
     } catch (error) {
-      console.error('Failed to capture block:', error)
+      console.error('[Block Capture] Failed to save block:', error)
     }
   }
 
@@ -408,7 +397,7 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI }: Ri
                             </button>
                             <button
                               className="capture-button"
-                              onClick={() => openCaptureDialog(msg.id)}
+                              onClick={() => captureBlock(msg.id)}
                             >
                               ◆ 捕获为Block
                             </button>
@@ -458,13 +447,6 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI }: Ri
         </div>
       )}
 
-      {showCaptureDialog && (
-        <BlockCaptureDialog
-          content={captureContent}
-          onCapture={handleCaptureBlock}
-          onCancel={() => setShowCaptureDialog(false)}
-        />
-      )}
     </div>
   )
 }
