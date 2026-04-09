@@ -1,0 +1,219 @@
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+.app { display: grid; grid-template-columns: 36px 1fr 320px; grid-template-rows: 36px 1fr 24px; height: 620px; border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); overflow: hidden; background: var(--color-background-primary); font-family: var(--font-sans); }
+
+.topbar { grid-column: 1/-1; background: var(--color-background-secondary); border-bottom: 0.5px solid var(--color-border-tertiary); display: flex; align-items: center; padding: 0 10px; gap: 8px; }
+.logo { font-size: 13px; font-weight: 500; color: var(--color-text-primary); padding: 0 6px; }
+.doc-title { font-size: 12px; color: var(--color-text-secondary); flex: 1; text-align: center; }
+.doc-title span { color: var(--color-text-primary); font-weight: 500; }
+.top-right { display: flex; gap: 5px; align-items: center; }
+.tbtn { font-size: 11px; padding: 2px 8px; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-tertiary); color: var(--color-text-secondary); cursor: pointer; background: transparent; }
+.tbtn.active { background: #EEEDFE; color: #3C3489; border-color: #AFA9EC; }
+
+.activity-bar { background: var(--color-background-secondary); border-right: 0.5px solid var(--color-border-tertiary); display: flex; flex-direction: column; align-items: center; padding: 8px 0; gap: 4px; }
+.act-icon { width: 28px; height: 28px; border-radius: var(--border-radius-md); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--color-text-tertiary); font-size: 14px; }
+.act-icon:hover, .act-icon.active { background: var(--color-background-primary); color: var(--color-text-primary); }
+.act-icon.active { color: #7F77DD; }
+.act-spacer { flex: 1; }
+
+.editor-area { display: flex; flex-direction: column; overflow: hidden; position: relative; }
+.editor-scroll { flex: 1; overflow-y: auto; padding: 40px 80px; }
+.editor-doc { max-width: 640px; margin: 0 auto; }
+.doc-h1 { font-size: 22px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 6px; line-height: 1.3; }
+.doc-meta { font-size: 11px; color: var(--color-text-tertiary); margin-bottom: 28px; display: flex; gap: 10px; }
+.doc-h2 { font-size: 15px; font-weight: 500; color: var(--color-text-primary); margin: 20px 0 8px; }
+.doc-p { font-size: 13px; color: var(--color-text-secondary); line-height: 1.8; margin-bottom: 10px; }
+.doc-p.writing { color: var(--color-text-primary); }
+.ai-writing { border-left: 2px solid #AFA9EC; padding-left: 12px; margin: 10px 0; }
+.ai-label { font-size: 10px; color: #7F77DD; margin-bottom: 4px; display: flex; align-items: center; gap: 4px; }
+.ai-cursor { display: inline-block; width: 2px; height: 13px; background: #7F77DD; border-radius: 1px; animation: blink 1s infinite; vertical-align: middle; margin-left: 2px; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+.inline-link { color: #185FA5; cursor: pointer; font-size: 13px; }
+.block-ref { background: #E1F5EE; color: #0F6E56; border-radius: 3px; padding: 0 3px; font-size: 12px; cursor: pointer; }
+.ai-stream { font-size: 13px; color: var(--color-text-primary); line-height: 1.8; }
+
+.editor-bottom { border-top: 0.5px solid var(--color-border-tertiary); padding: 7px 80px; background: var(--color-background-primary); }
+.cmd-bar { display: flex; align-items: center; gap: 8px; background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 6px 12px; }
+.cmd-prefix { font-size: 12px; color: #7F77DD; font-weight: 500; white-space: nowrap; }
+.cmd-input { flex: 1; font-size: 12px; color: var(--color-text-primary); background: transparent; border: none; outline: none; }
+.cmd-hint { font-size: 10px; color: var(--color-text-tertiary); white-space: nowrap; }
+
+.right-panel { border-left: 0.5px solid var(--color-border-tertiary); display: flex; flex-direction: column; overflow: hidden; }
+.rp-header { padding: 8px 12px; border-bottom: 0.5px solid var(--color-border-tertiary); display: flex; align-items: center; gap: 6px; }
+.rp-title { font-size: 12px; font-weight: 500; color: var(--color-text-secondary); }
+.rp-tabs { display: flex; gap: 2px; margin-left: auto; }
+.rtab { font-size: 10px; padding: 2px 7px; border-radius: var(--border-radius-md); border: 0.5px solid transparent; color: var(--color-text-tertiary); cursor: pointer; }
+.rtab.active { border-color: var(--color-border-tertiary); color: var(--color-text-primary); background: var(--color-background-secondary); }
+.rp-body { flex: 1; overflow-y: auto; padding: 10px 12px; display: flex; flex-direction: column; gap: 8px; }
+
+.chat-msg { display: flex; flex-direction: column; gap: 2px; }
+.chat-who { font-size: 10px; color: var(--color-text-tertiary); }
+.bubble { font-size: 12px; line-height: 1.6; padding: 7px 10px; border-radius: var(--border-radius-md); }
+.bubble.user { background: #EEEDFE; color: #26215C; align-self: flex-end; max-width: 85%; }
+.bubble.ai { background: var(--color-background-secondary); color: var(--color-text-primary); max-width: 95%; }
+.bubble-action { font-size: 10px; color: #7F77DD; margin-top: 3px; cursor: pointer; }
+
+.block-card { border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 7px 9px; cursor: pointer; }
+.block-card:hover { border-color: var(--color-border-secondary); }
+.block-text { font-size: 11px; color: var(--color-text-primary); line-height: 1.5; margin-bottom: 4px; }
+.block-meta { display: flex; gap: 4px; align-items: center; }
+.badge { font-size: 10px; padding: 1px 6px; border-radius: 99px; }
+.bp { background: #EEEDFE; color: #3C3489; }
+.bt { background: #E1F5EE; color: #0F6E56; }
+.ba { background: #FAEEDA; color: #854F0B; }
+.btime { font-size: 10px; color: var(--color-text-tertiary); margin-left: auto; }
+
+.statusbar { grid-column: 1/-1; background: var(--color-background-secondary); border-top: 0.5px solid var(--color-border-tertiary); display: flex; align-items: center; padding: 0 10px; gap: 12px; }
+.sstat { font-size: 10px; color: var(--color-text-tertiary); display: flex; gap: 4px; }
+.sstat span { color: var(--color-text-secondary); }
+.sdiv { width: 0.5px; height: 10px; background: var(--color-border-tertiary); }
+
+.floating-hint { position: absolute; top: 12px; right: 12px; background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 5px 10px; font-size: 10px; color: var(--color-text-tertiary); display: flex; gap: 8px; }
+.fh-key { background: var(--color-background-primary); border: 0.5px solid var(--color-border-secondary); border-radius: 3px; padding: 1px 5px; color: var(--color-text-secondary); }
+</style>
+
+<div class="app">
+
+  <div class="topbar">
+    <span class="logo">BlockOS</span>
+    <span class="doc-title">墨水屏阅读器 · <span>PRD v1</span></span>
+    <div class="top-right">
+      <span class="tbtn">⌘K 块空间</span>
+      <span class="tbtn">侧边栏</span>
+      <span class="tbtn active">AI 面板</span>
+      <span class="tbtn">导出</span>
+    </div>
+  </div>
+
+  <div class="activity-bar">
+    <div class="act-icon active" title="文件">≡</div>
+    <div class="act-icon" title="块空间">◫</div>
+    <div class="act-icon" title="图谱">⬡</div>
+    <div class="act-icon" title="搜索">○</div>
+    <div class="act-spacer"></div>
+    <div class="act-icon" title="插件">⊕</div>
+    <div class="act-icon" title="设置">◎</div>
+  </div>
+
+  <div class="editor-area">
+    <div class="floating-hint">
+      <span><span class="fh-key">⌘K</span> 块空间</span>
+      <span><span class="fh-key">⌘/</span> AI指令</span>
+      <span><span class="fh-key">[[</span> 链接</span>
+    </div>
+
+    <div class="editor-scroll">
+      <div class="editor-doc">
+        <div class="doc-h1">墨水屏阅读器产品需求文档</div>
+        <div class="doc-meta">
+          <span>PRD · v1.0</span>
+          <span>墨水屏项目</span>
+          <span>2026-04-09</span>
+        </div>
+
+        <div class="doc-h2">一、产品定位</div>
+        <div class="doc-p writing">
+          <span class="inline-link">[[墨水屏阅读器]]</span> 的核心竞争力不是硬件参数，而是「不打扰」的阅读体验设计。目标用户是重度阅读者，对续航和护眼有强需求。
+        </div>
+
+        <div class="doc-h2">二、核心硬件需求</div>
+        <div class="doc-p writing">
+          显示刷新率目标 120ms 以内，配合局部刷新技术消除拖影。<span class="block-ref">((block-a1c9))</span>
+        </div>
+
+        <div class="doc-h2">三、交互设计原则</div>
+        <div class="ai-writing">
+          <div class="ai-label">
+            <span style="width:6px;height:6px;border-radius:50%;background:#7F77DD;display:inline-block;"></span>
+            AI 正在根据对话上下文生成…
+            <div class="ai-cursor"></div>
+          </div>
+          <div class="ai-stream">
+            交互设计应遵循「最小干扰」原则：翻页为主要操作，所有功能菜单默认隐藏，用户专注于内容本身。物理按键优先于触屏手势，避免误触打断阅读状态。
+          </div>
+        </div>
+
+        <div class="doc-h2">四、差异化功能</div>
+        <div class="doc-p" style="color:var(--color-text-tertiary);font-style:italic;">
+          点击此处继续写作，或使用 ⌘/ 让 AI 续写…
+        </div>
+      </div>
+    </div>
+
+    <div class="editor-bottom">
+      <div class="cmd-bar">
+        <span class="cmd-prefix">⌘/</span>
+        <input class="cmd-input" placeholder="向 AI 发出指令，直接作用于文档… 如「续写第四节」「把这段改得更简洁」" type="text" value="根据我们的对话，补全第四节差异化功能" />
+        <span class="cmd-hint">↵ 执行</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="right-panel">
+    <div class="rp-header">
+      <span class="rp-title">AI 副驾驶</span>
+      <div class="rp-tabs">
+        <span class="rtab active">对话</span>
+        <span class="rtab">块空间</span>
+        <span class="rtab">Session</span>
+      </div>
+    </div>
+    <div class="rp-body">
+      <div class="chat-msg">
+        <div class="chat-who">你</div>
+        <div class="bubble user">帮我写一份墨水屏阅读器的PRD</div>
+      </div>
+      <div class="chat-msg">
+        <div class="chat-who">AI</div>
+        <div class="bubble ai">好的，我已基于本次 Session 的讨论（刷新率、定位、用户群）开始在文档里生成 PRD 框架。你可以直接在编辑区修改，或继续告诉我调整方向。</div>
+        <div class="bubble-action">↗ 正在写入文档区…</div>
+      </div>
+      <div class="chat-msg">
+        <div class="chat-who">你</div>
+        <div class="bubble user">第三节交互设计原则帮我补充一下</div>
+      </div>
+      <div class="chat-msg">
+        <div class="chat-who">AI</div>
+        <div class="bubble ai">已在第三节生成「最小干扰」交互原则，包含翻页逻辑和物理按键优先策略。</div>
+        <div class="bubble-action">↗ 已写入文档 · 第三节</div>
+      </div>
+
+      <div style="height:0.5px;background:var(--color-border-tertiary);"></div>
+      <div style="font-size:10px;color:var(--color-text-tertiary);">相关块 · 来自块空间</div>
+
+      <div class="block-card">
+        <div class="block-text">刷新率 120ms 以内，配合局部刷新，体验质变</div>
+        <div class="block-meta">
+          <span class="badge bp">AI对话</span>
+          <span class="badge bt">#硬件</span>
+          <span class="btime">14:32</span>
+        </div>
+      </div>
+      <div class="block-card">
+        <div class="block-text">核心竞争力是「不打扰」的阅读体验，不是参数</div>
+        <div class="block-meta">
+          <span class="badge" style="background:#F1EFE8;color:#5F5E5A;">用户输入</span>
+          <span class="badge ba">#定位</span>
+          <span class="btime">13:55</span>
+        </div>
+      </div>
+    </div>
+    <div style="padding:7px 10px;border-top:0.5px solid var(--color-border-tertiary);">
+      <input type="text" placeholder="继续和 AI 对话，或 @块 引用素材…" style="width:100%;font-size:12px;" />
+    </div>
+  </div>
+
+  <div class="statusbar">
+    <div class="sstat">PRD v1 <span>· 已自动保存</span></div>
+    <div class="sdiv"></div>
+    <div class="sstat">Git <span>main · 3 changes</span></div>
+    <div class="sdiv"></div>
+    <div class="sstat">Session <span>2026-04-09.json</span></div>
+    <div class="sdiv"></div>
+    <div class="sstat">块空间 <span>12 块 · 5 未整理</span></div>
+    <div class="sdiv"></div>
+    <div class="sstat" style="margin-left:auto;">插件 <span>基础版 · 无模式</span></div>
+  </div>
+
+</div>

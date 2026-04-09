@@ -1,0 +1,32 @@
+:root {
+  --color-bg-primary: #ffffff;
+  --color-bg-secondary: #f8f9fa;
+  --color-border-primary: #e1e4e8;
+  --color-border-secondary: #d1d5da;
+  --color-text-primary: #24292e;
+  --color-text-secondary: #586069;
+  --color-text-tertiary: #6a737d;
+  --color-purple: #7F77DD;
+  --color-purple-light: #EEEDFE;
+  --border-radius: 6px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
+}
+
+#root {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}

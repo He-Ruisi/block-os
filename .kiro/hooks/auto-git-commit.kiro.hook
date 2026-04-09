@@ -1,0 +1,13 @@
+{
+  "enabled": true,
+  "name": "Auto Git Commit",
+  "description": "每轮对话结束后自动将所有变更提交到 Git，使用智能生成的提交信息",
+  "version": "1",
+  "when": {
+    "type": "agentStop"
+  },
+  "then": {
+    "type": "runCommand",
+    "command": "git add -A && git commit -m \"Auto commit: $(date '+%Y-%m-%d %H:%M')\" || echo \"No changes to commit\""
+  }
+}

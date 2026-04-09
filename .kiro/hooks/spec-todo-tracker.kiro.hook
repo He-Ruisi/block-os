@@ -1,0 +1,15 @@
+{
+  "enabled": true,
+  "name": "Spec & Todo Tracker",
+  "description": "每轮对话结束时提取新需求，创建需求文档到 docs/spec/PRD 目录，并更新 todo.md 待办清单",
+  "version": "1",
+  "when": {
+    "type": "promptSubmit"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "分析本轮对话中的新需求和功能讨论。如果有新需求：1) 在 /Users/mac/Documents/Programming/Coda/block-os/docs/spec/ 创建详细需求文档（文件名：YYYY-MM-DD-feature-name.md）2) 在 /Users/mac/Documents/Programming/Coda/block-os/docs/spec/todo.md 中添加待办事项链接，按优先级排序（P0/P1/P2），保持简洁明了。如果没有新需求则跳过。"
+  },
+  "workspaceFolderName": "Coda",
+  "shortName": "spec-todo-tracker"
+}

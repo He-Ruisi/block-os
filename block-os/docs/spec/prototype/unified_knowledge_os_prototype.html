@@ -1,0 +1,274 @@
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+.app { display: grid; grid-template-columns: 180px 1fr 1fr; grid-template-rows: 38px 1fr 28px; height: 620px; border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); overflow: hidden; background: var(--color-background-primary); font-family: var(--font-sans); }
+.topbar { grid-column: 1/-1; background: var(--color-background-secondary); border-bottom: 0.5px solid var(--color-border-tertiary); display: flex; align-items: center; padding: 0 14px; gap: 10px; }
+.logo { font-size: 13px; font-weight: 500; color: var(--color-text-primary); }
+.top-search { flex: 1; max-width: 240px; font-size: 11px; padding: 3px 8px; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-tertiary); background: var(--color-background-primary); color: var(--color-text-secondary); }
+.top-right { margin-left: auto; display: flex; gap: 6px; align-items: center; }
+.top-btn { font-size: 11px; padding: 3px 9px; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-tertiary); color: var(--color-text-secondary); cursor: pointer; background: transparent; }
+.top-btn.primary { background: #EEEDFE; color: #3C3489; border-color: #AFA9EC; }
+
+.sidebar { background: var(--color-background-secondary); border-right: 0.5px solid var(--color-border-tertiary); padding: 10px 6px; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; }
+.sec-label { font-size: 10px; color: var(--color-text-tertiary); padding: 0 6px; letter-spacing: 0.05em; margin-bottom: 3px; }
+.nav-item { font-size: 12px; color: var(--color-text-secondary); padding: 4px 8px; border-radius: var(--border-radius-md); cursor: pointer; display: flex; align-items: center; gap: 6px; }
+.nav-item:hover, .nav-item.active { background: var(--color-background-primary); color: var(--color-text-primary); }
+.dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.dp { background: #7F77DD; } .dt { background: #1D9E75; } .da { background: #BA7517; } .dc { background: #D85A30; } .dg { background: #888780; }
+.count { margin-left: auto; font-size: 10px; color: var(--color-text-tertiary); background: var(--color-background-primary); border-radius: 99px; padding: 0px 5px; border: 0.5px solid var(--color-border-tertiary); }
+.tag-row { display: flex; flex-wrap: wrap; gap: 4px; padding: 0 4px; }
+.tag { font-size: 10px; padding: 2px 7px; border-radius: 99px; border: 0.5px solid var(--color-border-tertiary); color: var(--color-text-secondary); cursor: pointer; }
+.tag:hover { border-color: var(--color-border-secondary); color: var(--color-text-primary); }
+
+.panel { display: flex; flex-direction: column; overflow: hidden; }
+.panel-header { padding: 8px 12px; border-bottom: 0.5px solid var(--color-border-tertiary); display: flex; align-items: center; gap: 8px; }
+.panel-title { font-size: 12px; font-weight: 500; color: var(--color-text-secondary); }
+.view-tabs { display: flex; gap: 2px; margin-left: auto; }
+.vtab { font-size: 10px; padding: 2px 8px; border-radius: var(--border-radius-md); border: 0.5px solid transparent; color: var(--color-text-tertiary); cursor: pointer; }
+.vtab.active { border-color: var(--color-border-tertiary); color: var(--color-text-primary); background: var(--color-background-primary); }
+.panel-body { flex: 1; overflow-y: auto; padding: 10px 12px; }
+.panel-right { border-left: 0.5px solid var(--color-border-tertiary); }
+
+.chat-msg { margin-bottom: 10px; }
+.chat-who { font-size: 10px; color: var(--color-text-tertiary); margin-bottom: 2px; }
+.bubble { font-size: 12px; line-height: 1.6; color: var(--color-text-primary); background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 7px 10px; }
+.bubble.user { background: #EEEDFE; color: #26215C; }
+.hl { background: #FAEEDA; border-radius: 3px; padding: 0 2px; position: relative; cursor: pointer; }
+.float-menu { position: absolute; top: -34px; left: 0; background: var(--color-background-primary); border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); padding: 4px 8px; font-size: 11px; white-space: nowrap; display: flex; gap: 8px; z-index: 10; }
+.fc { color: #3C3489; cursor: pointer; font-weight: 500; }
+.fc.teal { color: #0F6E56; }
+.fc.coral { color: #993C1D; }
+.chip-row { display: flex; gap: 4px; margin-top: 5px; flex-wrap: wrap; }
+.chip { font-size: 10px; padding: 2px 8px; border-radius: 99px; border: 0.5px solid var(--color-border-tertiary); color: var(--color-text-secondary); cursor: pointer; background: transparent; }
+
+.capture-toast { background: #E1F5EE; border: 0.5px solid #5DCAA5; border-radius: var(--border-radius-md); padding: 6px 10px; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+.toast-text { font-size: 11px; color: #0F6E56; flex: 1; }
+.toast-tag { font-size: 10px; background: #9FE1CB; color: #085041; border-radius: 99px; padding: 1px 7px; }
+
+.block-card { border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 8px 10px; margin-bottom: 7px; cursor: pointer; }
+.block-card:hover { border-color: var(--color-border-secondary); }
+.block-text { font-size: 12px; color: var(--color-text-primary); line-height: 1.5; margin-bottom: 5px; }
+.block-meta { display: flex; gap: 5px; align-items: center; flex-wrap: wrap; }
+.badge { font-size: 10px; padding: 1px 6px; border-radius: 99px; }
+.bp { background: #EEEDFE; color: #3C3489; }
+.bt { background: #E1F5EE; color: #0F6E56; }
+.ba { background: #FAEEDA; color: #854F0B; }
+.bc { background: #FAECE7; color: #993C1D; }
+.bg { background: #F1EFE8; color: #5F5E5A; }
+.btime { font-size: 10px; color: var(--color-text-tertiary); margin-left: auto; }
+
+.canvas-hint { font-size: 11px; color: var(--color-text-tertiary); text-align: center; padding: 16px 0 10px; }
+.canvas-slot { border: 0.5px dashed var(--color-border-secondary); border-radius: var(--border-radius-md); padding: 8px 10px; margin-bottom: 6px; }
+.canvas-slot.filled { border-style: solid; border-color: var(--color-border-tertiary); background: var(--color-background-secondary); }
+.slot-label { font-size: 10px; color: var(--color-text-tertiary); margin-bottom: 4px; }
+.slot-text { font-size: 12px; color: var(--color-text-primary); line-height: 1.5; }
+.slot-ref { font-size: 10px; color: #185FA5; margin-top: 3px; }
+.canvas-actions { display: flex; gap: 6px; margin-top: 10px; }
+.cta-btn { font-size: 11px; padding: 4px 12px; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-secondary); color: var(--color-text-secondary); cursor: pointer; background: transparent; }
+.cta-btn.primary { background: #EEEDFE; color: #3C3489; border-color: #AFA9EC; }
+
+.statusbar { grid-column: 1/-1; background: var(--color-background-secondary); border-top: 0.5px solid var(--color-border-tertiary); display: flex; align-items: center; padding: 0 14px; gap: 16px; }
+.stat { font-size: 10px; color: var(--color-text-tertiary); display: flex; align-items: center; gap: 4px; }
+.stat-val { color: var(--color-text-secondary); font-weight: 500; }
+.divv { width: 0.5px; height: 12px; background: var(--color-border-tertiary); }
+
+.right-panel-body { padding: 10px 12px; }
+.inbox-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.inbox-title { font-size: 11px; color: var(--color-text-tertiary); }
+.inbox-sort { font-size: 10px; color: var(--color-text-tertiary); cursor: pointer; }
+
+.session-bar { display: flex; align-items: center; gap: 6px; padding: 5px 10px; background: var(--color-background-secondary); border-bottom: 0.5px solid var(--color-border-tertiary); }
+.session-label { font-size: 10px; color: var(--color-text-tertiary); }
+.session-val { font-size: 10px; color: var(--color-text-secondary); font-weight: 500; }
+.session-export { font-size: 10px; color: #185FA5; margin-left: auto; cursor: pointer; }
+</style>
+
+<div class="app">
+
+  <div class="topbar">
+    <span class="logo">BlockOS</span>
+    <input class="top-search" placeholder="搜索任意块、标签、项目…" type="text" />
+    <div class="top-right">
+      <span class="top-btn">图谱视图</span>
+      <span class="top-btn">今日回顾</span>
+      <span class="top-btn primary">+ 新建块</span>
+    </div>
+  </div>
+
+  <div class="sidebar">
+    <div>
+      <div class="sec-label">TODAY</div>
+      <div class="nav-item active"><span class="dot da"></span>2026-04-09 <span class="count">12</span></div>
+      <div class="nav-item"><span class="dot dg"></span>收件箱 <span class="count">5</span></div>
+    </div>
+    <div>
+      <div class="sec-label">项目</div>
+      <div class="nav-item"><span class="dot dp"></span>小说 · 失忆研究员</div>
+      <div class="nav-item"><span class="dot dt"></span>墨水屏项目</div>
+      <div class="nav-item"><span class="dot dc"></span>AI 写作工具</div>
+      <div class="nav-item" style="padding-left:14px;font-size:11px;color:var(--color-text-tertiary);">+ 新建项目</div>
+    </div>
+    <div>
+      <div class="sec-label">标签</div>
+      <div class="tag-row">
+        <span class="tag">#灵感</span>
+        <span class="tag">#需求</span>
+        <span class="tag">#人物</span>
+        <span class="tag">#硬件</span>
+        <span class="tag">#PRD</span>
+        <span class="tag">#场景</span>
+        <span class="tag">#待办</span>
+      </div>
+    </div>
+    <div>
+      <div class="sec-label">历史 Session</div>
+      <div class="nav-item"><span class="dot dg"></span>04-08 · 墨水屏讨论</div>
+      <div class="nav-item"><span class="dot dg"></span>04-07 · 小说世界观</div>
+      <div class="nav-item"><span class="dot dg"></span>04-06 · PRD 初稿</div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-header">
+      <span class="panel-title">AI 对话</span>
+      <div class="view-tabs">
+        <span class="vtab active">对话</span>
+        <span class="vtab">Session 历史</span>
+      </div>
+    </div>
+    <div class="session-bar">
+      <span class="session-label">当前 Session：</span>
+      <span class="session-val">2026-04-09 · 墨水屏项目</span>
+      <span class="session-export">导出 JSON ↓</span>
+    </div>
+    <div class="panel-body">
+      <div class="capture-toast">
+        <span class="toast-text">已捕获 1 个块 → 收件箱</span>
+        <span class="toast-tag">#灵感</span>
+        <span class="toast-tag">#墨水屏</span>
+      </div>
+
+      <div class="chat-msg">
+        <div class="chat-who">你</div>
+        <div class="bubble user">墨水屏的刷新率问题怎么解决？做阅读器的话200ms够用吗</div>
+      </div>
+      <div class="chat-msg">
+        <div class="chat-who">AI</div>
+        <div class="bubble">
+          200ms 对静态阅读够用，但翻页动画会有明显拖影。<br><br>
+          <span class="hl">如果刷新率能做到 120ms 以内，配合局部刷新技术，体验会有质变。<div class="float-menu"><span class="fc">💡 灵感</span><span class="fc teal">📋 需求块</span><span class="fc coral">📄 加入PRD</span></div></span><br><br>
+          目前 Eink 的主流方案是 TCON 芯片配合驱动波形优化……
+        </div>
+        <div class="chip-row">
+          <span class="chip">保存整段对话为块</span>
+          <span class="chip">生成需求文档</span>
+          <span class="chip">关联墨水屏项目</span>
+        </div>
+      </div>
+
+      <div class="chat-msg">
+        <div class="chat-who">你</div>
+        <div class="bubble user">帮我生成一份墨水屏阅读器的 PRD 框架</div>
+      </div>
+      <div class="chat-msg">
+        <div class="chat-who">AI</div>
+        <div class="bubble">
+          已基于本次 Session 的讨论生成 PRD 框架，包含：产品定位、核心需求、硬件规格、交互设计……
+          <div class="chip-row" style="margin-top:6px;">
+            <span class="chip" style="background:#E1F5EE;color:#0F6E56;border-color:#5DCAA5;">保存为项目文档 →</span>
+            <span class="chip">拆分为多个块</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="padding:7px 12px;border-top:0.5px solid var(--color-border-tertiary);">
+      <div style="display:flex;gap:6px;align-items:center;">
+        <input type="text" placeholder="输入消息，或 @项目 关联上下文…" style="flex:1;font-size:12px;" />
+        <span class="top-btn">发送</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel panel-right">
+    <div class="panel-header">
+      <span class="panel-title">块空间</span>
+      <div class="view-tabs">
+        <span class="vtab active">收件箱</span>
+        <span class="vtab">画布</span>
+        <span class="vtab">编辑器</span>
+      </div>
+    </div>
+    <div class="panel-body">
+
+      <div class="inbox-header">
+        <span class="inbox-title">未整理的块 · 5</span>
+        <span class="inbox-sort">按时间 ↓</span>
+      </div>
+
+      <div class="block-card">
+        <div class="block-text">如果刷新率能做到 120ms 以内，配合局部刷新技术，体验会有质变。</div>
+        <div class="block-meta">
+          <span class="badge bp">AI对话</span>
+          <span class="badge bt">#灵感</span>
+          <span class="badge bt">#墨水屏</span>
+          <span class="btime">14:32</span>
+        </div>
+      </div>
+
+      <div class="block-card">
+        <div class="block-text">墨水屏阅读器的核心竞争力不是硬件参数，而是"不打扰"的阅读体验设计</div>
+        <div class="block-meta">
+          <span class="badge bg">用户输入</span>
+          <span class="badge ba">#灵感</span>
+          <span class="badge bc">#产品定位</span>
+          <span class="btime">13:55</span>
+        </div>
+      </div>
+
+      <div class="block-card">
+        <div class="block-text">失忆作为叙事装置——读者和主角同步获取世界信息，天然代入感</div>
+        <div class="block-meta">
+          <span class="badge bg">用户输入</span>
+          <span class="badge bp">#小说</span>
+          <span class="badge bt">#灵感</span>
+          <span class="btime">昨天</span>
+        </div>
+      </div>
+
+      <div style="height:0.5px;background:var(--color-border-tertiary);margin:10px 0;"></div>
+      <div style="font-size:11px;color:var(--color-text-tertiary);margin-bottom:8px;">画布预览 · 墨水屏 PRD</div>
+
+      <div class="canvas-slot filled">
+        <div class="slot-label">产品定位</div>
+        <div class="slot-text">不打扰的阅读体验设计</div>
+        <div class="slot-ref">← block-b3f2</div>
+      </div>
+      <div class="canvas-slot filled">
+        <div class="slot-label">核心硬件需求</div>
+        <div class="slot-text">刷新率 120ms 以内，局部刷新</div>
+        <div class="slot-ref">← block-a1c9</div>
+      </div>
+      <div class="canvas-slot">
+        <div class="slot-label" style="color:var(--color-text-tertiary);">交互设计 · 拖入块或让 AI 填充</div>
+      </div>
+
+      <div class="canvas-actions">
+        <span class="cta-btn primary">AI 补全空白块 →</span>
+        <span class="cta-btn">导出为 PRD.md</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="statusbar">
+    <div class="stat">今日捕获 <span class="stat-val">12 块</span></div>
+    <div class="divv"></div>
+    <div class="stat">当前项目 <span class="stat-val">墨水屏</span></div>
+    <div class="divv"></div>
+    <div class="stat">Git <span class="stat-val">main · 5 changes</span></div>
+    <div class="divv"></div>
+    <div class="stat">Session <span class="stat-val">2026-04-09.json · 自动保存</span></div>
+    <div class="divv"></div>
+    <div class="stat" style="margin-left:auto;cursor:pointer;color:#185FA5;">查看今日全部 Session →</div>
+  </div>
+
+</div>
