@@ -1,5 +1,37 @@
 # BlockOS 更新日志
 
+## [v0.2.4] - 2026-04-09 🐛 修复 Block 捕获失败问题
+
+### Bug 修复
+- ✅ **Block 捕获失败**: 修复点击"捕获为Block"直接显示失败的问题
+- ✅ **根本原因**: App.tsx 中未初始化 blockStore，导致 IndexedDB 未准备好
+
+### 技术改进
+- ✅ **App 初始化**: 在 App.tsx 中添加 blockStore.init() 调用
+- ✅ **状态检查**: blockStore 添加 isInitialized() 公共方法
+- ✅ **防御性编程**: captureBlock 函数添加初始化检查，未初始化则先初始化
+- ✅ **详细错误**: 捕获失败时显示具体错误信息（如"Database not initialized"）
+
+### 测试文档
+- ✅ **完整测试用例**: 366 行测试文档，包含浏览器控制台测试脚本
+- ✅ **诊断指南**: 详细的问题诊断流程和修复方案
+- ✅ **快速测试**: 5 步快速验证修复效果
+
+### 文件变更
+- 修改：`src/App.tsx` - 添加 blockStore 初始化
+- 修改：`src/lib/blockStore.ts` - 添加 isInitialized() 方法
+- 修改：`src/components/RightPanel.tsx` - 改进错误处理
+- 新增：`BLOCK_CAPTURE_TEST_CASE.md` - 完整测试用例
+- 新增：`docs/tests/block-capture-debug.md` - 诊断文档
+- 新增：`docs/tests/QUICK_TEST_GUIDE.md` - 快速测试指南
+
+### 技术亮点
+- **双重保障**: App 初始化 + RightPanel 按需初始化
+- **详细错误**: 显示具体错误原因，便于调试
+- **完整测试**: 提供自动化测试脚本，可在控制台一键执行
+
+---
+
 ## [v0.2.3] - 2026-04-09 🐛 修复 Block 刷新和添加 Toast 通知
 
 ### Bug 修复

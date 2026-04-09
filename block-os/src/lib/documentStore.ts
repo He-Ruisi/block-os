@@ -43,7 +43,15 @@ export class DocumentStore {
       request.onupgradeneeded = (event) => {
         const db = (event.target as IDBOpenDBRequest).result
 
-        // 创建 documents store
+        // 创建 blocks store（如果不存在）- 确保与 blockStore 兼容
+        if (!db.objectStoreNames.contains('blocks')) {
+          const blockStore = db.createObjectStore('blocks', { keyPath: 'id' })
+          blockStore.createIndex('tags', 'metadata.tags', { multiEntry: true })
+          blockStore.createIndex('createdAt', 'metadata.createdAt', { unique: false })
+          blockStore.createIndex('type', 'type', { unique: false })
+        }
+
+        // 创建 documents store（如果不存在）
         if (!db.objectStoreNames.contains(this.storeName)) {
           const store = db.createObjectStore(this.storeName, { keyPath: 'id' })
           store.createIndex('updatedAt', 'metadata.updatedAt', { unique: false })
