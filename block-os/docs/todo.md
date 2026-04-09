@@ -19,13 +19,22 @@
 - [x] 双向链接 `[[]]` 语法
 - [x] 块引用 `(())` 语法
 - [x] 链接关系自动维护（插入/删除时自动更新）
+- [x] AI 回复自动创建隐式 Block
+- [x] Block 版本派生系统 - [详细文档](./spec/features/block-system/block-derivative-system.md)
+  - [x] 创建派生版本
+  - [x] 查看派生树
+  - [x] 版本选择器组件
+  - [x] 自动检测修改
+- [x] Git 集成与自动提交
+  - [x] 自动提交功能
+  - [x] 手动提交
+  - [x] 导出为 Markdown
 - [ ] 块空间可视化界面（关系图谱）
 
 ## P1 - 重要功能
 
 ### Phase 4: 本地存储
 - [ ] 文件系统读写 - [详细需求](./spec/PRD/2026-04-09-phase4-local-storage.md)
-- [ ] Git 集成与自动提交
 - [ ] Session 管理与状态恢复
 
 ## P2 - 增强功能

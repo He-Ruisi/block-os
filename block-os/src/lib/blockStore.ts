@@ -19,6 +19,27 @@ export interface Block {
     outgoing: string[]  // 引用的其他 blocks
     incoming: string[]  // 被哪些 blocks 引用
   }
+  // 版本派生相关
+  derivation?: {
+    isDerivative: boolean      // 是否是派生版本
+    sourceBlockId?: string     // 源 Block ID
+    derivedFrom?: string       // 直接派生自哪个版本
+    contextDocumentId?: string // 使用的文档/上下文
+    contextTitle?: string      // 文档标题
+    modifications?: string     // 修改说明
+  }
+}
+
+// Block 派生版本
+export interface BlockDerivative {
+  id: string                   // 派生版本 ID
+  sourceBlockId: string        // 源 Block ID
+  content: string              // 修改后的内容
+  contextDocumentId: string    // 使用的文档
+  contextTitle: string         // 文档标题
+  modifications: string        // 修改说明
+  createdAt: Date
+  createdBy: string            // 创建者（用户 ID）
 }
 
 // IndexedDB 封装类
@@ -245,6 +266,104 @@ export class BlockStore {
       outgoing: outgoing.filter((b): b is Block => b !== null),
       incoming: incoming.filter((b): b is Block => b !== null)
     }
+  }
+
+  // 创建派生版本
+  async createDerivative(
+    sourceBlockId: string,
+    modifiedContent: string,
+    contextDocumentId: string,
+    contextTitle: string,
+    modifications: string = '用户修改'
+  ): Promise<Block> {
+    const sourceBlock = await this.getBlock(sourceBlockId)
+    if (!sourceBlock) throw new Error('Source block not found')
+
+    const derivative: Block = {
+      id: generateUUID(),
+      content: modifiedContent,
+      type: sourceBlock.type,
+      source: {
+        type: 'editor',
+        documentId: contextDocumentId,
+        capturedAt: new Date()
+      },
+      metadata: {
+        title: sourceBlock.metadata.title,
+        tags: [...sourceBlock.metadata.tags, '派生版本'],
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      derivation: {
+        isDerivative: true,
+        sourceBlockId: sourceBlockId,
+        derivedFrom: sourceBlockId,
+        contextDocumentId: contextDocumentId,
+        contextTitle: contextTitle,
+        modifications: modifications
+      }
+    }
+
+    await this.saveBlock(derivative)
+    return derivative
+  }
+
+  // 获取 Block 的所有派生版本
+  async getDerivatives(sourceBlockId: string): Promise<Block[]> {
+    const allBlocks = await this.getAllBlocks()
+    return allBlocks.filter(block => 
+      block.derivation?.isDerivative && 
+      block.derivation.sourceBlockId === sourceBlockId
+    )
+  }
+
+  // 获取派生树（包括源 Block 和所有派生）
+  async getDerivativeTree(blockId: string): Promise<{
+    source: Block | null
+    derivatives: Block[]
+  }> {
+    const block = await this.getBlock(blockId)
+    if (!block) return { source: null, derivatives: [] }
+
+    // 如果是派生版本，找到源 Block
+    const sourceBlockId = block.derivation?.sourceBlockId || blockId
+    const sourceBlock = await this.getBlock(sourceBlockId)
+    
+    // 获取所有派生版本
+    const derivatives = await this.getDerivatives(sourceBlockId)
+
+    return {
+      source: sourceBlock,
+      derivatives: derivatives
+    }
+  }
+
+  // 检测内容是否被修改
+  isContentModified(original: string, modified: string): boolean {
+    return original.trim() !== modified.trim()
+  }
+
+  // 自动检测并创建派生版本
+  async autoCreateDerivativeIfModified(
+    sourceBlockId: string,
+    currentContent: string,
+    contextDocumentId: string,
+    contextTitle: string
+  ): Promise<Block | null> {
+    const sourceBlock = await this.getBlock(sourceBlockId)
+    if (!sourceBlock) return null
+
+    if (this.isContentModified(sourceBlock.content, currentContent)) {
+      return await this.createDerivative(
+        sourceBlockId,
+        currentContent,
+        contextDocumentId,
+        contextTitle,
+        '自动检测到内容修改'
+      )
+    }
+
+    return null
   }
 }
 

@@ -243,6 +243,33 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI }: Ri
           }
         }
       }
+
+      // AI 回复完成后，自动创建隐式 Block
+      if (assistantMessage.trim()) {
+        try {
+          const aiBlock: Block = {
+            id: assistantId, // 使用消息 ID 作为 Block ID
+            content: assistantMessage,
+            type: 'ai-generated',
+            source: {
+              type: 'ai',
+              aiMessageId: assistantId,
+              capturedAt: new Date()
+            },
+            metadata: {
+              title: `AI 回复 - ${new Date().toLocaleString()}`,
+              tags: ['AI回复', '自动生成'],
+              createdAt: new Date(),
+              updatedAt: new Date()
+            }
+          }
+          
+          await blockStore.saveBlock(aiBlock)
+          console.log('[AI Block] Auto-created implicit block:', aiBlock.id)
+        } catch (error) {
+          console.error('[AI Block] Failed to create implicit block:', error)
+        }
+      }
     } catch (error) {
       console.error('发送消息失败:', error)
       setMessages(prev => [...prev, {
