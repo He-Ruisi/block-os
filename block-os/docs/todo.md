@@ -2,6 +2,15 @@
 
 ## P0 - 核心功能（当前优先）
 
+### 多项目工作区 UI 改进 🎨
+- [ ] 左侧边栏可呼出/收起 - [详细需求](./spec/features/editor/multi-project-workspace.md)
+- [ ] 项目管理（今日、项目列表、新建项目）
+- [ ] 多标签页编辑器（每个项目独立标签页）
+- [ ] 全屏模式（隐藏侧边栏和 AI 面板）
+- [ ] 可调整布局（编辑器 ↔ AI 面板拖拽分隔条）
+- [ ] 默认打开"今日"标签页
+- [ ] 项目数据持久化（IndexedDB）
+
 ### 项目架构优化 🔧
 - [x] 设计新的文档组织结构 - [详细方案](./spec/2026-04-09-project-structure-improvement.md)
 - [x] 优化 Hooks 触发时机（改为 agentStop）

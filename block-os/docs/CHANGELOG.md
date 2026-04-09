@@ -1,5 +1,33 @@
 # BlockOS 更新日志
 
+## [v0.2.5] - 2026-04-09 🐛 修复 IndexedDB 版本冲突
+
+### Bug 修复
+- ✅ **IndexedDB 版本冲突**: 修复"尝试用更低版本打开数据库"错误
+- ✅ **根本原因**: blockStore (v1) 和 documentStore (v2) 版本不一致
+
+### 技术改进
+- ✅ **统一版本号**: 将 blockStore 版本从 1 升级到 2
+- ✅ **互相兼容**: 两个 store 的 onupgradeneeded 都能创建对方的 objectStore
+- ✅ **向后兼容**: 从 v1 升级到 v2 时自动创建 documents store
+
+### 用户操作
+需要清除旧数据库后刷新页面：
+```javascript
+indexedDB.deleteDatabase('blockos-db')
+```
+
+### 文件变更
+- 修改：`src/lib/blockStore.ts` - 版本号升级到 2
+- 修改：`src/lib/documentStore.ts` - 添加 blocks store 创建逻辑
+
+### 技术说明
+- IndexedDB 不允许用更低版本打开已存在的数据库
+- Editor 先初始化 documentStore (v2)，点击捕获时 blockStore 尝试打开 v1 导致错误
+- 修复后两个 store 使用统一的 version 2，无论谁先初始化都能正常工作
+
+---
+
 ## [v0.2.4] - 2026-04-09 🐛 修复 Block 捕获失败问题
 
 ### Bug 修复
