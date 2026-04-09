@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { BlockCaptureDialog } from './BlockCaptureDialog'
 import { BlockSpacePanel } from './BlockSpacePanel'
+import { DocumentBlocksPanel } from './DocumentBlocksPanel'
 import { blockStore, generateUUID, Block } from '../lib/blockStore'
 import './RightPanel.css'
 
@@ -18,7 +19,7 @@ interface RightPanelProps {
   onTextSentToAI?: () => void
 }
 
-type PanelTab = 'chat' | 'blocks' | 'session'
+type PanelTab = 'chat' | 'blocks' | 'structure' | 'session'
 
 const DEFAULT_SYSTEM_PROMPT = '你是MiMo，是小米公司研发的AI智能助手。今天的日期：2026-04-09，你的知识截止日期是2024年12月。'
 
@@ -289,6 +290,12 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI }: Ri
             Block空间
           </button>
           <button
+            className={`panel-tab ${activeTab === 'structure' ? 'active' : ''}`}
+            onClick={() => setActiveTab('structure')}
+          >
+            文档结构
+          </button>
+          <button
             className={`panel-tab ${activeTab === 'session' ? 'active' : ''}`}
             onClick={() => setActiveTab('session')}
             disabled
@@ -411,6 +418,8 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI }: Ri
       )}
 
       {activeTab === 'blocks' && <BlockSpacePanel />}
+
+      {activeTab === 'structure' && <DocumentBlocksPanel />}
 
       {activeTab === 'session' && (
         <div className="panel-body">
