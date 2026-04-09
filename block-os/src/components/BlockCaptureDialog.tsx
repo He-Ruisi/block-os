@@ -76,9 +76,17 @@ export function BlockCaptureDialog({ content, onCapture, onCancel }: BlockCaptur
                 value={tagInput}
                 onChange={(e) => setTagInput(e.target.value)}
                 onKeyDown={handleKeyDown}
-                onBlur={handleAddTag}
               />
             </div>
+            {tagInput.trim() && (
+              <button 
+                type="button"
+                className="btn-add-tag"
+                onClick={handleAddTag}
+              >
+                + 添加标签
+              </button>
+            )}
           </div>
 
           <div className="form-group">
