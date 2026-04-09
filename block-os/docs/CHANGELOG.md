@@ -1,5 +1,53 @@
 # BlockOS 更新日志
 
+## [v0.2.0] - 2026-04-09 🚀 Phase 3 完成 - Block 系统核心功能
+
+### 重要里程碑
+Phase 3 基本完成（95%），实现完整的 Block 系统核心功能，包括版本派生、Git 集成等高级特性。
+
+### 核心功能
+- ✅ **AI 回复自动 Block 化**: 每个 AI 回复自动保存为隐式 Block，无需手动操作
+- ✅ **Block 版本派生系统**: 
+  - 创建派生版本（记录来源、上下文、修改说明）
+  - 查看派生树（源 Block + 所有派生版本）
+  - 版本选择器（可视化选择源或派生版本）
+  - 自动检测修改并创建派生
+- ✅ **Git 集成**: 
+  - 自动提交（定时 5 分钟）
+  - 手动提交（支持自定义消息）
+  - 导出为 Markdown（Block 和文档）
+- ✅ **Bug 修复**: 
+  - 修复 Block 捕获对话框无响应
+  - 修复 Markdown 解析无限嵌套
+
+### 技术实现
+- 扩展 Block 数据模型，添加 `derivation` 字段
+- 新增 6 个派生版本管理 API
+- 创建 `BlockDerivativeSelector` 组件
+- 实现 `GitIntegration` 模块
+
+### 新增文件
+- `src/lib/gitIntegration.ts` - Git 集成核心逻辑（300+ 行）
+- `src/components/BlockDerivativeSelector.tsx` - 版本选择器（200+ 行）
+- `src/components/BlockDerivativeSelector.css` - 样式定义（250+ 行）
+- `docs/spec/features/block-system/block-derivative-system.md` - 完整文档（600+ 行）
+- `BLOCK_CAPTURE_TEST.md` - 测试文档（500+ 行）
+
+### Phase 3 进度
+- ✅ 隐式 Block 系统（100%）
+- ✅ Block 数据模型完善（100%）
+- ✅ 双向链接 `[[]]` 语法（100%）
+- ✅ 块引用 `(())` 语法（100%）
+- ✅ 链接关系自动维护（100%）
+- ✅ AI 回复自动创建 Block（100%）
+- ✅ Block 版本派生系统（100%）
+- ✅ Git 集成（100%）
+- ⏳ 关系图谱可视化（0%）
+
+**总体完成度: 95%**
+
+---
+
 ## [v0.1.2] - 2026-04-09 🛠️ Fix Skill 系统上线
 
 ### 新功能
