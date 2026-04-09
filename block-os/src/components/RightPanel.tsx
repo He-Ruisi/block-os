@@ -4,12 +4,17 @@ import './RightPanel.css'
 interface Message {
   role: 'user' | 'assistant'
   content: string
+  insertedToEditor?: boolean
+}
+
+interface RightPanelProps {
+  onInsertContent?: (content: string) => void
 }
 
 const MIMO_API_KEY = import.meta.env.VITE_MIMO_API_KEY || ''
 const MIMO_API_URL = 'https://api.xiaomimimo.com/v1/chat/completions'
 
-export function RightPanel() {
+export function RightPanel({ onInsertContent }: RightPanelProps) {
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -22,6 +27,20 @@ export function RightPanel() {
   useEffect(() => {
     scrollToBottom()
   }, [messages])
+
+  const insertToEditor = (messageIndex: number) => {
+    const message = messages[messageIndex]
+    if (message.role === 'assistant' && onInsertContent) {
+      onInsertContent(message.content)
+      
+      // 标记为已插入
+      setMessages(prev => {
+        const newMessages = [...prev]
+        newMessages[messageIndex] = { ...message, insertedToEditor: true }
+        return newMessages
+      })
+    }
+  }
 
   const sendMessage = async () => {
     if (!input.trim() || isLoading) return
@@ -62,7 +81,7 @@ export function RightPanel() {
       const decoder = new TextDecoder()
       let assistantMessage = ''
 
-      setMessages(prev => [...prev, { role: 'assistant', content: '' }])
+      setMessages(prev => [...prev, { role: 'assistant', content: '', insertedToEditor: false }])
 
       while (reader) {
         const { done, value } = await reader.read()
@@ -84,7 +103,8 @@ export function RightPanel() {
                 const newMessages = [...prev]
                 newMessages[newMessages.length - 1] = {
                   role: 'assistant',
-                  content: assistantMessage
+                  content: assistantMessage,
+                  insertedToEditor: false
                 }
                 return newMessages
               })
@@ -98,7 +118,8 @@ export function RightPanel() {
       console.error('发送消息失败:', error)
       setMessages(prev => [...prev, {
         role: 'assistant',
-        content: '抱歉，发送消息时出现错误。请检查 API 配置。'
+        content: '抱歉，发送消息时出现错误。请检查 API 配置。',
+        insertedToEditor: false
       }])
     } finally {
       setIsLoading(false)
@@ -126,7 +147,7 @@ export function RightPanel() {
               <div className="placeholder-icon">🤖</div>
               <div className="placeholder-text">开始与 AI 对话</div>
               <div className="placeholder-hint">
-                输入消息开始智能写作辅助
+                AI 回复可直接写入编辑器
               </div>
             </div>
           ) : (
@@ -135,7 +156,18 @@ export function RightPanel() {
                 <div className="message-avatar">
                   {msg.role === 'user' ? '👤' : '🤖'}
                 </div>
-                <div className="message-content">{msg.content}</div>
+                <div className="message-wrapper">
+                  <div className="message-content">{msg.content}</div>
+                  {msg.role === 'assistant' && msg.content && (
+                    <button
+                      className={`insert-button ${msg.insertedToEditor ? 'inserted' : ''}`}
+                      onClick={() => insertToEditor(idx)}
+                      disabled={msg.insertedToEditor}
+                    >
+                      {msg.insertedToEditor ? '✓ 已写入编辑器' : '↗ 写入编辑器'}
+                    </button>
+                  )}
+                </div>
               </div>
             ))
           )}

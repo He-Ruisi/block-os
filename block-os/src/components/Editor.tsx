@@ -1,8 +1,13 @@
-import { useEditor, EditorContent } from '@tiptap/react'
+import { useEffect } from 'react'
+import { useEditor, EditorContent, Editor as TiptapEditor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import './Editor.css'
 
-export function Editor() {
+interface EditorProps {
+  onEditorReady?: (editor: TiptapEditor) => void
+}
+
+export function Editor({ onEditorReady }: EditorProps) {
   const editor = useEditor({
     extensions: [StarterKit],
     content: `
@@ -23,6 +28,12 @@ export function Editor() {
       },
     },
   })
+
+  useEffect(() => {
+    if (editor && onEditorReady) {
+      onEditorReady(editor)
+    }
+  }, [editor, onEditorReady])
 
   return (
     <div className="editor-container">
