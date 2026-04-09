@@ -6,6 +6,7 @@ export interface Document {
   title: string
   content: string // JSON 格式的编辑器内容
   blocks: DocumentBlock[] // 文档中的隐式 Block
+  projectId?: string // 所属项目 ID（可选）
   metadata: {
     createdAt: Date
     updatedAt: Date
@@ -227,12 +228,13 @@ export class DocumentStore {
   }
 
   // 创建新文档
-  async createDocument(title: string = '无标题文档'): Promise<Document> {
+  async createDocument(title: string = '无标题文档', projectId?: string): Promise<Document> {
     const doc: Document = {
       id: generateUUID(),
       title,
       content: '',
       blocks: [],
+      projectId,
       metadata: {
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -262,7 +264,39 @@ export class DocumentStore {
       request.onerror = () => reject(request.error)
     })
   }
+
+  // 获取项目下的所有文档
+  async getDocumentsByProject(projectId: string): Promise<Document[]> {
+    const allDocs = await this.getAllDocuments()
+    return allDocs.filter(doc => doc.projectId === projectId)
+  }
+
+  // 获取今日文档（今天创建或修改的）
+  async getTodayDocuments(): Promise<Document[]> {
+    const allDocs = await this.getAllDocuments()
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    
+    return allDocs.filter(doc => {
+      const updatedAt = new Date(doc.metadata.updatedAt)
+      updatedAt.setHours(0, 0, 0, 0)
+      return updatedAt.getTime() === today.getTime()
+    })
+  }
+
+  // 更新文档的项目归属
+  async updateDocumentProject(documentId: string, projectId: string | undefined): Promise<void> {
+    const doc = await this.getDocument(documentId)
+    if (!doc) throw new Error('Document not found')
+    
+    doc.projectId = projectId
+    doc.metadata.updatedAt = new Date()
+    await this.saveDocument(doc)
+  }
 }
 
 // 单例实例
 export const documentStore = new DocumentStore()
+
+// 导出 generateUUID 供其他模块使用
+export { generateUUID } from './blockStore'

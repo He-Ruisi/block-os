@@ -6,6 +6,7 @@ import { Editor } from './components/Editor'
 import { ResizeHandle } from './components/ResizeHandle'
 import { RightPanel } from './components/RightPanel'
 import { blockStore } from './lib/blockStore'
+import { documentStore } from './lib/documentStore'
 import { projectStore, Tab } from './lib/projectStore'
 import './App.css'
 
@@ -36,6 +37,7 @@ function App() {
   useEffect(() => {
     blockStore.init().catch(console.error)
     projectStore.init().catch(console.error)
+    documentStore.init().catch(console.error)
     
     // 计算初始编辑器宽度（60%）
     const calculateEditorWidth = () => {
@@ -121,15 +123,33 @@ function App() {
   }
 
   // 处理新建标签页
-  const handleNewTab = () => {
-    const newTab: Tab = {
-      id: 'new-' + Date.now(),
-      type: 'document',
-      title: '新文档',
-      isDirty: false
+  const handleNewTab = async () => {
+    try {
+      // 创建新文档，如果当前在项目中则关联到项目
+      const projectId = currentProjectId && currentProjectId !== 'today' ? currentProjectId : undefined
+      const doc = await documentStore.createDocument('新文档', projectId)
+      
+      console.log('[App] Created new document:', doc.id, 'projectId:', projectId)
+      
+      // 如果文档关联到项目，更新项目的文档列表
+      if (projectId) {
+        await projectStore.addDocumentToProject(projectId, doc.id)
+      }
+      
+      const newTab: Tab = {
+        id: 'doc-' + doc.id,
+        type: 'document',
+        documentId: doc.id,
+        projectId: projectId,
+        title: doc.title,
+        isDirty: false
+      }
+      setTabs([...tabs, newTab])
+      setActiveTabId(newTab.id)
+    } catch (error) {
+      console.error('[App] Failed to create new document:', error)
+      alert('创建文档失败：' + (error instanceof Error ? error.message : '未知错误'))
     }
-    setTabs([...tabs, newTab])
-    setActiveTabId(newTab.id)
   }
 
   // 处理全屏切换

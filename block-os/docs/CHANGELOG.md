@@ -1,5 +1,90 @@
 # BlockOS 更新日志
 
+## [v0.3.0] - 2026-04-09 🚀 多项目工作区系统
+
+### 重要里程碑
+实现完整的多项目工作区系统，支持项目管理、多标签页编辑、全屏模式和灵活布局。
+
+### 核心功能
+- ✅ **左侧边栏**：可收起/展开（☰ 按钮），收起时 60px，展开时 240px
+- ✅ **项目管理**：
+  - 创建项目（弹出对话框）
+  - 项目列表显示（按更新时间排序）
+  - 项目切换（点击项目名）
+  - 项目数据持久化（IndexedDB）
+- ✅ **多标签页编辑器**：
+  - 每个项目独立标签页
+  - 默认打开"今日"标签页
+  - 支持切换、关闭、新建标签页
+  - 未保存状态标记（圆点）
+- ✅ **全屏模式**：
+  - 点击 ⛶ 按钮进入全屏
+  - 隐藏侧边栏和 AI 面板
+  - 编辑器占满整个窗口
+- ✅ **可调整布局**：
+  - 拖拽分隔条调整编辑器和 AI 面板宽度
+  - 双击恢复默认比例（60/40）
+  - 实时预览
+
+### 新增文件
+- `src/lib/projectStore.ts` - 项目存储和管理（200+ 行）
+- `src/components/Sidebar.tsx` + `.css` - 左侧边栏（600+ 行）
+- `src/components/TabBar.tsx` + `.css` - 标签栏（230+ 行）
+- `src/components/ResizeHandle.tsx` + `.css` - 分隔条（110+ 行）
+- `docs/spec/features/editor/multi-project-workspace.md` - 完整需求文档
+- `MULTI_PROJECT_QUICK_START.md` - 快速开始指南
+
+### 修改文件
+- `src/App.tsx` - 集成所有新组件，管理全局状态
+- `src/App.css` - 更新布局样式
+
+### 数据模型
+```typescript
+interface Project {
+  id: string
+  name: string
+  description?: string
+  documents: string[]
+  metadata: { createdAt, updatedAt, color?, icon? }
+}
+
+interface Tab {
+  id: string
+  type: 'today' | 'project' | 'document'
+  projectId?: string
+  title: string
+  isDirty: boolean
+}
+```
+
+### 用户体验
+- 启动时自动打开"今日"标签页
+- 点击项目在新标签页打开
+- 平滑动画过渡（300ms）
+- 拖拽分隔条实时预览
+- 双击分隔条恢复默认
+
+### 技术实现
+- IndexedDB 数据持久化（projects store）
+- 完整的 TypeScript 类型定义
+- 模块化组件设计
+- 性能优化（useRef 避免重渲染）
+
+### 待优化功能
+- 标签页拖拽重排序
+- 标签页右键菜单
+- 项目重命名和删除
+- 快捷键支持
+- 布局偏好持久化
+
+### 代码统计
+- 新增代码：约 1500 行
+- 新增文件：7 个
+- 修改文件：2 个
+- 类型检查：✅ 通过
+
+---
+
 ## [v0.2.5] - 2026-04-09 🐛 修复 IndexedDB 版本冲突
 
 ### Bug 修复

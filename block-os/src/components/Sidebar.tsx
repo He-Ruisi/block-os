@@ -41,13 +41,26 @@ export function Sidebar({
 
   // 创建新项目
   const handleCreateProject = async () => {
-    if (!newProjectName.trim()) return
+    if (!newProjectName.trim()) {
+      console.log('[Sidebar] Project name is empty')
+      return
+    }
 
     try {
+      console.log('[Sidebar] Creating project:', newProjectName.trim())
+      
+      // 确保 projectStore 已初始化
+      if (!projectStore.isInitialized()) {
+        console.log('[Sidebar] Initializing projectStore...')
+        await projectStore.init()
+      }
+      
       const project = await projectStore.createProject(
         newProjectName.trim(),
         newProjectDescription.trim() || undefined
       )
+      
+      console.log('[Sidebar] Project created:', project.id)
       
       setProjects(prev => [project, ...prev])
       setShowNewProjectDialog(false)
@@ -57,7 +70,8 @@ export function Sidebar({
       // 自动选中新项目
       onSelectProject(project.id)
     } catch (error) {
-      console.error('Failed to create project:', error)
+      console.error('[Sidebar] Failed to create project:', error)
+      alert('创建项目失败：' + (error instanceof Error ? error.message : '未知错误'))
     }
   }
 
