@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { BlockSpacePanel } from './BlockSpacePanel'
 import { DocumentBlocksPanel } from './DocumentBlocksPanel'
+import { Toast } from './Toast'
 import { blockStore, generateUUID, Block } from '../lib/blockStore'
 import './RightPanel.css'
 
@@ -33,6 +34,10 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI }: Ri
   const [showSettings, setShowSettings] = useState(false)
   const [systemPrompt, setSystemPrompt] = useState(DEFAULT_SYSTEM_PROMPT)
   const [tempSystemPrompt, setTempSystemPrompt] = useState(DEFAULT_SYSTEM_PROMPT)
+  
+  // Toast 通知
+  const [toastMessage, setToastMessage] = useState<string | null>(null)
+  const [toastType, setToastType] = useState<'success' | 'error' | 'info'>('success')
   
   // Block 捕获相关（已移除对话框，直接保存）
   
@@ -91,6 +96,12 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI }: Ri
     }
   }
 
+  // 显示 Toast
+  const showToast = (message: string, type: 'success' | 'error' | 'info' = 'success') => {
+    setToastMessage(message)
+    setToastType(type)
+  }
+
   // 直接捕获 Block（不弹出对话框）
   const captureBlock = async (messageId: string) => {
     const message = messages.find(m => m.id === messageId)
@@ -118,10 +129,17 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI }: Ri
       await blockStore.saveBlock(block)
       console.log('[Block Capture] Block saved successfully:', block.id)
       
+      // 触发 Block 更新事件
+      window.dispatchEvent(new Event('blockUpdated'))
+      
+      // 显示成功提示
+      showToast('Block 捕获成功！', 'success')
+      
       // 切换到 Block 空间标签页
       setActiveTab('blocks')
     } catch (error) {
       console.error('[Block Capture] Failed to save block:', error)
+      showToast('Block 捕获失败，请重试', 'error')
     }
   }
 
@@ -255,6 +273,9 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI }: Ri
           
           await blockStore.saveBlock(aiBlock)
           console.log('[AI Block] Auto-created implicit block:', aiBlock.id)
+          
+          // 触发 Block 更新事件
+          window.dispatchEvent(new Event('blockUpdated'))
         } catch (error) {
           console.error('[AI Block] Failed to create implicit block:', error)
         }
@@ -447,6 +468,13 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI }: Ri
         </div>
       )}
 
+      {toastMessage && (
+        <Toast
+          message={toastMessage}
+          type={toastType}
+          onClose={() => setToastMessage(null)}
+        />
+      )}
     </div>
   )
 }

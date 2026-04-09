@@ -32,6 +32,17 @@ export function BlockSpacePanel() {
     loadBlocks()
   }, [])
 
+  // 监听 Block 更新事件
+  useEffect(() => {
+    const handleBlockUpdate = () => {
+      console.log('[BlockSpacePanel] Reloading blocks...')
+      loadBlocks()
+    }
+
+    window.addEventListener('blockUpdated', handleBlockUpdate)
+    return () => window.removeEventListener('blockUpdated', handleBlockUpdate)
+  }, [])
+
   // 监听显示 Block 事件
   useEffect(() => {
     const handleShowBlock = (e: Event) => {
