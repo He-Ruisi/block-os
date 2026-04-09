@@ -9,10 +9,11 @@ interface BlockCaptureDialogProps {
 
 export function BlockCaptureDialog({ content, onCapture, onCancel }: BlockCaptureDialogProps) {
   const [title, setTitle] = useState('')
-  const [tagInput, setTagInput] = useState('')
   const [tags, setTags] = useState<string[]>([])
+  const [tagInput, setTagInput] = useState('')
 
-  const handleAddTag = () => {
+  // 添加标签
+  const addTag = () => {
     const trimmedTag = tagInput.trim()
     if (trimmedTag && !tags.includes(trimmedTag)) {
       setTags([...tags, trimmedTag])
@@ -20,41 +21,59 @@ export function BlockCaptureDialog({ content, onCapture, onCancel }: BlockCaptur
     }
   }
 
-  const handleRemoveTag = (tagToRemove: string) => {
+  // 移除标签
+  const removeTag = (tagToRemove: string) => {
     setTags(tags.filter(tag => tag !== tagToRemove))
   }
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
+  // 处理标签输入框的 Enter 键
+  const handleTagInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       e.preventDefault()
-      handleAddTag()
+      addTag()
     }
   }
 
+  // 处理捕获
   const handleCapture = () => {
-    console.log('handleCapture called', { title, tags })
+    console.log('[BlockCapture] Capture triggered', { title, tags })
     onCapture(title, tags)
   }
 
-  const handleCaptureClick = (e: React.MouseEvent) => {
-    e.preventDefault()
+  // 处理取消
+  const handleCancel = () => {
+    console.log('[BlockCapture] Cancel triggered')
+    onCancel()
+  }
+
+  // 阻止对话框内容区域的点击事件冒泡到 overlay
+  const handleContentClick = (e: React.MouseEvent) => {
     e.stopPropagation()
-    console.log('Capture button clicked', { title, tags })
-    handleCapture()
   }
 
   return (
-    <div className="dialog-overlay" onClick={onCancel}>
-      <div className="dialog-content" onClick={(e) => e.stopPropagation()}>
+    <div className="dialog-overlay" onClick={handleCancel}>
+      <div className="dialog-content" onClick={handleContentClick}>
+        {/* 头部 */}
         <div className="dialog-header">
           <h3>捕获为 Block</h3>
-          <button className="dialog-close" onClick={onCancel}>×</button>
+          <button
+            type="button"
+            className="dialog-close"
+            onClick={handleCancel}
+            aria-label="关闭"
+          >
+            ×
+          </button>
         </div>
 
+        {/* 主体 */}
         <div className="dialog-body">
+          {/* 标题输入 */}
           <div className="form-group">
-            <label>标题（可选）</label>
+            <label htmlFor="block-title">标题（可选）</label>
             <input
+              id="block-title"
               type="text"
               className="form-input"
               placeholder="为这个 Block 添加标题..."
@@ -63,60 +82,67 @@ export function BlockCaptureDialog({ content, onCapture, onCancel }: BlockCaptur
             />
           </div>
 
+          {/* 标签输入 */}
           <div className="form-group">
-            <label>标签</label>
+            <label htmlFor="block-tags">标签（可选）</label>
             <div className="tags-container">
-              {tags.map(tag => (
+              {tags.map((tag) => (
                 <span key={tag} className="tag">
-                  #{tag}
-                  <button 
+                  {tag}
+                  <button
+                    type="button"
                     className="tag-remove"
-                    onClick={() => handleRemoveTag(tag)}
+                    onClick={() => removeTag(tag)}
+                    aria-label={`移除标签 ${tag}`}
                   >
                     ×
                   </button>
                 </span>
               ))}
               <input
+                id="block-tags"
                 type="text"
                 className="tag-input"
-                placeholder="添加标签..."
+                placeholder="输入标签后按 Enter..."
                 value={tagInput}
                 onChange={(e) => setTagInput(e.target.value)}
-                onKeyDown={handleKeyDown}
+                onKeyDown={handleTagInputKeyDown}
               />
             </div>
             {tagInput.trim() && (
-              <button 
+              <button
                 type="button"
                 className="btn-add-tag"
-                onClick={handleAddTag}
+                onClick={addTag}
               >
                 + 添加标签
               </button>
             )}
           </div>
 
+          {/* 内容预览 */}
           <div className="form-group">
-            <label>预览</label>
+            <label>内容预览</label>
             <div className="content-preview">
-              {content}
+              {content.slice(0, 500)}
+              {content.length > 500 && '...'}
             </div>
           </div>
         </div>
 
+        {/* 底部按钮 */}
         <div className="dialog-footer">
-          <button 
+          <button
             type="button"
-            className="btn-secondary" 
-            onClick={onCancel}
+            className="btn-secondary"
+            onClick={handleCancel}
           >
             取消
           </button>
-          <button 
+          <button
             type="button"
-            className="btn-primary" 
-            onClick={handleCaptureClick}
+            className="btn-primary"
+            onClick={handleCapture}
           >
             捕获
           </button>
