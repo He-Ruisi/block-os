@@ -9,6 +9,7 @@
 - [x] 创建新的目录结构（logs/YYYY-MM/, spec/features/）
 - [x] 更新 3 个 Hooks 配置文件
 - [x] 创建架构文档（ARCHITECTURE.md, QUICK_START.md 等）
+- [x] 创建 Fix Skill 用于系统化 bug 修复 - [使用指南](./guide/developer/bug-fixing-guide.md)
 - [ ] 清理旧的分散日志文件
 - [ ] 移动现有需求文档到功能分类目录
 
