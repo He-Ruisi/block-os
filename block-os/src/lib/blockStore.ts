@@ -76,6 +76,11 @@ export class BlockStore {
     })
   }
 
+  // 检查数据库是否已初始化
+  isInitialized(): boolean {
+    return this.db !== null
+  }
+
   // 保存 Block
   async saveBlock(block: Block): Promise<string> {
     if (!this.db) throw new Error('Database not initialized')

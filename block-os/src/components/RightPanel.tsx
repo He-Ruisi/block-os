@@ -108,6 +108,12 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI }: Ri
     if (!message || message.role !== 'assistant') return
 
     try {
+      // 确保 blockStore 已初始化
+      if (!blockStore.isInitialized()) {
+        console.log('[Block Capture] Initializing blockStore...')
+        await blockStore.init()
+      }
+
       const content = message.editorContent || message.content
       const block: Block = {
         id: generateUUID(),
@@ -139,7 +145,10 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI }: Ri
       setActiveTab('blocks')
     } catch (error) {
       console.error('[Block Capture] Failed to save block:', error)
-      showToast('Block 捕获失败，请重试', 'error')
+      
+      // 显示详细错误信息
+      const errorMessage = error instanceof Error ? error.message : '未知错误'
+      showToast(`Block 捕获失败: ${errorMessage}`, 'error')
     }
   }
 

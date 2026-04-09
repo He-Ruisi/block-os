@@ -1,5 +1,34 @@
 # BlockOS 更新日志
 
+## [v0.2.3] - 2026-04-09 🐛 修复 Block 刷新和添加 Toast 通知
+
+### Bug 修复
+- ✅ **Block 空间不刷新**: 修复捕获 Block 后列表不更新的问题
+- ✅ **缺少用户反馈**: 添加 Toast 通知组件，显示操作结果
+
+### 新增功能
+- ✅ **Toast 通知组件**: 支持 success/error/info 三种类型
+- ✅ **全局事件系统**: 使用 `blockUpdated` 事件实现组件间通信
+- ✅ **自动刷新**: Block 保存后自动刷新列表
+
+### 技术实现
+- 全局事件 `blockUpdated` 触发 BlockSpacePanel 重新加载
+- Toast 组件自动消失（3秒），平滑动画
+- 手动捕获和 AI 自动创建都触发刷新
+
+### 用户体验
+- 捕获成功显示绿色提示："Block 捕获成功！"
+- 捕获失败显示红色提示："Block 捕获失败，请重试"
+- Toast 固定在右上角，不遮挡主要内容
+
+### 文件变更
+- 新增：`src/components/Toast.tsx` - Toast 通知组件
+- 新增：`src/components/Toast.css` - Toast 样式
+- 修改：`src/components/BlockSpacePanel.tsx` - 事件监听
+- 修改：`src/components/RightPanel.tsx` - 集成 Toast
+
+---
+
 ## [v0.2.2] - 2026-04-09 ⚡ Block 直接捕获（移除对话框）
 
 ### 用户体验优化

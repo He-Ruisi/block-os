@@ -1,13 +1,21 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Editor as TiptapEditor } from '@tiptap/react'
 import { ActivityBar } from './components/ActivityBar'
 import { Editor } from './components/Editor'
 import { RightPanel } from './components/RightPanel'
+import { blockStore } from './lib/blockStore'
 import './App.css'
 
 function App() {
   const [editor, setEditor] = useState<TiptapEditor | null>(null)
   const [selectedText, setSelectedText] = useState<string>('')
+
+  // 初始化 blockStore
+  useEffect(() => {
+    blockStore.init().catch(error => {
+      console.error('Failed to initialize blockStore:', error)
+    })
+  }, [])
 
   const handleInsertAIContent = (content: string) => {
     if (editor) {
