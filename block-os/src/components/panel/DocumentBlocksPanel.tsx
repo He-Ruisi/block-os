@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
-import { documentStore, DocumentBlock } from '../../storage/documentStore'
+import type { DocumentBlock } from '../../types/document'
+import { documentStore } from '../../storage/documentStore'
 import './DocumentBlocksPanel.css'
 
 export function DocumentBlocksPanel() {

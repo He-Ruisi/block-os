@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
-import { Block, blockStore } from '../../storage/blockStore'
+import type { Block } from '../../types/block'
+import { blockStore } from '../../storage/blockStore'
 import { formatDateTime } from '../../utils/date'
 import './BlockDerivativeSelector.css'
 
