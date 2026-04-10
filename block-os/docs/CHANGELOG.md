@@ -1,5 +1,71 @@
 # BlockOS 更新日志
 
+## [v0.3.2] - 2026-04-09 🐛 关键问题修复
+
+### Bug 修复
+- ✅ **创建项目失败**: 修复 IndexedDB `projects` store 不存在的问题
+- ✅ **文档跳转**: 修复创建文档后不跳转到编辑区的问题
+
+### 技术改进
+- ✅ **数据库版本升级**: 统一所有 store 到 version 3
+- ✅ **互相兼容**: 每个 store 都创建所有需要的 objectStores
+- ✅ **文档加载**: Editor 组件支持 documentId prop，自动加载文档
+- ✅ **标签页切换**: 切换标签页时自动加载对应文档
+
+### 问题详情
+
+**问题 1：创建项目失败**
+```
+Failed to execute 'transaction' on 'IDBDatabase': 
+One of the specified object stores was not found.
+```
+
+**原因**：
+- 数据库已经是 version 2（由其他 store 创建）
+- projectStore 的 onupgradeneeded 不触发
+- projects store 未创建
+
+**解决方案**：
+- 升级所有 store 到 version 3
+- 确保每个 store 都创建 projects store
+
+**问题 2：创建文档后不跳转**
+
+**原因**：
+- Editor 组件不知道应该加载哪个文档
+- 始终显示默认内容
+
+**解决方案**：
+- Editor 添加 documentId prop
+- 监听 documentId 变化，自动加载文档
+- App 传递当前活动标签页的 documentId
+
+### 用户操作
+
+**重要：需要清除旧数据库！**
+
+在浏览器控制台执行：
+```javascript
+indexedDB.deleteDatabase('blockos-db').onsuccess = () => {
+  location.reload();
+};
+```
+
+### 文件变更
+- 修改：`src/lib/blockStore.ts` - 版本升级到 3
+- 修改：`src/lib/documentStore.ts` - 版本升级到 3
+- 修改：`src/lib/projectStore.ts` - 版本升级到 3
+- 修改：`src/components/Editor.tsx` - 添加 documentId 支持
+- 修改：`src/App.tsx` - 传递 documentId
+
+### 效果
+- 创建项目成功
+- 创建文档后编辑器自动清空
+- 切换标签页自动加载对应文档
+- 真正的多文档编辑
+
+---
+
 ## [v0.3.1] - 2026-04-09 📁 文档管理系统
 
 ### Bug 修复
