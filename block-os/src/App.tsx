@@ -1,232 +1,95 @@
 import { useState, useEffect } from 'react'
 import { Editor as TiptapEditor } from '@tiptap/react'
-import { Sidebar } from './components/Sidebar'
-import { TabBar } from './components/TabBar'
-import { Editor } from './components/Editor'
-import { ResizeHandle } from './components/ResizeHandle'
-import { RightPanel } from './components/RightPanel'
-import { blockStore } from './storage/blockStore'
-import { documentStore } from './storage/documentStore'
-import { projectStore } from './storage/projectStore'
-import type { Tab } from './types/project'
+import { Sidebar } from './components/layout/Sidebar'
+import { TabBar } from './components/layout/TabBar'
+import { Editor } from './components/editor/Editor'
+import { ResizeHandle } from './components/layout/ResizeHandle'
+import { RightPanel } from './components/panel/RightPanel'
+import { initStorage } from './storage'
 import { markdownToHtml } from './utils/markdown'
+import { useAppLayout } from './hooks/useAppLayout'
+import { useTabs } from './hooks/useTabs'
 import './App.css'
 
 function App() {
   const [editor, setEditor] = useState<TiptapEditor | null>(null)
-  const [selectedText, setSelectedText] = useState<string>('')
-  
-  // 侧边栏状态
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
-  
-  // 标签页状态
-  const [tabs, setTabs] = useState<Tab[]>([
-    {
-      id: 'today',
-      type: 'today',
-      title: '今日',
-      isDirty: false
-    }
-  ])
-  const [activeTabId, setActiveTabId] = useState('today')
-  const [currentProjectId, setCurrentProjectId] = useState<string | null>('today')
-  
-  // 布局状态
-  const [isFullscreen, setIsFullscreen] = useState(false)
-  const [editorWidth, setEditorWidth] = useState(0)
+  const [selectedText, setSelectedText] = useState('')
 
-  // 初始化
+  const {
+    sidebarCollapsed,
+    isFullscreen,
+    editorWidth,
+    toggleSidebar,
+    toggleFullscreen,
+    setEditorWidth,
+    minEditorWidth,
+    maxEditorWidth,
+  } = useAppLayout()
+
+  const {
+    tabs,
+    activeTabId,
+    currentProjectId,
+    selectTab,
+    closeTab,
+    selectToday,
+    selectProject,
+    newTab,
+  } = useTabs()
+
+  // 统一初始化所有 Store
   useEffect(() => {
-    blockStore.init().catch(console.error)
-    projectStore.init().catch(console.error)
-    documentStore.init().catch(console.error)
-    
-    // 计算初始编辑器宽度（60%）
-    const calculateEditorWidth = () => {
-      const windowWidth = window.innerWidth
-      const sidebarWidth = sidebarCollapsed ? 60 : 240
-      return (windowWidth - sidebarWidth) * 0.6
-    }
-    
-    setEditorWidth(calculateEditorWidth())
-    
-    // 监听窗口大小变化
-    const handleResize = () => {
-      setEditorWidth(calculateEditorWidth())
-    }
-    
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
-  }, [sidebarCollapsed])
-
-  // 处理侧边栏切换
-  const handleToggleSidebar = () => {
-    setSidebarCollapsed(!sidebarCollapsed)
-  }
-
-  // 处理选择今日
-  const handleSelectToday = () => {
-    setCurrentProjectId('today')
-    
-    // 检查是否已有今日标签页
-    const todayTab = tabs.find(t => t.type === 'today')
-    if (todayTab) {
-      setActiveTabId(todayTab.id)
-    } else {
-      const newTab: Tab = {
-        id: 'today-' + Date.now(),
-        type: 'today',
-        title: '今日',
-        isDirty: false
-      }
-      setTabs([...tabs, newTab])
-      setActiveTabId(newTab.id)
-    }
-  }
-
-  // 处理选择项目
-  const handleSelectProject = (projectId: string) => {
-    setCurrentProjectId(projectId)
-    
-    // 检查是否已有该项目的标签页
-    const projectTab = tabs.find(t => t.projectId === projectId)
-    if (projectTab) {
-      setActiveTabId(projectTab.id)
-    } else {
-      // 创建新标签页
-      projectStore.getProject(projectId).then(project => {
-        if (project) {
-          const newTab: Tab = {
-            id: 'project-' + projectId,
-            type: 'project',
-            projectId: projectId,
-            title: project.name,
-            isDirty: false
-          }
-          setTabs([...tabs, newTab])
-          setActiveTabId(newTab.id)
-        }
-      })
-    }
-  }
-
-  // 处理关闭标签页
-  const handleCloseTab = (tabId: string) => {
-    const newTabs = tabs.filter(t => t.id !== tabId)
-    
-    // 如果关闭的是当前标签页，切换到前一个
-    if (tabId === activeTabId && newTabs.length > 0) {
-      const closedIndex = tabs.findIndex(t => t.id === tabId)
-      const newActiveIndex = Math.max(0, closedIndex - 1)
-      setActiveTabId(newTabs[newActiveIndex].id)
-    }
-    
-    setTabs(newTabs)
-  }
-
-  // 处理新建标签页
-  const handleNewTab = async () => {
-    try {
-      // 创建新文档，如果当前在项目中则关联到项目
-      const projectId = currentProjectId && currentProjectId !== 'today' ? currentProjectId : undefined
-      const doc = await documentStore.createDocument('新文档', projectId)
-      
-      console.log('[App] Created new document:', doc.id, 'projectId:', projectId)
-      
-      // 如果文档关联到项目，更新项目的文档列表
-      if (projectId) {
-        await projectStore.addDocumentToProject(projectId, doc.id)
-      }
-      
-      const newTab: Tab = {
-        id: 'doc-' + doc.id,
-        type: 'document',
-        documentId: doc.id,
-        projectId: projectId,
-        title: doc.title,
-        isDirty: false
-      }
-      setTabs([...tabs, newTab])
-      setActiveTabId(newTab.id)
-    } catch (error) {
-      console.error('[App] Failed to create new document:', error)
-      alert('创建文档失败：' + (error instanceof Error ? error.message : '未知错误'))
-    }
-  }
-
-  // 处理全屏切换
-  const handleToggleFullscreen = () => {
-    setIsFullscreen(!isFullscreen)
-  }
-
-  // 处理编辑器宽度调整
-  const handleEditorResize = (width: number) => {
-    setEditorWidth(width)
-  }
+    initStorage().catch(console.error)
+  }, [])
 
   const handleInsertAIContent = (content: string) => {
     if (editor) {
-      const finalHtml = markdownToHtml(content)
-      editor.chain().focus().insertContent(finalHtml).run()
+      editor.chain().focus().insertContent(markdownToHtml(content)).run()
     }
   }
 
-  const handleTextSelected = (text: string) => {
-    setSelectedText(text)
-  }
-
-  const handleTextSentToAI = () => {
-    // 清空选中文字状态
-    setSelectedText('')
-  }
-
-  // 计算最小/最大宽度
-  const windowWidth = window.innerWidth
-  const sidebarWidth = sidebarCollapsed ? 60 : 240
-  const availableWidth = windowWidth - sidebarWidth
-  const minEditorWidth = 400
-  const maxEditorWidth = availableWidth * 0.8
+  const activeDocumentId = tabs.find(t => t.id === activeTabId)?.documentId
 
   return (
     <div className={`app ${isFullscreen ? 'fullscreen' : ''}`}>
       {!isFullscreen && (
         <Sidebar
           collapsed={sidebarCollapsed}
-          onToggle={handleToggleSidebar}
-          onSelectToday={handleSelectToday}
-          onSelectProject={handleSelectProject}
+          onToggle={toggleSidebar}
+          onSelectToday={selectToday}
+          onSelectProject={selectProject}
           currentProjectId={currentProjectId}
         />
       )}
-      
+
       <div className="editor-area" style={{ width: isFullscreen ? '100%' : editorWidth }}>
         <TabBar
           tabs={tabs}
           activeTabId={activeTabId}
-          onSelectTab={setActiveTabId}
-          onCloseTab={handleCloseTab}
-          onNewTab={handleNewTab}
-          onToggleFullscreen={handleToggleFullscreen}
+          onSelectTab={selectTab}
+          onCloseTab={closeTab}
+          onNewTab={newTab}
+          onToggleFullscreen={toggleFullscreen}
           isFullscreen={isFullscreen}
         />
-        <Editor 
+        <Editor
           onEditorReady={setEditor}
-          onTextSelected={handleTextSelected}
-          documentId={tabs.find(t => t.id === activeTabId)?.documentId}
+          onTextSelected={setSelectedText}
+          documentId={activeDocumentId}
         />
       </div>
 
       {!isFullscreen && (
         <>
           <ResizeHandle
-            onResize={handleEditorResize}
+            onResize={setEditorWidth}
             minWidth={minEditorWidth}
             maxWidth={maxEditorWidth}
           />
-          <RightPanel 
+          <RightPanel
             onInsertContent={handleInsertAIContent}
             selectedText={selectedText}
-            onTextSentToAI={handleTextSentToAI}
+            onTextSentToAI={() => setSelectedText('')}
           />
         </>
       )}

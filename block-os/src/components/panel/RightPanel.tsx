@@ -1,11 +1,11 @@
 import { useState, useRef, useEffect } from 'react'
 import { BlockSpacePanel } from './BlockSpacePanel'
 import { DocumentBlocksPanel } from './DocumentBlocksPanel'
-import { Toast } from './Toast'
-import { generateUUID } from '../utils/uuid'
-import { sendMessage, createImplicitBlockFromAI } from '../services/aiService'
-import { captureMessageAsBlock } from '../services/blockCaptureService'
-import type { Message, PanelTab } from '../types/chat'
+import { Toast } from '../shared/Toast'
+import { generateUUID } from '../../utils/uuid'
+import { sendMessage, createImplicitBlockFromAI } from '../../services/aiService'
+import { captureMessageAsBlock } from '../../services/blockCaptureService'
+import type { Message, PanelTab } from '../../types/chat'
 import './RightPanel.css'
 
 interface RightPanelProps {

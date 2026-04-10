@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
-import { Block, blockStore } from '../storage/blockStore'
-import { formatDateTime } from '../utils/date'
+import { Block, blockStore } from '../../storage/blockStore'
+import { formatDateTime } from '../../utils/date'
 import './BlockDerivativeSelector.css'
 
 interface BlockDerivativeSelectorProps {

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { documentStore, DocumentBlock } from '../storage/documentStore'
+import { documentStore, DocumentBlock } from '../../storage/documentStore'
 import './DocumentBlocksPanel.css'
 
 export function DocumentBlocksPanel() {

@@ -1,5 +1,29 @@
 # BlockOS 更新日志
 
+## [v0.4.0] - 2026-04-10 🏗️ 模块化分层架构重构（全部完成）
+
+### 重要里程碑
+完成代码架构全部 8 步重构，建立严格单向依赖的 8 层模块化架构。
+
+### 新增层级
+- ✅ **`types/`**: 统一类型定义（Block, Document, Project, Tab, Message, PanelTab），零依赖
+- ✅ **`utils/`**: 纯工具函数（generateUUID 唯一来源、markdownToHtml、日期格式化）
+- ✅ **`storage/`**: 统一 IndexedDB 初始化（`database.ts` 单例），三个 Store 共享连接
+- ✅ **`services/`**: 业务逻辑层（aiService、blockCaptureService、gitIntegration）
+- ✅ **`editor/extensions/`**: TipTap 扩展拆分（blockLink、blockReference、suggestion）
+- ✅ **`components/`**: 按功能域重组（layout / editor / panel / shared）
+- ✅ **`hooks/`**: useAppLayout、useTabs、useBlockSearch
+- ✅ **`App.tsx`**: 精简为 90 行布局壳，删除 `lib/` 旧目录
+
+### 核心改进
+- **消除竞态**: 三个 Store 统一通过 `database.ts` 单例初始化
+- **消除重复**: `generateUUID` 合并为唯一来源
+- **解耦业务逻辑**: RightPanel 精简 ~150 行，AI 调用和 Block 捕获移入 services/
+- **App.tsx 精简**: 260 行 → 90 行
+- **类型安全**: 消除所有 `any` 类型
+
+---
+
 ## [v0.3.2] - 2026-04-09 🐛 关键问题修复
 
 ### Bug 修复

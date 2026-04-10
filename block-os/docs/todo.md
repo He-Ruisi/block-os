@@ -31,14 +31,14 @@
 - [x] 审查现有代码，诊断架构问题
 - [x] 设计 8 层模块化分层方案
 - [x] 编写 CLAUDE.md 项目指南
-- [ ] **步骤 1**: 提取 `types/` 统一类型定义层
-- [ ] **步骤 2**: 提取 `utils/` 纯工具函数（uuid, markdown, date）
-- [ ] **步骤 3**: 重构 `storage/` 统一 IndexedDB 初始化
-- [ ] **步骤 4**: 提取 `services/` 业务逻辑层（AI、Block 捕获、Git）
-- [ ] **步骤 5**: 拆分 `editor/extensions/` 编辑器扩展
-- [ ] **步骤 6**: 按功能域重组 `components/`（layout/editor/panel/shared）
-- [ ] **步骤 7**: 提取 `hooks/`（useAppLayout, useTabs, useBlockSearch）
-- [ ] **步骤 8**: 精简 `App.tsx` 为布局壳
+- [x] **步骤 1**: 提取 `types/` 统一类型定义层
+- [x] **步骤 2**: 提取 `utils/` 纯工具函数（uuid, markdown, date）
+- [x] **步骤 3**: 重构 `storage/` 统一 IndexedDB 初始化
+- [x] **步骤 4**: 提取 `services/` 业务逻辑层（AI、Block 捕获、Git）
+- [x] **步骤 5**: 拆分 `editor/extensions/` 编辑器扩展
+- [x] **步骤 6**: 按功能域重组 `components/`（layout/editor/panel/shared）
+- [x] **步骤 7**: 提取 `hooks/`（useAppLayout, useTabs, useBlockSearch）
+- [x] **步骤 8**: 精简 `App.tsx` 为布局壳
 
 ### 项目架构优化 🔧（已完成）
 - [x] 设计新的文档组织结构 - [详细方案](./spec/2026-04-09-project-structure-improvement.md)
@@ -123,6 +123,6 @@
 
 ---
 
-**更新时间**: 2026-04-10 14:07  
-**当前阶段**: 代码架构重构（方案已设计，待执行）  
-**下次评审**: 重构步骤 1 完成后
+**更新时间**: 2026-04-10 16:30  
+**当前阶段**: 代码架构重构完成（全部 8 步）  
+**下次评审**: 步骤 6-8 完成后
