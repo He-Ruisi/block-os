@@ -407,3 +407,28 @@
 .capture-button:hover {
   background: var(--color-purple-light);
 }
+
+/* Drag Handle */
+.drag-handle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  font-size: 16px;
+  color: var(--color-text-tertiary);
+  cursor: grab;
+  border-radius: 4px;
+  transition: all 0.2s;
+  user-select: none;
+  letter-spacing: -2px;
+}
+
+.drag-handle:hover {
+  background: var(--color-bg-secondary);
+  color: var(--color-text-secondary);
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+}

@@ -105,7 +105,7 @@ export async function sendMessage(options: SendMessageOptions): Promise<SendMess
   return { assistantId, fullResponse: assistantMessage }
 }
 
-// AI 回复完成后自动创建隐式 Block
+// AI 回复完成后自动创建隐式 Block（不显示在 Block 空间）
 export async function createImplicitBlockFromAI(
   assistantId: string,
   content: string
@@ -116,15 +116,16 @@ export async function createImplicitBlockFromAI(
     id: assistantId,
     content,
     type: 'ai-generated',
+    implicit: true,  // 隐式，不在 Block 空间显示
     source: { type: 'ai', aiMessageId: assistantId, capturedAt: new Date() },
     metadata: {
       title: `AI 回复 - ${new Date().toLocaleString()}`,
-      tags: ['AI回复', '自动生成'],
+      tags: ['AI回复'],
       createdAt: new Date(),
       updatedAt: new Date(),
     },
   }
 
   await blockStore.saveBlock(aiBlock)
-  window.dispatchEvent(new Event('blockUpdated'))
+  // 隐式 Block 不触发 blockUpdated，避免 Block 空间刷新
 }

@@ -68,6 +68,15 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI }: Ri
     }
   }
 
+  const handleDragStart = (e: React.DragEvent, messageId: string) => {
+    const message = messages.find(m => m.id === messageId)
+    if (!message) return
+    const content = message.editorContent || message.content
+    e.dataTransfer.setData('text/plain', content)
+    e.dataTransfer.setData('application/blockos-ai-content', content)
+    e.dataTransfer.effectAllowed = 'copy'
+  }
+
   const handleCaptureBlock = async (messageId: string) => {
     const message = messages.find(m => m.id === messageId)
     if (!message || message.role !== 'assistant') return
@@ -210,6 +219,14 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI }: Ri
                             <button className="capture-button" onClick={() => handleCaptureBlock(msg.id)}>
                               ◆ 捕获为Block
                             </button>
+                            <span
+                              className="drag-handle"
+                              draggable
+                              onDragStart={e => handleDragStart(e, msg.id)}
+                              title="拖拽到编辑器"
+                            >
+                              ⠿
+                            </span>
                           </div>
                         )}
                       </div>

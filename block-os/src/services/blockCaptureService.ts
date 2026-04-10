@@ -8,7 +8,8 @@ export interface CaptureResult {
   error?: string
 }
 
-// 手动捕获 AI 消息为 Block
+// 手动捕获 AI 消息为显式 Block
+// 如果该消息已有隐式 Block（id = messageId），先删除它，再创建显式 Block
 export async function captureMessageAsBlock(
   messageId: string,
   content: string
@@ -18,14 +19,21 @@ export async function captureMessageAsBlock(
       await blockStore.init()
     }
 
+    // 删除同一消息的隐式 Block（id 与 messageId 相同）
+    const existing = await blockStore.getBlock(messageId)
+    if (existing?.implicit) {
+      await blockStore.deleteBlock(messageId)
+    }
+
     const block: Block = {
       id: generateUUID(),
       content,
       type: 'ai-generated',
+      implicit: false,  // 显式，显示在 Block 空间
       source: { type: 'ai', aiMessageId: messageId, capturedAt: new Date() },
       metadata: {
         title: `AI 回复 - ${new Date().toLocaleString()}`,
-        tags: ['AI回复', '手动捕获'],
+        tags: ['AI回复'],
         createdAt: new Date(),
         updatedAt: new Date(),
       },

@@ -3,6 +3,7 @@ export interface Block {
   id: string
   content: string
   type: 'text' | 'ai-generated' | 'heading' | 'list' | 'code'
+  implicit?: boolean  // true = 隐式（不显示在 Block 空间），false/undefined = 显式
   source: {
     type: 'editor' | 'ai'
     documentId?: string

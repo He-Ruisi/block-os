@@ -1,10 +1,11 @@
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef, useCallback } from 'react'
 import { useEditor, EditorContent, Editor as TiptapEditor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import { BlockLink, BlockReference, searchBlocks } from '../../editor/extensions'
 import { SuggestionMenu } from './SuggestionMenu'
 import { documentStore } from '../../storage/documentStore'
 import { blockStore } from '../../storage/blockStore'
+import { markdownToHtml } from '../../utils/markdown'
 import './Editor.css'
 
 interface EditorProps {
@@ -119,8 +120,28 @@ export function Editor({ onEditorReady, onTextSelected, documentId }: EditorProp
     },
   })
 
-  const handleSearch = async (query: string) => {
-    try {
+  // 处理从 AI 面板拖拽内容到编辑器
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    const content = e.dataTransfer.getData('application/blockos-ai-content')
+    if (!content || !editor) return
+    e.preventDefault()
+    const pos = editor.view.posAtCoords({ left: e.clientX, top: e.clientY })
+    const html = markdownToHtml(content)
+    if (pos) {
+      editor.chain().focus().setTextSelection(pos.pos).insertContent(html).run()
+    } else {
+      editor.chain().focus().insertContent(html).run()
+    }
+  }, [editor])
+
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    if (e.dataTransfer.types.includes('application/blockos-ai-content')) {
+      e.preventDefault()
+      e.dataTransfer.dropEffect = 'copy'
+    }
+  }, [])
+
+  const handleSearch = async (query: string) => {    try {
       const results = await searchBlocks(query)
       setSuggestionItems(results)
       setShowSuggestion(results.length > 0)
@@ -357,7 +378,7 @@ export function Editor({ onEditorReady, onTextSelected, documentId }: EditorProp
           💡 选中文字后按 Cmd/Ctrl + Shift + A 发送给 AI
         </div>
       </div>
-      <div className="editor-scroll">
+      <div className="editor-scroll" onDrop={handleDrop} onDragOver={handleDragOver}>
         <EditorContent editor={editor} />
       </div>
 

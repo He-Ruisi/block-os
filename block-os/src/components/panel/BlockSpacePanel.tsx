@@ -13,14 +13,16 @@ export function BlockSpacePanel() {
   const [isLoading, setIsLoading] = useState(true)
   const [highlightedBlockId, setHighlightedBlockId] = useState<string | null>(null)
 
-  // 加载 Blocks
+  // 加载 Blocks（只加载显式 Block）
   const loadBlocks = async () => {
     try {
       setIsLoading(true)
       const allBlocks = await blockStore.getAllBlocks()
-      const tags = await blockStore.getAllTags()
-      setBlocks(allBlocks)
-      setFilteredBlocks(allBlocks)
+      // 过滤掉隐式 Block
+      const explicitBlocks = allBlocks.filter(b => !b.implicit)
+      const tags = Array.from(new Set(explicitBlocks.flatMap(b => b.metadata.tags))).sort()
+      setBlocks(explicitBlocks)
+      setFilteredBlocks(explicitBlocks)
       setAllTags(tags)
     } catch (error) {
       console.error('Failed to load blocks:', error)
