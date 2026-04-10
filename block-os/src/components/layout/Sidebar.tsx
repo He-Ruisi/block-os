@@ -28,10 +28,14 @@ export function Sidebar({
   const [showNewProjectDialog, setShowNewProjectDialog] = useState(false)
   const [newProjectName, setNewProjectName] = useState('')
   const [newProjectDescription, setNewProjectDescription] = useState('')
-  // 重命名状态
+  // 重命名文档状态
   const [renamingDocId, setRenamingDocId] = useState<string | null>(null)
   const [renameValue, setRenameValue] = useState('')
   const renameInputRef = useRef<HTMLInputElement>(null)
+  // 重命名项目状态
+  const [renamingProjectId, setRenamingProjectId] = useState<string | null>(null)
+  const [renameProjectValue, setRenameProjectValue] = useState('')
+  const renameProjectInputRef = useRef<HTMLInputElement>(null)
   // 移动文档状态
   const [movingDoc, setMovingDoc] = useState<Document | null>(null)
 
@@ -46,6 +50,23 @@ export function Sidebar({
 
   useEffect(() => {
     loadProjects()
+  }, [])
+
+  // 监听文档创建事件，自动刷新对应项目的文档列表
+  useEffect(() => {
+    const handleDocumentCreated = (e: Event) => {
+      const { projectId } = (e as CustomEvent<{ projectId?: string }>).detail
+      if (projectId) {
+        // 刷新项目文档列表
+        loadProjectDocs(projectId)
+        // 刷新项目列表（更新文档数量）
+        loadProjects()
+        // 自动展开该项目
+        setExpandedProjects(prev => new Set([...prev, projectId]))
+      }
+    }
+    window.addEventListener('documentCreated', handleDocumentCreated)
+    return () => window.removeEventListener('documentCreated', handleDocumentCreated)
   }, [])
 
   // 加载项目下的文档
@@ -155,7 +176,6 @@ export function Sidebar({
   const handleMoveDoc = async (doc: Document, targetProjectId: string) => {
     if (doc.projectId === targetProjectId) { setMovingDoc(null); return }
     try {
-      // 从旧项目移除
       if (doc.projectId) {
         await projectStore.removeDocumentFromProject(doc.projectId, doc.id)
         setProjectDocs(prev => ({
@@ -163,19 +183,50 @@ export function Sidebar({
           [doc.projectId!]: (prev[doc.projectId!] || []).filter(d => d.id !== doc.id),
         }))
       }
-      // 加入新项目
       await projectStore.addDocumentToProject(targetProjectId, doc.id)
       await documentStore.updateDocumentProject(doc.id, targetProjectId)
-      // 刷新目标项目文档列表
       if (expandedProjects.has(targetProjectId)) {
         await loadProjectDocs(targetProjectId)
       }
-      // 刷新项目列表（更新文档数量）
       await loadProjects()
     } catch (error) {
       console.error('Failed to move doc:', error)
     }
     setMovingDoc(null)
+  }
+
+  // 开始重命名项目
+  const startRenameProject = (e: React.MouseEvent, project: Project) => {
+    e.stopPropagation()
+    setRenamingProjectId(project.id)
+    setRenameProjectValue(project.name)
+    setTimeout(() => renameProjectInputRef.current?.select(), 50)
+  }
+
+  // 提交项目重命名
+  const submitRenameProject = async (projectId: string) => {
+    const newName = renameProjectValue.trim()
+    if (!newName) { setRenamingProjectId(null); return }
+    try {
+      await projectStore.updateProject(projectId, { name: newName })
+      setProjects(prev => prev.map(p => p.id === projectId ? { ...p, name: newName } : p))
+    } catch (error) {
+      console.error('Failed to rename project:', error)
+    }
+    setRenamingProjectId(null)
+  }
+
+  // 删除项目
+  const handleDeleteProject = async (e: React.MouseEvent, project: Project) => {
+    e.stopPropagation()
+    if (!confirm(`确定删除项目「${project.name}」？项目下的文档不会被删除。`)) return
+    try {
+      await projectStore.deleteProject(project.id)
+      setProjects(prev => prev.filter(p => p.id !== project.id))
+      setExpandedProjects(prev => { const n = new Set(prev); n.delete(project.id); return n })
+    } catch (error) {
+      console.error('Failed to delete project:', error)
+    }
   }
 
   if (collapsed) {
@@ -231,9 +282,31 @@ export function Sidebar({
                       {expandedProjects.has(project.id) ? '▾' : '▸'}
                     </span>
                     <span className="project-icon">{project.metadata.icon || '📁'}</span>
-                    <span className="project-name">{project.name}</span>
-                    {project.documents.length > 0 && (
-                      <span className="project-count">{project.documents.length}</span>
+                    {renamingProjectId === project.id ? (
+                      <input
+                        ref={renameProjectInputRef}
+                        className="doc-rename-input"
+                        value={renameProjectValue}
+                        onChange={e => setRenameProjectValue(e.target.value)}
+                        onBlur={() => submitRenameProject(project.id)}
+                        onKeyDown={e => {
+                          if (e.key === 'Enter') submitRenameProject(project.id)
+                          if (e.key === 'Escape') setRenamingProjectId(null)
+                        }}
+                        onClick={e => e.stopPropagation()}
+                        autoFocus
+                      />
+                    ) : (
+                      <>
+                        <span className="project-name">{project.name}</span>
+                        {project.documents.length > 0 && (
+                          <span className="project-count">{project.documents.length}</span>
+                        )}
+                        <div className="doc-actions project-actions">
+                          <button className="doc-action-btn" onClick={e => startRenameProject(e, project)} title="重命名">✏️</button>
+                          <button className="doc-action-btn danger" onClick={e => handleDeleteProject(e, project)} title="删除项目">🗑</button>
+                        </div>
+                      </>
                     )}
                   </div>
 

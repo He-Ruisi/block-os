@@ -43,6 +43,26 @@ function App() {
     initStorage().catch(console.error)
   }, [])
 
+  // 全局键盘快捷键
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const isMod = e.metaKey || e.ctrlKey
+      if (!isMod) return
+      if (e.key === 't') {
+        e.preventDefault()
+        newTab()
+      } else if (e.key === 'w') {
+        e.preventDefault()
+        closeTab(activeTabId)
+      } else if (e.key === 'b') {
+        e.preventDefault()
+        toggleSidebar()
+      }
+    }
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [newTab, closeTab, activeTabId, toggleSidebar])
+
   const handleInsertAIContent = (content: string) => {
     if (editor) {
       editor.chain().focus().insertContent(markdownToHtml(content)).run()

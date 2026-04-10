@@ -102,6 +102,8 @@ export function useTabs(): TabsState {
     }
     setTabs(prev => [...prev, newTab])
     setActiveTabId(tabId)
+    // 通知 Sidebar 刷新文档列表
+    window.dispatchEvent(new CustomEvent('documentCreated', { detail: { projectId, documentId: doc.id } }))
   }
 
   return {
