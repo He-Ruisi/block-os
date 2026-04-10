@@ -48,12 +48,19 @@ function App() {
     const handleKeyDown = (e: KeyboardEvent) => {
       const isMod = e.metaKey || e.ctrlKey
       if (!isMod) return
+      // 输入框内不触发
+      const target = e.target as HTMLElement
+      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') return
+
       if (e.key === 't') {
         e.preventDefault()
         newTab()
       } else if (e.key === 'w') {
-        e.preventDefault()
-        closeTab(activeTabId)
+        // 只有多于1个标签页时才拦截，避免关闭浏览器窗口
+        if (tabs.length > 1) {
+          e.preventDefault()
+          closeTab(activeTabId)
+        }
       } else if (e.key === 'b') {
         e.preventDefault()
         toggleSidebar()
@@ -61,7 +68,7 @@ function App() {
     }
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [newTab, closeTab, activeTabId, toggleSidebar])
+  }, [newTab, closeTab, activeTabId, toggleSidebar, tabs.length])
 
   const handleInsertAIContent = (content: string) => {
     if (editor) {

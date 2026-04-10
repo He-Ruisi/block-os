@@ -485,3 +485,23 @@
   background: #f0f8ff;
   border-color: #007bff;
 }
+
+/* Project row actions (rename/delete) */
+.sidebar-project-item .project-actions {
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.sidebar-project-item:hover .project-actions {
+  opacity: 1;
+}
+
+/* Active project row — keep actions visible */
+.sidebar-project-item.active .doc-action-btn {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.sidebar-project-item.active .doc-action-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+}

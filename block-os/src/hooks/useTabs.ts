@@ -23,39 +23,44 @@ export function useTabs(): TabsState {
   const [activeTabId, setActiveTabId] = useState('today')
   const [currentProjectId, setCurrentProjectId] = useState<string | null>('today')
 
-  const selectToday = () => {
+  const selectToday = useCallback(() => {
     setCurrentProjectId('today')
-    const existing = tabs.find(t => t.type === 'today')
-    if (existing) {
-      setActiveTabId(existing.id)
-    } else {
-      const newTab: Tab = { id: 'today-' + Date.now(), type: 'today', title: '今日', isDirty: false }
-      setTabs(prev => [...prev, newTab])
-      setActiveTabId(newTab.id)
-    }
-  }
+    setTabs(prev => {
+      const existing = prev.find(t => t.type === 'today')
+      if (existing) {
+        setActiveTabId(existing.id)
+        return prev
+      }
+      const tab: Tab = { id: 'today-' + Date.now(), type: 'today', title: '今日', isDirty: false }
+      setActiveTabId(tab.id)
+      return [...prev, tab]
+    })
+  }, [])
 
-  const selectProject = (projectId: string) => {
+  const selectProject = useCallback((projectId: string) => {
     setCurrentProjectId(projectId)
-    const existing = tabs.find(t => t.projectId === projectId && t.type === 'project')
-    if (existing) {
-      setActiveTabId(existing.id)
-    } else {
+    setTabs(prev => {
+      const existing = prev.find(t => t.projectId === projectId && t.type === 'project')
+      if (existing) {
+        setActiveTabId(existing.id)
+        return prev
+      }
       projectStore.getProject(projectId).then(project => {
         if (project) {
-          const newTab: Tab = {
+          const tab: Tab = {
             id: 'project-' + projectId,
             type: 'project',
             projectId,
             title: project.name,
             isDirty: false,
           }
-          setTabs(prev => [...prev, newTab])
-          setActiveTabId(newTab.id)
+          setTabs(p => [...p, tab])
+          setActiveTabId(tab.id)
         }
       })
-    }
-  }
+      return prev
+    })
+  }, [])
 
   // 直接打开一个文档（从侧边栏点击）
   const openDocument = useCallback((doc: Document) => {
@@ -76,7 +81,7 @@ export function useTabs(): TabsState {
     if (doc.projectId) setCurrentProjectId(doc.projectId)
   }, [])
 
-  const closeTab = (tabId: string) => {
+  const closeTab = useCallback((tabId: string) => {
     setTabs(prev => {
       const newTabs = prev.filter(t => t.id !== tabId)
       if (tabId === activeTabId && newTabs.length > 0) {
@@ -85,14 +90,14 @@ export function useTabs(): TabsState {
       }
       return newTabs
     })
-  }
+  }, [activeTabId])
 
-  const newTab = async () => {
+  const newTab = useCallback(async () => {
     const projectId = currentProjectId && currentProjectId !== 'today' ? currentProjectId : undefined
     const doc = await documentStore.createDocument('新文档', projectId)
     if (projectId) await projectStore.addDocumentToProject(projectId, doc.id)
     const tabId = 'doc-' + doc.id
-    const newTab: Tab = {
+    const tab: Tab = {
       id: tabId,
       type: 'document',
       documentId: doc.id,
@@ -100,11 +105,10 @@ export function useTabs(): TabsState {
       title: doc.title,
       isDirty: false,
     }
-    setTabs(prev => [...prev, newTab])
+    setTabs(prev => [...prev, tab])
     setActiveTabId(tabId)
-    // 通知 Sidebar 刷新文档列表
     window.dispatchEvent(new CustomEvent('documentCreated', { detail: { projectId, documentId: doc.id } }))
-  }
+  }, [currentProjectId])
 
   return {
     tabs,
