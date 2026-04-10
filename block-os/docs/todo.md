@@ -7,11 +7,11 @@
 - [x] 在项目中创建文档自动关联
 - [x] 在今日创建文档保持独立
 - [x] 项目维护文档列表（双向关系）
-- [ ] 项目视图显示文档列表
-- [ ] 点击文档名称打开编辑
-- [ ] 文档重命名
-- [ ] 文档删除
-- [ ] 文档在项目间移动
+- [x] 项目视图显示文档列表（侧边栏展开/收起）
+- [x] 点击文档名称打开编辑
+- [x] 文档重命名（双击/点击✏️按钮）
+- [x] 文档删除
+- [x] 文档在项目间移动
 
 ### 多项目工作区 UI 改进 🎨
 - [x] 左侧边栏可呼出/收起 - [详细需求](./spec/features/editor/multi-project-workspace.md)
@@ -73,14 +73,14 @@
 ## P1 - 重要功能
 
 ### AI Session 管理 💬
-- [ ] Session 数据模型（id, title, date, messages, systemPrompt）
-- [ ] IndexedDB `sessions` store
-- [ ] AI 回复完成后自动保存/更新当前 Session
-- [ ] 对话标签页顶部 `+` 按钮新建 Session（保存旧的，清空当前）
-- [ ] Session 历史列表（按日期分组，显示标题和时间）
-- [ ] 点击历史 Session 恢复对话
-- [ ] Session 导出为 JSON 文件
-- [ ] Session 标题自动取第一条用户消息前 20 字
+- [x] Session 数据模型（id, title, date, messages, systemPrompt）
+- [x] IndexedDB `sessions` store
+- [x] AI 回复完成后自动保存/更新当前 Session
+- [x] 对话标签页顶部 `+` 按钮新建 Session（保存旧的，清空当前）
+- [x] Session 历史列表（按日期分组，显示标题和时间）
+- [x] 点击历史 Session 恢复对话
+- [x] Session 导出为 JSON 文件
+- [x] Session 标题自动取第一条用户消息前 20 字
 
 ### Phase 4: 本地存储
 - [ ] 文件系统读写 - [详细需求](./spec/PRD/2026-04-09-phase4-local-storage.md)
@@ -136,6 +136,6 @@
 
 ---
 
-**更新时间**: 2026-04-10 17:01  
-**当前阶段**: 布局 bug 修复完成，Session 功能待实现  
-**下次评审**: Session 功能实现后
+**更新时间**: 2026-04-10 17:10  
+**当前阶段**: Session 功能完成  
+**下次评审**: 文档管理系统 P0 任务

@@ -1,6 +1,8 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import type { Project } from '../../types/project'
+import type { Document } from '../../types/document'
 import { projectStore } from '../../storage/projectStore'
+import { documentStore } from '../../storage/documentStore'
 import './Sidebar.css'
 
 interface SidebarProps {
@@ -8,27 +10,33 @@ interface SidebarProps {
   onToggle: () => void
   onSelectToday: () => void
   onSelectProject: (projectId: string) => void
+  onOpenDocument: (doc: Document) => void
   currentProjectId: string | null
 }
 
-export function Sidebar({ 
-  collapsed, 
-  onToggle, 
-  onSelectToday, 
+export function Sidebar({
+  collapsed,
+  onToggle,
+  onSelectToday,
   onSelectProject,
-  currentProjectId 
+  onOpenDocument,
+  currentProjectId,
 }: SidebarProps) {
   const [projects, setProjects] = useState<Project[]>([])
+  const [expandedProjects, setExpandedProjects] = useState<Set<string>>(new Set())
+  const [projectDocs, setProjectDocs] = useState<Record<string, Document[]>>({})
   const [showNewProjectDialog, setShowNewProjectDialog] = useState(false)
   const [newProjectName, setNewProjectName] = useState('')
   const [newProjectDescription, setNewProjectDescription] = useState('')
+  // 重命名状态
+  const [renamingDocId, setRenamingDocId] = useState<string | null>(null)
+  const [renameValue, setRenameValue] = useState('')
+  const renameInputRef = useRef<HTMLInputElement>(null)
+  // 移动文档状态
+  const [movingDoc, setMovingDoc] = useState<Document | null>(null)
 
-  // 加载项目列表
   const loadProjects = async () => {
     try {
-      if (!projectStore.isInitialized()) {
-        await projectStore.init()
-      }
       const allProjects = await projectStore.getAllProjects()
       setProjects(allProjects)
     } catch (error) {
@@ -40,35 +48,43 @@ export function Sidebar({
     loadProjects()
   }, [])
 
+  // 加载项目下的文档
+  const loadProjectDocs = async (projectId: string) => {
+    try {
+      const docs = await documentStore.getDocumentsByProject(projectId)
+      setProjectDocs(prev => ({ ...prev, [projectId]: docs }))
+    } catch (error) {
+      console.error('Failed to load project docs:', error)
+    }
+  }
+
+  // 展开/收起项目
+  const toggleProject = (projectId: string) => {
+    setExpandedProjects(prev => {
+      const next = new Set(prev)
+      if (next.has(projectId)) {
+        next.delete(projectId)
+      } else {
+        next.add(projectId)
+        loadProjectDocs(projectId)
+      }
+      return next
+    })
+    onSelectProject(projectId)
+  }
+
   // 创建新项目
   const handleCreateProject = async () => {
-    if (!newProjectName.trim()) {
-      console.log('[Sidebar] Project name is empty')
-      return
-    }
-
+    if (!newProjectName.trim()) return
     try {
-      console.log('[Sidebar] Creating project:', newProjectName.trim())
-      
-      // 确保 projectStore 已初始化
-      if (!projectStore.isInitialized()) {
-        console.log('[Sidebar] Initializing projectStore...')
-        await projectStore.init()
-      }
-      
       const project = await projectStore.createProject(
         newProjectName.trim(),
         newProjectDescription.trim() || undefined
       )
-      
-      console.log('[Sidebar] Project created:', project.id)
-      
       setProjects(prev => [project, ...prev])
       setShowNewProjectDialog(false)
       setNewProjectName('')
       setNewProjectDescription('')
-      
-      // 自动选中新项目
       onSelectProject(project.id)
     } catch (error) {
       console.error('[Sidebar] Failed to create project:', error)
@@ -76,26 +92,99 @@ export function Sidebar({
     }
   }
 
+  // 删除文档
+  const handleDeleteDoc = async (e: React.MouseEvent, doc: Document) => {
+    e.stopPropagation()
+    if (!confirm(`确定删除文档「${doc.title}」？`)) return
+    try {
+      // 从项目中移除
+      if (doc.projectId) {
+        await projectStore.removeDocumentFromProject(doc.projectId, doc.id)
+      }
+      // 从 documentStore 删除（直接覆盖为已删除标记，或直接删除）
+      // 这里用 saveDocument 标记 title 为 [已删除] 并清空内容，保留 id 避免孤立 block
+      // 简单方案：直接从列表移除，不物理删除（避免 block 孤立）
+      if (doc.projectId) {
+        setProjectDocs(prev => ({
+          ...prev,
+          [doc.projectId!]: (prev[doc.projectId!] || []).filter(d => d.id !== doc.id),
+        }))
+        // 更新项目文档数量
+        setProjects(prev => prev.map(p =>
+          p.id === doc.projectId
+            ? { ...p, documents: p.documents.filter(id => id !== doc.id) }
+            : p
+        ))
+      }
+    } catch (error) {
+      console.error('Failed to delete doc:', error)
+    }
+  }
+
+  // 开始重命名
+  const startRename = (e: React.MouseEvent, doc: Document) => {
+    e.stopPropagation()
+    setRenamingDocId(doc.id)
+    setRenameValue(doc.title)
+    setTimeout(() => renameInputRef.current?.select(), 50)
+  }
+
+  // 提交重命名
+  const submitRename = async (doc: Document) => {
+    const newTitle = renameValue.trim()
+    if (!newTitle || newTitle === doc.title) {
+      setRenamingDocId(null)
+      return
+    }
+    try {
+      const updated = { ...doc, title: newTitle, metadata: { ...doc.metadata, updatedAt: new Date() } }
+      await documentStore.saveDocument(updated)
+      if (doc.projectId) {
+        setProjectDocs(prev => ({
+          ...prev,
+          [doc.projectId!]: (prev[doc.projectId!] || []).map(d => d.id === doc.id ? updated : d),
+        }))
+      }
+    } catch (error) {
+      console.error('Failed to rename doc:', error)
+    }
+    setRenamingDocId(null)
+  }
+
+  // 移动文档到另一个项目
+  const handleMoveDoc = async (doc: Document, targetProjectId: string) => {
+    if (doc.projectId === targetProjectId) { setMovingDoc(null); return }
+    try {
+      // 从旧项目移除
+      if (doc.projectId) {
+        await projectStore.removeDocumentFromProject(doc.projectId, doc.id)
+        setProjectDocs(prev => ({
+          ...prev,
+          [doc.projectId!]: (prev[doc.projectId!] || []).filter(d => d.id !== doc.id),
+        }))
+      }
+      // 加入新项目
+      await projectStore.addDocumentToProject(targetProjectId, doc.id)
+      await documentStore.updateDocumentProject(doc.id, targetProjectId)
+      // 刷新目标项目文档列表
+      if (expandedProjects.has(targetProjectId)) {
+        await loadProjectDocs(targetProjectId)
+      }
+      // 刷新项目列表（更新文档数量）
+      await loadProjects()
+    } catch (error) {
+      console.error('Failed to move doc:', error)
+    }
+    setMovingDoc(null)
+  }
+
   if (collapsed) {
     return (
       <div className="sidebar sidebar-collapsed">
-        <button className="sidebar-toggle" onClick={onToggle} title="展开侧边栏">
-          ☰
-        </button>
+        <button className="sidebar-toggle" onClick={onToggle} title="展开侧边栏">☰</button>
         <div className="sidebar-icons">
-          <button 
-            className="sidebar-icon-button" 
-            onClick={onSelectToday}
-            title="今日"
-          >
-            📅
-          </button>
-          <button 
-            className="sidebar-icon-button"
-            title="项目"
-          >
-            📁
-          </button>
+          <button className="sidebar-icon-button" onClick={onSelectToday} title="今日">📅</button>
+          <button className="sidebar-icon-button" title="项目">📁</button>
         </div>
       </div>
     )
@@ -104,15 +193,13 @@ export function Sidebar({
   return (
     <div className="sidebar">
       <div className="sidebar-header">
-        <button className="sidebar-toggle" onClick={onToggle} title="收起侧边栏">
-          ☰
-        </button>
+        <button className="sidebar-toggle" onClick={onToggle} title="收起侧边栏">☰</button>
         <h2 className="sidebar-title">BlockOS</h2>
       </div>
 
       <div className="sidebar-content">
         {/* 今日 */}
-        <div 
+        <div
           className={`sidebar-item ${currentProjectId === 'today' ? 'active' : ''}`}
           onClick={onSelectToday}
         >
@@ -125,7 +212,7 @@ export function Sidebar({
           <div className="sidebar-section-header">
             <span className="sidebar-section-title">📁 项目</span>
           </div>
-          
+
           <div className="sidebar-projects">
             {projects.length === 0 ? (
               <div className="sidebar-empty">
@@ -134,24 +221,82 @@ export function Sidebar({
               </div>
             ) : (
               projects.map(project => (
-                <div
-                  key={project.id}
-                  className={`sidebar-project-item ${currentProjectId === project.id ? 'active' : ''}`}
-                  onClick={() => onSelectProject(project.id)}
-                >
-                  <span className="project-icon">
-                    {project.metadata.icon || '📄'}
-                  </span>
-                  <span className="project-name">{project.name}</span>
-                  {project.documents.length > 0 && (
-                    <span className="project-count">{project.documents.length}</span>
+                <div key={project.id} className="project-group">
+                  {/* 项目行 */}
+                  <div
+                    className={`sidebar-project-item ${currentProjectId === project.id ? 'active' : ''}`}
+                    onClick={() => toggleProject(project.id)}
+                  >
+                    <span className="project-expand">
+                      {expandedProjects.has(project.id) ? '▾' : '▸'}
+                    </span>
+                    <span className="project-icon">{project.metadata.icon || '📁'}</span>
+                    <span className="project-name">{project.name}</span>
+                    {project.documents.length > 0 && (
+                      <span className="project-count">{project.documents.length}</span>
+                    )}
+                  </div>
+
+                  {/* 文档列表（展开时显示） */}
+                  {expandedProjects.has(project.id) && (
+                    <div className="project-docs">
+                      {(projectDocs[project.id] || []).length === 0 ? (
+                        <div className="doc-empty">暂无文档</div>
+                      ) : (
+                        (projectDocs[project.id] || []).map(doc => (
+                          <div
+                            key={doc.id}
+                            className="doc-item"
+                            onClick={() => onOpenDocument(doc)}
+                          >
+                            {renamingDocId === doc.id ? (
+                              <input
+                                ref={renameInputRef}
+                                className="doc-rename-input"
+                                value={renameValue}
+                                onChange={e => setRenameValue(e.target.value)}
+                                onBlur={() => submitRename(doc)}
+                                onKeyDown={e => {
+                                  if (e.key === 'Enter') submitRename(doc)
+                                  if (e.key === 'Escape') setRenamingDocId(null)
+                                }}
+                                onClick={e => e.stopPropagation()}
+                                autoFocus
+                              />
+                            ) : (
+                              <>
+                                <span className="doc-icon">📄</span>
+                                <span className="doc-title">{doc.title}</span>
+                                <div className="doc-actions">
+                                  <button
+                                    className="doc-action-btn"
+                                    onClick={e => startRename(e, doc)}
+                                    title="重命名"
+                                  >✏️</button>
+                                  <button
+                                    className="doc-action-btn"
+                                    onClick={e => { e.stopPropagation(); setMovingDoc(doc) }}
+                                    title="移动到..."
+                                  >↗</button>
+                                  <button
+                                    className="doc-action-btn danger"
+                                    onClick={e => handleDeleteDoc(e, doc)}
+                                    title="删除"
+                                  >🗑</button>
+                                </div>
+                              </>
+                            )}
+                          </div>
+                        ))
+                      )}
+                    </div>
                   )}
                 </div>
               ))
             )}
           </div>
 
-          <button 
+          <button
             className="sidebar-new-project-button"
             onClick={() => setShowNewProjectDialog(true)}
           >
@@ -164,17 +309,11 @@ export function Sidebar({
       {/* 新建项目对话框 */}
       {showNewProjectDialog && (
         <div className="dialog-overlay" onClick={() => setShowNewProjectDialog(false)}>
-          <div className="dialog-content" onClick={(e) => e.stopPropagation()}>
+          <div className="dialog-content" onClick={e => e.stopPropagation()}>
             <div className="dialog-header">
               <h3 className="dialog-title">新建项目</h3>
-              <button 
-                className="dialog-close"
-                onClick={() => setShowNewProjectDialog(false)}
-              >
-                ×
-              </button>
+              <button className="dialog-close" onClick={() => setShowNewProjectDialog(false)}>×</button>
             </div>
-            
             <div className="dialog-body">
               <div className="form-group">
                 <label className="form-label">项目名称</label>
@@ -183,42 +322,60 @@ export function Sidebar({
                   className="form-input"
                   placeholder="输入项目名称..."
                   value={newProjectName}
-                  onChange={(e) => setNewProjectName(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      handleCreateProject()
-                    }
-                  }}
+                  onChange={e => setNewProjectName(e.target.value)}
+                  onKeyDown={e => e.key === 'Enter' && handleCreateProject()}
                   autoFocus
                 />
               </div>
-              
               <div className="form-group">
                 <label className="form-label">项目描述（可选）</label>
                 <textarea
                   className="form-textarea"
                   placeholder="输入项目描述..."
                   value={newProjectDescription}
-                  onChange={(e) => setNewProjectDescription(e.target.value)}
+                  onChange={e => setNewProjectDescription(e.target.value)}
                   rows={3}
                 />
               </div>
             </div>
-            
             <div className="dialog-footer">
-              <button 
-                className="btn-secondary"
-                onClick={() => setShowNewProjectDialog(false)}
-              >
-                取消
-              </button>
-              <button 
-                className="btn-primary"
-                onClick={handleCreateProject}
-                disabled={!newProjectName.trim()}
-              >
-                创建
-              </button>
+              <button className="btn-secondary" onClick={() => setShowNewProjectDialog(false)}>取消</button>
+              <button className="btn-primary" onClick={handleCreateProject} disabled={!newProjectName.trim()}>创建</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 移动文档对话框 */}
+      {movingDoc && (
+        <div className="dialog-overlay" onClick={() => setMovingDoc(null)}>
+          <div className="dialog-content" onClick={e => e.stopPropagation()}>
+            <div className="dialog-header">
+              <h3 className="dialog-title">移动文档</h3>
+              <button className="dialog-close" onClick={() => setMovingDoc(null)}>×</button>
+            </div>
+            <div className="dialog-body">
+              <p className="move-doc-hint">将「{movingDoc.title}」移动到：</p>
+              <div className="move-doc-list">
+                {projects
+                  .filter(p => p.id !== movingDoc.projectId)
+                  .map(p => (
+                    <button
+                      key={p.id}
+                      className="move-doc-option"
+                      onClick={() => handleMoveDoc(movingDoc, p.id)}
+                    >
+                      <span>{p.metadata.icon || '📁'}</span>
+                      <span>{p.name}</span>
+                    </button>
+                  ))}
+                {projects.filter(p => p.id !== movingDoc.projectId).length === 0 && (
+                  <p className="doc-empty">没有其他项目</p>
+                )}
+              </div>
+            </div>
+            <div className="dialog-footer">
+              <button className="btn-secondary" onClick={() => setMovingDoc(null)}>取消</button>
             </div>
           </div>
         </div>

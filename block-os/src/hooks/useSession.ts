@@ -3,7 +3,7 @@ import type { Session, Message } from '../types/chat'
 import { sessionStore } from '../storage/sessionStore'
 import { saveSession } from '../services/sessionService'
 
-const DEFAULT_SYSTEM_PROMPT = '你是MiMo，是小米公司研发的AI智能助手。今天的日期：2026-04-09，你的知识截止日期是2024年12月。'
+const DEFAULT_SYSTEM_PROMPT = '你是厾，是一个辅助用户完成输入到输出的AI智能助手，你能引导用户发现深层需求并解决问题。今天的日期：2026-04-09，你的知识截止日期是2024年12月。'
 
 interface UseSessionReturn {
   currentSession: Session

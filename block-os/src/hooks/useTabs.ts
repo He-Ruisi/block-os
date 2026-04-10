@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import type { Tab } from '../types/project'
 import { documentStore } from '../storage/documentStore'
 import { projectStore } from '../storage/projectStore'
+import type { Document } from '../types/document'
 
 interface TabsState {
   tabs: Tab[]
@@ -11,6 +12,7 @@ interface TabsState {
   closeTab: (tabId: string) => void
   selectToday: () => void
   selectProject: (projectId: string) => void
+  openDocument: (doc: Document) => void
   newTab: () => Promise<void>
 }
 
@@ -35,7 +37,7 @@ export function useTabs(): TabsState {
 
   const selectProject = (projectId: string) => {
     setCurrentProjectId(projectId)
-    const existing = tabs.find(t => t.projectId === projectId)
+    const existing = tabs.find(t => t.projectId === projectId && t.type === 'project')
     if (existing) {
       setActiveTabId(existing.id)
     } else {
@@ -55,6 +57,25 @@ export function useTabs(): TabsState {
     }
   }
 
+  // 直接打开一个文档（从侧边栏点击）
+  const openDocument = useCallback((doc: Document) => {
+    const tabId = 'doc-' + doc.id
+    setTabs(prev => {
+      const existing = prev.find(t => t.documentId === doc.id)
+      if (existing) return prev
+      return [...prev, {
+        id: tabId,
+        type: 'document',
+        documentId: doc.id,
+        projectId: doc.projectId,
+        title: doc.title,
+        isDirty: false,
+      }]
+    })
+    setActiveTabId(tabId)
+    if (doc.projectId) setCurrentProjectId(doc.projectId)
+  }, [])
+
   const closeTab = (tabId: string) => {
     setTabs(prev => {
       const newTabs = prev.filter(t => t.id !== tabId)
@@ -70,8 +91,9 @@ export function useTabs(): TabsState {
     const projectId = currentProjectId && currentProjectId !== 'today' ? currentProjectId : undefined
     const doc = await documentStore.createDocument('新文档', projectId)
     if (projectId) await projectStore.addDocumentToProject(projectId, doc.id)
+    const tabId = 'doc-' + doc.id
     const newTab: Tab = {
-      id: 'doc-' + doc.id,
+      id: tabId,
       type: 'document',
       documentId: doc.id,
       projectId,
@@ -79,7 +101,7 @@ export function useTabs(): TabsState {
       isDirty: false,
     }
     setTabs(prev => [...prev, newTab])
-    setActiveTabId(newTab.id)
+    setActiveTabId(tabId)
   }
 
   return {
@@ -90,6 +112,7 @@ export function useTabs(): TabsState {
     closeTab,
     selectToday,
     selectProject,
+    openDocument,
     newTab,
   }
 }

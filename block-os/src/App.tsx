@@ -34,6 +34,7 @@ function App() {
     closeTab,
     selectToday,
     selectProject,
+    openDocument,
     newTab,
   } = useTabs()
 
@@ -58,6 +59,7 @@ function App() {
           onToggle={toggleSidebar}
           onSelectToday={selectToday}
           onSelectProject={selectProject}
+          onOpenDocument={openDocument}
           currentProjectId={currentProjectId}
         />
       )}
