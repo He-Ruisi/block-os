@@ -5,6 +5,9 @@
   background: var(--color-bg-primary);
   height: 100vh;
   overflow: hidden;
+  flex: 1;             /* 占满剩余空间，宽度由 flex 决定 */
+  min-width: 280px;
+  max-width: 480px;
 }
 
 .panel-header {
@@ -101,6 +104,7 @@
 
 .message-wrapper {
   flex: 1;
+  min-width: 0;        /* 防止 flex 子元素撑开父容器 */
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -112,7 +116,10 @@
   line-height: 1.6;
   color: var(--color-text-primary);
   word-wrap: break-word;
+  word-break: break-word;
+  overflow-wrap: break-word;
   white-space: pre-wrap;
+  min-width: 0;        /* 防止 flex 子元素撑开父容器 */
 }
 
 .message-user .message-content {

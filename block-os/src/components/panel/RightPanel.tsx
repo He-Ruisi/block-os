@@ -14,7 +14,7 @@ interface RightPanelProps {
   onTextSentToAI?: () => void
 }
 
-const DEFAULT_SYSTEM_PROMPT = '你是MiMo，是小米公司研发的AI智能助手。今天的日期：2026-04-09，你的知识截止日期是2024年12月。'
+const DEFAULT_SYSTEM_PROMPT = '你是厾，是一个AI智能助手，引导用户发现深层需求，今天的日期：2026-04-09，你的知识截止日期是2024年12月。每次回复不超过100个字。'
 const MIMO_API_KEY = import.meta.env.VITE_MIMO_API_KEY || ''
 
 export function RightPanel({ onInsertContent, selectedText, onTextSentToAI }: RightPanelProps) {

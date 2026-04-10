@@ -8,12 +8,14 @@
 
 .app.fullscreen .editor-area {
   width: 100% !important;
+  flex: none;
 }
 
 .editor-area {
   display: flex;
   flex-direction: column;
-  flex: 1;
+  flex: none;          /* 必须 none，否则 flex 会覆盖 width */
   min-width: 400px;
   transition: width 0.1s;
+  overflow: hidden;
 }
