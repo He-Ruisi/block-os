@@ -1,11 +1,13 @@
 import { useState, useRef, useEffect } from 'react'
 import { BlockSpacePanel } from './BlockSpacePanel'
 import { DocumentBlocksPanel } from './DocumentBlocksPanel'
+import { SessionHistoryPanel } from './SessionHistoryPanel'
 import { Toast } from '../shared/Toast'
 import { generateUUID } from '../../utils/uuid'
 import { sendMessage, createImplicitBlockFromAI } from '../../services/aiService'
 import { captureMessageAsBlock } from '../../services/blockCaptureService'
-import type { Message, PanelTab } from '../../types/chat'
+import { useSession } from '../../hooks/useSession'
+import type { PanelTab } from '../../types/chat'
 import './RightPanel.css'
 
 interface RightPanelProps {
@@ -14,20 +16,31 @@ interface RightPanelProps {
   onTextSentToAI?: () => void
 }
 
-const DEFAULT_SYSTEM_PROMPT = '你是厾，是一个AI智能助手，引导用户发现深层需求，今天的日期：2026-04-09，你的知识截止日期是2024年12月。每次回复不超过100个字。'
 const MIMO_API_KEY = import.meta.env.VITE_MIMO_API_KEY || ''
 
 export function RightPanel({ onInsertContent, selectedText, onTextSentToAI }: RightPanelProps) {
   const [activeTab, setActiveTab] = useState<PanelTab>('chat')
-  const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
-  const [systemPrompt, setSystemPrompt] = useState(DEFAULT_SYSTEM_PROMPT)
-  const [tempSystemPrompt, setTempSystemPrompt] = useState(DEFAULT_SYSTEM_PROMPT)
+  const [tempSystemPrompt, setTempSystemPrompt] = useState('')
+  const [showHistory, setShowHistory] = useState(false)
   const [toastMessage, setToastMessage] = useState<string | null>(null)
   const [toastType, setToastType] = useState<'success' | 'error' | 'info'>('success')
   const messagesEndRef = useRef<HTMLDivElement>(null)
+
+  const {
+    currentSession,
+    allSessions,
+    messages,
+    systemPrompt,
+    setMessages,
+    setSystemPrompt,
+    newSession,
+    loadSession,
+    persistSession,
+    refreshSessions,
+  } = useSession()
 
   // 监听选中文字事件
   useEffect(() => {
@@ -35,6 +48,7 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI }: Ri
       const text = (e as CustomEvent<string>).detail
       if (text) {
         setActiveTab('chat')
+        setShowHistory(false)
         setInput(`[上下文]\n${text}\n\n[我的问题]\n`)
         onTextSentToAI?.()
       }
@@ -46,6 +60,7 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI }: Ri
   useEffect(() => {
     if (selectedText?.trim()) {
       setActiveTab('chat')
+      setShowHistory(false)
       setInput(`[上下文]\n${selectedText}\n\n[我的问题]\n`)
       onTextSentToAI?.()
     }
@@ -80,10 +95,8 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI }: Ri
   const handleCaptureBlock = async (messageId: string) => {
     const message = messages.find(m => m.id === messageId)
     if (!message || message.role !== 'assistant') return
-
     const content = message.editorContent || message.content
     const result = await captureMessageAsBlock(messageId, content)
-
     if (result.success) {
       showToast('Block 捕获成功！', 'success')
       setActiveTab('blocks')
@@ -95,13 +108,13 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI }: Ri
   const handleSendMessage = async () => {
     if (!input.trim() || isLoading) return
 
-    const userMessage: Message = { id: generateUUID(), role: 'user', content: input.trim() }
-    setMessages(prev => [...prev, userMessage])
+    const userMessage = { id: generateUUID(), role: 'user' as const, content: input.trim() }
+    const newMessages = [...messages, userMessage]
+    setMessages(newMessages)
     setInput('')
     setIsLoading(true)
 
     try {
-      // 占位 assistant 消息
       let assistantId = ''
 
       const { assistantId: id, fullResponse } = await sendMessage({
@@ -120,7 +133,16 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI }: Ri
         },
       })
 
-      // 自动创建隐式 Block
+      // 自动保存 Session
+      const finalMessages = [...newMessages, {
+        id,
+        role: 'assistant' as const,
+        content: fullResponse,
+        insertedToEditor: false,
+      }]
+      await persistSession(finalMessages)
+
+      // 创建隐式 Block
       await createImplicitBlockFromAI(id, fullResponse)
     } catch (error) {
       console.error('发送消息失败:', error)
@@ -140,32 +162,67 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI }: Ri
     }
   }
 
+  const handleNewSession = async () => {
+    await newSession()
+    setShowHistory(false)
+  }
+
+  const handleLoadSession = (session: typeof currentSession) => {
+    loadSession(session)
+    setShowHistory(false)
+  }
+
+  const handleDeleteSession = (sessionId: string) => {
+    // 如果删除的是当前 session，新建一个
+    if (sessionId === currentSession.id) {
+      newSession()
+    }
+  }
+
   return (
     <div className="right-panel">
       <div className="panel-header">
         <div className="panel-tabs">
-          {(['chat', 'blocks', 'structure', 'session'] as PanelTab[]).map(tab => (
+          {(['chat', 'blocks', 'structure'] as PanelTab[]).map(tab => (
             <button
               key={tab}
-              className={`panel-tab ${activeTab === tab ? 'active' : ''}`}
-              onClick={() => setActiveTab(tab)}
-              disabled={tab === 'session'}
+              className={`panel-tab ${activeTab === tab && !showHistory ? 'active' : ''}`}
+              onClick={() => { setActiveTab(tab); setShowHistory(false) }}
             >
-              {tab === 'chat' ? '对话' : tab === 'blocks' ? 'Block空间' : tab === 'structure' ? '文档结构' : 'Session'}
+              {tab === 'chat' ? '对话' : tab === 'blocks' ? 'Block空间' : '文档结构'}
             </button>
           ))}
         </div>
+
+        {/* 对话标签页的操作按钮 */}
         {activeTab === 'chat' && (
-          <button
-            className="settings-button"
-            onClick={() => { setTempSystemPrompt(systemPrompt); setShowSettings(!showSettings) }}
-            title="设置"
-          >
-            ⚙
-          </button>
+          <div className="chat-header-actions">
+            <button
+              className="icon-button"
+              onClick={handleNewSession}
+              title="新建对话"
+            >
+              +
+            </button>
+            <button
+              className={`icon-button ${showHistory ? 'active' : ''}`}
+              onClick={() => setShowHistory(v => !v)}
+              title="历史对话"
+            >
+              ☰
+            </button>
+            <button
+              className="icon-button"
+              onClick={() => { setTempSystemPrompt(systemPrompt); setShowSettings(!showSettings) }}
+              title="设置"
+            >
+              ⚙
+            </button>
+          </div>
         )}
       </div>
 
+      {/* 对话标签页 */}
       {activeTab === 'chat' && (
         showSettings ? (
           <div className="settings-panel">
@@ -185,8 +242,23 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI }: Ri
               <button className="btn-primary" onClick={() => { setSystemPrompt(tempSystemPrompt); setShowSettings(false) }}>保存</button>
             </div>
           </div>
+        ) : showHistory ? (
+          <SessionHistoryPanel
+            sessions={allSessions}
+            currentSessionId={currentSession.id}
+            onSelect={handleLoadSession}
+            onDelete={handleDeleteSession}
+            onRefresh={refreshSessions}
+          />
         ) : (
           <>
+            {/* Session 标题栏 */}
+            {messages.length > 0 && (
+              <div className="session-title-bar">
+                <span className="session-title">{currentSession.title}</span>
+              </div>
+            )}
+
             <div className="panel-body">
               <div className="messages-container">
                 {messages.length === 0 ? (
@@ -236,6 +308,7 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI }: Ri
                 <div ref={messagesEndRef} />
               </div>
             </div>
+
             <div className="panel-footer">
               <textarea
                 className="chat-input"
@@ -256,15 +329,6 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI }: Ri
 
       {activeTab === 'blocks' && <BlockSpacePanel />}
       {activeTab === 'structure' && <DocumentBlocksPanel />}
-      {activeTab === 'session' && (
-        <div className="panel-body">
-          <div className="panel-placeholder">
-            <div className="placeholder-icon">📅</div>
-            <div className="placeholder-text">Session 功能</div>
-            <div className="placeholder-hint">即将推出</div>
-          </div>
-        </div>
-      )}
 
       {toastMessage && (
         <Toast message={toastMessage} type={toastType} onClose={() => setToastMessage(null)} />

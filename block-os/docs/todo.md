@@ -72,6 +72,16 @@
 
 ## P1 - 重要功能
 
+### AI Session 管理 💬
+- [ ] Session 数据模型（id, title, date, messages, systemPrompt）
+- [ ] IndexedDB `sessions` store
+- [ ] AI 回复完成后自动保存/更新当前 Session
+- [ ] 对话标签页顶部 `+` 按钮新建 Session（保存旧的，清空当前）
+- [ ] Session 历史列表（按日期分组，显示标题和时间）
+- [ ] 点击历史 Session 恢复对话
+- [ ] Session 导出为 JSON 文件
+- [ ] Session 标题自动取第一条用户消息前 20 字
+
 ### Phase 4: 本地存储
 - [ ] 文件系统读写 - [详细需求](./spec/PRD/2026-04-09-phase4-local-storage.md)
 - [ ] Session 管理与状态恢复
@@ -126,6 +136,6 @@
 
 ---
 
-**更新时间**: 2026-04-10 16:30  
-**当前阶段**: 代码架构重构完成（全部 8 步）  
-**下次评审**: 步骤 6-8 完成后
+**更新时间**: 2026-04-10 17:01  
+**当前阶段**: 布局 bug 修复完成，Session 功能待实现  
+**下次评审**: Session 功能实现后

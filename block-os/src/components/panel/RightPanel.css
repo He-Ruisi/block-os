@@ -439,3 +439,50 @@
 .drag-handle:active {
   cursor: grabbing;
 }
+
+/* Chat Header Actions */
+.chat-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-left: auto;
+}
+
+.icon-button {
+  background: transparent;
+  border: none;
+  font-size: 15px;
+  cursor: pointer;
+  padding: 4px 7px;
+  border-radius: 4px;
+  color: var(--color-text-tertiary);
+  transition: all 0.2s;
+  line-height: 1;
+}
+
+.icon-button:hover {
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
+}
+
+.icon-button.active {
+  background: var(--color-bg-primary);
+  color: var(--color-purple);
+}
+
+/* Session Title Bar */
+.session-title-bar {
+  padding: 4px 14px;
+  background: var(--color-bg-secondary);
+  border-bottom: 1px solid var(--color-border-primary);
+  flex-shrink: 0;
+}
+
+.session-title {
+  font-size: 11px;
+  color: var(--color-text-tertiary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+}

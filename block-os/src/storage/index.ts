@@ -1,6 +1,7 @@
 export { blockStore } from './blockStore'
 export { documentStore } from './documentStore'
 export { projectStore } from './projectStore'
+export { sessionStore } from './sessionStore'
 export { initDatabase, getDatabase, isDatabaseInitialized } from './database'
 import { initDatabase } from './database'
 

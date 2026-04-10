@@ -1,6 +1,6 @@
 // 统一 IndexedDB 初始化 — 单例，所有 Store 共享同一个连接
 const DB_NAME = 'blockos-db'
-const DB_VERSION = 3
+const DB_VERSION = 4  // 升级到 4，添加 sessions store
 
 let db: IDBDatabase | null = null
 let initPromise: Promise<IDBDatabase> | null = null
@@ -42,6 +42,13 @@ export async function initDatabase(): Promise<IDBDatabase> {
         const projStore = database.createObjectStore('projects', { keyPath: 'id' })
         projStore.createIndex('createdAt', 'metadata.createdAt', { unique: false })
         projStore.createIndex('updatedAt', 'metadata.updatedAt', { unique: false })
+      }
+
+      // sessions store
+      if (!database.objectStoreNames.contains('sessions')) {
+        const sessionStore = database.createObjectStore('sessions', { keyPath: 'id' })
+        sessionStore.createIndex('date', 'date', { unique: false })
+        sessionStore.createIndex('updatedAt', 'updatedAt', { unique: false })
       }
     }
   })
