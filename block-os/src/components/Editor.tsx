@@ -1,10 +1,10 @@
 import { useEffect, useState, useRef } from 'react'
 import { useEditor, EditorContent, Editor as TiptapEditor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
-import { BlockLink, BlockReference, searchBlocks } from '../lib/tiptapExtensions'
+import { BlockLink, BlockReference, searchBlocks } from '../editor/extensions'
 import { SuggestionMenu } from './SuggestionMenu'
-import { documentStore } from '../lib/documentStore'
-import { blockStore } from '../lib/blockStore'
+import { documentStore } from '../storage/documentStore'
+import { blockStore } from '../storage/blockStore'
 import './Editor.css'
 
 interface EditorProps {

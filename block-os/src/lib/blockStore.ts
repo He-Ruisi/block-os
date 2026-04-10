@@ -1,46 +1,10 @@
-// Block 数据模型
-export interface Block {
-  id: string
-  content: string
-  type: 'text' | 'ai-generated' | 'heading' | 'list' | 'code'
-  source: {
-    type: 'editor' | 'ai'
-    documentId?: string
-    aiMessageId?: string
-    capturedAt: Date
-  }
-  metadata: {
-    title?: string
-    tags: string[]
-    createdAt: Date
-    updatedAt: Date
-  }
-  links?: {
-    outgoing: string[]  // 引用的其他 blocks
-    incoming: string[]  // 被哪些 blocks 引用
-  }
-  // 版本派生相关
-  derivation?: {
-    isDerivative: boolean      // 是否是派生版本
-    sourceBlockId?: string     // 源 Block ID
-    derivedFrom?: string       // 直接派生自哪个版本
-    contextDocumentId?: string // 使用的文档/上下文
-    contextTitle?: string      // 文档标题
-    modifications?: string     // 修改说明
-  }
-}
+import type { Block, BlockDerivative } from '../types/block'
+import { generateUUID } from '../utils/uuid'
 
-// Block 派生版本
-export interface BlockDerivative {
-  id: string                   // 派生版本 ID
-  sourceBlockId: string        // 源 Block ID
-  content: string              // 修改后的内容
-  contextDocumentId: string    // 使用的文档
-  contextTitle: string         // 文档标题
-  modifications: string        // 修改说明
-  createdAt: Date
-  createdBy: string            // 创建者（用户 ID）
-}
+// 重新导出类型，保持向后兼容
+export type { Block, BlockDerivative }
+// 重新导出 generateUUID，保持向后兼容
+export { generateUUID }
 
 // IndexedDB 封装类
 export class BlockStore {
@@ -383,15 +347,6 @@ export class BlockStore {
 
     return null
   }
-}
-
-// 生成 UUID
-export function generateUUID(): string {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
-    const r = (Math.random() * 16) | 0
-    const v = c === 'x' ? r : (r & 0x3) | 0x8
-    return v.toString(16)
-  })
 }
 
 // 单例实例

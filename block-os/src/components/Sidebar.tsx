@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Project, projectStore } from '../lib/projectStore'
+import { Project, projectStore } from '../storage/projectStore'
 import './Sidebar.css'
 
 interface SidebarProps {

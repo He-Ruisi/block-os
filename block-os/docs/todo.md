@@ -27,7 +27,20 @@
 - [ ] 快捷键支持（Cmd+B, Cmd+T, Cmd+W 等）
 - [ ] 布局偏好持久化
 
-### 项目架构优化 🔧
+### 代码架构重构 🏗️（模块化分层）
+- [x] 审查现有代码，诊断架构问题
+- [x] 设计 8 层模块化分层方案
+- [x] 编写 CLAUDE.md 项目指南
+- [ ] **步骤 1**: 提取 `types/` 统一类型定义层
+- [ ] **步骤 2**: 提取 `utils/` 纯工具函数（uuid, markdown, date）
+- [ ] **步骤 3**: 重构 `storage/` 统一 IndexedDB 初始化
+- [ ] **步骤 4**: 提取 `services/` 业务逻辑层（AI、Block 捕获、Git）
+- [ ] **步骤 5**: 拆分 `editor/extensions/` 编辑器扩展
+- [ ] **步骤 6**: 按功能域重组 `components/`（layout/editor/panel/shared）
+- [ ] **步骤 7**: 提取 `hooks/`（useAppLayout, useTabs, useBlockSearch）
+- [ ] **步骤 8**: 精简 `App.tsx` 为布局壳
+
+### 项目架构优化 🔧（已完成）
 - [x] 设计新的文档组织结构 - [详细方案](./spec/2026-04-09-project-structure-improvement.md)
 - [x] 优化 Hooks 触发时机（改为 agentStop）
 - [x] 实现每天一个日志文件（追加模式）
@@ -110,6 +123,6 @@
 
 ---
 
-**更新时间**: 2026-04-09 17:45  
-**当前阶段**: Phase 3 - Block 系统（95% 完成）  
-**下次评审**: Phase 3 完成后
+**更新时间**: 2026-04-10 14:07  
+**当前阶段**: 代码架构重构（方案已设计，待执行）  
+**下次评审**: 重构步骤 1 完成后

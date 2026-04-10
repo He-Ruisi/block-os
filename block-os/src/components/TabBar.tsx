@@ -1,4 +1,4 @@
-import { Tab } from '../lib/projectStore'
+import { Tab } from '../storage/projectStore'
 import './TabBar.css'
 
 interface TabBarProps {

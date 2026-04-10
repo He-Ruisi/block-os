@@ -1,7 +1,7 @@
 import { Node, mergeAttributes } from '@tiptap/core'
 import { Plugin, PluginKey } from '@tiptap/pm/state'
 import { Decoration, DecorationSet } from '@tiptap/pm/view'
-import { blockStore } from './blockStore'
+import { blockStore } from '../storage/blockStore'
 
 // 双向链接 [[]] 扩展
 export const BlockLink = Node.create({

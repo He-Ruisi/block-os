@@ -2,16 +2,11 @@ import { useState, useRef, useEffect } from 'react'
 import { BlockSpacePanel } from './BlockSpacePanel'
 import { DocumentBlocksPanel } from './DocumentBlocksPanel'
 import { Toast } from './Toast'
-import { blockStore, generateUUID, Block } from '../lib/blockStore'
+import { generateUUID } from '../utils/uuid'
+import { sendMessage, createImplicitBlockFromAI } from '../services/aiService'
+import { captureMessageAsBlock } from '../services/blockCaptureService'
+import type { Message, PanelTab } from '../types/chat'
 import './RightPanel.css'
-
-interface Message {
-  id: string
-  role: 'user' | 'assistant'
-  content: string
-  editorContent?: string
-  insertedToEditor?: boolean
-}
 
 interface RightPanelProps {
   onInsertContent?: (content: string) => void
@@ -19,12 +14,8 @@ interface RightPanelProps {
   onTextSentToAI?: () => void
 }
 
-type PanelTab = 'chat' | 'blocks' | 'structure' | 'session'
-
 const DEFAULT_SYSTEM_PROMPT = '你是MiMo，是小米公司研发的AI智能助手。今天的日期：2026-04-09，你的知识截止日期是2024年12月。'
-
 const MIMO_API_KEY = import.meta.env.VITE_MIMO_API_KEY || ''
-const MIMO_API_URL = 'https://api.xiaomimimo.com/v1/chat/completions'
 
 export function RightPanel({ onInsertContent, selectedText, onTextSentToAI }: RightPanelProps) {
   const [activeTab, setActiveTab] = useState<PanelTab>('chat')
@@ -34,269 +25,100 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI }: Ri
   const [showSettings, setShowSettings] = useState(false)
   const [systemPrompt, setSystemPrompt] = useState(DEFAULT_SYSTEM_PROMPT)
   const [tempSystemPrompt, setTempSystemPrompt] = useState(DEFAULT_SYSTEM_PROMPT)
-  
-  // Toast 通知
   const [toastMessage, setToastMessage] = useState<string | null>(null)
   const [toastType, setToastType] = useState<'success' | 'error' | 'info'>('success')
-  
-  // Block 捕获相关（已移除对话框，直接保存）
-  
   const messagesEndRef = useRef<HTMLDivElement>(null)
-
-  // 初始化 IndexedDB
-  useEffect(() => {
-    blockStore.init().catch(console.error)
-  }, [])
 
   // 监听选中文字事件
   useEffect(() => {
     const handleSendToAI = (e: Event) => {
-      const customEvent = e as CustomEvent<string>
-      const text = customEvent.detail
+      const text = (e as CustomEvent<string>).detail
       if (text) {
-        // 切换到对话标签页
         setActiveTab('chat')
-        // 设置输入框内容
         setInput(`[上下文]\n${text}\n\n[我的问题]\n`)
-        // 通知 App 组件
         onTextSentToAI?.()
       }
     }
-
     window.addEventListener('sendToAI', handleSendToAI)
     return () => window.removeEventListener('sendToAI', handleSendToAI)
   }, [onTextSentToAI])
 
-  // 当 selectedText 变化时，自动填充到输入框
   useEffect(() => {
-    if (selectedText && selectedText.trim()) {
+    if (selectedText?.trim()) {
       setActiveTab('chat')
       setInput(`[上下文]\n${selectedText}\n\n[我的问题]\n`)
       onTextSentToAI?.()
     }
   }, [selectedText, onTextSentToAI])
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }
-
   useEffect(() => {
-    scrollToBottom()
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
+
+  const showToast = (msg: string, type: 'success' | 'error' | 'info' = 'success') => {
+    setToastMessage(msg)
+    setToastType(type)
+  }
 
   const insertToEditor = (messageId: string) => {
     const message = messages.find(m => m.id === messageId)
     if (message?.role === 'assistant' && onInsertContent) {
-      const contentToInsert = message.editorContent || message.content
-      onInsertContent(contentToInsert)
-      
-      setMessages(prev =>
-        prev.map(m => m.id === messageId ? { ...m, insertedToEditor: true } : m)
-      )
+      onInsertContent(message.editorContent || message.content)
+      setMessages(prev => prev.map(m => m.id === messageId ? { ...m, insertedToEditor: true } : m))
     }
   }
 
-  // 显示 Toast
-  const showToast = (message: string, type: 'success' | 'error' | 'info' = 'success') => {
-    setToastMessage(message)
-    setToastType(type)
-  }
-
-  // 直接捕获 Block（不弹出对话框）
-  const captureBlock = async (messageId: string) => {
+  const handleCaptureBlock = async (messageId: string) => {
     const message = messages.find(m => m.id === messageId)
     if (!message || message.role !== 'assistant') return
 
-    try {
-      // 确保 blockStore 已初始化
-      if (!blockStore.isInitialized()) {
-        console.log('[Block Capture] Initializing blockStore...')
-        await blockStore.init()
-      }
+    const content = message.editorContent || message.content
+    const result = await captureMessageAsBlock(messageId, content)
 
-      const content = message.editorContent || message.content
-      const block: Block = {
-        id: generateUUID(),
-        content: content,
-        type: 'ai-generated',
-        source: {
-          type: 'ai',
-          aiMessageId: messageId,
-          capturedAt: new Date()
-        },
-        metadata: {
-          title: `AI 回复 - ${new Date().toLocaleString()}`,
-          tags: ['AI回复', '手动捕获'],
-          createdAt: new Date(),
-          updatedAt: new Date()
-        }
-      }
-
-      await blockStore.saveBlock(block)
-      console.log('[Block Capture] Block saved successfully:', block.id)
-      
-      // 触发 Block 更新事件
-      window.dispatchEvent(new Event('blockUpdated'))
-      
-      // 显示成功提示
+    if (result.success) {
       showToast('Block 捕获成功！', 'success')
-      
-      // 切换到 Block 空间标签页
       setActiveTab('blocks')
-    } catch (error) {
-      console.error('[Block Capture] Failed to save block:', error)
-      
-      // 显示详细错误信息
-      const errorMessage = error instanceof Error ? error.message : '未知错误'
-      showToast(`Block 捕获失败: ${errorMessage}`, 'error')
+    } else {
+      showToast(`Block 捕获失败: ${result.error}`, 'error')
     }
   }
 
-  const parseAIResponse = (fullResponse: string): { reply: string; editorContent?: string } => {
-    try {
-      const parsed = JSON.parse(fullResponse)
-      if (parsed.reply && parsed.content) {
-        return { reply: parsed.reply, editorContent: parsed.content }
-      }
-    } catch (e) {
-      // Not JSON
-    }
-
-    const separators = ['---CONTENT---', '【写入内容】', '[CONTENT]']
-    for (const sep of separators) {
-      if (fullResponse.includes(sep)) {
-        const parts = fullResponse.split(sep)
-        return {
-          reply: parts[0].trim(),
-          editorContent: parts[1].trim()
-        }
-      }
-    }
-
-    return { reply: fullResponse }
-  }
-
-  const sendMessage = async () => {
+  const handleSendMessage = async () => {
     if (!input.trim() || isLoading) return
 
-    const userMessage: Message = { 
-      id: generateUUID(),
-      role: 'user', 
-      content: input.trim() 
-    }
+    const userMessage: Message = { id: generateUUID(), role: 'user', content: input.trim() }
     setMessages(prev => [...prev, userMessage])
     setInput('')
     setIsLoading(true)
 
     try {
-      const response = await fetch(MIMO_API_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'api-key': MIMO_API_KEY,
+      // 占位 assistant 消息
+      let assistantId = ''
+
+      const { assistantId: id, fullResponse } = await sendMessage({
+        input: userMessage.content,
+        history: messages,
+        systemPrompt,
+        apiKey: MIMO_API_KEY,
+        onToken: (aid, reply, editorContent) => {
+          if (!assistantId) {
+            assistantId = aid
+            setMessages(prev => [...prev, { id: aid, role: 'assistant', content: '', insertedToEditor: false }])
+          }
+          setMessages(prev =>
+            prev.map(m => m.id === aid ? { ...m, content: reply, editorContent, insertedToEditor: false } : m)
+          )
         },
-        body: JSON.stringify({
-          model: 'mimo-v2-flash',
-          messages: [
-            {
-              role: 'system',
-              content: systemPrompt + '\n\n如果用户需要写入编辑器的内容，请用以下格式回复：\n简短回复用户\n---CONTENT---\n要写入编辑器的内容'
-            },
-            ...messages.map(m => ({ role: m.role, content: m.content })),
-            { role: 'user', content: userMessage.content }
-          ],
-          temperature: 0.8,
-          top_p: 0.95,
-          stream: true,
-        }),
       })
 
-      if (!response.ok) {
-        throw new Error(`API 请求失败: ${response.status}`)
-      }
-
-      const reader = response.body?.getReader()
-      const decoder = new TextDecoder()
-      let assistantMessage = ''
-      const assistantId = generateUUID()
-
-      setMessages(prev => [...prev, { 
-        id: assistantId,
-        role: 'assistant', 
-        content: '', 
-        insertedToEditor: false 
-      }])
-
-      while (reader) {
-        const { done, value } = await reader.read()
-        if (done) break
-
-        const chunk = decoder.decode(value)
-        const lines = chunk.split('\n').filter(line => line.trim().startsWith('data:'))
-
-        for (const line of lines) {
-          const data = line.replace(/^data:\s*/, '')
-          if (data === '[DONE]') continue
-
-          try {
-            const parsed = JSON.parse(data)
-            const content = parsed.choices?.[0]?.delta?.content
-            if (content) {
-              assistantMessage += content
-              const { reply, editorContent } = parseAIResponse(assistantMessage)
-              
-              setMessages(prev =>
-                prev.map(m => m.id === assistantId ? {
-                  ...m,
-                  content: reply,
-                  editorContent: editorContent,
-                  insertedToEditor: false
-                } : m)
-              )
-            }
-          } catch (e) {
-            // Ignore parse errors
-          }
-        }
-      }
-
-      // AI 回复完成后，自动创建隐式 Block
-      if (assistantMessage.trim()) {
-        try {
-          const aiBlock: Block = {
-            id: assistantId, // 使用消息 ID 作为 Block ID
-            content: assistantMessage,
-            type: 'ai-generated',
-            source: {
-              type: 'ai',
-              aiMessageId: assistantId,
-              capturedAt: new Date()
-            },
-            metadata: {
-              title: `AI 回复 - ${new Date().toLocaleString()}`,
-              tags: ['AI回复', '自动生成'],
-              createdAt: new Date(),
-              updatedAt: new Date()
-            }
-          }
-          
-          await blockStore.saveBlock(aiBlock)
-          console.log('[AI Block] Auto-created implicit block:', aiBlock.id)
-          
-          // 触发 Block 更新事件
-          window.dispatchEvent(new Event('blockUpdated'))
-        } catch (error) {
-          console.error('[AI Block] Failed to create implicit block:', error)
-        }
-      }
+      // 自动创建隐式 Block
+      await createImplicitBlockFromAI(id, fullResponse)
     } catch (error) {
       console.error('发送消息失败:', error)
-      setMessages(prev => [...prev, {
-        id: generateUUID(),
-        role: 'assistant',
-        content: '抱歉，发送消息时出现错误。请检查 API 配置。',
-        insertedToEditor: false
-      }])
+      setMessages(prev => [
+        ...prev,
+        { id: generateUUID(), role: 'assistant', content: '抱歉，发送消息时出现错误。请检查 API 配置。', insertedToEditor: false },
+      ])
     } finally {
       setIsLoading(false)
     }
@@ -305,57 +127,29 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI }: Ri
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
-      sendMessage()
+      handleSendMessage()
     }
-  }
-
-  const handleSaveSettings = () => {
-    setSystemPrompt(tempSystemPrompt)
-    setShowSettings(false)
-  }
-
-  const handleCancelSettings = () => {
-    setTempSystemPrompt(systemPrompt)
-    setShowSettings(false)
   }
 
   return (
     <div className="right-panel">
       <div className="panel-header">
         <div className="panel-tabs">
-          <button
-            className={`panel-tab ${activeTab === 'chat' ? 'active' : ''}`}
-            onClick={() => setActiveTab('chat')}
-          >
-            对话
-          </button>
-          <button
-            className={`panel-tab ${activeTab === 'blocks' ? 'active' : ''}`}
-            onClick={() => setActiveTab('blocks')}
-          >
-            Block空间
-          </button>
-          <button
-            className={`panel-tab ${activeTab === 'structure' ? 'active' : ''}`}
-            onClick={() => setActiveTab('structure')}
-          >
-            文档结构
-          </button>
-          <button
-            className={`panel-tab ${activeTab === 'session' ? 'active' : ''}`}
-            onClick={() => setActiveTab('session')}
-            disabled
-          >
-            Session
-          </button>
+          {(['chat', 'blocks', 'structure', 'session'] as PanelTab[]).map(tab => (
+            <button
+              key={tab}
+              className={`panel-tab ${activeTab === tab ? 'active' : ''}`}
+              onClick={() => setActiveTab(tab)}
+              disabled={tab === 'session'}
+            >
+              {tab === 'chat' ? '对话' : tab === 'blocks' ? 'Block空间' : tab === 'structure' ? '文档结构' : 'Session'}
+            </button>
+          ))}
         </div>
         {activeTab === 'chat' && (
-          <button 
+          <button
             className="settings-button"
-            onClick={() => {
-              setTempSystemPrompt(systemPrompt)
-              setShowSettings(!showSettings)
-            }}
+            onClick={() => { setTempSystemPrompt(systemPrompt); setShowSettings(!showSettings) }}
             title="设置"
           >
             ⚙
@@ -366,28 +160,20 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI }: Ri
       {activeTab === 'chat' && (
         showSettings ? (
           <div className="settings-panel">
-            <div className="settings-header">
-              <h3>系统提示词设置</h3>
-            </div>
+            <div className="settings-header"><h3>系统提示词设置</h3></div>
             <div className="settings-body">
               <textarea
                 className="system-prompt-input"
                 value={tempSystemPrompt}
-                onChange={(e) => setTempSystemPrompt(e.target.value)}
+                onChange={e => setTempSystemPrompt(e.target.value)}
                 rows={10}
                 placeholder="输入系统提示词..."
               />
-              <div className="settings-hint">
-                系统提示词会影响 AI 的回复风格和行为
-              </div>
+              <div className="settings-hint">系统提示词会影响 AI 的回复风格和行为</div>
             </div>
             <div className="settings-footer">
-              <button className="btn-secondary" onClick={handleCancelSettings}>
-                取消
-              </button>
-              <button className="btn-primary" onClick={handleSaveSettings}>
-                保存
-              </button>
+              <button className="btn-secondary" onClick={() => { setTempSystemPrompt(systemPrompt); setShowSettings(false) }}>取消</button>
+              <button className="btn-primary" onClick={() => { setSystemPrompt(tempSystemPrompt); setShowSettings(false) }}>保存</button>
             </div>
           </div>
         ) : (
@@ -398,16 +184,12 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI }: Ri
                   <div className="panel-placeholder">
                     <div className="placeholder-icon">🤖</div>
                     <div className="placeholder-text">开始与 AI 对话</div>
-                    <div className="placeholder-hint">
-                      AI 回复可直接写入编辑器或捕获为 Block
-                    </div>
+                    <div className="placeholder-hint">AI 回复可直接写入编辑器或捕获为 Block</div>
                   </div>
                 ) : (
-                  messages.map((msg) => (
+                  messages.map(msg => (
                     <div key={msg.id} className={`message message-${msg.role}`}>
-                      <div className="message-avatar">
-                        {msg.role === 'user' ? '👤' : '🤖'}
-                      </div>
+                      <div className="message-avatar">{msg.role === 'user' ? '👤' : '🤖'}</div>
                       <div className="message-wrapper">
                         <div className="message-content">{msg.content}</div>
                         {msg.role === 'assistant' && msg.editorContent && (
@@ -425,10 +207,7 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI }: Ri
                             >
                               {msg.insertedToEditor ? '✓ 已写入编辑器' : '↗ 写入编辑器'}
                             </button>
-                            <button
-                              className="capture-button"
-                              onClick={() => captureBlock(msg.id)}
-                            >
+                            <button className="capture-button" onClick={() => handleCaptureBlock(msg.id)}>
                               ◆ 捕获为Block
                             </button>
                           </div>
@@ -440,22 +219,17 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI }: Ri
                 <div ref={messagesEndRef} />
               </div>
             </div>
-
             <div className="panel-footer">
               <textarea
                 className="chat-input"
                 placeholder="输入消息... (Enter 发送，Shift+Enter 换行)"
                 value={input}
-                onChange={(e) => setInput(e.target.value)}
+                onChange={e => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
                 disabled={isLoading}
                 rows={3}
               />
-              <button
-                className="send-button"
-                onClick={sendMessage}
-                disabled={!input.trim() || isLoading}
-              >
+              <button className="send-button" onClick={handleSendMessage} disabled={!input.trim() || isLoading}>
                 {isLoading ? '发送中...' : '发送'}
               </button>
             </div>
@@ -464,9 +238,7 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI }: Ri
       )}
 
       {activeTab === 'blocks' && <BlockSpacePanel />}
-
       {activeTab === 'structure' && <DocumentBlocksPanel />}
-
       {activeTab === 'session' && (
         <div className="panel-body">
           <div className="panel-placeholder">
@@ -478,11 +250,7 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI }: Ri
       )}
 
       {toastMessage && (
-        <Toast
-          message={toastMessage}
-          type={toastType}
-          onClose={() => setToastMessage(null)}
-        />
+        <Toast message={toastMessage} type={toastType} onClose={() => setToastMessage(null)} />
       )}
     </div>
   )

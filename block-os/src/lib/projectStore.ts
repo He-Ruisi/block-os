@@ -1,26 +1,8 @@
-// 项目数据模型
-export interface Project {
-  id: string
-  name: string
-  description?: string
-  documents: string[] // 文档 ID 列表
-  metadata: {
-    createdAt: Date
-    updatedAt: Date
-    color?: string // 项目颜色标记
-    icon?: string  // 项目图标
-  }
-}
+import type { Project, Tab } from '../types/project'
+import { generateUUID } from '../utils/uuid'
 
-// 标签页数据模型
-export interface Tab {
-  id: string
-  type: 'today' | 'project' | 'document'
-  projectId?: string
-  documentId?: string
-  title: string
-  isDirty: boolean // 是否有未保存的更改
-}
+// 重新导出类型，保持向后兼容
+export type { Project, Tab }
 
 // 项目存储类
 export class ProjectStore {
@@ -191,15 +173,6 @@ export class ProjectStore {
     project.documents = project.documents.filter(id => id !== documentId)
     await this.updateProject(projectId, { documents: project.documents })
   }
-}
-
-// 生成 UUID
-function generateUUID(): string {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
-    const r = (Math.random() * 16) | 0
-    const v = c === 'x' ? r : (r & 0x3) | 0x8
-    return v.toString(16)
-  })
 }
 
 // 单例实例
