@@ -243,8 +243,11 @@ export function Editor({ onEditorReady, onTextSelected, documentId }: EditorProp
             editor.commands.setContent('')
           }
         } else {
-          // 新文档，清空编辑器
+          // 新文档，清空编辑器并保存空内容
           editor.commands.setContent('')
+          const emptyContent = editor.getJSON()
+          doc.content = JSON.stringify(emptyContent)
+          await documentStore.saveDocument(doc)
           console.log('[Editor] New document, editor cleared')
         }
       } catch (error) {
