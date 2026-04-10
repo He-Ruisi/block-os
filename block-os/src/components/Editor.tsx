@@ -28,6 +28,7 @@ export function Editor({ onEditorReady, onTextSelected, documentId }: EditorProp
   const [currentDocumentId, setCurrentDocumentId] = useState<string | null>(null)
   const editorRef = useRef<HTMLDivElement>(null)
   const updateTimeoutRef = useRef<number | null>(null)
+  const loadedDocumentIdRef = useRef<string | undefined>(undefined) // 记录已加载的文档 ID，避免重复加载
 
   const editor = useEditor({
     extensions: [
@@ -203,6 +204,10 @@ export function Editor({ onEditorReady, onTextSelected, documentId }: EditorProp
   useEffect(() => {
     const loadDocument = async () => {
       if (!editor) return
+      
+      // 避免重复加载同一个文档
+      if (loadedDocumentIdRef.current === documentId) return
+      loadedDocumentIdRef.current = documentId
 
       try {
         await documentStore.init()
@@ -217,38 +222,47 @@ export function Editor({ onEditorReady, onTextSelected, documentId }: EditorProp
             return
           }
           console.log('[Editor] Loading document:', documentId)
+          
+          // 加载文档内容到编辑器
+          if (doc.content && doc.content.trim() !== '') {
+            try {
+              const content = JSON.parse(doc.content)
+              editor.commands.setContent(content)
+              console.log('[Editor] Document content loaded')
+            } catch (e) {
+              console.error('Failed to parse document content:', e)
+              editor.commands.setContent('<p></p>')
+            }
+          } else {
+            // 新文档，设置空段落（不清空，保留光标）
+            editor.commands.setContent('<p></p>')
+            console.log('[Editor] New document, ready to edit')
+          }
+          
+          setCurrentDocumentId(doc.id)
+          documentStore.setCurrentDocument(doc.id)
         } else {
-          // 创建或加载默认文档
+          // 没有指定文档 ID（今日/项目视图），加载或创建默认文档
           const docs = await documentStore.getAllDocuments()
           
           if (docs.length === 0) {
             doc = await documentStore.createDocument('我的第一篇文档')
+            editor.commands.setContent(`<h1>我的第一篇文档</h1><p>开始写作...</p>`)
           } else {
-            doc = docs[0] // 加载最近的文档
+            doc = docs[0]
+            // 加载已有内容
+            if (doc.content && doc.content.trim() !== '') {
+              try {
+                const content = JSON.parse(doc.content)
+                editor.commands.setContent(content)
+              } catch (e) {
+                console.error('Failed to parse document content:', e)
+              }
+            }
           }
-        }
-        
-        setCurrentDocumentId(doc.id)
-        documentStore.setCurrentDocument(doc.id)
-        
-        // 加载文档内容到编辑器
-        if (doc.content) {
-          try {
-            const content = JSON.parse(doc.content)
-            editor.commands.setContent(content)
-            console.log('[Editor] Document content loaded')
-          } catch (e) {
-            console.error('Failed to parse document content:', e)
-            // 如果解析失败，清空编辑器
-            editor.commands.setContent('')
-          }
-        } else {
-          // 新文档，清空编辑器并保存空内容
-          editor.commands.setContent('')
-          const emptyContent = editor.getJSON()
-          doc.content = JSON.stringify(emptyContent)
-          await documentStore.saveDocument(doc)
-          console.log('[Editor] New document, editor cleared')
+          
+          setCurrentDocumentId(doc.id)
+          documentStore.setCurrentDocument(doc.id)
         }
       } catch (error) {
         console.error('Failed to load document:', error)
