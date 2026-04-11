@@ -54,6 +54,12 @@ docs/
 ```
 
 ## 关键架构文档
-- `CLAUDE.md` — 快速上手指南（项目根目录）
-- `docs/ARCHITECTURE.md` — 架构概览 + ADR 链接
+- `CLAUDE.md` — 快速上手指南 + 关键约束（项目根目录）
+- `docs/ARCHITECTURE.md` — 架构概览 + ADR 索引
 - `docs/spec/architecture/` — 架构决策记录（每个重大决策一份）
+- `docs/todo.md` — 待办事项
+- `docs/CHANGELOG.md` — 版本更新记录（精简摘要）
+
+## 自动化 Hooks（`.kiro/hooks/`）
+- `daily-changelog-logger` — 每轮对话结束后追加日志 + 更新 todo/spec + 里程碑更新 CHANGELOG
+- `auto-git-commit` — 每轮对话结束后自动 git commit
