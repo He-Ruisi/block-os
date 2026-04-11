@@ -1,44 +1,228 @@
-// Block 数据模型
+// ============================================================
+// Block 数据模型 — 内容/样式/模板 三层解耦
+// ============================================================
+
+// ---------- 内容层（Content）：纯粹的意义 ----------
+
+/** Block 来源信息，可追溯 */
+export interface BlockSource {
+  type: 'editor' | 'ai' | 'import'
+  documentId?: string       // 来源文档
+  aiMessageId?: string      // AI 消息 ID
+  conversationId?: string   // AI 会话 ID
+  originalPrompt?: string   // 触发 AI 的原始提示
+  capturedAt: Date
+}
+
+/** 编辑历史条目 */
+export interface BlockEditRecord {
+  editedAt: Date
+  editedBy: 'user' | 'ai'
+  summary?: string          // 修改摘要
+}
+
+// ---------- 样式层（Style）：视觉表现配置 ----------
+
+/** AI 块的视觉处理方式 */
+export type AIBlockTreatment = 'accent-border' | 'subtle-bg' | 'invisible'
+
+/** 单个 Block 的样式覆盖 */
+export interface BlockStyle {
+  aiBlockTreatment?: AIBlockTreatment   // AI 块显示方式
+  showSourceLabel?: boolean             // 是否显示来源标签
+  accentColor?: string                  // 强调色
+  customClass?: string                  // 自定义 CSS 类名
+}
+
+// ---------- 模板层（Template）：结构角色 + 导出规则 ----------
+
+/** Block 在文档结构中的角色 */
+export type BlockRole = 'paragraph' | 'heading' | 'quote' | 'separator' | 'list' | 'code' | 'scene' | 'dialogue'
+
+/** 导出时对 AI 块的处理策略 */
+export type AIBlockExportStrategy = 'merge-as-paragraph' | 'keep-as-quote' | 'remove'
+
+/** 单个 Block 的模板属性 */
+export interface BlockTemplate {
+  role: BlockRole                        // 结构角色
+  level?: number                         // heading 层级 (1-6)
+  group?: string                         // 分组/章节标识
+  order?: number                         // 组内排序
+  exportStrategy?: AIBlockExportStrategy // 导出时的处理策略
+}
+
+// ---------- Block 主体 ----------
+
 export interface Block {
   id: string
   content: string
   type: 'text' | 'ai-generated' | 'heading' | 'list' | 'code'
-  implicit?: boolean  // true = 隐式（不显示在 Block 空间），false/undefined = 显式
-  source: {
-    type: 'editor' | 'ai'
-    documentId?: string
-    aiMessageId?: string
-    capturedAt: Date
-  }
+  implicit?: boolean  // true = 隐式（不显示在 Block 空间）
+
+  // 内容层
+  source: BlockSource
+  editHistory?: BlockEditRecord[]
+
+  // 样式层（可选，未设置时使用全局默认）
+  style?: BlockStyle
+
+  // 模板层（可选，未设置时根据 type 推断）
+  template?: BlockTemplate
+
+  // 元数据
   metadata: {
     title?: string
     tags: string[]
     createdAt: Date
     updatedAt: Date
   }
+
+  // 关系
   links?: {
-    outgoing: string[]  // 引用的其他 blocks
-    incoming: string[]  // 被哪些 blocks 引用
+    outgoing: string[]
+    incoming: string[]
   }
-  // 版本派生相关
+
+  // 版本派生
   derivation?: {
-    isDerivative: boolean      // 是否是派生版本
-    sourceBlockId?: string     // 源 Block ID
-    derivedFrom?: string       // 直接派生自哪个版本
-    contextDocumentId?: string // 使用的文档/上下文
-    contextTitle?: string      // 文档标题
-    modifications?: string     // 修改说明
+    isDerivative: boolean
+    sourceBlockId?: string
+    derivedFrom?: string
+    contextDocumentId?: string
+    contextTitle?: string
+    modifications?: string
   }
 }
 
-// Block 派生版本
+// Block 派生版本（保持兼容）
 export interface BlockDerivative {
-  id: string                   // 派生版本 ID
-  sourceBlockId: string        // 源 Block ID
-  content: string              // 修改后的内容
-  contextDocumentId: string    // 使用的文档
-  contextTitle: string         // 文档标题
-  modifications: string        // 修改说明
+  id: string
+  sourceBlockId: string
+  content: string
+  contextDocumentId: string
+  contextTitle: string
+  modifications: string
   createdAt: Date
-  createdBy: string            // 创建者（用户 ID）
+  createdBy: string
 }
+
+// ============================================================
+// 全局样式配置 + 文档模板
+// ============================================================
+
+/** 全局样式主题配置 */
+export interface StyleTheme {
+  id: string
+  name: string                          // "编辑模式" | "预览模式" | "小说导出"
+  aiBlockTreatment: AIBlockTreatment
+  showSourceLabels: boolean
+  fontFamily?: string
+  fontSize?: number
+  lineHeight?: number
+  customCSS?: string
+}
+
+/** 文档导出模板 */
+export interface DocumentTemplate {
+  id: string
+  name: string                          // "小说" | "博客" | "大纲" | "剧本"
+  description?: string
+  structure: TemplateStructureRule[]
+  exportRules: TemplateExportRules
+}
+
+/** 模板结构规则 */
+export interface TemplateStructureRule {
+  role: BlockRole
+  level?: number
+  minBlocks?: number
+  maxBlocks?: number
+  optional?: boolean
+}
+
+/** 模板导出规则 */
+export interface TemplateExportRules {
+  aiBlocks: AIBlockExportStrategy
+  indentFirstLine: boolean
+  pageSize?: 'A4' | 'A5' | 'Letter'
+  format: 'markdown' | 'html' | 'plain-text'
+  includeMetadata?: boolean
+}
+
+// ============================================================
+// 预置样式主题
+// ============================================================
+
+export const DEFAULT_STYLE_THEMES: StyleTheme[] = [
+  {
+    id: 'editing',
+    name: '编辑模式',
+    aiBlockTreatment: 'accent-border',
+    showSourceLabels: true,
+  },
+  {
+    id: 'preview',
+    name: '预览模式',
+    aiBlockTreatment: 'invisible',
+    showSourceLabels: false,
+  },
+  {
+    id: 'review',
+    name: '审阅模式',
+    aiBlockTreatment: 'subtle-bg',
+    showSourceLabels: true,
+  },
+]
+
+// ============================================================
+// 预置文档模板
+// ============================================================
+
+export const DEFAULT_DOCUMENT_TEMPLATES: DocumentTemplate[] = [
+  {
+    id: 'novel',
+    name: '小说',
+    description: '章节标题 + 正文段落，首行缩进，AI 块融入正文',
+    structure: [
+      { role: 'heading', level: 1 },
+      { role: 'paragraph', minBlocks: 1 },
+      { role: 'separator', optional: true },
+    ],
+    exportRules: {
+      aiBlocks: 'merge-as-paragraph',
+      indentFirstLine: true,
+      pageSize: 'A4',
+      format: 'plain-text',
+    },
+  },
+  {
+    id: 'blog',
+    name: '博客',
+    description: 'Markdown 格式，AI 块保留为引用块',
+    structure: [
+      { role: 'heading', level: 1 },
+      { role: 'paragraph' },
+      { role: 'quote', optional: true },
+    ],
+    exportRules: {
+      aiBlocks: 'keep-as-quote',
+      indentFirstLine: false,
+      format: 'markdown',
+    },
+  },
+  {
+    id: 'outline',
+    name: '大纲',
+    description: '纯结构 + 层级缩进，移除 AI 块',
+    structure: [
+      { role: 'heading', level: 1 },
+      { role: 'heading', level: 2, optional: true },
+      { role: 'list', optional: true },
+    ],
+    exportRules: {
+      aiBlocks: 'remove',
+      indentFirstLine: false,
+      format: 'plain-text',
+    },
+  },
+]

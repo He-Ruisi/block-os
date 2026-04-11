@@ -117,7 +117,23 @@ export async function createImplicitBlockFromAI(
     content,
     type: 'ai-generated',
     implicit: true,  // 隐式，不在 Block 空间显示
-    source: { type: 'ai', aiMessageId: assistantId, capturedAt: new Date() },
+    // 内容层：来源可追溯
+    source: {
+      type: 'ai',
+      aiMessageId: assistantId,
+      capturedAt: new Date(),
+    },
+    editHistory: [],
+    // 样式层：隐式块默认不显示标签
+    style: {
+      aiBlockTreatment: 'accent-border',
+      showSourceLabel: false,
+    },
+    // 模板层：默认段落
+    template: {
+      role: 'paragraph',
+      exportStrategy: 'merge-as-paragraph',
+    },
     metadata: {
       title: `AI 回复 - ${new Date().toLocaleString()}`,
       tags: ['AI回复'],

@@ -1,4 +1,4 @@
-import type { Block } from '../types/block'
+import type { Block, BlockStyle, BlockTemplate } from '../types/block'
 import { generateUUID } from '../utils/uuid'
 import { initDatabase, getDatabase, isDatabaseInitialized } from './database'
 
@@ -161,7 +161,19 @@ export class BlockStore {
       id: generateUUID(),
       content: modifiedContent,
       type: sourceBlock.type,
-      source: { type: 'editor', documentId: contextDocumentId, capturedAt: new Date() },
+      // 内容层：继承源 Block 的来源信息，记录派生上下文
+      source: {
+        type: 'editor',
+        documentId: contextDocumentId,
+        capturedAt: new Date(),
+      },
+      editHistory: [
+        { editedAt: new Date(), editedBy: 'user', summary: modifications },
+      ],
+      // 样式层：继承源 Block 的样式
+      style: sourceBlock.style ? { ...sourceBlock.style } : undefined,
+      // 模板层：继承源 Block 的模板
+      template: sourceBlock.template ? { ...sourceBlock.template } : undefined,
       metadata: {
         title: sourceBlock.metadata.title,
         tags: [...sourceBlock.metadata.tags, '派生版本'],
@@ -217,6 +229,40 @@ export class BlockStore {
       return this.createDerivative(sourceBlockId, currentContent, contextDocumentId, contextTitle, '自动检测到内容修改')
     }
     return null
+  }
+
+  // ---------- 样式层操作 ----------
+
+  /** 更新 Block 的样式属性（合并，不覆盖未传入的字段） */
+  async updateBlockStyle(id: string, style: Partial<BlockStyle>): Promise<void> {
+    const block = await this.getBlock(id)
+    if (!block) throw new Error('Block not found')
+    block.style = { ...block.style, ...style }
+    block.metadata.updatedAt = new Date()
+    await this.saveBlock(block)
+  }
+
+  // ---------- 模板层操作 ----------
+
+  /** 更新 Block 的模板属性（合并，不覆盖未传入的字段） */
+  async updateBlockTemplate(id: string, template: Partial<BlockTemplate>): Promise<void> {
+    const block = await this.getBlock(id)
+    if (!block) throw new Error('Block not found')
+    block.template = { ...block.template, role: block.template?.role ?? 'paragraph', ...template }
+    block.metadata.updatedAt = new Date()
+    await this.saveBlock(block)
+  }
+
+  // ---------- 编辑历史 ----------
+
+  /** 追加编辑记录（用户改写 AI 内容时调用） */
+  async appendEditRecord(id: string, editedBy: 'user' | 'ai', summary?: string): Promise<void> {
+    const block = await this.getBlock(id)
+    if (!block) throw new Error('Block not found')
+    if (!block.editHistory) block.editHistory = []
+    block.editHistory.push({ editedAt: new Date(), editedBy, summary })
+    block.metadata.updatedAt = new Date()
+    await this.saveBlock(block)
   }
 }
 

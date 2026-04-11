@@ -82,6 +82,12 @@
 
 ## P1 - 重要功能
 
+### 内容/样式/模板三层解耦 🏗️ - [PRD](./spec/PRD/PRD_内容形式模板.md)
+- [ ] 阶段一：数据层解耦（BlockContent / BlockStyle / BlockTemplate 分离）
+- [ ] 阶段二：多形态渲染（编辑态/预览态/导出小说/导出博客/导出大纲）
+- [ ] 阶段三：交互模式重构（对话沉浸 ↔ 分屏协作 ↔ 写作沉浸光谱）
+- [ ] AI 行内气泡（选中文字后快捷改写/扩展/润色）
+
 ### AI Session 管理 💬
 - [x] Session 数据模型（id, title, date, messages, systemPrompt）
 - [x] IndexedDB `sessions` store
