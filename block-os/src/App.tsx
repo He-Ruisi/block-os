@@ -79,7 +79,9 @@ function App() {
 
   const handleInsertAIContent = (content: string) => {
     if (editor) {
-      editor.chain().focus().insertContent(markdownToHtml(content)).run()
+      const innerHtml = markdownToHtml(content)
+      const html = `<blockquote data-source="ai"><p><strong>◆ AI 生成</strong></p>${innerHtml}</blockquote><p></p>`
+      editor.chain().focus().insertContent(html).run()
     }
   }
 

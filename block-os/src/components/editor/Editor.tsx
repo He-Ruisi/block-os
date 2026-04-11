@@ -125,18 +125,19 @@ export function Editor({ onEditorReady, onTextSelected, documentId }: EditorProp
     let html = ''
 
     if (blockData) {
-      // Block 空间拖入 → 灵感块样式
+      // Block 空间拖入 → 灵感块样式（用 blockquote 包裹，TipTap 原生支持，内容可编辑）
       try {
         const parsed = JSON.parse(blockData)
         const innerHtml = markdownToHtml(parsed.content || '')
-        html = `<div data-type="inspiration-block" class="inspiration-block"><div class="inspiration-block-label">💡 灵感 · ${escapeHtml(parsed.title || 'Block')}</div>${innerHtml}</div><p></p>`
+        const title = escapeHtml(parsed.title || 'Block')
+        html = `<blockquote data-source="inspiration"><p><strong>💡 灵感 · ${title}</strong></p>${innerHtml}</blockquote><p></p>`
       } catch {
-        html = `<div class="inspiration-block"><div class="inspiration-block-label">💡 灵感</div><p>${escapeHtml(blockData)}</p></div><p></p>`
+        html = `<blockquote data-source="inspiration"><p><strong>💡 灵感</strong></p><p>${escapeHtml(blockData)}</p></blockquote><p></p>`
       }
     } else if (aiContent) {
-      // AI 回复拖入 → AI 块样式
+      // AI 回复拖入 → AI 块样式（用 blockquote 包裹，内容可编辑）
       const innerHtml = markdownToHtml(aiContent)
-      html = `<div data-type="ai-block" class="ai-block"><div class="ai-block-label">🤖 AI 生成</div>${innerHtml}</div><p></p>`
+      html = `<blockquote data-source="ai"><p><strong>◆ AI 生成</strong></p>${innerHtml}</blockquote><p></p>`
     }
 
     if (!html) return
