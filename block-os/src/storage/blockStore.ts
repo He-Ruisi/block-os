@@ -1,4 +1,4 @@
-import type { Block, BlockStyle, BlockTemplate } from '../types/block'
+import type { Block, BlockStyle, BlockTemplate, BlockRelease } from '../types/block'
 import { generateUUID } from '../utils/uuid'
 import { initDatabase, getDatabase, isDatabaseInitialized } from './database'
 
@@ -263,6 +263,44 @@ export class BlockStore {
     block.editHistory.push({ editedAt: new Date(), editedBy, summary })
     block.metadata.updatedAt = new Date()
     await this.saveBlock(block)
+  }
+
+  // ---------- Release 版本管理 ----------
+
+  /** 将当前 content 快照为新 release */
+  async createRelease(blockId: string, title: string): Promise<BlockRelease> {
+    const block = await this.getBlock(blockId)
+    if (!block) throw new Error('Block not found')
+    if (!block.releases) block.releases = []
+
+    const nextVersion = block.releases.length > 0
+      ? Math.max(...block.releases.map(r => r.version)) + 1
+      : 1
+
+    const release: BlockRelease = {
+      version: nextVersion,
+      content: block.content,
+      title,
+      releasedAt: new Date(),
+    }
+
+    block.releases.push(release)
+    block.metadata.updatedAt = new Date()
+    await this.saveBlock(block)
+    return release
+  }
+
+  /** 获取 Block 的所有 release 版本 */
+  async getReleases(blockId: string): Promise<BlockRelease[]> {
+    const block = await this.getBlock(blockId)
+    if (!block) return []
+    return block.releases ?? []
+  }
+
+  /** 获取指定版本的 release */
+  async getRelease(blockId: string, version: number): Promise<BlockRelease | null> {
+    const releases = await this.getReleases(blockId)
+    return releases.find(r => r.version === version) ?? null
   }
 }
 

@@ -53,6 +53,24 @@ export interface BlockTemplate {
 
 // ---------- Block 主体 ----------
 
+/** Block 版本快照（用户主动发布） */
+export interface BlockRelease {
+  version: number           // 自增版本号
+  content: string           // 该版本的内容快照
+  title: string             // 用户起的版本标题
+  releasedAt: Date
+}
+
+/** Block 使用记录（独立存储，不内嵌在 Block 中） */
+export interface BlockUsage {
+  id: string                // usage 记录 ID
+  blockId: string           // 引用的 Block ID
+  releaseVersion: number    // 引用的 release 版本号
+  documentId: string        // 使用该 Block 的文档 ID
+  documentTitle: string     // 文档标题
+  insertedAt: Date
+}
+
 export interface Block {
   id: string
   content: string
@@ -92,6 +110,9 @@ export interface Block {
     contextTitle?: string
     modifications?: string
   }
+
+  // 版本快照（用户主动发布的 release）
+  releases?: BlockRelease[]
 }
 
 // Block 派生版本（保持兼容）

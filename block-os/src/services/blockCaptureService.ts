@@ -29,20 +29,17 @@ export async function captureMessageAsBlock(
       id: generateUUID(),
       content,
       type: 'ai-generated',
-      implicit: false,  // 显式，显示在 Block 空间
-      // 内容层：来源可追溯
+      implicit: false,
       source: {
         type: 'ai',
         aiMessageId: messageId,
         capturedAt: new Date(),
       },
       editHistory: [],
-      // 样式层：AI 块默认金色边框
       style: {
         aiBlockTreatment: 'accent-border',
         showSourceLabel: true,
       },
-      // 模板层：默认段落角色
       template: {
         role: 'paragraph',
         exportStrategy: 'merge-as-paragraph',
@@ -53,6 +50,15 @@ export async function captureMessageAsBlock(
         createdAt: new Date(),
         updatedAt: new Date(),
       },
+      // 自动创建 release v1
+      releases: [
+        {
+          version: 1,
+          content,
+          title: '原始版本',
+          releasedAt: new Date(),
+        },
+      ],
     }
 
     await blockStore.saveBlock(block)

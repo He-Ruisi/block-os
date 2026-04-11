@@ -6,6 +6,8 @@ export type {
   BlockStyle,
   BlockTemplate,
   BlockRole,
+  BlockRelease,
+  BlockUsage,
   AIBlockTreatment,
   AIBlockExportStrategy,
   StyleTheme,
