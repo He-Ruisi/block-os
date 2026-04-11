@@ -135,11 +135,13 @@
   font-family: 'Inter', -apple-system, sans-serif;
 }
 
+.theme-newsprint .toolbar-row:first-child {
+  border-bottom: 1px solid #111111;
+}
+
 .theme-newsprint .toolbar-btn {
   font-family: 'Inter', -apple-system, sans-serif;
   font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
 }
 
 .theme-newsprint .toolbar-btn.active {

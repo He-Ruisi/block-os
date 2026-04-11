@@ -352,66 +352,64 @@ export function Editor({ onEditorReady, onTextSelected, documentId }: EditorProp
 
   return (
     <div className="editor-container" ref={editorRef}>
-      {/* Toolbar — 对标 minimal-tiptap 风格 */}
+      {/* Toolbar — 两行布局，对标 reactjs-tiptap-editor 风格 */}
       <div className="editor-toolbar">
-        {/* 段落/标题组 */}
-        <div className="toolbar-group">
-          <button className={`toolbar-btn ${!editor?.isActive('heading') ? 'active' : ''}`}
-            onClick={() => editor?.chain().focus().setParagraph().run()} title="正文">¶</button>
-          <button className={`toolbar-btn ${editor?.isActive('heading', { level: 1 }) ? 'active' : ''}`}
-            onClick={() => editor?.chain().focus().toggleHeading({ level: 1 }).run()} title="标题 1">H1</button>
-          <button className={`toolbar-btn ${editor?.isActive('heading', { level: 2 }) ? 'active' : ''}`}
-            onClick={() => editor?.chain().focus().toggleHeading({ level: 2 }).run()} title="标题 2">H2</button>
-          <button className={`toolbar-btn ${editor?.isActive('heading', { level: 3 }) ? 'active' : ''}`}
-            onClick={() => editor?.chain().focus().toggleHeading({ level: 3 }).run()} title="标题 3">H3</button>
+        {/* 第一行：撤销/重做 | 清除 | 标题 | 文字格式 | 列表 */}
+        <div className="toolbar-row">
+          <div className="toolbar-group">
+            <button className="toolbar-btn" onClick={() => editor?.chain().focus().undo().run()}
+              disabled={!editor?.can().undo()} title="撤销 ⌘Z">↩</button>
+            <button className="toolbar-btn" onClick={() => editor?.chain().focus().redo().run()}
+              disabled={!editor?.can().redo()} title="重做 ⌘⇧Z">↪</button>
+          </div>
+          <div className="toolbar-sep" />
+          <div className="toolbar-group">
+            <button className="toolbar-btn" onClick={() => editor?.chain().focus().unsetAllMarks().run()}
+              title="清除格式">✕</button>
+          </div>
+          <div className="toolbar-sep" />
+          <div className="toolbar-group">
+            <button className={`toolbar-btn toolbar-btn-wide ${!editor?.isActive('heading') && !editor?.isActive('codeBlock') ? 'active' : ''}`}
+              onClick={() => editor?.chain().focus().setParagraph().run()} title="正文">正文</button>
+            <button className={`toolbar-btn toolbar-btn-wide ${editor?.isActive('heading', { level: 1 }) ? 'active' : ''}`}
+              onClick={() => editor?.chain().focus().toggleHeading({ level: 1 }).run()} title="标题 1">标题 1</button>
+            <button className={`toolbar-btn toolbar-btn-wide ${editor?.isActive('heading', { level: 2 }) ? 'active' : ''}`}
+              onClick={() => editor?.chain().focus().toggleHeading({ level: 2 }).run()} title="标题 2">标题 2</button>
+            <button className={`toolbar-btn toolbar-btn-wide ${editor?.isActive('heading', { level: 3 }) ? 'active' : ''}`}
+              onClick={() => editor?.chain().focus().toggleHeading({ level: 3 }).run()} title="标题 3">标题 3</button>
+          </div>
+          <div className="toolbar-sep" />
+          <div className="toolbar-group">
+            <button className={`toolbar-btn ${editor?.isActive('bold') ? 'active' : ''}`}
+              onClick={() => editor?.chain().focus().toggleBold().run()} title="粗体 ⌘B"><strong>B</strong></button>
+            <button className={`toolbar-btn ${editor?.isActive('italic') ? 'active' : ''}`}
+              onClick={() => editor?.chain().focus().toggleItalic().run()} title="斜体 ⌘I"><em>I</em></button>
+            <button className={`toolbar-btn toolbar-btn-underline ${editor?.isActive('strike') ? 'active' : ''}`}
+              onClick={() => editor?.chain().focus().toggleStrike().run()} title="删除线"><s>S</s></button>
+            <button className={`toolbar-btn ${editor?.isActive('code') ? 'active' : ''}`}
+              onClick={() => editor?.chain().focus().toggleCode().run()} title="行内代码 ⌘E">{'</>'}</button>
+          </div>
+          <div className="toolbar-sep" />
+          <div className="toolbar-group">
+            <button className={`toolbar-btn ${editor?.isActive('bulletList') ? 'active' : ''}`}
+              onClick={() => editor?.chain().focus().toggleBulletList().run()} title="无序列表">☰</button>
+            <button className={`toolbar-btn ${editor?.isActive('orderedList') ? 'active' : ''}`}
+              onClick={() => editor?.chain().focus().toggleOrderedList().run()} title="有序列表">☷</button>
+          </div>
         </div>
-
-        <div className="toolbar-sep" />
-
-        {/* 文字格式组 */}
-        <div className="toolbar-group">
-          <button className={`toolbar-btn ${editor?.isActive('bold') ? 'active' : ''}`}
-            onClick={() => editor?.chain().focus().toggleBold().run()} title="粗体 ⌘B">
-            <strong>B</strong>
-          </button>
-          <button className={`toolbar-btn ${editor?.isActive('italic') ? 'active' : ''}`}
-            onClick={() => editor?.chain().focus().toggleItalic().run()} title="斜体 ⌘I">
-            <em>I</em>
-          </button>
-          <button className={`toolbar-btn ${editor?.isActive('strike') ? 'active' : ''}`}
-            onClick={() => editor?.chain().focus().toggleStrike().run()} title="删除线">
-            <s>S</s>
-          </button>
-          <button className={`toolbar-btn ${editor?.isActive('code') ? 'active' : ''}`}
-            onClick={() => editor?.chain().focus().toggleCode().run()} title="行内代码 ⌘E">
-            {'</>'}
-          </button>
+        {/* 第二行：引用 | 分隔线 | 代码块 | 快捷键提示 */}
+        <div className="toolbar-row">
+          <div className="toolbar-group">
+            <button className={`toolbar-btn ${editor?.isActive('blockquote') ? 'active' : ''}`}
+              onClick={() => editor?.chain().focus().toggleBlockquote().run()} title="引用">❝</button>
+            <button className="toolbar-btn"
+              onClick={() => editor?.chain().focus().setHorizontalRule().run()} title="分隔线">―</button>
+            <button className={`toolbar-btn ${editor?.isActive('codeBlock') ? 'active' : ''}`}
+              onClick={() => editor?.chain().focus().toggleCodeBlock().run()} title="代码块">{'{ }'}</button>
+          </div>
+          <div className="toolbar-spacer" />
+          <span className="toolbar-hint">⌘⇧A 发送选区给 AI</span>
         </div>
-
-        <div className="toolbar-sep" />
-
-        {/* 列表组 */}
-        <div className="toolbar-group">
-          <button className={`toolbar-btn ${editor?.isActive('bulletList') ? 'active' : ''}`}
-            onClick={() => editor?.chain().focus().toggleBulletList().run()} title="无序列表">•</button>
-          <button className={`toolbar-btn ${editor?.isActive('orderedList') ? 'active' : ''}`}
-            onClick={() => editor?.chain().focus().toggleOrderedList().run()} title="有序列表">1.</button>
-        </div>
-
-        <div className="toolbar-sep" />
-
-        {/* 块级元素组 */}
-        <div className="toolbar-group">
-          <button className={`toolbar-btn ${editor?.isActive('codeBlock') ? 'active' : ''}`}
-            onClick={() => editor?.chain().focus().toggleCodeBlock().run()} title="代码块">{'{ }'}</button>
-          <button className={`toolbar-btn ${editor?.isActive('blockquote') ? 'active' : ''}`}
-            onClick={() => editor?.chain().focus().toggleBlockquote().run()} title="引用">"</button>
-          <button className="toolbar-btn"
-            onClick={() => editor?.chain().focus().setHorizontalRule().run()} title="分隔线">—</button>
-        </div>
-
-        <div className="toolbar-spacer" />
-        <span className="toolbar-hint">⌘⇧A 发送选区给 AI</span>
       </div>
 
       {/* 编辑区域 */}
@@ -433,7 +431,7 @@ export function Editor({ onEditorReady, onTextSelected, documentId }: EditorProp
               onClick={() => editor.chain().focus().toggleCode().run()}>{'<>'}</button>
             <div className="toolbar-sep" />
             <button className={`toolbar-btn ${editor.isActive('blockquote') ? 'active' : ''}`}
-              onClick={() => editor.chain().focus().toggleBlockquote().run()}>"</button>
+              onClick={() => editor.chain().focus().toggleBlockquote().run()}>❝</button>
           </div>
         </BubbleMenu>
       )}

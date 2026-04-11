@@ -545,3 +545,40 @@
   color: #cf1322;
   background: #fff2f0;
 }
+
+/* 主题切换 */
+.sidebar-theme-toggle {
+  padding: 8px 12px;
+  border-top: 1px solid #e0e0e0;
+  flex-shrink: 0;
+}
+
+.sidebar-theme-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  background: transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  color: #555;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.sidebar-theme-btn:hover {
+  border-color: #007bff;
+  color: #007bff;
+  background: #f0f8ff;
+}
+
+.theme-icon {
+  font-size: 16px;
+}
+
+.theme-label {
+  font-weight: 500;
+}

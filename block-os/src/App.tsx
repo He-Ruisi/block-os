@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Editor as TiptapEditor } from '@tiptap/react'
 import { Sidebar } from './components/layout/Sidebar'
 import { TabBar } from './components/layout/TabBar'
@@ -15,6 +15,15 @@ import './App.css'
 function App() {
   const [editor, setEditor] = useState<TiptapEditor | null>(null)
   const [selectedText, setSelectedText] = useState('')
+  const [theme, setTheme] = useState<string>(() => localStorage.getItem('blockos-theme') || 'default')
+
+  const toggleTheme = useCallback(() => {
+    setTheme(prev => {
+      const next = prev === 'default' ? 'newsprint' : 'default'
+      localStorage.setItem('blockos-theme', next)
+      return next
+    })
+  }, [])
 
   const auth = useAuth()
 
@@ -114,7 +123,7 @@ function App() {
   }
 
   return (
-    <div className={`app ${isFullscreen ? 'fullscreen' : ''}`}>
+    <div className={`app ${isFullscreen ? 'fullscreen' : ''} ${theme === 'newsprint' ? 'theme-newsprint' : ''}`}>
       {!isFullscreen && (
         <Sidebar
           collapsed={sidebarCollapsed}
@@ -125,6 +134,8 @@ function App() {
           currentProjectId={currentProjectId}
           username={auth.user?.username}
           onSignOut={auth.signOut}
+          theme={theme}
+          onToggleTheme={toggleTheme}
         />
       )}
 

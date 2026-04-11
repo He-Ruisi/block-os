@@ -14,6 +14,8 @@ interface SidebarProps {
   currentProjectId: string | null
   username?: string
   onSignOut?: () => void
+  theme?: string
+  onToggleTheme?: () => void
 }
 
 export function Sidebar({
@@ -25,6 +27,8 @@ export function Sidebar({
   currentProjectId,
   username,
   onSignOut,
+  theme,
+  onToggleTheme,
 }: SidebarProps) {
   const [projects, setProjects] = useState<Project[]>([])
   const [expandedProjects, setExpandedProjects] = useState<Set<string>>(new Set())
@@ -455,6 +459,16 @@ export function Sidebar({
               <button className="btn-secondary" onClick={() => setMovingDoc(null)}>取消</button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* 主题切换 */}
+      {onToggleTheme && (
+        <div className="sidebar-theme-toggle">
+          <button className="sidebar-theme-btn" onClick={onToggleTheme} title="切换主题">
+            <span className="theme-icon">{theme === 'newsprint' ? '📰' : '🎨'}</span>
+            <span className="theme-label">{theme === 'newsprint' ? 'Newsprint' : '默认主题'}</span>
+          </button>
         </div>
       )}
 
