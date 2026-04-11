@@ -116,6 +116,11 @@
 ### Block 增强
 - [x] 隐式/显式 Block 区分（AI 自动创建为隐式，捕获后变显式）
 - [x] Block 空间只显示显式 Block
+- [ ] Block 版本化引用系统 — [详细需求](./spec/features/block-system/block-versioned-references.md)
+  - [ ] usages 使用追踪（Block 被哪些文档引用）
+  - [ ] 编辑器内派生触发（修改 SourceBlock 后提示保存为新版本）
+  - [ ] 版本选择器增强（Block 详情面板 + 版本列表 + 插入/派生操作）
+  - [ ] `(())` 块引用触发版本选择器
 - [ ] Block 编辑和更新
 - [ ] Block 删除和归档
 - [ ] Block 导出（Markdown/JSON）
