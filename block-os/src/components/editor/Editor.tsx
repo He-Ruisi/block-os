@@ -294,6 +294,26 @@ export function Editor({ onEditorReady, onTextSelected, documentId }: EditorProp
     return () => window.removeEventListener('navigateToBlock', handler)
   }, [])
 
+  // 监听从 Block 详情面板插入 release 的事件
+  useEffect(() => {
+    if (!editor) return
+    const handler = (e: Event) => {
+      const { content, title, releaseVersion } = (e as CustomEvent).detail
+      if (!content) return
+      const lines = content.split('\n').filter((l: string) => l.trim())
+      editor.chain().focus().insertContent({
+        type: 'sourceBlock',
+        attrs: { source: 'inspiration', sourceLabel: `📦 v${releaseVersion} · ${title}` },
+        content: lines.map((line: string) => ({
+          type: 'paragraph',
+          content: [{ type: 'text', text: line }],
+        })),
+      }).run()
+    }
+    window.addEventListener('insertBlockRelease', handler)
+    return () => window.removeEventListener('insertBlockRelease', handler)
+  }, [editor])
+
   useEffect(() => {
     return () => { if (updateTimeoutRef.current) clearTimeout(updateTimeoutRef.current) }
   }, [])

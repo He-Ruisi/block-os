@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from 'react'
-import type { Block } from '../../types/block'
+import type { Block, BlockRelease } from '../../types/block'
 import { blockStore } from '../../storage/blockStore'
 import { formatRelativeTime } from '../../utils/date'
+import { BlockDetailPanel } from './BlockDetailPanel'
 import './BlockSpacePanel.css'
 
 export function BlockSpacePanel() {
@@ -12,6 +13,7 @@ export function BlockSpacePanel() {
   const [allTags, setAllTags] = useState<string[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [highlightedBlockId, setHighlightedBlockId] = useState<string | null>(null)
+  const [detailBlockId, setDetailBlockId] = useState<string | null>(null)
 
   // 加载 Blocks（只加载显式 Block）
   const loadBlocks = async () => {
@@ -120,6 +122,26 @@ export function BlockSpacePanel() {
     e.dataTransfer.effectAllowed = 'copy'
   }, [])
 
+  // 从详情面板插入 release 到编辑器
+  const handleInsertRelease = useCallback((_block: Block, release: BlockRelease) => {
+    // 通过全局事件通知编辑器插入 release 内容
+    window.dispatchEvent(new CustomEvent('insertBlockRelease', {
+      detail: { blockId: _block.id, releaseVersion: release.version, content: release.content, title: release.title },
+    }))
+    setDetailBlockId(null)
+  }, [])
+
+  // 如果正在查看详情，显示详情面板
+  if (detailBlockId) {
+    return (
+      <BlockDetailPanel
+        blockId={detailBlockId}
+        onClose={() => setDetailBlockId(null)}
+        onInsertRelease={handleInsertRelease}
+      />
+    )
+  }
+
   return (
     <div className="block-space-panel">
       <div className="block-space-header">
@@ -174,6 +196,7 @@ export function BlockSpacePanel() {
                 data-block-id={block.id}
                 draggable
                 onDragStart={e => handleBlockDragStart(e, block)}
+                onClick={() => setDetailBlockId(block.id)}
               >
                 {block.metadata.title && (
                   <div className="block-title">{block.metadata.title}</div>
@@ -191,6 +214,11 @@ export function BlockSpacePanel() {
                     <span className="block-type">
                       {block.type === 'ai-generated' ? '🤖 AI' : '✍️ 编辑器'}
                     </span>
+                    {(block.releases?.length ?? 0) > 0 && (
+                      <span className="block-versions">
+                        📦 {block.releases!.length} 版本
+                      </span>
+                    )}
                     <span className="block-time">
                       {formatDate(block.metadata.createdAt)}
                     </span>
