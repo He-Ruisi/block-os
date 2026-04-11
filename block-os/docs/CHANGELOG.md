@@ -1,5 +1,9 @@
 # BlockOS 更新日志
 
+## [v0.7.0] - 2026-04-11 📦 Block 版本化引用系统
+
+Block 支持 working copy + release 模型。捕获时自动创建 v1，用户可发布新版本。Block 详情面板显示版本列表（标题+内容预览+时间）、引用记录。选择 release 版本插入编辑器为 SourceBlock。usages 独立 IndexedDB store。→ [需求文档](./spec/features/block-system/block-versioned-references.md)
+
 ## [v0.6.1] - 2026-04-11 🧩 SourceBlock 自定义节点
 
 编辑器中的 AI 块/灵感块从 blockquote hack 重构为 `SourceBlock` 自定义 TipTap 节点。来源信息存在节点 attrs 中（不可编辑元数据），内容完全可编辑，视觉由 CSS 类名 + 主题控制。→ [ADR](./spec/architecture/content-style-template.md)
