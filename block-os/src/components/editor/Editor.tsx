@@ -1,10 +1,19 @@
 import { useEffect, useState, useRef, useCallback } from 'react'
 import { useEditor, EditorContent, BubbleMenu, Editor as TiptapEditor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
-import { BlockLink, BlockReference, SourceBlock, searchBlocks } from '../../editor/extensions'
+import {
+  BlockLink, BlockReference, SourceBlock, searchBlocks,
+  createInlineAIPlugin,
+  startInlineAIReplace, updateInlineAIContent,
+  confirmInlineAIReplace, discardInlineAIReplace,
+  cancelActiveInlineAI, hasActiveInlineAI,
+} from '../../editor/extensions'
 import { SuggestionMenu } from './SuggestionMenu'
 import { documentStore } from '../../storage/documentStore'
 import { blockStore } from '../../storage/blockStore'
+import { sendInlineAIRequest } from '../../services/aiService'
+import { captureSelectionAsBlock } from '../../services/blockCaptureService'
+import { generateUUID } from '../../utils/uuid'
 import './Editor.css'
 
 interface EditorProps {
@@ -18,6 +27,10 @@ interface SuggestionItem {
   title: string
   content: string
 }
+
+type AIToolbarMode = 'continue' | 'rewrite' | 'shorten' | 'expand' | 'translate' | 'explain' | 'capture'
+
+const MIMO_API_KEY = import.meta.env.VITE_MIMO_API_KEY || ''
 
 /** 判断拖拽事件是否来自 BlockOS（AI 回复或 Block 空间） */
 function isBlockOSDrag(e: DragEvent | React.DragEvent): boolean {
@@ -33,14 +46,19 @@ export function Editor({ onEditorReady, onTextSelected, documentId }: EditorProp
   const [suggestionPosition, setSuggestionPosition] = useState({ top: 0, left: 0 })
   const [suggestionType, setSuggestionType] = useState<'link' | 'reference' | null>(null)
   const [suggestionRange, setSuggestionRange] = useState<{ from: number; to: number } | null>(null)
+  // AI toolbar state
+  const [aiLoading, setAiLoading] = useState<AIToolbarMode | null>(null)
+  const [annotationPreview, setAnnotationPreview] = useState<{ text: string; mode: 'explain' | 'translate' } | null>(null)
   const currentDocIdRef = useRef<string | null>(null)
   const setCurrentDocId = (id: string) => { currentDocIdRef.current = id }
   const editorRef = useRef<HTMLDivElement>(null)
   const updateTimeoutRef = useRef<number | null>(null)
   const loadedDocumentIdRef = useRef<string | undefined>(undefined)
+  // Inline AI plugin instance (stable ref)
+  const inlineAIPluginRef = useRef(createInlineAIPlugin())
 
   const editor = useEditor({
-    extensions: [StarterKit, BlockLink, BlockReference, SourceBlock],
+    extensions: [StarterKit, BlockLink, BlockReference, SourceBlock, inlineAIPluginRef.current],
     content: `
       <h1>欢迎使用 BlockOS</h1>
       <p>这是一个写作优先的知识操作系统。</p>
@@ -171,6 +189,244 @@ export function Editor({ onEditorReady, onTextSelected, documentId }: EditorProp
       e.dataTransfer.dropEffect = 'copy'
     }
   }, [])
+
+  // ---- Inline AI Decoration 事件处理 ----
+  // 监听 Decoration widget 内的 confirm/discard 自定义事件
+  useEffect(() => {
+    if (!editor) return
+    const el = editor.view.dom
+    const onConfirm = () => confirmInlineAIReplace(editor.view)
+    const onDiscard = () => discardInlineAIReplace(editor.view)
+    el.addEventListener('inlineAIConfirm', onConfirm)
+    el.addEventListener('inlineAIDiscard', onDiscard)
+    return () => {
+      el.removeEventListener('inlineAIConfirm', onConfirm)
+      el.removeEventListener('inlineAIDiscard', onDiscard)
+    }
+  }, [editor])
+
+  // ---- AI 工具栏操作 ----
+
+  /** 获取选中文字及其前后上下文 */
+  const getSelectionContext = useCallback((): { text: string; context: string; from: number; to: number } | null => {
+    if (!editor) return null
+    const { from, to } = editor.state.selection
+    if (from === to) return null
+    const text = editor.state.doc.textBetween(from, to, '\n')
+    if (!text.trim()) return null
+    // 取前后各 200 字符作为上下文
+    const docText = editor.state.doc.textContent
+    const contextStart = Math.max(0, from - 200)
+    const contextEnd = Math.min(docText.length, to + 200)
+    const context = docText.slice(contextStart, contextEnd)
+    return { text, context, from, to }
+  }, [editor])
+
+  /** 续写：在选中段落后插入 pending SourceBlock */
+  const handleContinue = useCallback(async () => {
+    if (!editor || !MIMO_API_KEY) return
+    const sel = getSelectionContext()
+    if (!sel) return
+
+    // 取消已有操作
+    cancelActiveInlineAI(editor.view)
+    setAiLoading('continue')
+
+    const abortController = new AbortController()
+
+    try {
+      // 先插入一个 pending SourceBlock（空内容占位）
+      const insertPos = sel.to
+      editor.chain().focus().setTextSelection(insertPos).insertContent({
+        type: 'sourceBlock',
+        attrs: { source: 'ai', sourceLabel: '✦ AI 续写（待确认）', pending: true },
+        content: [{ type: 'paragraph', content: [{ type: 'text', text: '...' }] }],
+      }).run()
+
+      // 找到刚插入的 pending SourceBlock 位置
+      let pendingPos = -1
+      editor.state.doc.descendants((node, pos) => {
+        if (node.type.name === 'sourceBlock' && node.attrs.pending === true) {
+          pendingPos = pos
+        }
+      })
+
+      await sendInlineAIRequest({
+        mode: 'continue',
+        selectedText: sel.text,
+        context: sel.context,
+        apiKey: MIMO_API_KEY,
+        signal: abortController.signal,
+        onToken: (content) => {
+          // 实时更新 pending SourceBlock 内容
+          if (pendingPos >= 0) {
+            editor.chain().command(({ tr }) => {
+              const node = editor.state.doc.nodeAt(pendingPos)
+              if (!node || node.type.name !== 'sourceBlock') return false
+              const lines = content.split('\n').filter(l => l.trim())
+              const paragraphs = lines.length > 0
+                ? lines.map(line => editor.state.schema.nodes.paragraph.create(
+                    null, editor.state.schema.text(line)
+                  ))
+                : [editor.state.schema.nodes.paragraph.create()]
+              const newNode = node.type.create(node.attrs, paragraphs)
+              tr.replaceWith(pendingPos, pendingPos + node.nodeSize, newNode)
+              return true
+            }).run()
+          }
+        },
+      })
+    } catch (err) {
+      if ((err as Error).name !== 'AbortError') {
+        console.error('[InlineAI] continue failed:', err)
+      }
+    } finally {
+      setAiLoading(null)
+    }
+  }, [editor, getSelectionContext])
+
+  /** 改写/缩写/扩写/翻译：AIReplaceDecoration */
+  const handleReplace = useCallback(async (mode: 'rewrite' | 'shorten' | 'expand' | 'translate') => {
+    if (!editor || !MIMO_API_KEY) return
+    const sel = getSelectionContext()
+    if (!sel) return
+
+    // 取消已有操作
+    cancelActiveInlineAI(editor.view)
+    setAiLoading(mode)
+
+    const abortController = new AbortController()
+    startInlineAIReplace(editor.view, sel.from, sel.to, mode, abortController)
+
+    try {
+      await sendInlineAIRequest({
+        mode,
+        selectedText: sel.text,
+        context: sel.context,
+        apiKey: MIMO_API_KEY,
+        signal: abortController.signal,
+        onToken: (content) => {
+          updateInlineAIContent(editor.view, content)
+        },
+      })
+    } catch (err) {
+      if ((err as Error).name !== 'AbortError') {
+        console.error(`[InlineAI] ${mode} failed:`, err)
+        discardInlineAIReplace(editor.view)
+      }
+    } finally {
+      setAiLoading(null)
+    }
+  }, [editor, getSelectionContext])
+
+  /** 解释：写入 annotations.explanation，显示行内预览 */
+  const handleExplain = useCallback(async () => {
+    if (!editor || !MIMO_API_KEY) return
+    const sel = getSelectionContext()
+    if (!sel) return
+
+    setAiLoading('explain')
+    setAnnotationPreview(null)
+
+    let finalContent = ''
+    try {
+      await sendInlineAIRequest({
+        mode: 'explain',
+        selectedText: sel.text,
+        apiKey: MIMO_API_KEY,
+        onToken: (content) => {
+          finalContent = content
+          setAnnotationPreview({ text: content, mode: 'explain' })
+        },
+      })
+
+      // 写入 Block 附属层（如果选中文字在 SourceBlock 内，找到对应 blockId）
+      let blockId: string | null = null
+      editor.state.doc.nodesBetween(sel.from, sel.to, (node) => {
+        if (node.type.name === 'sourceBlock' && node.attrs.blockId) {
+          blockId = node.attrs.blockId
+        }
+      })
+
+      if (blockId) {
+        await blockStore.addAnnotation(blockId, {
+          id: generateUUID(),
+          type: 'explanation',
+          content: finalContent,
+          source: 'ai',
+          createdAt: new Date(),
+          anchor: { text: sel.text },
+        })
+      }
+    } catch (err) {
+      console.error('[InlineAI] explain failed:', err)
+    } finally {
+      setAiLoading(null)
+    }
+  }, [editor, getSelectionContext])
+
+  /** 翻译：写入 annotations.translation，显示行内预览 */
+  const handleTranslate = useCallback(async () => {
+    if (!editor || !MIMO_API_KEY) return
+    const sel = getSelectionContext()
+    if (!sel) return
+
+    setAiLoading('translate')
+    setAnnotationPreview(null)
+
+    let finalContent = ''
+    try {
+      await sendInlineAIRequest({
+        mode: 'translate',
+        selectedText: sel.text,
+        apiKey: MIMO_API_KEY,
+        onToken: (content) => {
+          finalContent = content
+          setAnnotationPreview({ text: content, mode: 'translate' })
+        },
+      })
+
+      // 写入 Block 附属层
+      let blockId: string | null = null
+      editor.state.doc.nodesBetween(sel.from, sel.to, (node) => {
+        if (node.type.name === 'sourceBlock' && node.attrs.blockId) {
+          blockId = node.attrs.blockId
+        }
+      })
+
+      if (blockId) {
+        await blockStore.addAnnotation(blockId, {
+          id: generateUUID(),
+          type: 'translation',
+          content: finalContent,
+          source: 'ai',
+          createdAt: new Date(),
+          anchor: { text: sel.text },
+        })
+      }
+    } catch (err) {
+      console.error('[InlineAI] translate failed:', err)
+    } finally {
+      setAiLoading(null)
+    }
+  }, [editor, getSelectionContext])
+
+  /** 存为块：捕获选中文字为显式 Block */
+  const handleCapture = useCallback(async () => {
+    if (!editor) return
+    const sel = getSelectionContext()
+    if (!sel) return
+
+    // 检查是否在 SourceBlock 内，继承 source
+    let inheritedSource: { type: 'editor' | 'ai' | 'import'; aiMessageId?: string } | undefined
+    editor.state.doc.nodesBetween(sel.from, sel.to, (node) => {
+      if (node.type.name === 'sourceBlock') {
+        inheritedSource = { type: node.attrs.source === 'ai' ? 'ai' : 'editor' }
+      }
+    })
+
+    await captureSelectionAsBlock(sel.text, inheritedSource)
+  }, [editor, getSelectionContext])
 
   // ---- 搜索 / 建议 ----
 
@@ -417,23 +673,91 @@ export function Editor({ onEditorReady, onTextSelected, documentId }: EditorProp
         <EditorContent editor={editor} />
       </div>
 
-      {/* BubbleMenu — 选中文字时的悬浮菜单 */}
+      {/* BubbleMenu — AI 操作工具栏 */}
       {editor && (
-        <BubbleMenu editor={editor} tippyOptions={{ duration: 150 }}>
-          <div className="bubble-menu">
+        <BubbleMenu
+          editor={editor}
+          tippyOptions={{ duration: 150, placement: 'top-start' }}
+          shouldShow={({ editor: ed, state }) => {
+            const { from, to } = state.selection
+            // 有文字选中 且 没有活跃的 replace 操作时显示
+            return from !== to && !hasActiveInlineAI(state) && !ed.isActive('sourceBlock', { pending: true })
+          }}
+        >
+          <div className="bubble-menu bubble-menu--ai">
+            {/* 格式组 */}
             <button className={`toolbar-btn ${editor.isActive('bold') ? 'active' : ''}`}
-              onClick={() => editor.chain().focus().toggleBold().run()}><strong>B</strong></button>
+              onClick={() => editor.chain().focus().toggleBold().run()} title="粗体"><strong>B</strong></button>
             <button className={`toolbar-btn ${editor.isActive('italic') ? 'active' : ''}`}
-              onClick={() => editor.chain().focus().toggleItalic().run()}><em>I</em></button>
-            <button className={`toolbar-btn ${editor.isActive('strike') ? 'active' : ''}`}
-              onClick={() => editor.chain().focus().toggleStrike().run()}><s>S</s></button>
-            <button className={`toolbar-btn ${editor.isActive('code') ? 'active' : ''}`}
-              onClick={() => editor.chain().focus().toggleCode().run()}>{'<>'}</button>
+              onClick={() => editor.chain().focus().toggleItalic().run()} title="斜体"><em>I</em></button>
             <div className="toolbar-sep" />
-            <button className={`toolbar-btn ${editor.isActive('blockquote') ? 'active' : ''}`}
-              onClick={() => editor.chain().focus().toggleBlockquote().run()}>❝</button>
+            {/* AI 操作组 */}
+            <button
+              className={`toolbar-btn toolbar-btn-wide${aiLoading === 'continue' ? ' ai-btn--loading' : ''}`}
+              onClick={handleContinue}
+              disabled={aiLoading !== null}
+              title="续写：在选中段落下方插入 AI 续写内容">
+              {aiLoading === 'continue' ? '...' : '续写'}
+            </button>
+            <button
+              className={`toolbar-btn toolbar-btn-wide${aiLoading === 'rewrite' ? ' ai-btn--loading' : ''}`}
+              onClick={() => handleReplace('rewrite')}
+              disabled={aiLoading !== null}
+              title="改写：替换选中内容">
+              {aiLoading === 'rewrite' ? '...' : '改写'}
+            </button>
+            <button
+              className={`toolbar-btn toolbar-btn-wide${aiLoading === 'shorten' ? ' ai-btn--loading' : ''}`}
+              onClick={() => handleReplace('shorten')}
+              disabled={aiLoading !== null}
+              title="缩写">
+              {aiLoading === 'shorten' ? '...' : '缩写'}
+            </button>
+            <button
+              className={`toolbar-btn toolbar-btn-wide${aiLoading === 'expand' ? ' ai-btn--loading' : ''}`}
+              onClick={() => handleReplace('expand')}
+              disabled={aiLoading !== null}
+              title="扩写">
+              {aiLoading === 'expand' ? '...' : '扩写'}
+            </button>
+            <button
+              className={`toolbar-btn toolbar-btn-wide${aiLoading === 'translate' ? ' ai-btn--loading' : ''}`}
+              onClick={handleTranslate}
+              disabled={aiLoading !== null}
+              title="翻译：写入附属层，不替换原文">
+              {aiLoading === 'translate' ? '...' : '翻译'}
+            </button>
+            <button
+              className={`toolbar-btn toolbar-btn-wide${aiLoading === 'explain' ? ' ai-btn--loading' : ''}`}
+              onClick={handleExplain}
+              disabled={aiLoading !== null}
+              title="解释：写入附属层批注">
+              {aiLoading === 'explain' ? '...' : '解释'}
+            </button>
+            <div className="toolbar-sep" />
+            <button
+              className="toolbar-btn toolbar-btn-wide"
+              onClick={handleCapture}
+              disabled={aiLoading !== null}
+              title="存为块：捕获选中文字为 Block">
+              存为块
+            </button>
           </div>
         </BubbleMenu>
+      )}
+
+      {/* 翻译/解释 行内预览 */}
+      {annotationPreview && (
+        <div className="annotation-preview">
+          <span className="annotation-preview-label">
+            {annotationPreview.mode === 'explain' ? '💡 解释' : '🌐 翻译'}
+          </span>
+          <span className="annotation-preview-text">{annotationPreview.text}</span>
+          <button
+            className="annotation-preview-close"
+            onClick={() => setAnnotationPreview(null)}
+            title="关闭">✕</button>
+        </div>
       )}
 
       {showSuggestion && (

@@ -96,12 +96,18 @@
   - [x] 编辑器中 AI 块样式根据主题动态切换（SourceBlock 自定义节点）
 - [ ] 阶段三：交互模式重构（对话沉浸 ↔ 分屏协作 ↔ 写作沉浸光谱）
 - [ ] AI 浮动工具栏（选中文字后 AI 操作菜单）— [详细需求](./spec/features/editor/inline-ai-toolbar.md)
-  - [ ] BubbleMenu 改为 AI 操作菜单 + sendInlineAIRequest
-  - [ ] 续写（SourceBlock pending 属性）
-  - [ ] 改写（AIReplaceDecoration）
-  - [ ] 缩写/扩写/翻译（复用改写机制）
-  - [ ] 解释（CommentMark + Block annotation）
-  - [ ] 存为块（captureSelectionAsBlock）
+  - [x] Block 附属层数据模型（annotations: translation/explanation/comment/footnote）
+  - [x] blockStore 附属层 CRUD（addAnnotation/getAnnotations/getLatestAnnotation/getAnnotationAt）
+  - [x] sendInlineAIRequest（六种模式专用 prompt + AbortSignal）
+  - [x] captureSelectionAsBlock（编辑器选中文字捕获）
+  - [x] exportService 支持 includeAnnotations 导出附属层
+  - [x] BubbleMenu 改为 AI 操作菜单 UI
+  - [x] 续写（SourceBlock pending 属性 + 保留/丢弃按钮）
+  - [x] 改写（AIReplaceDecoration Plugin）
+  - [x] 缩写/扩写/翻译（复用改写/附属层机制）
+  - [x] 解释（CommentMark + annotations.explanation）
+  - [x] 存为块 UI（调用 captureSelectionAsBlock）
+  - [x] 并发控制 Plugin（activeAIOperation）
 
 ### AI Session 管理 💬
 - [x] Session 数据模型（id, title, date, messages, systemPrompt）
@@ -174,6 +180,6 @@
 
 ---
 
-**更新时间**: 2026-04-11 18:11  
-**当前阶段**: AI 浮动工具栏方案评估完成（v0.8.0）  
-**下次评审**: AI 浮动工具栏实现 / 阶段三交互模式重构
+**更新时间**: 2026-04-11 18:50  
+**当前阶段**: AI 浮动工具栏编辑器层全部完成（v0.10.0）  
+**下次评审**: Block 空间 annotations 展示 / 阶段三交互模式重构

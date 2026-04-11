@@ -509,3 +509,171 @@
   from { opacity: 0; transform: translateX(-6px); }
   to { opacity: 1; transform: translateX(0); }
 }
+
+/* ---- AI BubbleMenu ---- */
+
+.bubble-menu--ai {
+  flex-wrap: nowrap;
+  gap: 2px;
+  max-width: 520px;
+}
+
+.bubble-menu--ai .toolbar-btn-wide {
+  font-size: 11px;
+  padding: 0 7px;
+  height: 26px;
+  min-width: 36px;
+}
+
+.ai-btn--loading {
+  opacity: 0.5;
+  cursor: wait;
+}
+
+/* ---- SourceBlock pending 临时态 ---- */
+
+.source-block--pending {
+  border-left: 3px solid var(--color-accent-gold);
+  background: linear-gradient(135deg, #fffdf5 0%, var(--color-accent-gold-light) 100%);
+  animation: blockSlideIn 0.25s ease;
+}
+
+.source-block--pending .source-block-label {
+  color: #b8860b;
+  font-style: italic;
+}
+
+.source-block-pending-actions {
+  display: flex;
+  gap: 6px;
+  margin-left: auto;
+}
+
+/* ---- Inline AI Replace Decoration ---- */
+
+/* 原文：半透明 + 删除线 */
+.inline-ai-original {
+  opacity: 0.4;
+  text-decoration: line-through;
+  text-decoration-color: #e57373;
+}
+
+/* AI 预览 widget */
+.inline-ai-preview {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-left: 6px;
+  padding: 2px 8px;
+  background: linear-gradient(135deg, #fffdf5, var(--color-accent-gold-light));
+  border: 1px solid var(--color-accent-gold);
+  border-radius: 6px;
+  font-size: 0.9em;
+  vertical-align: baseline;
+}
+
+.inline-ai-preview--streaming .inline-ai-preview-text::after {
+  content: '▋';
+  animation: blink 0.8s step-end infinite;
+  color: var(--color-accent-gold);
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.inline-ai-preview-text {
+  color: var(--color-text-primary);
+  line-height: 1.5;
+}
+
+.inline-ai-actions {
+  display: inline-flex;
+  gap: 4px;
+  margin-left: 4px;
+  flex-shrink: 0;
+}
+
+.inline-ai-btn {
+  font-size: 11px;
+  padding: 1px 7px;
+  border-radius: 4px;
+  border: 1px solid;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.12s;
+}
+
+.inline-ai-btn--confirm {
+  background: var(--color-purple);
+  color: white;
+  border-color: var(--color-purple);
+}
+
+.inline-ai-btn--confirm:hover {
+  opacity: 0.85;
+}
+
+.inline-ai-btn--discard {
+  background: transparent;
+  color: var(--color-text-muted);
+  border-color: var(--color-border-primary);
+}
+
+.inline-ai-btn--discard:hover {
+  border-color: #e57373;
+  color: #e57373;
+}
+
+/* ---- 翻译/解释 行内预览条 ---- */
+
+.annotation-preview {
+  position: sticky;
+  bottom: 12px;
+  left: 48px;
+  right: 48px;
+  margin: 0 48px;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 14px;
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border-primary);
+  border-left: 3px solid var(--color-purple);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-md);
+  font-size: 13px;
+  z-index: 10;
+  animation: blockSlideIn 0.2s ease;
+}
+
+.annotation-preview-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-purple);
+  white-space: nowrap;
+  flex-shrink: 0;
+  padding-top: 1px;
+}
+
+.annotation-preview-text {
+  flex: 1;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+}
+
+.annotation-preview-close {
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  font-size: 12px;
+  padding: 0 2px;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.annotation-preview-close:hover {
+  color: var(--color-text-primary);
+}

@@ -4,7 +4,9 @@ import { blockStore } from '../../storage/blockStore'
 /**
  * SourceBlock — 内容与形式分离的核心节点
  *
- * attrs: source, sourceLabel, blockId, releaseVersion
+ * attrs: source, sourceLabel, blockId, releaseVersion, pending
+ * pending=true → 临时态（续写结果），显示「保留」「丢弃」按钮
+ * pending=false → 正常 SourceBlock
  * 内容区域 block+，完全可编辑
  * 编辑器内容实时同步回 Block.content（debounce 500ms）
  * hover 操作栏：发布新版本 / 查看版本
@@ -21,6 +23,8 @@ export const SourceBlock = Node.create({
       sourceLabel: { default: '' },
       blockId: { default: null },
       releaseVersion: { default: null },
+      /** 临时态：续写结果等待用户确认 */
+      pending: { default: false },
     }
   },
 
@@ -34,6 +38,7 @@ export const SourceBlock = Node.create({
           sourceLabel: dom.getAttribute('data-source-label') || '',
           blockId: dom.getAttribute('data-block-id') || null,
           releaseVersion: dom.getAttribute('data-release-version') ? Number(dom.getAttribute('data-release-version')) : null,
+          pending: dom.getAttribute('data-pending') === 'true',
         }
       },
     }]
@@ -49,21 +54,24 @@ export const SourceBlock = Node.create({
         'data-source-label': HTMLAttributes.sourceLabel || '',
         'data-block-id': HTMLAttributes.blockId || '',
         'data-release-version': HTMLAttributes.releaseVersion != null ? String(HTMLAttributes.releaseVersion) : '',
-        class: `source-block source-block--${source}`,
+        'data-pending': HTMLAttributes.pending ? 'true' : 'false',
+        class: `source-block source-block--${source}${HTMLAttributes.pending ? ' source-block--pending' : ''}`,
       }),
       0,
     ]
   },
 
   addNodeView() {
-    return ({ node }) => {
+    return ({ node, getPos, editor }) => {
       const source = node.attrs.source || 'ai'
+      const isPending: boolean = node.attrs.pending === true
       const label = node.attrs.sourceLabel || (source === 'ai' ? '◆ AI 生成' : '💡 灵感')
       const bId: string | null = node.attrs.blockId
 
       // ---- DOM ----
       const dom = document.createElement('div')
       dom.classList.add('source-block', `source-block--${source}`)
+      if (isPending) dom.classList.add('source-block--pending')
       dom.setAttribute('data-type', 'source-block')
       dom.setAttribute('data-source', source)
       if (bId) dom.setAttribute('data-block-id', bId)
@@ -75,11 +83,55 @@ export const SourceBlock = Node.create({
 
       const labelEl = document.createElement('span')
       labelEl.classList.add('source-block-label')
-      labelEl.textContent = label
+      labelEl.textContent = isPending ? '✦ AI 续写（待确认）' : label
       headerEl.appendChild(labelEl)
 
-      // 操作栏
-      if (bId) {
+      // 临时态：保留 / 丢弃按钮
+      if (isPending) {
+        const pendingActions = document.createElement('div')
+        pendingActions.classList.add('source-block-pending-actions')
+
+        const keepBtn = document.createElement('button')
+        keepBtn.classList.add('sb-toolbar-btn', 'sb-btn-confirm')
+        keepBtn.textContent = '✓ 保留'
+        keepBtn.type = 'button'
+        keepBtn.addEventListener('mousedown', (e) => {
+          e.preventDefault()
+          e.stopPropagation()
+          // 将 pending 改为 false，变为正常 SourceBlock
+          if (typeof getPos === 'function') {
+            const pos = getPos()
+            editor.chain().focus().command(({ tr }) => {
+              tr.setNodeMarkup(pos, undefined, { ...node.attrs, pending: false, sourceLabel: label })
+              return true
+            }).run()
+          }
+        })
+
+        const discardBtn = document.createElement('button')
+        discardBtn.classList.add('sb-toolbar-btn', 'sb-btn-cancel')
+        discardBtn.textContent = '✕ 丢弃'
+        discardBtn.type = 'button'
+        discardBtn.addEventListener('mousedown', (e) => {
+          e.preventDefault()
+          e.stopPropagation()
+          if (typeof getPos === 'function') {
+            const pos = getPos()
+            editor.chain().focus().command(({ tr }) => {
+              const nodeSize = editor.state.doc.nodeAt(pos)?.nodeSize ?? 0
+              tr.delete(pos, pos + nodeSize)
+              return true
+            }).run()
+          }
+        })
+
+        pendingActions.appendChild(keepBtn)
+        pendingActions.appendChild(discardBtn)
+        headerEl.appendChild(pendingActions)
+      }
+
+      // 正常态：hover 操作栏
+      if (!isPending && bId) {
         const toolbar = document.createElement('div')
         toolbar.classList.add('source-block-toolbar')
 
@@ -103,7 +155,6 @@ export const SourceBlock = Node.create({
         viewBtn.addEventListener('mousedown', (e) => {
           e.preventDefault()
           e.stopPropagation()
-          // 通知 RightPanel 切换到 blocks 标签并打开详情
           window.dispatchEvent(new CustomEvent('openBlockDetail', { detail: bId }))
         })
         toolbar.appendChild(viewBtn)
@@ -121,7 +172,7 @@ export const SourceBlock = Node.create({
       // ---- 内容同步回 Block.content（debounce 500ms） ----
       let syncTimer: ReturnType<typeof setTimeout> | null = null
 
-      if (bId) {
+      if (bId && !isPending) {
         const observer = new MutationObserver(() => {
           if (syncTimer) clearTimeout(syncTimer)
           syncTimer = setTimeout(() => {
