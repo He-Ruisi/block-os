@@ -1,25 +1,32 @@
 # BlockOS 更新日志
 
-## [v0.6.0] - 2026-04-11 🏗️ 内容/样式/模板三层解耦（阶段一）
+## [v0.6.0] - 2026-04-11 🏗️ 内容/样式/模板三层解耦（阶段一+阶段二）
 
 ### 重要里程碑
-完成 Block 数据层解耦，将扁平的 Block 模型拆分为 Content（来源追溯）、Style（视觉配置）、Template（结构角色+导出规则）三层独立架构。
+完成 Block 数据层解耦和多形态渲染 UI 集成。
 
-### 核心改动
-- ✅ **类型重构**：新增 `BlockSource`、`BlockStyle`、`BlockTemplate` 等独立类型
-- ✅ **预置主题**：编辑模式 / 预览模式 / 审阅模式三套 `StyleTheme`
-- ✅ **预置模板**：小说 / 博客 / 大纲三套 `DocumentTemplate`，含导出规则
-- ✅ **导出服务**：`exportService.ts` 实现同一内容按不同模板导出为 Markdown / HTML / 纯文本
-- ✅ **编辑历史**：`editHistory` 记录用户对 AI 内容的修改，来源信息始终保留
-- ✅ **向后兼容**：`style` 和 `template` 字段均为可选，旧数据无需迁移
+### 阶段一：数据层解耦
+- ✅ Block 类型拆分为 Content / Style / Template 三层
+- ✅ 预置样式主题（编辑/预览/审阅）和文档模板（小说/博客/大纲）
+- ✅ `exportService.ts` 多格式导出（Markdown / HTML / 纯文本）
+- ✅ 编辑历史追踪，AI 来源可追溯
+
+### 阶段二：多形态渲染 UI
+- ✅ 右侧面板新增「预览导出」标签页（`PreviewPanel`）
+- ✅ 样式主题切换（编辑/预览/审阅），预览区域动态切换字体和视觉风格
+- ✅ 导出模板切换（小说/博客/大纲），AI 块按策略处理（融入正文/保留引用/移除）
+- ✅ 一键复制和导出文件（.md / .html / .txt）
 
 ### 新增文件
 - `src/services/exportService.ts` — 多形态导出服务
+- `src/components/panel/PreviewPanel.tsx` + `.css` — 预览导出面板
 
 ### 修改文件
 - `src/types/block.ts` — 三层解耦类型定义
+- `src/types/chat.ts` — PanelTab 新增 `'preview'`
 - `src/storage/blockStore.ts` — 新增 `updateBlockStyle` / `updateBlockTemplate` / `appendEditRecord`
 - `src/services/aiService.ts` / `blockCaptureService.ts` — Block 创建填充三层数据
+- `src/components/panel/RightPanel.tsx` — 新增「预览导出」标签页
 
 ---
 
