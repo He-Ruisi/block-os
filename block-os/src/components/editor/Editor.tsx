@@ -11,13 +11,25 @@ import './Editor.css'
 interface EditorProps {
   onEditorReady?: (editor: TiptapEditor) => void
   onTextSelected?: (text: string) => void
-  documentId?: string // 要加载的文档 ID
+  documentId?: string
 }
 
 interface SuggestionItem {
   id: string
   title: string
   content: string
+}
+
+/** 判断拖拽事件是否来自 BlockOS（AI 回复或 Block 空间） */
+function isBlockOSDrag(e: DragEvent | React.DragEvent): boolean {
+  return (
+    e.dataTransfer?.types.includes('application/blockos-ai-content') ||
+    e.dataTransfer?.types.includes('application/blockos-block')
+  ) ?? false
+}
+
+function escapeHtml(str: string): string {
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
 }
 
 export function Editor({ onEditorReady, onTextSelected, documentId }: EditorProps) {
@@ -29,14 +41,10 @@ export function Editor({ onEditorReady, onTextSelected, documentId }: EditorProp
   const [currentDocumentId, setCurrentDocumentId] = useState<string | null>(null)
   const editorRef = useRef<HTMLDivElement>(null)
   const updateTimeoutRef = useRef<number | null>(null)
-  const loadedDocumentIdRef = useRef<string | undefined>(undefined) // 记录已加载的文档 ID，避免重复加载
+  const loadedDocumentIdRef = useRef<string | undefined>(undefined)
 
   const editor = useEditor({
-    extensions: [
-      StarterKit,
-      BlockLink,
-      BlockReference,
-    ],
+    extensions: [StarterKit, BlockLink, BlockReference],
     content: `
       <h1>欢迎使用 BlockOS</h1>
       <p>这是一个写作优先的知识操作系统。</p>
@@ -54,79 +62,87 @@ export function Editor({ onEditorReady, onTextSelected, documentId }: EditorProp
       <p>选中任意文字，然后按 Cmd/Ctrl + Shift + A 发送给 AI，或者右键选择"发送给 AI"。</p>
     `,
     editorProps: {
-      attributes: {
-        class: 'editor-content',
+      attributes: { class: 'editor-content' },
+      // 拦截 ProseMirror 的 drop，阻止它用 text/plain 插入（导致重复）
+      handleDrop: (_view, event) => {
+        if (isBlockOSDrag(event as DragEvent)) {
+          // 返回 true = 告诉 ProseMirror "我已处理，别再插入了"
+          // 实际插入由外层 React onDrop 完成
+          return true
+        }
+        return false
       },
     },
-    onSelectionUpdate: ({ editor }) => {
-      // 监听选中变化
-      const { from, to } = editor.state.selection
+    onSelectionUpdate: ({ editor: ed }) => {
+      const { from, to } = ed.state.selection
       if (from !== to) {
-        const selectedText = editor.state.doc.textBetween(from, to, '\n')
-        if (selectedText.trim() && onTextSelected) {
-          onTextSelected(selectedText)
-        }
+        const selectedText = ed.state.doc.textBetween(from, to, '\n')
+        if (selectedText.trim() && onTextSelected) onTextSelected(selectedText)
       }
     },
-    onUpdate: ({ editor }) => {
-      // 检测 [[ 或 (( 触发自动补全
-      const { selection } = editor.state
-      const { $from } = selection
+    onUpdate: ({ editor: ed }) => {
+      const { $from } = ed.state.selection
       const textBefore = $from.parent.textBetween(
-        Math.max(0, $from.parentOffset - 20),
-        $from.parentOffset,
-        null,
-        '\ufffc'
+        Math.max(0, $from.parentOffset - 20), $from.parentOffset, null, '\ufffc'
       )
 
-      // 检测 [[
       const linkMatch = textBefore.match(/\[\[([^\]]*)$/)
       if (linkMatch) {
         const query = linkMatch[1]
-        const from = $from.pos - query.length
-        const to = $from.pos
-        
         setSuggestionType('link')
-        setSuggestionRange({ from: from - 2, to })
+        setSuggestionRange({ from: $from.pos - query.length - 2, to: $from.pos })
         handleSearch(query)
-        updateSuggestionPosition(editor)
+        updateSuggestionPosition(ed)
         return
       }
 
-      // 检测 ((
       const refMatch = textBefore.match(/\(\(([^)]*)$/)
       if (refMatch) {
         const query = refMatch[1]
-        const from = $from.pos - query.length
-        const to = $from.pos
-        
         setSuggestionType('reference')
-        setSuggestionRange({ from: from - 2, to })
+        setSuggestionRange({ from: $from.pos - query.length - 2, to: $from.pos })
         handleSearch(query)
-        updateSuggestionPosition(editor)
+        updateSuggestionPosition(ed)
         return
       }
 
-      // 没有匹配，关闭建议
       setShowSuggestion(false)
-
-      // 延迟更新文档（防抖）
-      if (updateTimeoutRef.current) {
-        clearTimeout(updateTimeoutRef.current)
-      }
-      updateTimeoutRef.current = window.setTimeout(() => {
-        handleDocumentUpdate(editor)
-      }, 1000) // 1秒后更新
+      if (updateTimeoutRef.current) clearTimeout(updateTimeoutRef.current)
+      updateTimeoutRef.current = window.setTimeout(() => handleDocumentUpdate(ed), 1000)
     },
   })
 
-  // 处理从 AI 面板拖拽内容到编辑器
+  // ---- 拖拽处理（React 层，在 ProseMirror 之上） ----
+
   const handleDrop = useCallback((e: React.DragEvent) => {
-    const content = e.dataTransfer.getData('application/blockos-ai-content')
-    if (!content || !editor) return
+    if (!editor || !isBlockOSDrag(e)) return
     e.preventDefault()
+    e.stopPropagation()
+
+    const aiContent = e.dataTransfer.getData('application/blockos-ai-content')
+    const blockData = e.dataTransfer.getData('application/blockos-block')
+
+    let html = ''
+
+    if (blockData) {
+      // Block 空间拖入 → 灵感块样式
+      try {
+        const parsed = JSON.parse(blockData)
+        const innerHtml = markdownToHtml(parsed.content || '')
+        html = `<div data-type="inspiration-block" class="inspiration-block"><div class="inspiration-block-label">💡 灵感 · ${escapeHtml(parsed.title || 'Block')}</div>${innerHtml}</div><p></p>`
+      } catch {
+        html = `<div class="inspiration-block"><div class="inspiration-block-label">💡 灵感</div><p>${escapeHtml(blockData)}</p></div><p></p>`
+      }
+    } else if (aiContent) {
+      // AI 回复拖入 → AI 块样式
+      const innerHtml = markdownToHtml(aiContent)
+      html = `<div data-type="ai-block" class="ai-block"><div class="ai-block-label">🤖 AI 生成</div>${innerHtml}</div><p></p>`
+    }
+
+    if (!html) return
+
+    // 将光标移到拖拽位置
     const pos = editor.view.posAtCoords({ left: e.clientX, top: e.clientY })
-    const html = markdownToHtml(content)
     if (pos) {
       editor.chain().focus().setTextSelection(pos.pos).insertContent(html).run()
     } else {
@@ -135,13 +151,16 @@ export function Editor({ onEditorReady, onTextSelected, documentId }: EditorProp
   }, [editor])
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
-    if (e.dataTransfer.types.includes('application/blockos-ai-content')) {
+    if (isBlockOSDrag(e)) {
       e.preventDefault()
       e.dataTransfer.dropEffect = 'copy'
     }
   }, [])
 
-  const handleSearch = async (query: string) => {    try {
+  // ---- 搜索 / 建议 ----
+
+  const handleSearch = async (query: string) => {
+    try {
       const results = await searchBlocks(query)
       setSuggestionItems(results)
       setShowSuggestion(results.length > 0)
@@ -151,24 +170,15 @@ export function Editor({ onEditorReady, onTextSelected, documentId }: EditorProp
     }
   }
 
-  const updateSuggestionPosition = (editor: TiptapEditor) => {
-    const { selection } = editor.state
-    const { $from } = selection
-    const coords = editor.view.coordsAtPos($from.pos)
-    
-    setSuggestionPosition({
-      top: coords.bottom + 5,
-      left: coords.left,
-    })
+  const updateSuggestionPosition = (ed: TiptapEditor) => {
+    const coords = ed.view.coordsAtPos(ed.state.selection.$from.pos)
+    setSuggestionPosition({ top: coords.bottom + 5, left: coords.left })
   }
 
-  // 处理文档更新（提取隐式 Block 和更新链接关系）
-  const handleDocumentUpdate = async (editor: TiptapEditor) => {
+  const handleDocumentUpdate = async (ed: TiptapEditor) => {
     if (!currentDocumentId) return
-
     try {
-      const editorJSON = editor.getJSON()
-      await documentStore.updateDocumentBlocks(currentDocumentId, editorJSON)
+      await documentStore.updateDocumentBlocks(currentDocumentId, ed.getJSON())
     } catch (error) {
       console.error('Failed to update document blocks:', error)
     }
@@ -176,104 +186,58 @@ export function Editor({ onEditorReady, onTextSelected, documentId }: EditorProp
 
   const handleSelectSuggestion = async (item: SuggestionItem) => {
     if (!editor || !suggestionRange) return
-
     const { from, to } = suggestionRange
 
     if (suggestionType === 'link') {
-      // 插入双向链接
-      editor
-        .chain()
-        .focus()
-        .deleteRange({ from, to })
-        .insertContent({
-          type: 'blockLink',
-          attrs: {
-            blockId: item.id,
-            blockTitle: item.title,
-          },
-        })
+      editor.chain().focus().deleteRange({ from, to })
+        .insertContent({ type: 'blockLink', attrs: { blockId: item.id, blockTitle: item.title } })
         .run()
-
-      // 立即更新链接关系
       if (currentDocumentId) {
-        try {
-          await blockStore.addLink(currentDocumentId, item.id)
-        } catch (error) {
-          console.error('Failed to add link:', error)
-        }
+        try { await blockStore.addLink(currentDocumentId, item.id) }
+        catch (error) { console.error('Failed to add link:', error) }
       }
     } else if (suggestionType === 'reference') {
-      // 插入块引用
-      editor
-        .chain()
-        .focus()
-        .deleteRange({ from, to })
-        .insertContent({
-          type: 'blockReference',
-          attrs: {
-            blockId: item.id,
-            blockContent: item.content,
-          },
-        })
+      editor.chain().focus().deleteRange({ from, to })
+        .insertContent({ type: 'blockReference', attrs: { blockId: item.id, blockContent: item.content } })
         .run()
     }
-
     setShowSuggestion(false)
   }
 
-  // 初始化文档或加载指定文档
+  // ---- 文档加载 ----
+
   useEffect(() => {
     const loadDocument = async () => {
       if (!editor) return
-
-      // 避免重复加载同一个文档
       if (loadedDocumentIdRef.current === documentId) return
       loadedDocumentIdRef.current = documentId
 
       try {
-        // 确保 DB 已初始化
         await documentStore.init()
-
         if (documentId) {
-          // 加载指定的文档
           const doc = await documentStore.getDocument(documentId)
-          if (!doc) {
-            console.error('[Editor] Document not found:', documentId)
-            editor.commands.setContent('<p></p>')
-            return
-          }
-
-          if (doc.content && doc.content.trim() !== '') {
-            try {
-              editor.commands.setContent(JSON.parse(doc.content))
-            } catch {
-              editor.commands.setContent('<p></p>')
-            }
+          if (!doc) { editor.commands.setContent('<p></p>'); return }
+          if (doc.content?.trim()) {
+            try { editor.commands.setContent(JSON.parse(doc.content)) }
+            catch { editor.commands.setContent('<p></p>') }
           } else {
             editor.commands.setContent('<p></p>')
           }
-
           setCurrentDocumentId(doc.id)
           documentStore.setCurrentDocument(doc.id)
         } else {
-          // 今日/项目视图：加载或创建默认文档
           const docs = await documentStore.getAllDocuments()
-
           let doc
           if (docs.length === 0) {
             doc = await documentStore.createDocument('我的第一篇文档')
             editor.commands.setContent('<h1>我的第一篇文档</h1><p>开始写作...</p>')
           } else {
             doc = docs[0]
-            if (doc.content && doc.content.trim() !== '') {
-              try {
-                editor.commands.setContent(JSON.parse(doc.content))
-              } catch {
-                // keep current content
-              }
+            if (doc.content?.trim()) {
+              try { editor.commands.setContent(JSON.parse(doc.content)) }
+              catch { /* keep */ }
             }
           }
-
           setCurrentDocumentId(doc.id)
           documentStore.setCurrentDocument(doc.id)
         }
@@ -281,99 +245,62 @@ export function Editor({ onEditorReady, onTextSelected, documentId }: EditorProp
         console.error('[Editor] Failed to load document:', error)
       }
     }
-
     loadDocument()
   }, [editor, documentId])
 
   useEffect(() => {
-    if (editor && onEditorReady) {
-      onEditorReady(editor)
-    }
+    if (editor && onEditorReady) onEditorReady(editor)
   }, [editor, onEditorReady])
 
-  // 添加键盘快捷键监听
+  // 快捷键
   useEffect(() => {
     if (!editor) return
-
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Cmd/Ctrl + Shift + A
       if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key === 'a') {
         e.preventDefault()
         const { from, to } = editor.state.selection
         if (from !== to) {
-          const selectedText = editor.state.doc.textBetween(from, to, '\n')
-          if (selectedText.trim() && onTextSelected) {
-            onTextSelected(selectedText)
-            // 触发一个自定义事件，通知 RightPanel
-            window.dispatchEvent(new CustomEvent('sendToAI', { detail: selectedText }))
+          const text = editor.state.doc.textBetween(from, to, '\n')
+          if (text.trim() && onTextSelected) {
+            onTextSelected(text)
+            window.dispatchEvent(new CustomEvent('sendToAI', { detail: text }))
           }
         }
       }
     }
-
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
   }, [editor, onTextSelected])
 
-  // 监听 Block 导航事件
   useEffect(() => {
-    const handleNavigateToBlock = async (e: Event) => {
-      const customEvent = e as CustomEvent<string>
-      const blockId = customEvent.detail
-      
-      // 切换到 Block 空间并高亮该 Block
-      window.dispatchEvent(new CustomEvent('showBlockInSpace', { detail: blockId }))
+    const handler = (e: Event) => {
+      window.dispatchEvent(new CustomEvent('showBlockInSpace', { detail: (e as CustomEvent<string>).detail }))
     }
-
-    window.addEventListener('navigateToBlock', handleNavigateToBlock)
-    return () => window.removeEventListener('navigateToBlock', handleNavigateToBlock)
+    window.addEventListener('navigateToBlock', handler)
+    return () => window.removeEventListener('navigateToBlock', handler)
   }, [])
 
-  // 清理定时器
   useEffect(() => {
-    return () => {
-      if (updateTimeoutRef.current) {
-        clearTimeout(updateTimeoutRef.current)
-      }
-    }
+    return () => { if (updateTimeoutRef.current) clearTimeout(updateTimeoutRef.current) }
   }, [])
 
   return (
     <div className="editor-container" ref={editorRef}>
       <div className="editor-toolbar">
-        <button
-          onClick={() => editor?.chain().focus().toggleBold().run()}
-          className={editor?.isActive('bold') ? 'active' : ''}
-        >
-          B
-        </button>
-        <button
-          onClick={() => editor?.chain().focus().toggleItalic().run()}
-          className={editor?.isActive('italic') ? 'active' : ''}
-        >
-          I
-        </button>
-        <button
-          onClick={() => editor?.chain().focus().toggleHeading({ level: 1 }).run()}
-          className={editor?.isActive('heading', { level: 1 }) ? 'active' : ''}
-        >
-          H1
-        </button>
-        <button
-          onClick={() => editor?.chain().focus().toggleHeading({ level: 2 }).run()}
-          className={editor?.isActive('heading', { level: 2 }) ? 'active' : ''}
-        >
-          H2
-        </button>
+        <button onClick={() => editor?.chain().focus().toggleBold().run()}
+          className={editor?.isActive('bold') ? 'active' : ''}>B</button>
+        <button onClick={() => editor?.chain().focus().toggleItalic().run()}
+          className={editor?.isActive('italic') ? 'active' : ''}>I</button>
+        <button onClick={() => editor?.chain().focus().toggleHeading({ level: 1 }).run()}
+          className={editor?.isActive('heading', { level: 1 }) ? 'active' : ''}>H1</button>
+        <button onClick={() => editor?.chain().focus().toggleHeading({ level: 2 }).run()}
+          className={editor?.isActive('heading', { level: 2 }) ? 'active' : ''}>H2</button>
         <div className="toolbar-divider"></div>
-        <div className="toolbar-hint">
-          💡 选中文字后按 Cmd/Ctrl + Shift + A 发送给 AI
-        </div>
+        <div className="toolbar-hint">💡 选中文字后按 Cmd/Ctrl + Shift + A 发送给 AI</div>
       </div>
       <div className="editor-scroll" onDrop={handleDrop} onDragOver={handleDragOver}>
         <EditorContent editor={editor} />
       </div>
-
       {showSuggestion && (
         <SuggestionMenu
           items={suggestionItems}

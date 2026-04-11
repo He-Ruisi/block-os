@@ -172,3 +172,57 @@
   border-radius: 3px;
   color: var(--color-purple);
 }
+
+/* ---- AI 生成块样式 ---- */
+.editor-content .ai-block {
+  margin: 16px 0;
+  padding: 12px 16px;
+  border-left: 3px solid #f0b429;
+  background: linear-gradient(135deg, #fffdf5 0%, #fff9e6 100%);
+  border-radius: 0 var(--border-radius) var(--border-radius) 0;
+  position: relative;
+}
+
+.editor-content .ai-block-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #b8860b;
+  margin-bottom: 8px;
+  letter-spacing: 0.3px;
+}
+
+.editor-content .ai-block p {
+  color: var(--color-text-primary);
+  margin-bottom: 8px;
+}
+
+.editor-content .ai-block p:last-child {
+  margin-bottom: 0;
+}
+
+/* ---- 灵感块样式（从 Block 空间拖入） ---- */
+.editor-content .inspiration-block {
+  margin: 16px 0;
+  padding: 12px 16px;
+  border-left: 3px solid var(--color-purple);
+  background: linear-gradient(135deg, #f8f5ff 0%, var(--color-purple-light) 100%);
+  border-radius: 0 var(--border-radius) var(--border-radius) 0;
+  position: relative;
+}
+
+.editor-content .inspiration-block-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-purple);
+  margin-bottom: 8px;
+  letter-spacing: 0.3px;
+}
+
+.editor-content .inspiration-block p {
+  color: var(--color-text-primary);
+  margin-bottom: 8px;
+}
+
+.editor-content .inspiration-block p:last-child {
+  margin-bottom: 0;
+}

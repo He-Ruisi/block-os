@@ -184,3 +184,13 @@
     transform: scale(1.02);
   }
 }
+
+/* 拖拽提示 */
+.block-card[draggable="true"] {
+  cursor: grab;
+}
+
+.block-card[draggable="true"]:active {
+  cursor: grabbing;
+  opacity: 0.7;
+}

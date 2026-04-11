@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import type { Block } from '../../types/block'
 import { blockStore } from '../../storage/blockStore'
 import { formatRelativeTime } from '../../utils/date'
@@ -107,6 +107,19 @@ export function BlockSpacePanel() {
     return content.substring(0, maxLength) + '...'
   }
 
+  // 拖拽 Block 到编辑器
+  const handleBlockDragStart = useCallback((e: React.DragEvent, block: Block) => {
+    const data = JSON.stringify({
+      id: block.id,
+      title: block.metadata.title || block.content.substring(0, 30),
+      content: block.content,
+      type: block.type,
+    })
+    e.dataTransfer.setData('application/blockos-block', data)
+    e.dataTransfer.setData('text/plain', block.content)
+    e.dataTransfer.effectAllowed = 'copy'
+  }, [])
+
   return (
     <div className="block-space-panel">
       <div className="block-space-header">
@@ -159,6 +172,8 @@ export function BlockSpacePanel() {
                 key={block.id} 
                 className={`block-card ${highlightedBlockId === block.id ? 'highlighted' : ''}`}
                 data-block-id={block.id}
+                draggable
+                onDragStart={e => handleBlockDragStart(e, block)}
               >
                 {block.metadata.title && (
                   <div className="block-title">{block.metadata.title}</div>

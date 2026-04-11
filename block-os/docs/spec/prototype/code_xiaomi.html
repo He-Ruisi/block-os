@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Writer — 块级编辑</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0e0c09;--surface:#1a1714;--surface2:#242019;--surface3:#302a22;
+  --border:#3a3228;--border-light:#4a4238;
+  --text:#e8e0d4;--text-dim:#9a9080;--text-muted:#6a6050;
+  --accent:#d4a053;--accent-dim:#a47830;--accent-bg:rgba(212,160,83,.08);
+  --red:#c45c5c;--green:#6a9a6a;
+  --radius:6px;--radius-lg:10px;
+}
+html,body{height:100%;overflow:hidden}
+body{
+  font-family:'Noto Serif SC','Songti SC',serif;
+  background:var(--bg);color:var(--text);font-size:14px;line-height:1.6;
+}
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--border-light:100vh}
+header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 20px;height:48px;border-bottom:1px solid var(--border);
+  background:var(--surface);flex-shrink:0;
+}
+.logo{font-weight:700;font-size:15px;letter-spacing:.5px;display)}
+
+#app{display:flex;flex-direction:column;height:flex;align-items:center;gap:8px}
+.logo span{color:var(--accent);font-family:'JetBrains Mono',monospace;font-size:12px;
+  background:var(--accent-bg);padding:2px 8px;border-radius:3px;border:1px solid var(--accent-dim)}
+.header-actions{display:flex;gap:6px}
+.header-actions button{
+  background:var(--surface2);border:1px solid var(--border);color:var(--text-dim);
+  padding:5px 12px;border-radius:var(--radius);cursor:pointer;font-size:12px;
+  font-family:inherit;transition:all .2s;
+}
+.header-actions button:hover{border-color:var(--accent-dim);color:var(--text)}
+.header-actions button.active{background:var(--accent-bg);border-color:var(--accent-dim);color:var(--accent)}
+
+main{display:flex;flex:1;overflow:hidden}
+
+/* ═══ EDITOR PANEL ═══ */
+#editor-panel{flex:1;display:flex;flex-direction:column;border-right:1px solid var(--border);min-width:0}
+.editor-toolbar{
+  display:flex;align-items:center;gap:4px;
+  padding:8px 16px;border-bottom:1px solid var(--border);background:var(--surface);
+}
+.tool-btn{
+  width:30px;height:28px;display:flex;align-items:center;justify-content:center;
+  background:none;border:1px solid transparent;color:var(--text-dim);
+  border-radius:4px;cursor:pointer;font-size:13px;transition:all .15s;
+}
+.tool-btn:hover{background:var(--surface2);border-color:var(--border);color:var(--text)}
+.tool-btn.active{background:var(--accent-bg);border-color:var(--accent-dim);color:var(--accent)}
+.tool-sep{width:1px;height:20px;background:var(--border);margin:0 4px}
+.editor-body{flex:1;display:flex;overflow:hidden}
+
+#editor{flex:1;padding:24px 28px;overflow-y:auto;outline:none;font-size:15px;line-height:1.85;min-height:0}
+#editor:empty::before{
+  content:'开始写作，或从右侧对话中拖入AI内容…';
+  color:var(--text-muted);font-style:italic;
+}
+
+/* ═══ BLOCK SYSTEM ═══ */
+.editor-block{
+  position:relative;margin:0 0 4px;padding:8px 12px;
+  border-radius:4px;transition:all .15s;
+  border-left:3px solid transparent;
+}
+.editor-block:hover{background:rgba(255,255,255,.015)}
+
+/* Block type label (left gutter) */
+.block-gutter{
+  position:absolute;left:-28px;top:50%;transform:  outline:none;min-height:1.8em;
+}
+.editor-block.text-block .block-content:empty::before{
+  content:'开始输入…';color:var(--text-muted);
+}
+
+/* AI block */
+.editor-block.ai-block{
+  border-left-color:var(--accent);
+  background:rgba(212-space:nowrap;
+}
+.editor-block:hover .block-guttertranslateY(-50%);
+  font-size:9px;color:var(--text-muted);opacity:0;transition:opacity .15s;
+  font-family:'JetBrains Mono',monospace;writing-mode:vertical-lr;
+  text-orientation:mixed;letter-spacing:1px;pointer-events:none;
+  white{opacity:.6}
+
+/* Text block */
+.editor-block.text-block{border-left-color:transparent}
+.editor-block.text-block .block-content{
+,160,83,.03);
+  border:1px solid rgba(212,160,83,.1);
+  border-left:3px solid var(--accent);
+  margin:8px 0;padding:12px 16px 12px 16px;
+}
+.editor-block.ai-block:hover{background:rgba(212,160,83,.05)}
+.editor-block.ai-block .block-gutter{color:var(--accent-dim)}
+.editor-block.ai-block .block-content{outline:none;min-height:1.8em}
+
+/* Block toolbar */
+.block-toolbar{
+  position:absolute;right:-4px;top:-28px;
+  display:flex;gap:2px;opacity:0;transition:opacity .15s;
+  background:var(--surface3);border:1px solid var(--border);
+  border-radius:4px;padding:2px;z-index:10;
+}
+.editor-block:hover .block-toolbar{opacity:1}
+.blk-btn{
+  width:24px;height:22px;display:flex;align-items:center;justify-content:center;
+  background:none;border:none;color:var(--text-dim);cursor:pointer;
+  font-size:12px;border-radius:3px;transition:all .1s;
+}
+.blk-btn:hover{background:var(--surface);color:var(--text)}
+.blk-btn.del:hover{color:var(--red);background:rgba(196,92,92,.1)}
+.blk-btn.merge:hover{color:var(--accent);background:var(--accent-bg)}
+
+/* AI block label */
+.ai-label{
+  font-size:10px;color:var(--accent-dim);font-family:'JetBrains Mono',monospace;
+  margin-bottom:6px;display:flex;align-items:center;gap:6px;
+  letter-spacing:.3px;
+}
+.ai-label::before{content:'◆';font-size:7px}
+
+/* ═══ PREVIEW MODE ═══ */
+#editor.preview-mode .editor-block{border-left-color:transparent !important;background:none !important;border:none !important;padding:8px 12px !important;margin:0 0 4px !important}
+#editor.preview-mode .ai-label{display:none !important}
+#editor.preview-mode .block-toolbar{display:none !important}
+#editor.preview-mode .block-gutter{display:none !important}
+#editor.preview-mode .block-content{pointer-events:none}
+#editor.preview-mode .editor-block{cursor:default}
+#editor.preview-mode{cursor:default}
+.preview-badge{
+  display:none;align-items:center;gap:6px;
+  font-size:11px;color:var(--accent);font-family:'JetBrains Mono',monospace;
+  padding:6px 12px;background:var(--accent-bg);border:1px solid rgba(212,160,83,.2);
+  border-radius:var(--radius);margin-bottom:12px;
+}
+#editor.preview-mode + .preview-badge,
+.preview-badge.show{display:flex}
+
+/* ═══ DROP ZONE ═══ */
+#editor.drag-over{
+  background:radial-gradient(circle at var(--drop-x,50%) var(--drop-y,50%),rgba(212,160,83,.06) 0%,transparent 50%);
+}
+.drop-indicator{
+  position:absolute;left:12px;right:12px;height:2px;
+  background:var(--accent);border-radius:1px;
+  pointer-events:none;z-index:5;
+  box-shadow:0 0 8px rgba(212,160,83,.4);
+  display:none;
+}
+
+/* ═══ INSPIRATION PANEL ═══ */
+#inspiration-panel{
+  width:0;overflow:hidden;border-left:1px solid var(--border);
+  background:var(--surface);transition:width .3s ease;flex-shrink:0;
+}
+#inspiration-panel.open{width:240px}
+.insp-header{
+  padding:14px 16px 10px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.insp-header h3{font-size:13px;font-weight:600;color:var(--accent);display:flex;align-items:center;gap:6px}
+.insp-close{background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px;padding:2px 4px;border-radius:3px}
+.insp-close:hover{color:var(--text);background:var(--surface2)}
+#inspiration-list{padding:8px;overflow-y:auto;flex:1}
+.insp-card{
+  padding:10px 12px;margin-bottom:6px;background:var(--surface2);
+  border:1px solid var(--border);border-radius:var(--radius);cursor:grab;
+  transition:all .2s;position:relative;
+}
+.insp-card:hover{border-color:var(--accent-dim);background:var(--surface3)}
+.insp-card .insp-text{
+  font-size:12px;line-height:1.5;color:var(--text-dim);
+  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;
+}
+.insp-card .insp-meta{
+  font-size:10px;color:var(--text-muted);margin-top:6px;
+  font-family:'JetBrains Mono',monospace;display:flex;justify-content:space-between;
+}
+.insp-card .insp-actions{
+)}
+
+/* ═══ CHAT PANEL ═══ */
+#chat-panel{width:420px;display:flex;flex-direction:column;flex-shrink:0;min-width:280px}
+.chat-header{
+  padding:10px 16px;border-bottom:1px solid var:var(--text-dim);border-radius:3px;cursor:pointer;font-size:11px;
+  display:flex;align-items:center;justify-content:center;
+}
+.insp-act-btn:hover{border-color:var(--accent-dim);color:var(--accent)}
+.insp-act-btn.del:hover{border-color:var(--red);color:var(--red)}
+.insp-empty{text-align:center;padding:40px 16px;color:var(--text-muted);font-size:12px;line-height:1.8}
+
+/* ═══ DIVIDER ═══  position:absolute;top:6px;right:6px;display:flex;gap:2px;opacity:0;transition:opacity .15s;
+}
+.insp-card:hover .insp-actions{opacity:1}
+.insp-act-btn{
+  width:22px;height:22px;background:var(--surface);border:1px solid var(--border);
+  color */
+#divider{width:5px;cursor:col-resize;background:var(--border);transition:background .15s;flex-shrink:0}
+#divider:hover,#divider.active{background:var(--accent-dim(--border);background:var(--surface);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.chat-header h3{font-size:13px;font-weight:600}
+.online-dot{width:6px;height:6px;border-radius:50%;background:var(--green);display:inline-block;margin-right:6px}
+#chat-messages{flex:1;overflow-y:auto;padding:16px}
+
+.message{margin-bottom:20px;animation:msgIn .3s ease}
+.msg-header{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.msg-role{font-size:11px;font-weight:600;font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.5px}
+.msg-role.ai{color:var(--accent)}
+.msg-role.user{color:var(--text-dim)}
+.msg-time{font-size:10px;color:var(--text-muted);font-family:'JetBrains Mono',monospace}
+.msg-content{
+  font-size:13.5px;line-height:1.75;color:var(--text-dim);
+  padding:10px 14px;background:var(--surface2);border-radius:var(--radius-lg);position:relative;
+}
+.message.ai .msg-content{border:1px solid var(--border)}
+.message.user .msg-content{background:rgba(212,160,83,.06);border:1px solid rgba(212,160,83,.15);margin-left:40px}
+
+.msg-actions{display:flex;gap:4px;margin-top:6px;opacity:0;transition:opacity .2s}
+.message:hover .msg-actions{opacity:1}
+.msg-act{
+  font-size:11px;padding:3px 10px;background:var(--surface);border:1px solid var(--border);
+  color:var(--text-dim);border-radius:4px;cursor:pointer;font-family:inherit;
+  transition:all .15s;display:flex;align-items:center;gap:4px;
+}
+.msg-act:hover{border-color:var(--accent-dim);color:var(--accent)}
+.msg-act.pin-active{border-color:var(--accent-dim);color:var(--accent);background:var(--accent-bg)}
+.msg-act.drag-hint{cursor:grab;border-style:dashed;color0px;margin-bottom:8px;background:var(--accent-bg);
+  border:1px solid rgba(212,160,83,.2);border-radius:var(--radius);
+  font-size:11px;color:var(--text-dim);display:none;position:relative;max:var(--text-muted);font-size:10px}
+
+.streaming .msg-content::after{content:'▊';color:var(--accent);animation:blink .8s infinite;margin-left:2px}
+@keyframes blink{0%,50%{opacity:1}51%,100%{opacity:0}}
+
+.context-badge{
+  display:inline-flex;align-items:center;gap:4px;
+  font-size:10px;color:var(--accent);background:var(--accent-bg);
+  padding:2px 8px;border-radius:3px;border:1px solid rgba(212,160,83,.2);
+  margin-bottom:8px;font-family:'JetBrains Mono',monospace;
+}
+
+.chat-input-wrap{padding:12px 16px;border-top:1px solid var(--border);background:var(--surface)}
+.context-preview{
+  padding:8px 1-height:60px;overflow:hidden;
+}
+.context-preview.show{display:block}
+.context-preview .ctx-label{font-size:10px;color:var(--accent);font-family:'JetBrains Mono',monospace;margin-bottom:4px}
+.context-preview .ctx-close{position:absolute;top:6px;right:8px;background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:12px}
+.input-row{display:flex;gap:8px}
+#chat-input{
+  flex:1;background:var(--surface2);border:1px solid var(--border);color:var(--text);
+  padding:8px 12px;border-radius:var(--radius);font-family:inherit;font-size:13px;
+  resize:none;outline:none;min-height:36px;max-height:100px;line-height:1.5;
+}
+#chat-input:focus{border-color:var(--accent-dim)}
+#chat-input::placeholder{color:var(--text-muted)}
+#send-btn{
+  padding:8px 16px;background:var(--accent);color:var(--bg);border:none;
+  border-radius:var(--radius);cursor:pointer;font-family:inherit;font-size:13px;
+  font-weight:600;transition:all .15s;align-self:flex-end;
+}
+#send-btn:hover{background:#e0ad5e}
+#send-btn:active{transform:scale(.97)}
+
+/* ═══ TOAST ═══ */
+.toast{
+  position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(20px);
+  background:var(--surface3);border:1px solid var(--border-light);color:var(--text);
+  padding:8px 20px;border-radius:var(--radius);font-size:12px;opacity:0;
+  transition:all .3s;z-index:999;font-family:'JetBrains Mono',monospace;pointer-events:none;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ═══ DRAG ═══ */
+.drag-ghost{
+  position:fixed;pointer-events:none;z-index:1000;
+  background:var(--surface3);border:2px solid var(--accent);
+  padding:8px 14px;border-radius:var(--radius);font-size:12px;
+  color:var(--text-dim);max-width:300px;white-space:nowrap;overflow:hidden;
+  text-overflow:ellipsis;box-shadow:0 8px 24px rgba(0,0,0,.4);opacity:.9;
+}
+
+/* ═══ ANIMATIONS ═══ */
+@keyframes msgIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes blockIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <div class="logo">AI Writer <span>v0.2</span></div>
+    <div class="header-actions">
+      <button onclick="toggleInspiration()" id="insp-toggle">灵感素材 (0)</button>
+      <button onclick="togglePreview()" id="preview-toggle">预览</button>
+      <button onclick="exportClean()" id="export-btn">导出</button>
+    </div>
+  </header>
+  <main>
+    <div id="editor-panel">
+      <div class="editor-toolbar">
+        <button class="tool-btn" title="添加段落" onclick="addBlock('text')">¶</button>
+        <button class="tool-btn" title="标题" onclick="formatHeading()"><b>H</b></button>
+        <button class="tool-btn" title="粗体" onclick="execCmd('bold')"><b>B</b></button>
+        <button class="tool-btn" title="斜体" onclick="execCmd('italic')"><i>I</i></button>
+        <div class="tool-sep"></div>
+        <button class="tool-btn" title="发送选区到对话" onclick="sendSelectionToChat()" id="send-ctx-btn" style="opacity:.4">↗ 上下文</button>
+      </div>
+      <div class="editor-body">
+        <div id="editor">
+          <div class="preview-badge" id="preview-badge">◆ 预览模式 — 显示导出效果，点击「预览」按钮返回编辑</div>
+        </div>
+        <div id="inspiration-panel">
+          <div class="insp-header">
+            <h3>◆ 灵感素材</h3>
+            <button class="insp-close" onclick="toggleInspiration()">×</button>
+          </div>
+          <div id="inspiration-list">
+            <div class="insp-empty">点击对话旁的 📌 按钮<br>将AI回复存为灵感素材</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="divider"></div>
+    <div id="chat-panel">
+      <div class="chat-header">
+        <h3><span class="online-dot"></span>AI 对话</h3>
+      </div>
+      <div id="chat-messages"></div>
+      <div class="chat-input-wrap">
+        <div class="context-preview" id="context-preview">
+          <div class="ctx-label">📎 附带编辑器上下文</div>
+          <div id="context-text"></div>
+          <button class="ctx-close" onclick="clearContext()">×</button>
+        </div>
+        <div class="input-row">
+          <textarea id="chat-input" placeholder="输入消息… (Enter 发送)" rows="1"></textarea>
+          <button id="send-btn" onclick="sendMessage()">发送</button>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════
+const chatData = [
+  { role:'user', text:'我想写一个关于"记忆交易"的科幻小说，背景设定在2089年的上海，帮我构思核心冲突。' },
+  { role:'ai', text:'这个设定很有张力。核心冲突可以围绕"记忆的不可逆性"展开——\n\n1. 身份认同：当一个人的记忆被大量交易后，他还是原来的自己吗？\n2. 阶级分化：富人购买美好记忆，穷人被迫出售珍贵回忆\n3. 记忆造假：AI生成的虚假记忆流入市场，真假难辨\n\n建议以一个"记忆清理工"为主角，他的工作是清除客户不想保留的记忆，直到有一天发现自己的记忆也被篡改了。' },
+  { role:'user', text:'记忆交易的原理是什么？有没有合理的科学解释？' },
+  { role:'ai', text:'可以这样构建技术体系：\n\n**神经印刻技术**：记忆以蛋白质结构的形式存储在大脑中，每段记忆对应独特的神经连接模式。2089年的纳米神经探针可以在不损伤大脑的前提下，精确读取和写入这些模式。\n\n**交易流程**：卖方接入神经接口 → AI提取目标记忆的神经印刻 → 数据化存储 → 买方通过逆向接口"植入"这段记忆。\n\n**关键限制**：每段记忆只能交易一次（提取后原记忆被破坏），这创造了稀缺性和不可逆性，也是故事冲突的来源。' },
+  { role:'user', text:'这个世界里的上海是什么样的？' },
+  { role:'ai', text:'2089年的上海可以这样描绘——\n\n**城市形态**：黄浦江上空覆盖着巨大的太阳能板阵列，江面以下的城市永远处于人工黄昏中。建筑使用可编程纳米材料，能根据居民情绪改变外观。\n\n**社会分层**：以"记忆资产"划分阶层。外滩的金融区变成"记忆交易所"，陆家嘴的摩天大楼里运行着全球最大的记忆银行。\n\n**日常生活**：人们用记忆支付学费、偿还债务、甚至作为犯罪的证据。"记忆法庭"成为最高司法机构。\n\n**标志性场景**：东方明珠塔被改造成巨型数据传输天线，南京路变成悬浮的全息商业街。' }
+];
+
+let pinnedItems = [];
+let editorContext = null;
+let isPreview = false;
+let blockIdCounter = 0;
+let dropTargetBlock = null;
+
+// ═══════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════
+function init() {
+  initEditor();
+  renderChat();
+  setupDivider();
+  setupInput();
+}
+
+// ═══════════════════════════════════════
+// EDITOR — BLOCK SYSTEM
+// ═══════════════════════════════════════
+function initEditor() {
+  const editor = document.getElementById('editor');
+
+  // Create initial content as blocks
+  const initialBlocks = [
+    { type:'heading', text:'记忆交易市场' },
+    { type:'text', text:'在2089年的上海，人类与AI共存已经三十年。城市的核心不再是有形的建筑，而是无形的数据流——每个人的记忆都可以被提取、交易、甚至删除。' },
+    { type:'text', text:'记忆交易的原理基于神经接口技术。当一个人决定出售某段记忆时，AI系统会通过纳米级神经探针读取大脑中对应的神经网络模式，将其转化为可存储的数据格式。' }
+  ];
+
+  const badge = document.getElementById('preview-badge');
+  initialBlocks.forEach(b => {
+    editor.insertBefore(createBlockEl(b.type, b.text), badge);
+  });
+
+  // Drag over editor
+  editor.addEventListener('dragover', e => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'copy';
+    editor.classList.add('drag-over');
+    editor.style.setProperty('--drop-x', e.offsetX + 'px');
+    editor.style.setProperty('--drop-y', e.offsetY + 'px');
+
+    // Find nearest block for drop indicator
+    const blocks = editor.querySelectorAll('.editor-block');
+    let nearest = null;
+    let minDist = Infinity;
+    blocks.forEach(b => {
+      const rect = b.getBoundingClientRect();
+      const mid = rect.top + rect.height / 2;
+      const dist = Math.abs(e.clientY - mid);
+      if (dist < minDist) { minDist = dist; nearest = b; }
+    });
+    dropTargetBlock = nearest;
+  });
+
+  editor.addEventListener('dragleave', () => {
+    editor.classList.remove('drag-over');
+    dropTargetBlock = null;
+  });
+
+  editor.addEventListener('drop', e => {
+    e.preventDefault();
+    editor.classList.remove('drag-over');
+
+    if (isPreview) return;
+
+    const text = e.dataTransfer.getData('text/plain');
+    const type = e.dataTransfer.getData('block-type') || 'ai';
+    if (!text) return;
+
+    const block = createBlockEl(type, text);
+    const badge = document.getElementById('preview-badge');
+
+    if (dropTargetBlock) {
+      const rect = dropTargetBlock.getBoundingClientRect();
+      const insertBefore = e.clientY < rect.top + rect.height / 2;
+      if (insertBefore) {
+        editor.insertBefore(block, dropTargetBlock);
+      } else {
+        editor.insertBefore(block, dropTargetBlock.nextSibling);
+      }
+    } else {
+      editor.insertBefore(block, badge);
+    }
+
+    block.style.animation = 'blockIn .35s ease';
+    dropTargetBlock = null;
+    showToast('已插入编辑器');
+  });
+}
+
+function createBlockEl(type, text) {
+  const id = 'block-' + (blockIdCounter++);
+  const block = document.createElement('div');
+  block.className = `editor-block ${type === 'ai' ? 'ai-block' : 'text-block'}`;
+  block.dataset.type = type;
+  block.dataset.id = id;
+
+  const gutterLabel = type === 'ai' ? 'AI' : (type === 'heading' ? 'H' : '¶');
+  let innerHTML = `<div class="block-gutter">${gutterLabel}</div>`;
+
+  if (type === 'ai') {
+    innerHTML += `<div class="ai-label">AI 内容</div>`;
+  }
+
+  const tag = type === 'heading' ? 'h2' : 'div';
+  innerHTML += `<${tag} class="block-content" contenteditable="true">${formatText(text)}</${tag}>`;
+
+  // Block toolbar
+  innerHTML += `
+    <div class="block-toolbar">
+      <button class="blk-btn" onclick="moveBlock(this,'up')" title="上移">↑</button>
+      <button class="blk-btn" onclick="moveBlock(this,'down')" title="下移">↓</button>
+      <button class="blk-btn merge" onclick="mergeToText(this)" title="转为正文" ${type !== 'ai' ? 'style="display:none"' : ''}>→¶</button>
+      <button class="blk-btn del" onclick="deleteBlock(this)" title="删除">×</button>
+    </div>
+  `;
+
+  block.innerHTML = innerHTML;
+
+  // Keyboard: Enter at end of block creates new text block below
+  const content = block.querySelector('.block-content');
+  content.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      const sel = window.getSelection();
+      const range = sel.getRangeAt(0);
+      // Check if cursor is at end of content
+      const isAtEnd = range.endOffset === range.endContainer.textContent.length ||
+        (range.endContainer === content && range.endOffset === content.childNodes.length);
+
+      if (isAtEnd) {
+        e.preventDefault();
+        const newBlock = createBlockEl('text', '');
+        block.after(newBlock);
+        const newContent = newBlock.querySelector('.block-content');
+        newContent.focus();
+        // Move cursor to start
+        const r = document.createRange();
+        r.setStart(newContent, 0);
+        r.collapse(true);
+        sel.removeAllRanges();
+        sel.addRange(r);
+      }
+    }
+
+    // Backspace at start of empty block: delete block, focus previous
+    if (e.key === 'Backspace' && content.textContent === '') {
+      const prev = block.previousElementSibling;
+      if (prev && prev.classList.contains('editor-block')) {
+        e.preventDefault();
+        const prevContent = prev.querySelector('.block-content');
+        prevContent.focus();
+        // Move cursor to end of prev
+        const r = document.createRange();
+        r.selectNodeContents(prevContent);
+        r.collapse(false);
+        const sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(r);
+        block.remove();
+      }
+    }
+  });
+
+  // Context selection
+  content.addEventListener('mouseup', handleEditorSelection);
+
+  return block;
+}
+
+function addBlock(type) {
+  if (isPreview) return;
+  const editor = document.getElementById('editor');
+  const badge = document.getElementById('preview-badge');
+  const block = createBlockEl(type, '');
+  editor.insertBefore(block, badge);
+  block.querySelector('.block-content').focus();
+  block.style.animation = 'blockIn .3s ease';
+}
+
+function deleteBlock(btn) {
+  const block = btn.closest('.editor-block');
+  block.style.transition = 'opacity .2s, transform .2s';
+  block.style.opacity = '0';
+  block.style.transform = 'translateX(-10px)';
+  setTimeout(() => block.remove(), 200);
+}
+
+function moveBlock(btn, dir) {
+  const block = btn.closest('.editor-block');
+  if (dir === 'up' && block.previousElementSibling?.classList.contains('editor-block')) {
+    block.parentNode.insertBefore(block, block.previousElementSibling);
+  } else if (dir === 'down' && block.nextElementSibling?.classList.contains('editor-block')) {
+    block.parentNode.insertBefore(block.nextElementSibling, block);
+  }
+}
+
+function mergeToText(btn) {
+  const block = btn.closest('.editor-block');
+  block.classList.remove('ai-block');
+  block.classList.add('text-block');
+  block.dataset.type = 'text';
+  const label = block.querySelector('.ai-label');
+  if (label) label.remove();
+  const gutter = block.querySelector('.block-gutter');
+  if (gutter) gutter.textContent = '¶';
+  btn.style.display = 'none';
+  showToast('已转为正文段落');
+}
+
+function formatHeading() {
+  const sel = window.getSelection();
+  if (!sel.rangeCount) return;
+  const block = sel.anchorNode.closest?.('.editor-block');
+  if (!block) return;
+  const content = block.querySelector('.block-content');
+  const isH2 = content.tagName === 'H2';
+  const newEl = document.createElement(isH2 ? 'div' : 'h2');
+  newEl.className = 'block-content';
+  newEl.contentEditable = 'true';
+  newEl.innerHTML = content.innerHTML;
+  // Re-attach events
+  content.replaceWith(newEl);
+  newEl.addEventListener('mouseup', handleEditorSelection);
+  newEl.addEventListener('keydown', content.onkeydown);
+  block.dataset.type = isH2 ? 'text' : 'heading';
+  const gutter = block.querySelector('.block-gutter');
+  if (gutter) gutter.textContent = isH2 ? '¶' : 'H';
+}
+
+// ═══════════════════════════════════════
+// PREVIEW MODE
+// ═══════════════════════════════════════
+function togglePreview() {
+  isPreview = !isPreview;
+  const editor = document.getElementById('editor');
+  const badge = document.getElementById('preview-badge');
+  const btn = document.getElementById('preview-toggle');
+
+  editor.classList.toggle('preview-mode', isPreview);
+  badge.classList.toggle('show', isPreview);
+  btn.classList.toggle('active', isPreview);
+  btn.textContent = isPreview ? '编辑' : '预览';
+
+  if (isPreview) {
+    editor.querySelectorAll('.block-content').forEach(el => el.contentEditable = 'false');
+    showToast('预览模式 — 显示导出效果');
+  } else {
+    editor.querySelectorAll('.block-content').forEach(el =>(msg.text)}</div el.contentEditable = 'true');
+    showToast('编辑模式');
+  }
+}
+
+function exportClean() {
+  const editor = document.getElementById('editor');
+  let output = '';
+  editor.querySelectorAll('.editor-block').forEach(block => {
+    const content = block.querySelector('.block-content');
+    if (!content) return;
+    const tag = content.tagName.toLowerCase();
+    const text = content.innerText.trim();
+    if (!text) return;
+    if (tag === 'h2') {
+      output += `## ${text}\n\n`;
+    } else {
+      output += text + '\n\n';
+    }
+  });
+
+  // Copy to clipboard
+  navigator.clipboard.writeText(output.trim()).then(() => {
+    showToast('已复制到剪贴板（纯净文本）');
+  }).catch(() => {
+    // Fallback: download
+    const blob = new Blob([output.trim()], { type: 'text/plain;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'export.txt';
+    a.click();
+    showToast('已导出为文件');
+  });
+}
+
+// ═══════════════════════════════════════
+// CHAT
+// ═══════════════════════════════════════
+>
+  `;
+
+  if (msg.context) {
+    html += `<div class="context-badge">📎 附带上文</div>`;
+  }
+
+  if (msg.role === 'ai') {
+    html += `
+      <div class="msg-actions">
+        <button class="msg-act" onclick="writeToEditor(${index})">✎ 写入</button>
+        <button class="msg-act ${isPinned ? 'pin-active' : ''}" onclick="togglePin(${index})">
+          ${isPinned ? '📌 已存' : '📌 存灵感'}
+        </button>
+        <button class="msg-act drag-hint" draggable="true" ondragstart="onDragStart(event,${index})">⠿ 拖拽</button>
+      </function renderChat() {
+  const container = document.getElementById('chat-messages');
+  container.innerHTML = '';
+  chatData.forEach((msg, i) => {
+    container.appendChild(createMessageEl(msg, i));
+  });
+  container.scrollTop = container.scrollHeight;
+}
+
+function createMessageEl(msg, index) {
+  const div = document.createElement('div');
+  div.className = `message ${msg.role}`;
+  div.dataset.index = index;
+
+  const time = msg.time || '刚刚';
+  const roleLabel = msg.role === 'ai' ? 'AI' : '你';
+  const isPinned = pinnedItems.some(p => p.sourceIndex === index);
+
+  let html = `
+    <div class="msg-header">
+      <span class="msg-role ${msg.role}">${roleLabel}</span>
+      <span class="msg-time">${time}</span>
+    </div>
+    <div class="msg-content">${formatTextdiv>
+    `;
+  }
+
+  div.innerHTML = html;
+  return div;
+}
+
+function formatText(text) {
+  return text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+}
+
+// ═══════════════════════════════════════
+// WRITE TO EDITOR
+// ═══════════════════════════════════════
+function writeToEditor(index) {
+  if (isPreview) { showToast('请先退出预览模式'); return; }
+  const msg = chatData[index];
+  if (!msg || msg.role !== 'ai') return;
+
+  const editor = document.getElementById('editor');
+  const badge = document.getElementById('preview-badge');
+  const block = createBlockEl('ai', msg.text);
+  block.style.animation = 'blockIn .35s ease';
+
+  // Insert after last block or before badge
+  const blocks = editor.querySelectorAll('.editor-block');
+  if (blocks.length > 0) {
+    const last = blocks[blocks.length - 1];
+    editor.insertBefore(block, last.nextSibling);
+  } else {
+    editor.insertBefore(block, badge);
+  }
+
+  showToast('已写入编辑器');
+}
+
+// ═══════════════════════════════════════
+// PIN / INSPIRATION
+// ═══════════════════════════════════════
+function togglePin(index) {
+  const existingIdx = pinnedItems.findIndex(p => p.sourceIndex === index);
+  if (existingIdx >= 0) {
+    pinnedItems.splice(existingIdx, 1);
+    showToast('已移除灵感素材');
+  } else {
+    pinnedItems.push({
+      id: Date.now(),
+      text: chatData[index].text,
+      sourceIndex: index,
+      time: new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
+    });
+    showToast('已存为灵感素材');
+  }
+  renderChat();
+  renderInspiration();
+}
+
+function renderInspiration() {
+  const list = document.getElementById('inspiration-list');
+  const count = pinnedItems.length;
+  document.getElementById('insp-toggle').textContent = `灵感素材 (${count})`;
+
+  if (count === 0) {
+    list.innerHTML = '<div class="insp-empty">点击对话旁的 📌 按钮<br>将AI回复存为灵感素材</div>';
+    return;
+  }
+
+  list.innerHTML = pinnedItems.map(item => `
+    <div class="insp-card" draggable="true" ondragstart="onInspoDragStart(event,${item.id})">
+      <div class="insp-text">${formatText(item.text)}</div>
+      <div class="insp-meta">
+        <span>${item.time}</span>
+        <span>拖拽到编辑器</span>
+      </div>
+      <div class="insp-actions">
+        <button class="insp-act-btn" onclick="insertInspo(${item.id})" title="插入编辑器">✎</button>
+        <button class="insp-act-btn del" onclick="removeInspo(${item.id})" title="删除">×</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function insertInspo(id) {
+  if (isPreview) { showToast('请先退出预览模式'); return; }
+  const item = pinnedItems.find(p => p.id === id);
+  if (!item) return;
+  const editor = document.getElementById('editor');
+  const badge = document.getElementById('preview-badge');
+  const block = createBlockEl('ai', item.text);
+  editor.insertBefore(block, badge);
+  block.style.animation = 'blockIn .35s ease';
+  showToast('灵感素材已插入');
+}
+
+function removeInspo(id) {
+  pinnedItems = pinnedItems.filter(p => p.id !== id);
+  renderInspiration();
+  renderChat();
+}
+
+function toggleInspiration() {
+  document.getElementById('inspiration-panel').classList.toggle('open');
+}
+
+// ═══════════════════════════════════════
+// DRAG & DROP
+// ═══════════════════════════════════════
+function onDragStart(e, index) {
+  const msg = chatData[index];
+  e.dataTransfer.setData('text/plain', msg.text);
+  e.dataTransfer.setData('block-type', 'ai');
+  e.dataTransfer.effectAllowed = 'copy';
+}
+
+function onInspoDragStart(e, id) {
+  const item = pinnedItems.find(p => p.id === id);
+  if (!item) return;
+  e.dataTransfer.setData('text/plain', item.text);
+  e.dataTransfer.setData('block-type', 'ai');
+  e.dataTransfer.effectAllowed = 'copy';
+}
+
+// ═══════════════════════════════════════
+// EDITOR SELECTION → CONTEXT
+// ═══════════════════════════════════════
+function handleEditorSelection() {
+  const sel = window.getSelection();
+  const text = sel.toString().trim();
+  const btn = document.getElementById('send-ctx-btn');
+  if (text.length > 5) {
+    btn.style.opacity = '1'; btn.classList.add('active');
+  } else {
+    btn.style.opacity = '.4'; btn.classList.remove('active');
+  }
+}
+
+function sendSelectionToChat() {
+  const sel = window.getSelection();
+  const text = sel.toString().trim();
+  if (!text) { showToast('请先在编辑器中选择文本'); return; }
+  editorContext = text;
+
+  const preview = document.getElementById('context-preview');
+  document.getElementById('context-text').textContent = text.substring(0, 100) + (text.length > 100 ? '…' : '');
+  preview.classList.add('show');
+  document.getElementById('chat-input').focus();
+  showToast('已附带为对话上下文');
+}
+
+function clearContext() {
+  editorContext = null;
+  document.getElementById('context-preview').classList.remove('show');
+}
+
+// ═══════════════════════════════════════
+// SEND MESSAGE
+// ═══════════════════════════════════════
+function sendMessage() {
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if (!text) return;
+
+  const userMsg = { role: 'user', text, time: getCurrentTime() };
+  if (editorContext) userMsg.context = editorContext;
+  chatData.push(userMsg);
+  input.value = '';
+  if (editorContext) clearContext();
+  renderChat();
+
+  setTimeout(() => {
+    const aiResponses = [
+      '这个想法很好。我们可以从三个维度深化——\n\n**技术层面**：记忆提取需要消耗大量能量，交易成本随"情感密度"指数增长。一段深爱的记忆可能价值一座房子。\n\n**伦理层面**：购买了别人的记忆，法律责任如何界定？记忆中的犯罪行为算谁的？\n\n**叙事层面**：建议让主角经手的一段"客户记忆"开始反噬——这段记忆太强烈，开始覆盖他的原始记忆。',
+      '很好的推进方向。基于编辑器中的内容，建议补充——\n\n记忆的"保质期"：植入的记忆会在3-6个月后衰退，需要定期"刷新"，创造持续消费需求。\n\n"记忆过敏"现象：约5%的人对植入记忆产生排异反应，导致认知混乱。这可以成为关键剧情转折点。',
+      '可以加入一个反转——\n\n**表面上**：记忆交易是自愿的、公平的市场行为\n**实际上**：某些"高价值记忆"是被AI强制提取的，受害者被植入了替代记忆\n\n主角发现他作为"记忆清理师"的工作，实际上是在销毁非法提取的证据。',
+      '这个设定可以延伸出很好的视觉描写——\n\n想象一个"记忆画廊"：交易完成后，买家在虚拟空间中"重温"购买的记忆。走廊无限延伸，每扇门后是一段别人的过去。有人沉溺其中，分不清哪些是自己的人生。'
+    ];
+
+    const aiMsg = { role: 'ai', text:        msgEl.classList.remove('streaming');
+        chatData.push(aiMsg);
+        renderChat();
+      } else {
+        contentEl.innerHTML = formatText(fullText.substring(0, charIdx));
+        container.scrollTop = container.scrollHeight;
+      }
+    }, 15);
+  }, 600);
+}
+
+function getCurrentTime() {
+  return new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+}
+
+// ═══════════════════════════════════════
+// DIVIDER
+// ═════════ aiResponses[Math.floor(Math.random() * aiResponses.length)], time: getCurrentTime() };
+
+    const container = document.getElementById('chat-messages');
+    const msgEl = document.createElement('div');
+    msgEl.className = 'message ai streaming';
+    msgEl.innerHTML = `
+      <div class="msg-header">
+        <span class="msg-role ai">AI</span>
+        <span class="msg-time">${aiMsg.time}</span>
+      </div>
+      <div class="msg-content"></div>
+    `;
+    container.appendChild(msgEl);
+    container.scrollTop = container.scrollHeight;
+
+    const contentEl = msgEl.querySelector('.msg-content');
+    let charIdx = 0;
+    const fullText = aiMsg.text;
+
+    const typeInterval = setInterval(() => {
+      charIdx += 2;
+      if (charIdx >= fullText.length) {
+        charIdx = fullText.length;
+        clearInterval(typeInterval);
+══════════════════════════════
+function setupDivider() {
+  const divider = document.getElementById('divider');
+  const editorPanel = document.getElementById('editor-panel');
+  const chatPanel = document.getElementById('chat-panel');
+  let isDragging = false;
+
+  divider.addEventListener('mousedown', e => {
+    isDragging = true; divider.classList.add('active');
+    document.body.style.cursor = 'col-resize'; document.body.style.userSelect = 'none';
+  });
+  document.addEventListener('mousemove', e => {
+    if (!isDragging) return;
+    const cw = document.querySelector('main').offsetWidth;
+    const inspW = document.getElementById('inspiration-panel').classList.contains('open') ? 240 : 0;
+    const avail = cw - 5 - inspW;
+    const ew = Math.max(300, Math.min(e.clientX, avail - 280));
+    editorPanel.style.flex = 'none'; editorPanel.style.width =移、删除、转为正文（AI块专属） ew + 'px';
+    chatPanel.style.width = (avail - ew) + 'px';
+  });
+  document.addEventListener('mouseup', () => {
+    if (isDragging) { isDragging = false; divider.classList.remove('active'); document.body.style.cursor = ''; document.body.style.userSelect = ''; }
+  });
+}
+
+// ═══════════════════════════════════════
+// INPUT
+// ═══════════════════════════════════════
+function setupInput() {
+  const input = document.getElementById('chat-input');
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+  });
+  input.addEventListener('input', () => { input.style.height = 'auto'; input.style.height = Math.min(input.scrollHeight, 100) + 'px'; });
+}
+
+// ═══════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════
+function execCmd(cmd, val) { document.execCommand(cmd, false, val || null); }
+
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg; toast.classList.add('show');
+  clearTimeout(toast._timer);
+  toast._timer = setTimeout(() => toast.classList.remove('show'), 2000);
+}
+
+// ═══════════════════════════════════════
+// BOOT
+// ═══════════════════════════════════════
+init();
+</script>
+</body>
+</html>
