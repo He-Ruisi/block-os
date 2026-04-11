@@ -30,6 +30,13 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI }: Ri
   const [toastType, setToastType] = useState<'success' | 'error' | 'info'>('success')
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
+  // 监听 openBlockDetail 事件 → 切换到 Block 空间标签
+  useEffect(() => {
+    const handler = () => { setActiveTab('blocks'); setShowHistory(false) }
+    window.addEventListener('openBlockDetail', handler)
+    return () => window.removeEventListener('openBlockDetail', handler)
+  }, [])
+
   const {
     currentSession,
     allSessions,
@@ -60,8 +67,7 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI }: Ri
 
   useEffect(() => {
     if (selectedText?.trim()) {
-      setActiveTab('chat')
-      setShowHistory(false)
+      // 只填充输入框，不强制切换标签页
       setInput(`[上下文]\n${selectedText}\n\n[我的问题]\n`)
       onTextSentToAI?.()
     }

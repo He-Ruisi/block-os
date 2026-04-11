@@ -2,7 +2,7 @@
 
 ## [v0.7.0] - 2026-04-11 📦 Block 版本化引用系统
 
-Block 支持 working copy + release 模型。捕获时自动创建 v1，用户可发布新版本。Block 详情面板显示版本列表（标题+内容预览+时间）、引用记录。选择 release 版本插入编辑器为 SourceBlock。usages 独立 IndexedDB store。→ [需求文档](./spec/features/block-system/block-versioned-references.md)
+Block 支持 working copy + release 模型。捕获时自动创建 v1，用户可发布新版本。Block 详情面板显示版本列表（标题+内容预览+时间）、引用记录。编辑器内 SourceBlock hover 显示操作栏（发布版本/查看版本），内容实时同步回 IndexedDB。usages 独立 store。→ [需求文档](./spec/features/block-system/block-versioned-references.md)
 
 ## [v0.6.1] - 2026-04-11 🧩 SourceBlock 自定义节点
 

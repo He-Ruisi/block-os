@@ -52,28 +52,26 @@ export function BlockSpacePanel() {
   // 监听显示 Block 事件
   useEffect(() => {
     const handleShowBlock = (e: Event) => {
-      const customEvent = e as CustomEvent<string>
-      const blockId = customEvent.detail
-      
-      // 高亮该 Block
+      const blockId = (e as CustomEvent<string>).detail
       setHighlightedBlockId(blockId)
-      
-      // 3秒后取消高亮
-      setTimeout(() => {
-        setHighlightedBlockId(null)
-      }, 3000)
-      
-      // 滚动到该 Block
+      setTimeout(() => setHighlightedBlockId(null), 3000)
       setTimeout(() => {
         const element = document.querySelector(`[data-block-id="${blockId}"]`)
-        if (element) {
-          element.scrollIntoView({ behavior: 'smooth', block: 'center' })
-        }
+        if (element) element.scrollIntoView({ behavior: 'smooth', block: 'center' })
       }, 100)
     }
-
     window.addEventListener('showBlockInSpace', handleShowBlock)
     return () => window.removeEventListener('showBlockInSpace', handleShowBlock)
+  }, [])
+
+  // 监听 openBlockDetail 事件 → 直接打开详情面板
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const blockId = (e as CustomEvent<string>).detail
+      if (blockId) setDetailBlockId(blockId)
+    }
+    window.addEventListener('openBlockDetail', handler)
+    return () => window.removeEventListener('openBlockDetail', handler)
   }, [])
 
   // 搜索和过滤

@@ -4,13 +4,10 @@ import { blockStore } from '../../storage/blockStore'
 /**
  * SourceBlock — 内容与形式分离的核心节点
  *
- * 内容层：source / sourceLabel / blockId / releaseVersion 存在 attrs 中
- * 样式层：CSS 类名 `source-block--{source}` 控制视觉
- * 模板层：导出时根据 source 属性决定处理策略
- *
- * 内容区域（content）是 block+，完全可编辑。
- * 编辑器内容实时同步回 Block.content（debounce 500ms）。
- * hover 时显示操作栏：发布新版本 / 查看版本。
+ * attrs: source, sourceLabel, blockId, releaseVersion
+ * 内容区域 block+，完全可编辑
+ * 编辑器内容实时同步回 Block.content（debounce 500ms）
+ * hover 操作栏：发布新版本 / 查看版本
  */
 export const SourceBlock = Node.create({
   name: 'sourceBlock',
@@ -28,16 +25,30 @@ export const SourceBlock = Node.create({
   },
 
   parseHTML() {
-    return [{ tag: 'div[data-type="source-block"]' }]
+    return [{
+      tag: 'div[data-type="source-block"]',
+      getAttrs: (el) => {
+        const dom = el as HTMLElement
+        return {
+          source: dom.getAttribute('data-source') || 'ai',
+          sourceLabel: dom.getAttribute('data-source-label') || '',
+          blockId: dom.getAttribute('data-block-id') || null,
+          releaseVersion: dom.getAttribute('data-release-version') ? Number(dom.getAttribute('data-release-version')) : null,
+        }
+      },
+    }]
   },
 
   renderHTML({ HTMLAttributes }) {
     const source = HTMLAttributes.source || 'ai'
     return [
       'div',
-      mergeAttributes(HTMLAttributes, {
+      mergeAttributes({
         'data-type': 'source-block',
         'data-source': source,
+        'data-source-label': HTMLAttributes.sourceLabel || '',
+        'data-block-id': HTMLAttributes.blockId || '',
+        'data-release-version': HTMLAttributes.releaseVersion != null ? String(HTMLAttributes.releaseVersion) : '',
         class: `source-block source-block--${source}`,
       }),
       0,
@@ -45,22 +56,19 @@ export const SourceBlock = Node.create({
   },
 
   addNodeView() {
-    return ({ node, HTMLAttributes, getPos }) => {
+    return ({ node }) => {
       const source = node.attrs.source || 'ai'
       const label = node.attrs.sourceLabel || (source === 'ai' ? '◆ AI 生成' : '💡 灵感')
       const bId: string | null = node.attrs.blockId
 
-      // ---- DOM 结构 ----
+      // ---- DOM ----
       const dom = document.createElement('div')
       dom.classList.add('source-block', `source-block--${source}`)
       dom.setAttribute('data-type', 'source-block')
       dom.setAttribute('data-source', source)
       if (bId) dom.setAttribute('data-block-id', bId)
-      Object.entries(mergeAttributes(HTMLAttributes)).forEach(([k, v]) => {
-        if (typeof v === 'string') dom.setAttribute(k, v)
-      })
 
-      // 标签行（标签 + 操作栏）
+      // 标签行
       const headerEl = document.createElement('div')
       headerEl.classList.add('source-block-header')
       headerEl.contentEditable = 'false'
@@ -70,32 +78,33 @@ export const SourceBlock = Node.create({
       labelEl.textContent = label
       headerEl.appendChild(labelEl)
 
-      // 操作栏（hover 时显示）
+      // 操作栏
       if (bId) {
         const toolbar = document.createElement('div')
         toolbar.classList.add('source-block-toolbar')
 
-        // 发布新版本按钮
         const publishBtn = document.createElement('button')
         publishBtn.classList.add('sb-toolbar-btn')
         publishBtn.textContent = '📦 发布版本'
         publishBtn.title = '将当前内容保存为新版本'
-        publishBtn.addEventListener('click', (e) => {
+        publishBtn.type = 'button'
+        publishBtn.addEventListener('mousedown', (e) => {
           e.preventDefault()
           e.stopPropagation()
-          showPublishForm(dom, bId, getPos)
+          showPublishForm(dom, bId, labelEl)
         })
         toolbar.appendChild(publishBtn)
 
-        // 查看版本按钮
         const viewBtn = document.createElement('button')
         viewBtn.classList.add('sb-toolbar-btn')
         viewBtn.textContent = '📋 版本'
         viewBtn.title = '在 Block 空间查看所有版本'
-        viewBtn.addEventListener('click', (e) => {
+        viewBtn.type = 'button'
+        viewBtn.addEventListener('mousedown', (e) => {
           e.preventDefault()
           e.stopPropagation()
-          window.dispatchEvent(new CustomEvent('showBlockInSpace', { detail: bId }))
+          // 通知 RightPanel 切换到 blocks 标签并打开详情
+          window.dispatchEvent(new CustomEvent('openBlockDetail', { detail: bId }))
         })
         toolbar.appendChild(viewBtn)
 
@@ -125,28 +134,21 @@ export const SourceBlock = Node.create({
           }, 500)
         })
         observer.observe(contentDOM, { childList: true, subtree: true, characterData: true })
-
-        // 清理
-        const origDestroy = dom.remove.bind(dom)
-        dom.remove = () => {
-          observer.disconnect()
-          if (syncTimer) clearTimeout(syncTimer)
-          origDestroy()
-        }
       }
 
-      return { dom, contentDOM }
+      return {
+        dom,
+        contentDOM,
+        destroy() {
+          if (syncTimer) clearTimeout(syncTimer)
+        },
+      }
     }
   },
 })
 
-// ---- 发布新版本的 inline 表单 ----
-function showPublishForm(
-  dom: HTMLElement,
-  blockId: string,
-  _getPos: (() => number) | boolean
-) {
-  // 防止重复打开
+// ---- 发布新版本 inline 表单 ----
+function showPublishForm(dom: HTMLElement, blockId: string, labelEl: HTMLElement) {
   if (dom.querySelector('.sb-publish-form')) return
 
   const contentEl = dom.querySelector('.source-block-content')
@@ -154,7 +156,6 @@ function showPublishForm(
 
   const form = document.createElement('div')
   form.classList.add('sb-publish-form')
-  form.contentEditable = 'false'
 
   const input = document.createElement('input')
   input.classList.add('sb-publish-input')
@@ -167,7 +168,8 @@ function showPublishForm(
   const cancelBtn = document.createElement('button')
   cancelBtn.classList.add('sb-toolbar-btn', 'sb-btn-cancel')
   cancelBtn.textContent = '取消'
-  cancelBtn.addEventListener('click', (e) => {
+  cancelBtn.type = 'button'
+  cancelBtn.addEventListener('mousedown', (e) => {
     e.preventDefault()
     form.remove()
   })
@@ -175,21 +177,16 @@ function showPublishForm(
   const confirmBtn = document.createElement('button')
   confirmBtn.classList.add('sb-toolbar-btn', 'sb-btn-confirm')
   confirmBtn.textContent = '发布'
-  confirmBtn.addEventListener('click', async (e) => {
+  confirmBtn.type = 'button'
+  confirmBtn.addEventListener('mousedown', async (e) => {
     e.preventDefault()
     const title = input.value.trim()
-    if (!title) return
+    if (!title) { input.focus(); return }
 
     try {
-      // 先同步当前内容到 Block.content
       await blockStore.updateBlock(blockId, { content: currentContent })
-      // 然后创建 release
       const release = await blockStore.createRelease(blockId, title)
-      // 更新标签显示
-      const labelEl = dom.querySelector('.source-block-label')
-      if (labelEl) {
-        labelEl.textContent = `📦 v${release.version} · ${title}`
-      }
+      labelEl.textContent = `📦 v${release.version} · ${title}`
       form.remove()
       window.dispatchEvent(new Event('blockUpdated'))
     } catch (err) {
@@ -197,10 +194,11 @@ function showPublishForm(
     }
   })
 
+  // 键盘事件 — 必须阻止冒泡，否则 ProseMirror 会拦截
   input.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') { e.preventDefault(); confirmBtn.click() }
+    e.stopPropagation()
+    if (e.key === 'Enter') { e.preventDefault(); confirmBtn.dispatchEvent(new MouseEvent('mousedown')) }
     if (e.key === 'Escape') { e.preventDefault(); form.remove() }
-    e.stopPropagation() // 防止 ProseMirror 拦截按键
   })
 
   actions.appendChild(cancelBtn)
@@ -208,13 +206,10 @@ function showPublishForm(
   form.appendChild(input)
   form.appendChild(actions)
 
-  // 插入到 header 和 content 之间
   const header = dom.querySelector('.source-block-header')
-  if (header) {
-    header.after(form)
-  } else {
-    dom.insertBefore(form, dom.querySelector('.source-block-content'))
-  }
+  if (header) header.after(form)
+  else dom.insertBefore(form, contentEl)
 
-  input.focus()
+  // 延迟 focus，避免被 ProseMirror 抢走
+  requestAnimationFrame(() => input.focus())
 }
