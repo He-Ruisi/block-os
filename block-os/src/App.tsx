@@ -7,7 +7,6 @@ import { ResizeHandle } from './components/layout/ResizeHandle'
 import { RightPanel } from './components/panel/RightPanel'
 import { AuthPage } from './components/auth/AuthPage'
 import { initStorage } from './storage'
-import { markdownToHtml } from './utils/markdown'
 import { useAppLayout } from './hooks/useAppLayout'
 import { useTabs } from './hooks/useTabs'
 import { useAuth } from './hooks/useAuth'
@@ -79,9 +78,15 @@ function App() {
 
   const handleInsertAIContent = (content: string) => {
     if (editor) {
-      const innerHtml = markdownToHtml(content)
-      const html = `<blockquote data-source="ai"><p><strong>◆ AI 生成</strong></p>${innerHtml}</blockquote><p></p>`
-      editor.chain().focus().insertContent(html).run()
+      const lines = content.split('\n').filter(l => l.trim())
+      editor.chain().focus().insertContent({
+        type: 'sourceBlock',
+        attrs: { source: 'ai', sourceLabel: '◆ AI 生成' },
+        content: lines.map(line => ({
+          type: 'paragraph',
+          content: [{ type: 'text', text: line }],
+        })),
+      }).run()
     }
   }
 

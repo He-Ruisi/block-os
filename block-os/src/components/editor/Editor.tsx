@@ -1,11 +1,10 @@
 import { useEffect, useState, useRef, useCallback } from 'react'
 import { useEditor, EditorContent, Editor as TiptapEditor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
-import { BlockLink, BlockReference, searchBlocks } from '../../editor/extensions'
+import { BlockLink, BlockReference, SourceBlock, searchBlocks } from '../../editor/extensions'
 import { SuggestionMenu } from './SuggestionMenu'
 import { documentStore } from '../../storage/documentStore'
 import { blockStore } from '../../storage/blockStore'
-import { markdownToHtml } from '../../utils/markdown'
 import './Editor.css'
 
 interface EditorProps {
@@ -28,10 +27,6 @@ function isBlockOSDrag(e: DragEvent | React.DragEvent): boolean {
   ) ?? false
 }
 
-function escapeHtml(str: string): string {
-  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
-}
-
 export function Editor({ onEditorReady, onTextSelected, documentId }: EditorProps) {
   const [showSuggestion, setShowSuggestion] = useState(false)
   const [suggestionItems, setSuggestionItems] = useState<SuggestionItem[]>([])
@@ -44,7 +39,7 @@ export function Editor({ onEditorReady, onTextSelected, documentId }: EditorProp
   const loadedDocumentIdRef = useRef<string | undefined>(undefined)
 
   const editor = useEditor({
-    extensions: [StarterKit, BlockLink, BlockReference],
+    extensions: [StarterKit, BlockLink, BlockReference, SourceBlock],
     content: `
       <h1>欢迎使用 BlockOS</h1>
       <p>这是一个写作优先的知识操作系统。</p>
@@ -122,32 +117,50 @@ export function Editor({ onEditorReady, onTextSelected, documentId }: EditorProp
     const aiContent = e.dataTransfer.getData('application/blockos-ai-content')
     const blockData = e.dataTransfer.getData('application/blockos-block')
 
-    let html = ''
+    let insertData: Record<string, unknown> | null = null
 
     if (blockData) {
-      // Block 空间拖入 → 灵感块样式（用 blockquote 包裹，TipTap 原生支持，内容可编辑）
+      // Block 空间拖入 → 灵感块
       try {
         const parsed = JSON.parse(blockData)
-        const innerHtml = markdownToHtml(parsed.content || '')
-        const title = escapeHtml(parsed.title || 'Block')
-        html = `<blockquote data-source="inspiration"><p><strong>💡 灵感 · ${title}</strong></p>${innerHtml}</blockquote><p></p>`
+        const title = parsed.title || 'Block'
+        const text = parsed.content || blockData
+        insertData = {
+          type: 'sourceBlock',
+          attrs: { source: 'inspiration', sourceLabel: `💡 灵感 · ${title}` },
+          content: text.split('\n').filter((l: string) => l.trim()).map((line: string) => ({
+            type: 'paragraph',
+            content: [{ type: 'text', text: line }],
+          })),
+        }
       } catch {
-        html = `<blockquote data-source="inspiration"><p><strong>💡 灵感</strong></p><p>${escapeHtml(blockData)}</p></blockquote><p></p>`
+        insertData = {
+          type: 'sourceBlock',
+          attrs: { source: 'inspiration', sourceLabel: '💡 灵感' },
+          content: [{ type: 'paragraph', content: [{ type: 'text', text: blockData }] }],
+        }
       }
     } else if (aiContent) {
-      // AI 回复拖入 → AI 块样式（用 blockquote 包裹，内容可编辑）
-      const innerHtml = markdownToHtml(aiContent)
-      html = `<blockquote data-source="ai"><p><strong>◆ AI 生成</strong></p>${innerHtml}</blockquote><p></p>`
+      // AI 回复拖入 → AI 块
+      const lines = aiContent.split('\n').filter((l: string) => l.trim())
+      insertData = {
+        type: 'sourceBlock',
+        attrs: { source: 'ai', sourceLabel: '◆ AI 生成' },
+        content: lines.map((line: string) => ({
+          type: 'paragraph',
+          content: [{ type: 'text', text: line }],
+        })),
+      }
     }
 
-    if (!html) return
+    if (!insertData) return
 
     // 将光标移到拖拽位置
     const pos = editor.view.posAtCoords({ left: e.clientX, top: e.clientY })
     if (pos) {
-      editor.chain().focus().setTextSelection(pos.pos).insertContent(html).run()
+      editor.chain().focus().setTextSelection(pos.pos).insertContent(insertData).run()
     } else {
-      editor.chain().focus().insertContent(html).run()
+      editor.chain().focus().insertContent(insertData).run()
     }
   }, [editor])
 
