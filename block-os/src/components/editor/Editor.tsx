@@ -33,7 +33,8 @@ export function Editor({ onEditorReady, onTextSelected, documentId }: EditorProp
   const [suggestionPosition, setSuggestionPosition] = useState({ top: 0, left: 0 })
   const [suggestionType, setSuggestionType] = useState<'link' | 'reference' | null>(null)
   const [suggestionRange, setSuggestionRange] = useState<{ from: number; to: number } | null>(null)
-  const [currentDocumentId, setCurrentDocumentId] = useState<string | null>(null)
+  const currentDocIdRef = useRef<string | null>(null)
+  const setCurrentDocId = (id: string) => { currentDocIdRef.current = id }
   const editorRef = useRef<HTMLDivElement>(null)
   const updateTimeoutRef = useRef<number | null>(null)
   const loadedDocumentIdRef = useRef<string | undefined>(undefined)
@@ -103,7 +104,7 @@ export function Editor({ onEditorReady, onTextSelected, documentId }: EditorProp
 
       setShowSuggestion(false)
       if (updateTimeoutRef.current) clearTimeout(updateTimeoutRef.current)
-      updateTimeoutRef.current = window.setTimeout(() => handleDocumentUpdate(ed), 1000)
+      updateTimeoutRef.current = window.setTimeout(() => handleDocumentUpdate(ed), 500)
     },
   })
 
@@ -190,9 +191,10 @@ export function Editor({ onEditorReady, onTextSelected, documentId }: EditorProp
   }
 
   const handleDocumentUpdate = async (ed: TiptapEditor) => {
-    if (!currentDocumentId) return
+    const docId = currentDocIdRef.current
+    if (!docId) return
     try {
-      await documentStore.updateDocumentBlocks(currentDocumentId, ed.getJSON())
+      await documentStore.updateDocumentBlocks(docId, ed.getJSON())
     } catch (error) {
       console.error('Failed to update document blocks:', error)
     }
@@ -206,8 +208,8 @@ export function Editor({ onEditorReady, onTextSelected, documentId }: EditorProp
       editor.chain().focus().deleteRange({ from, to })
         .insertContent({ type: 'blockLink', attrs: { blockId: item.id, blockTitle: item.title } })
         .run()
-      if (currentDocumentId) {
-        try { await blockStore.addLink(currentDocumentId, item.id) }
+      if (currentDocIdRef.current) {
+        try { await blockStore.addLink(currentDocIdRef.current, item.id) }
         catch (error) { console.error('Failed to add link:', error) }
       }
     } else if (suggestionType === 'reference') {
@@ -224,6 +226,15 @@ export function Editor({ onEditorReady, onTextSelected, documentId }: EditorProp
     const loadDocument = async () => {
       if (!editor) return
       if (loadedDocumentIdRef.current === documentId) return
+
+      // 切换文档前，先保存当前文档
+      const prevDocId = currentDocIdRef.current
+      if (prevDocId) {
+        try {
+          await documentStore.updateDocumentBlocks(prevDocId, editor.getJSON())
+        } catch { /* ignore */ }
+      }
+
       loadedDocumentIdRef.current = documentId
 
       try {
@@ -237,7 +248,7 @@ export function Editor({ onEditorReady, onTextSelected, documentId }: EditorProp
           } else {
             editor.commands.setContent('<p></p>')
           }
-          setCurrentDocumentId(doc.id)
+          setCurrentDocId(doc.id)
           documentStore.setCurrentDocument(doc.id)
         } else {
           const docs = await documentStore.getAllDocuments()
@@ -252,7 +263,7 @@ export function Editor({ onEditorReady, onTextSelected, documentId }: EditorProp
               catch { /* keep */ }
             }
           }
-          setCurrentDocumentId(doc.id)
+          setCurrentDocId(doc.id)
           documentStore.setCurrentDocument(doc.id)
         }
       } catch (error) {
@@ -322,6 +333,22 @@ export function Editor({ onEditorReady, onTextSelected, documentId }: EditorProp
   useEffect(() => {
     return () => { if (updateTimeoutRef.current) clearTimeout(updateTimeoutRef.current) }
   }, [])
+
+  // 页面关闭/刷新前立即保存
+  useEffect(() => {
+    if (!editor) return
+    const handleBeforeUnload = () => {
+      const docId = currentDocIdRef.current
+      if (!docId) return
+      try {
+        const json = editor.getJSON()
+        // 用同步方式尽力保存（beforeunload 中异步不可靠）
+        documentStore.updateDocumentBlocks(docId, json).catch(() => {})
+      } catch { /* ignore */ }
+    }
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
+  }, [editor])
 
   return (
     <div className="editor-container" ref={editorRef}>
