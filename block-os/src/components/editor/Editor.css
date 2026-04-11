@@ -184,14 +184,97 @@
   animation: blockSlideIn 0.35s ease;
 }
 
-/* 来源标签（不可编辑的元数据） */
+/* 来源标签行（标签 + 操作栏） */
+.source-block-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px 4px 20px;
+  user-select: none;
+}
+
+/* 来源标签 */
 .source-block-label {
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.3px;
-  padding: 8px 16px 4px 20px;
-  user-select: none;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* hover 操作栏 */
+.source-block-toolbar {
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.source-block:hover .source-block-toolbar {
+  opacity: 1;
+}
+
+.sb-toolbar-btn {
+  font-size: 11px;
+  padding: 2px 8px;
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border-primary);
+  border-radius: 4px;
+  color: var(--color-text-tertiary);
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.sb-toolbar-btn:hover {
+  border-color: var(--color-purple);
+  color: var(--color-purple);
+  background: var(--color-purple-light);
+}
+
+/* 发布表单 */
+.sb-publish-form {
+  display: flex;
+  gap: 6px;
+  padding: 6px 16px 6px 20px;
+  align-items: center;
+  animation: blockSlideIn 0.2s ease;
+}
+
+.sb-publish-input {
+  flex: 1;
+  padding: 4px 8px;
+  font-size: 12px;
+  border: 1px solid var(--color-border-primary);
+  border-radius: 4px;
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  outline: none;
+  font-family: inherit;
+}
+
+.sb-publish-input:focus {
+  border-color: var(--color-purple);
+}
+
+.sb-publish-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.sb-btn-cancel {
+  color: var(--color-text-tertiary);
+}
+
+.sb-btn-confirm {
+  background: var(--color-purple);
+  color: white;
+  border-color: var(--color-purple);
+}
+
+.sb-btn-confirm:hover {
+  opacity: 0.9;
+  color: white;
 }
 
 /* 可编辑内容区域 */

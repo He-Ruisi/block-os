@@ -127,7 +127,7 @@ export function Editor({ onEditorReady, onTextSelected, documentId }: EditorProp
         const text = parsed.content || blockData
         insertData = {
           type: 'sourceBlock',
-          attrs: { source: 'inspiration', sourceLabel: `💡 灵感 · ${title}` },
+          attrs: { source: 'inspiration', sourceLabel: `💡 灵感 · ${title}`, blockId: parsed.id || null },
           content: text.split('\n').filter((l: string) => l.trim()).map((line: string) => ({
             type: 'paragraph',
             content: [{ type: 'text', text: line }],
@@ -303,7 +303,12 @@ export function Editor({ onEditorReady, onTextSelected, documentId }: EditorProp
       const lines = content.split('\n').filter((l: string) => l.trim())
       editor.chain().focus().insertContent({
         type: 'sourceBlock',
-        attrs: { source: 'inspiration', sourceLabel: `📦 v${releaseVersion} · ${title}` },
+        attrs: {
+          source: 'inspiration',
+          sourceLabel: `📦 v${releaseVersion} · ${title}`,
+          blockId: (e as CustomEvent).detail.blockId || null,
+          releaseVersion: releaseVersion,
+        },
         content: lines.map((line: string) => ({
           type: 'paragraph',
           content: [{ type: 'text', text: line }],
