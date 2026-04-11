@@ -286,7 +286,7 @@ interface Tab {
 
 - [基础 Markdown 编辑器](./basic-markdown.md)
 - [项目架构文档](../../ARCHITECTURE.md)
-- [Phase 4 本地存储需求](../../PRD/2026-04-09-phase4-local-storage.md)
+- [Phase 4 本地存储需求](../storage/local-storage.md)
 
 ---
 

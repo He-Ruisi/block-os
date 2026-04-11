@@ -2,6 +2,16 @@
 
 ## P0 - 核心功能（当前优先）
 
+### Supabase 云端集成 🔐
+- [x] 用户认证（用户名+密码，无邮箱验证）
+- [x] 登录/注册页面
+- [x] 数据同步服务（projects/documents/blocks）
+- [x] RLS 安全策略
+- [x] 用户信息显示和退出
+- [ ] 数据自动同步（本地操作后自动上传）
+- [ ] 首次登录从云端拉取数据
+- [ ] 离线模式支持（断网时使用本地数据）
+
 ### 文档管理系统 📁
 - [x] 文档可关联到项目（projectId 字段）
 - [x] 在项目中创建文档自动关联
@@ -48,11 +58,11 @@
 - [x] 更新 3 个 Hooks 配置文件
 - [x] 创建架构文档（ARCHITECTURE.md, QUICK_START.md 等）
 - [x] 创建 Fix Skill 用于系统化 bug 修复 - [使用指南](./guide/developer/bug-fixing-guide.md)
-- [ ] 清理旧的分散日志文件
-- [ ] 移动现有需求文档到功能分类目录
+- [x] 清理旧的分散日志文件
+- [x] 移动现有需求文档到功能分类目录
 
 ### Phase 3: Block 系统 🚀
-- [x] 隐式 Block 系统（段落自动识别）- [详细需求](./spec/PRD/2026-04-09-phase3-block-system.md)
+- [x] 隐式 Block 系统（段落自动识别）- [详细需求](./spec/features/block-system/block-system-core.md)
 - [x] Block 数据模型完善（添加 links 字段）
 - [x] 双向链接 `[[]]` 语法
 - [x] 块引用 `(())` 语法
@@ -83,7 +93,7 @@
 - [x] Session 标题自动取第一条用户消息前 20 字
 
 ### Phase 4: 本地存储
-- [ ] 文件系统读写 - [详细需求](./spec/PRD/2026-04-09-phase4-local-storage.md)
+- [ ] 文件系统读写 - [详细需求](./spec/features/storage/local-storage.md)
 - [ ] Session 管理与状态恢复
 
 ## P2 - 增强功能

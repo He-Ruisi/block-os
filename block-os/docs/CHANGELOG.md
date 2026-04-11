@@ -1,5 +1,33 @@
 # BlockOS 更新日志
 
+## [v0.5.0] - 2026-04-11 🔐 Supabase 认证集成
+
+### 重要里程碑
+集成 Supabase 后端，支持用户注册/登录和云端数据存储。
+
+### 核心功能
+- ✅ **用户认证**：用户名+密码注册/登录，无需邮箱验证
+- ✅ **登录页面**：登录/注册切换，表单验证，错误提示
+- ✅ **数据同步服务**：projects/documents/blocks 的 CRUD 同步到 Supabase
+- ✅ **RLS 安全策略**：用户只能访问自己的数据
+- ✅ **用户信息**：Sidebar 底部显示用户名和退出按钮
+
+### 新增文件
+- `src/lib/supabase.ts` - Supabase 客户端
+- `src/services/authService.ts` - 认证服务
+- `src/services/syncService.ts` - 数据同步服务
+- `src/hooks/useAuth.ts` - 认证 Hook
+- `src/components/auth/AuthPage.tsx` + `.css` - 登录/注册页面
+- `supabase-schema.sql` - 数据库建表脚本
+- `docs/guide/SUPABASE_SETUP.md` - 配置指南
+
+### 配置要求
+1. Supabase 控制台关闭 "Confirm email"
+2. 执行 `supabase-schema.sql` 建表
+3. `.env` 填入 `VITE_SUPABASE_URL` 和 `VITE_SUPABASE_ANON_KEY`
+
+---
+
 ## [v0.4.2] - 2026-04-10 📁 文档管理系统完成
 
 ### 新功能
