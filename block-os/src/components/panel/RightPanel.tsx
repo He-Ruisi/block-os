@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import { BlockSpacePanel } from './BlockSpacePanel'
 import { DocumentBlocksPanel } from './DocumentBlocksPanel'
 import { SessionHistoryPanel } from './SessionHistoryPanel'
+import { PreviewPanel } from './PreviewPanel'
 import { Toast } from '../shared/Toast'
 import { generateUUID } from '../../utils/uuid'
 import { sendMessage, createImplicitBlockFromAI } from '../../services/aiService'
@@ -183,13 +184,13 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI }: Ri
     <div className="right-panel">
       <div className="panel-header">
         <div className="panel-tabs">
-          {(['chat', 'blocks', 'structure'] as PanelTab[]).map(tab => (
+          {(['chat', 'blocks', 'structure', 'preview'] as PanelTab[]).map(tab => (
             <button
               key={tab}
               className={`panel-tab ${activeTab === tab && !showHistory ? 'active' : ''}`}
               onClick={() => { setActiveTab(tab); setShowHistory(false) }}
             >
-              {tab === 'chat' ? '对话' : tab === 'blocks' ? 'Block空间' : '文档结构'}
+              {tab === 'chat' ? '对话' : tab === 'blocks' ? 'Block空间' : tab === 'structure' ? '文档结构' : '预览导出'}
             </button>
           ))}
         </div>
@@ -329,6 +330,7 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI }: Ri
 
       {activeTab === 'blocks' && <BlockSpacePanel />}
       {activeTab === 'structure' && <DocumentBlocksPanel />}
+      {activeTab === 'preview' && <PreviewPanel />}
 
       {toastMessage && (
         <Toast message={toastMessage} type={toastType} onClose={() => setToastMessage(null)} />

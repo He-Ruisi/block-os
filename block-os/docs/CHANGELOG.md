@@ -1,5 +1,28 @@
 # BlockOS 更新日志
 
+## [v0.6.0] - 2026-04-11 🏗️ 内容/样式/模板三层解耦（阶段一）
+
+### 重要里程碑
+完成 Block 数据层解耦，将扁平的 Block 模型拆分为 Content（来源追溯）、Style（视觉配置）、Template（结构角色+导出规则）三层独立架构。
+
+### 核心改动
+- ✅ **类型重构**：新增 `BlockSource`、`BlockStyle`、`BlockTemplate` 等独立类型
+- ✅ **预置主题**：编辑模式 / 预览模式 / 审阅模式三套 `StyleTheme`
+- ✅ **预置模板**：小说 / 博客 / 大纲三套 `DocumentTemplate`，含导出规则
+- ✅ **导出服务**：`exportService.ts` 实现同一内容按不同模板导出为 Markdown / HTML / 纯文本
+- ✅ **编辑历史**：`editHistory` 记录用户对 AI 内容的修改，来源信息始终保留
+- ✅ **向后兼容**：`style` 和 `template` 字段均为可选，旧数据无需迁移
+
+### 新增文件
+- `src/services/exportService.ts` — 多形态导出服务
+
+### 修改文件
+- `src/types/block.ts` — 三层解耦类型定义
+- `src/storage/blockStore.ts` — 新增 `updateBlockStyle` / `updateBlockTemplate` / `appendEditRecord`
+- `src/services/aiService.ts` / `blockCaptureService.ts` — Block 创建填充三层数据
+
+---
+
 ## [v0.5.0] - 2026-04-11 🔐 Supabase 认证集成
 
 ### 重要里程碑

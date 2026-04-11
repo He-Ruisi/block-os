@@ -19,4 +19,4 @@ export interface Session {
 }
 
 // 右侧面板标签页类型
-export type PanelTab = 'chat' | 'blocks' | 'structure' | 'session'
+export type PanelTab = 'chat' | 'blocks' | 'structure' | 'preview' | 'session'
