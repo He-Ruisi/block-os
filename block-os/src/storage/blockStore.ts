@@ -1,4 +1,4 @@
-import type { Block, BlockStyle, BlockTemplate, BlockRelease } from '../types/block'
+import type { Block, BlockStyle, BlockTemplate, BlockRelease, BlockAnnotation, AnnotationType } from '../types/block'
 import { generateUUID } from '../utils/uuid'
 import { initDatabase, getDatabase, isDatabaseInitialized } from './database'
 
@@ -301,6 +301,56 @@ export class BlockStore {
   async getRelease(blockId: string, version: number): Promise<BlockRelease | null> {
     const releases = await this.getReleases(blockId)
     return releases.find(r => r.version === version) ?? null
+  }
+
+  // ---------- 附属层（Annotations）操作 ----------
+
+  /** 追加一条附属记录（append-only） */
+  async addAnnotation(blockId: string, annotation: BlockAnnotation): Promise<void> {
+    const block = await this.getBlock(blockId)
+    if (!block) throw new Error('Block not found')
+    if (!block.annotations) block.annotations = {}
+
+    const key = annotation.type as keyof typeof block.annotations
+    if (!block.annotations[key]) block.annotations[key] = []
+    block.annotations[key]!.push(annotation)
+    block.metadata.updatedAt = new Date()
+    await this.saveBlock(block)
+  }
+
+  /** 获取某类型的所有附属记录 */
+  async getAnnotations(blockId: string, type: AnnotationType): Promise<BlockAnnotation[]> {
+    const block = await this.getBlock(blockId)
+    if (!block?.annotations) return []
+    return block.annotations[type] ?? []
+  }
+
+  /** 获取某类型的最新一条附属记录 */
+  async getLatestAnnotation(blockId: string, type: AnnotationType): Promise<BlockAnnotation | null> {
+    const annotations = await this.getAnnotations(blockId, type)
+    if (annotations.length === 0) return null
+    return annotations[annotations.length - 1]
+  }
+
+  /** 获取某类型在指定时间点之前的最新记录 */
+  async getAnnotationAt(blockId: string, type: AnnotationType, before: Date): Promise<BlockAnnotation | null> {
+    const annotations = await this.getAnnotations(blockId, type)
+    const beforeTime = before.getTime()
+    const filtered = annotations.filter(a => new Date(a.createdAt).getTime() <= beforeTime)
+    if (filtered.length === 0) return null
+    return filtered[filtered.length - 1]
+  }
+
+  /** 获取 Block 的所有附属层摘要（每种类型的最新记录） */
+  async getAnnotationsSummary(blockId: string): Promise<Record<AnnotationType, BlockAnnotation | null>> {
+    const block = await this.getBlock(blockId)
+    const types: AnnotationType[] = ['translation', 'explanation', 'comment', 'footnote']
+    const result = {} as Record<AnnotationType, BlockAnnotation | null>
+    for (const type of types) {
+      const list = block?.annotations?.[type]
+      result[type] = list && list.length > 0 ? list[list.length - 1] : null
+    }
+    return result
   }
 }
 

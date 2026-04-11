@@ -3,6 +3,7 @@ import type {
   StyleTheme,
   DocumentTemplate,
   AIBlockExportStrategy,
+  AnnotationType,
 } from '../types/block'
 import { DEFAULT_STYLE_THEMES, DEFAULT_DOCUMENT_TEMPLATES } from '../types/block'
 
@@ -89,7 +90,7 @@ export function exportBlocks(
 ): ExportResult {
   const template = getTemplateById(templateId) ?? DEFAULT_DOCUMENT_TEMPLATES[0]
   const theme = getThemeById(_themeId) ?? DEFAULT_STYLE_THEMES[0]
-  const { format, aiBlocks, indentFirstLine } = template.exportRules
+  const { format, aiBlocks, indentFirstLine, includeAnnotations } = template.exportRules
 
   const lines: string[] = []
 
@@ -111,6 +112,12 @@ export function exportBlocks(
       default:
         lines.push(formatPlainText(processed, role, level, indentFirstLine))
         break
+    }
+
+    // 附属层：按模板配置追加 annotation 内容
+    if (includeAnnotations && includeAnnotations.length > 0 && block.annotations) {
+      const annotationLines = formatAnnotations(block, includeAnnotations, format)
+      if (annotationLines) lines.push(annotationLines)
     }
   }
 
@@ -169,4 +176,43 @@ function formatPlainText(text: string, role: string, _level: number, indent: boo
     case 'list': return `• ${text}`
     default: return indent ? `　　${text}` : text
   }
+}
+
+// ---------- 附属层格式化 ----------
+
+const ANNOTATION_LABELS: Record<AnnotationType, string> = {
+  translation: '翻译',
+  explanation: '注释',
+  comment: '评论',
+  footnote: '脚注',
+}
+
+/** 格式化 Block 的附属层内容（取每种类型的最新记录） */
+function formatAnnotations(
+  block: Block,
+  types: AnnotationType[],
+  format: 'markdown' | 'html' | 'plain-text'
+): string {
+  const parts: string[] = []
+
+  for (const type of types) {
+    const list = block.annotations?.[type]
+    if (!list || list.length === 0) continue
+    const latest = list[list.length - 1]
+    const label = ANNOTATION_LABELS[type]
+
+    switch (format) {
+      case 'markdown':
+        parts.push(`> **${label}**: ${latest.content}`)
+        break
+      case 'html':
+        parts.push(`<aside class="annotation annotation--${type}"><strong>${label}</strong>: ${latest.content}</aside>`)
+        break
+      case 'plain-text':
+        parts.push(`  [${label}] ${latest.content}`)
+        break
+    }
+  }
+
+  return parts.join('\n')
 }

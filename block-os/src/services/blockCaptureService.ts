@@ -1,4 +1,4 @@
-import type { Block } from '../types/block'
+import type { Block, BlockSource } from '../types/block'
 import { generateUUID } from '../utils/uuid'
 import { blockStore } from '../storage/blockStore'
 
@@ -55,6 +55,67 @@ export async function captureMessageAsBlock(
         {
           version: 1,
           content,
+          title: '原始版本',
+          releasedAt: new Date(),
+        },
+      ],
+    }
+
+    await blockStore.saveBlock(block)
+    window.dispatchEvent(new Event('blockUpdated'))
+
+    return { success: true, blockId: block.id }
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : '未知错误'
+    return { success: false, error: errorMessage }
+  }
+}
+
+
+// 从编辑器选中文字捕获为显式 Block
+// 如果选中文字在 SourceBlock 内，继承其 source 信息
+export async function captureSelectionAsBlock(
+  text: string,
+  inheritedSource?: Partial<BlockSource>
+): Promise<CaptureResult> {
+  try {
+    if (!blockStore.isInitialized()) {
+      await blockStore.init()
+    }
+
+    const source: BlockSource = {
+      type: inheritedSource?.type ?? 'editor',
+      documentId: inheritedSource?.documentId,
+      aiMessageId: inheritedSource?.aiMessageId,
+      conversationId: inheritedSource?.conversationId,
+      capturedAt: new Date(),
+    }
+
+    const block: Block = {
+      id: generateUUID(),
+      content: text,
+      type: source.type === 'ai' ? 'ai-generated' : 'text',
+      implicit: false,
+      source,
+      editHistory: [],
+      style: {
+        aiBlockTreatment: source.type === 'ai' ? 'accent-border' : undefined,
+        showSourceLabel: true,
+      },
+      template: {
+        role: 'paragraph',
+        exportStrategy: 'merge-as-paragraph',
+      },
+      metadata: {
+        title: text.substring(0, 30) + (text.length > 30 ? '...' : ''),
+        tags: source.type === 'ai' ? ['AI回复', '编辑器捕获'] : ['编辑器捕获'],
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      releases: [
+        {
+          version: 1,
+          content: text,
           title: '原始版本',
           releasedAt: new Date(),
         },

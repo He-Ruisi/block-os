@@ -1,8 +1,8 @@
-# ADR: 内容/样式/模板三层解耦
+# ADR: 内容/样式/模板三层解耦 + 附属层
 
 **状态**: 已实施  
 **日期**: 2026-04-11  
-**版本**: v0.6.1
+**版本**: v0.9.0
 
 ## 背景
 
@@ -80,6 +80,54 @@ interface DocumentTemplate {
 
 同一份内容，小说模板融入正文，博客模板保留为引用，大纲模板移除 AI 块。
 
+### 附属层（Annotations）
+
+内容的空间维度。与主体内容和 release 版本完全独立。
+
+```typescript
+type AnnotationType = 'translation' | 'explanation' | 'comment' | 'footnote'
+
+interface BlockAnnotation {
+  id: string
+  type: AnnotationType
+  content: string
+  language?: string         // 翻译目标语言
+  source: 'user' | 'ai'
+  createdAt: Date
+  anchor?: {
+    text: string            // 锚定的原文片段
+    from?: number
+    to?: number
+  }
+}
+
+interface BlockAnnotations {
+  translation?: BlockAnnotation[]
+  explanation?: BlockAnnotation[]
+  comment?: BlockAnnotation[]
+  footnote?: BlockAnnotation[]
+}
+```
+
+附属层是 append-only log，每次修改追加一条记录，不覆盖。用户想看某个时间点的翻译，查时间戳即可。
+
+```
+Block
+├── content            ← 主体（唯一）
+├── releases[]         ← 主体的时间轴（全量快照，用户主动触发）
+└── annotations{}      ← 主体的空间维度（append-only，不参与 release）
+    ├── translation[]  ← 翻译（多语言）
+    ├── explanation[]  ← 解释/注释
+    ├── comment[]      ← 评论/备注
+    └── footnote[]     ← 脚注
+```
+
+导出时按模板配置自由组合：
+- 导出正式文章 → 只取 content
+- 导出双语版本 → content + translation
+- 导出注释版本 → content + explanation + footnote
+- 导出审阅版本 → content + comment
+
 ## 编辑器实现：SourceBlock 节点
 
 TipTap 自定义节点 `SourceBlock`，在编辑器层面实现三层分离：
@@ -109,9 +157,12 @@ TipTap 自定义节点 `SourceBlock`，在编辑器层面实现三层分离：
 
 ## 关键文件
 
-- `src/types/block.ts` — 三层类型定义 + 预置主题/模板
+- `src/types/block.ts` — 三层类型定义 + 附属层类型 + 预置主题/模板
 - `src/editor/extensions/sourceBlock.ts` — SourceBlock TipTap 节点
-- `src/services/exportService.ts` — 多形态导出服务
+- `src/storage/blockStore.ts` — Block 存储 + 附属层 CRUD
+- `src/services/aiService.ts` — AI 对话 + Inline AI 操作（六种模式）
+- `src/services/blockCaptureService.ts` — Block 捕获（AI 消息 + 编辑器选中文字）
+- `src/services/exportService.ts` — 多形态导出服务（支持附属层组合）
 - `src/components/panel/PreviewPanel.tsx` — 预览导出面板
 
 ## 权衡
@@ -119,3 +170,5 @@ TipTap 自定义节点 `SourceBlock`，在编辑器层面实现三层分离：
 - **为什么不用 ProseMirror marks？** marks 是行内标记，不适合块级容器。SourceBlock 需要包裹多个段落。
 - **为什么 style/template 是可选字段？** 向后兼容。旧数据没有这些字段，使用时 fallback 到默认值。
 - **为什么标签用 contentEditable=false？** 标签是元数据的视觉展示，不是内容本身。用户不应该编辑它。
+- **为什么 annotations 不参与 release？** 附属层的更新频率和主体完全不同。改一个翻译不代表主体有变化，如果每次改翻译都触发 release，版本列表会被噪音淹没。
+- **为什么 annotations 是 append-only？** 轻量文本增量存储体积很小。用户可以按时间戳查看历史，不需要和主体 release 绑定。导出时取指定时间点最近的记录即可。

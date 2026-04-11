@@ -37,7 +37,7 @@ export interface BlockStyle {
 // ---------- 模板层（Template）：结构角色 + 导出规则 ----------
 
 /** Block 在文档结构中的角色 */
-export type BlockRole = 'paragraph' | 'heading' | 'quote' | 'separator' | 'list' | 'code' | 'scene' | 'dialogue'
+export type BlockRole = 'paragraph' | 'heading' | 'quote' | 'separator' | 'list' | 'code' | 'scene' | 'dialogue' | 'annotation'
 
 /** 导出时对 AI 块的处理策略 */
 export type AIBlockExportStrategy = 'merge-as-paragraph' | 'keep-as-quote' | 'remove'
@@ -49,6 +49,35 @@ export interface BlockTemplate {
   group?: string                         // 分组/章节标识
   order?: number                         // 组内排序
   exportStrategy?: AIBlockExportStrategy // 导出时的处理策略
+}
+
+// ---------- 附属层（Annotations）：内容的空间维度 ----------
+
+/** 附属层类型 */
+export type AnnotationType = 'translation' | 'explanation' | 'comment' | 'footnote'
+
+/** 单条附属记录（append-only log） */
+export interface BlockAnnotation {
+  id: string                // 记录 ID
+  type: AnnotationType      // 附属类型
+  content: string           // 附属内容
+  language?: string         // 翻译目标语言（仅 translation 类型）
+  source: 'user' | 'ai'    // 来源
+  createdAt: Date
+  /** 锚定信息：附属内容关联的原文片段 */
+  anchor?: {
+    text: string            // 锚定的原文片段
+    from?: number           // 在主体 content 中的起始偏移（可选）
+    to?: number             // 结束偏移（可选）
+  }
+}
+
+/** Block 附属层集合 */
+export interface BlockAnnotations {
+  translation?: BlockAnnotation[]
+  explanation?: BlockAnnotation[]
+  comment?: BlockAnnotation[]
+  footnote?: BlockAnnotation[]
 }
 
 // ---------- Block 主体 ----------
@@ -113,6 +142,9 @@ export interface Block {
 
   // 版本快照（用户主动发布的 release）
   releases?: BlockRelease[]
+
+  // 附属层（不参与 release 版本管理，独立追踪）
+  annotations?: BlockAnnotations
 }
 
 // Block 派生版本（保持兼容）
@@ -168,6 +200,8 @@ export interface TemplateExportRules {
   pageSize?: 'A4' | 'A5' | 'Letter'
   format: 'markdown' | 'html' | 'plain-text'
   includeMetadata?: boolean
+  /** 导出时包含哪些附属层（默认不包含） */
+  includeAnnotations?: AnnotationType[]
 }
 
 // ============================================================

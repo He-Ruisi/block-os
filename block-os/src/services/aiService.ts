@@ -105,6 +105,112 @@ export async function sendMessage(options: SendMessageOptions): Promise<SendMess
   return { assistantId, fullResponse: assistantMessage }
 }
 
+// ============================================================
+// Inline AI — 选中文字后的 AI 操作（续写/改写/缩写/扩写/翻译/解释）
+// ============================================================
+
+export type InlineAIMode = 'continue' | 'rewrite' | 'shorten' | 'expand' | 'translate' | 'explain'
+
+export interface InlineAIRequest {
+  mode: InlineAIMode
+  selectedText: string
+  context?: string          // 选中文字的前后段落
+  targetLanguage?: string   // 翻译目标语言
+  apiKey: string
+  onToken: (content: string) => void
+  signal?: AbortSignal      // 用于取消请求
+}
+
+export interface InlineAIResult {
+  content: string
+  mode: InlineAIMode
+}
+
+/** 每种模式的 system prompt */
+const INLINE_PROMPTS: Record<InlineAIMode, (req: InlineAIRequest) => string> = {
+  continue: () =>
+    '你是一个写作助手。用户会给你一段文字，请续写下一段。' +
+    '直接输出续写内容，不要加任何前缀、解释或引号。保持原文的语气和风格。',
+  rewrite: () =>
+    '你是一个写作助手。用户会给你一段文字，请改写这段文字。' +
+    '保持原意不变，换一种表达方式。直接输出改写结果，不要加前缀或解释。输出长度应接近原文。',
+  shorten: () =>
+    '你是一个写作助手。用户会给你一段文字，请缩写这段文字。' +
+    '保留核心意思，删减冗余。直接输出缩写结果，不要加前缀或解释。输出必须比原文短。',
+  expand: () =>
+    '你是一个写作助手。用户会给你一段文字，请扩写这段文字。' +
+    '丰富细节和表达，保持原意。直接输出扩写结果，不要加前缀或解释。输出必须比原文长。',
+  translate: (req) => {
+    const lang = req.targetLanguage || '英文'
+    return `你是一个翻译助手。请将用户给出的文字翻译为${lang}。` +
+      '直接输出翻译结果，不要加前缀、解释或原文。'
+  },
+  explain: () =>
+    '你是一个知识助手。用户会给你一段文字，请用简洁的语言解释这段文字的含义。' +
+    '输出简短的解释（1-3句话），适合作为行内批注。不要加前缀。',
+}
+
+/** 发送 inline AI 请求（选中文字操作） */
+export async function sendInlineAIRequest(req: InlineAIRequest): Promise<InlineAIResult> {
+  const systemPrompt = INLINE_PROMPTS[req.mode](req)
+  const userContent = req.context
+    ? `上下文：\n${req.context}\n\n选中文字：\n${req.selectedText}`
+    : req.selectedText
+
+  const response = await fetch(MIMO_API_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'api-key': req.apiKey,
+    },
+    body: JSON.stringify({
+      model: 'mimo-v2-flash',
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userContent },
+      ],
+      temperature: req.mode === 'translate' ? 0.3 : 0.7,
+      top_p: 0.95,
+      stream: true,
+    }),
+    signal: req.signal,
+  })
+
+  if (!response.ok) {
+    throw new Error(`API 请求失败: ${response.status}`)
+  }
+
+  const reader = response.body?.getReader()
+  const decoder = new TextDecoder()
+  let fullContent = ''
+
+  while (reader) {
+    const { done, value } = await reader.read()
+    if (done) break
+
+    const chunk = decoder.decode(value)
+    const lines = chunk.split('\n').filter(line => line.trim().startsWith('data:'))
+
+    for (const line of lines) {
+      const data = line.replace(/^data:\s*/, '')
+      if (data === '[DONE]') continue
+
+      try {
+        const parsed = JSON.parse(data)
+        const content = parsed.choices?.[0]?.delta?.content
+        if (content) {
+          fullContent += content
+          req.onToken(fullContent)
+        }
+      } catch {
+        // Ignore parse errors
+      }
+    }
+  }
+
+  return { content: fullContent, mode: req.mode }
+}
+
 // AI 回复完成后自动创建隐式 Block（不显示在 Block 空间）
 export async function createImplicitBlockFromAI(
   assistantId: string,

@@ -95,7 +95,13 @@
   - [x] 导出对话框组件（选择模板+格式）
   - [x] 编辑器中 AI 块样式根据主题动态切换（SourceBlock 自定义节点）
 - [ ] 阶段三：交互模式重构（对话沉浸 ↔ 分屏协作 ↔ 写作沉浸光谱）
-- [ ] AI 行内气泡（选中文字后快捷改写/扩展/润色）
+- [ ] AI 浮动工具栏（选中文字后 AI 操作菜单）— [详细需求](./spec/features/editor/inline-ai-toolbar.md)
+  - [ ] BubbleMenu 改为 AI 操作菜单 + sendInlineAIRequest
+  - [ ] 续写（SourceBlock pending 属性）
+  - [ ] 改写（AIReplaceDecoration）
+  - [ ] 缩写/扩写/翻译（复用改写机制）
+  - [ ] 解释（CommentMark + Block annotation）
+  - [ ] 存为块（captureSelectionAsBlock）
 
 ### AI Session 管理 💬
 - [x] Session 数据模型（id, title, date, messages, systemPrompt）
@@ -168,6 +174,6 @@
 
 ---
 
-**更新时间**: 2026-04-11 17:17  
-**当前阶段**: 编辑器 UI 重构完成（v0.8.0）  
-**下次评审**: 阶段三交互模式重构 / 更多 Markdown 语法支持
+**更新时间**: 2026-04-11 18:11  
+**当前阶段**: AI 浮动工具栏方案评估完成（v0.8.0）  
+**下次评审**: AI 浮动工具栏实现 / 阶段三交互模式重构
