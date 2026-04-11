@@ -1,3 +1,7 @@
+/* ============================================================
+   Editor — 对标 minimal-tiptap 视觉风格
+   ============================================================ */
+
 .editor-container {
   display: flex;
   flex-direction: column;
@@ -5,102 +9,137 @@
   overflow: hidden;
 }
 
+/* ---- Toolbar ---- */
 .editor-toolbar {
   display: flex;
-  gap: 4px;
-  padding: 8px 12px;
-  border-bottom: 1px solid var(--color-border-primary);
-  background: var(--color-bg-secondary);
-  flex-shrink: 0;
   align-items: center;
-}
-
-.editor-toolbar button {
-  font-size: 12px;
-  padding: 4px 10px;
-  border-radius: var(--border-radius);
-  border: 1px solid var(--color-border-primary);
+  gap: 1px;
+  padding: 6px 12px;
+  height: var(--toolbar-height);
+  border-bottom: 1px solid var(--color-border-primary);
   background: var(--color-bg-primary);
-  color: var(--color-text-secondary);
-  cursor: pointer;
-  transition: all 0.15s;
-  font-weight: 500;
+  flex-shrink: 0;
+  overflow-x: auto;
 }
 
-.editor-toolbar button:hover {
-  border-color: var(--color-border-secondary);
-  color: var(--color-text-primary);
+.toolbar-group {
+  display: flex;
+  align-items: center;
+  gap: 1px;
 }
 
-.editor-toolbar button.active {
-  background: var(--color-purple-light);
-  color: var(--color-purple);
-  border-color: var(--color-purple);
-}
-
-.toolbar-divider {
+.toolbar-sep {
   width: 1px;
   height: 20px;
   background: var(--color-border-primary);
   margin: 0 8px;
+  flex-shrink: 0;
+}
+
+.toolbar-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--toolbar-btn-size);
+  height: var(--toolbar-btn-size);
+  border: none;
+  background: transparent;
+  color: var(--color-text-tertiary);
+  border-radius: var(--toolbar-btn-radius);
+  cursor: pointer;
+  transition: all 0.15s;
+  font-size: 14px;
+  font-weight: 500;
+  flex-shrink: 0;
+  font-family: var(--editor-font-family);
+}
+
+.toolbar-btn:hover {
+  background: var(--color-bg-hover);
+  color: var(--color-text-primary);
+}
+
+.toolbar-btn.active {
+  background: var(--color-purple-light);
+  color: var(--color-purple);
+}
+
+.toolbar-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.toolbar-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.toolbar-spacer {
+  flex: 1;
 }
 
 .toolbar-hint {
   font-size: 11px;
-  color: var(--color-text-tertiary);
-  margin-left: auto;
-  display: flex;
-  align-items: center;
-  gap: 4px;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
+/* ---- Editor scroll area ---- */
 .editor-scroll {
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 40px 80px;
+  padding: 32px 48px;
   min-height: 0;
 }
 
+/* ---- ProseMirror content ---- */
 .editor-content {
-  max-width: 680px;
+  max-width: var(--editor-max-width);
   margin: 0 auto;
   outline: none;
-}
-
-.editor-content h1 {
-  font-size: 28px;
-  font-weight: 600;
-  margin-bottom: 16px;
-  line-height: 1.3;
+  font-size: var(--editor-font-size);
+  line-height: var(--editor-line-height);
   color: var(--color-text-primary);
 }
 
+/* Typography */
+.editor-content h1 {
+  font-size: 1.875rem;
+  font-weight: 700;
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+  color: var(--color-text-primary);
+}
+
+.editor-content h1:first-child {
+  margin-top: 0;
+}
+
 .editor-content h2 {
-  font-size: 20px;
+  font-size: 1.375rem;
   font-weight: 600;
-  margin: 24px 0 12px;
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
   line-height: 1.4;
   color: var(--color-text-primary);
 }
 
+.editor-content h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+  line-height: 1.5;
+  color: var(--color-text-primary);
+}
+
 .editor-content p {
-  font-size: 15px;
-  line-height: 1.7;
-  margin-bottom: 12px;
-  color: var(--color-text-secondary);
-}
-
-.editor-content ul,
-.editor-content ol {
-  margin: 12px 0;
-  padding-left: 24px;
-}
-
-.editor-content li {
-  font-size: 15px;
-  line-height: 1.7;
-  margin-bottom: 6px;
+  margin-bottom: 0.625rem;
+  word-break: break-word;
   color: var(--color-text-secondary);
 }
 
@@ -113,42 +152,150 @@
   font-style: italic;
 }
 
-/* Block Link 样式 */
-.block-link {
-  color: var(--color-purple);
-  background: var(--color-purple-light);
-  padding: 2px 6px;
-  border-radius: 3px;
-  cursor: pointer;
-  transition: all 0.15s;
-  font-weight: 500;
+.editor-content s span {
+  text-decoration: line-through;
 }
 
-.block-link:hover {
-  background: rgba(139, 92, 246, 0.2);
+/* Links */
+.editor-content a {
+  color: var(--color-purple);
   text-decoration: underline;
 }
 
-/* Block Reference 样式 */
+.editor-content a:hover {
+  color: var(--color-purple-hover);
+}
+
+/* Lists */
+.editor-content ul,
+.editor-content ol {
+  padding-left: 1.5rem;
+  margin-bottom: 0.625rem;
+}
+
+.editor-content ol {
+  list-style: decimal;
+}
+
+.editor-content ol ol {
+  list-style: lower-alpha;
+}
+
+.editor-content ul {
+  list-style: disc;
+}
+
+.editor-content ul ul {
+  list-style: circle;
+}
+
+.editor-content li {
+  line-height: 1.75;
+  margin-bottom: 2px;
+  color: var(--color-text-secondary);
+}
+
+.editor-content li p {
+  margin-bottom: 0;
+}
+
+/* Blockquote */
+.editor-content blockquote {
+  position: relative;
+  padding-left: 1rem;
+  margin: 0.625rem 0;
+}
+
+.editor-content blockquote::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 3px;
+  border-radius: 2px;
+  background: var(--color-border-secondary);
+}
+
+.editor-content blockquote p {
+  color: var(--color-text-tertiary);
+}
+
+/* Horizontal rule */
+.editor-content hr {
+  border: none;
+  height: 2px;
+  background: var(--color-border-primary);
+  margin: 1.5rem 0;
+  border-radius: 1px;
+}
+
+/* Inline code */
+.editor-content code {
+  font-family: var(--editor-font-mono);
+  font-size: 0.875em;
+  background: var(--code-inline-bg);
+  border-radius: 4px;
+  padding: 2px 6px;
+  color: var(--color-text-primary);
+}
+
+/* Code block */
+.editor-content pre {
+  font-family: var(--editor-font-mono);
+  font-size: 0.875rem;
+  line-height: 1.7;
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-radius: var(--border-radius);
+  padding: 0.875rem 1rem;
+  margin: 0.625rem 0;
+  overflow-x: auto;
+  color: var(--code-color);
+}
+
+.editor-content pre code {
+  background: transparent;
+  padding: 0;
+  border-radius: 0;
+  font-size: inherit;
+}
+
+/* ---- Block Link 样式 ---- */
+.block-link {
+  color: var(--color-purple);
+  background: var(--color-purple-light);
+  padding: 1px 5px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.block-link:hover {
+  background: rgba(127, 119, 221, 0.2);
+}
+
+/* ---- Block Reference 样式 ---- */
 .block-reference {
-  margin: 12px 0;
-  padding: 12px;
+  margin: 0.625rem 0;
+  padding: 10px 12px;
   background: var(--color-bg-secondary);
   border-left: 3px solid var(--color-purple);
-  border-radius: var(--border-radius);
+  border-radius: 0 var(--border-radius) var(--border-radius) 0;
   cursor: pointer;
   transition: all 0.15s;
 }
 
 .block-reference:hover {
-  background: var(--color-bg-hover);
-  border-left-color: var(--color-purple);
+  background: var(--color-bg-tertiary);
 }
 
 .block-reference-label {
   font-size: 11px;
-  color: var(--color-text-tertiary);
-  margin-bottom: 6px;
+  color: var(--color-text-muted);
+  margin-bottom: 4px;
   font-weight: 500;
 }
 
@@ -164,44 +311,55 @@
   border-radius: 3px;
 }
 
-.editor-content code {
-  font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+/* ---- BubbleMenu 悬浮菜单 ---- */
+.bubble-menu {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  padding: 4px;
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border-primary);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-md);
+}
+
+.bubble-menu .toolbar-btn {
+  width: 28px;
+  height: 28px;
   font-size: 13px;
-  background: var(--color-bg-secondary);
-  padding: 2px 6px;
-  border-radius: 3px;
-  color: var(--color-purple);
+  border-radius: 4px;
+}
+
+.bubble-menu .toolbar-sep {
+  height: 16px;
+  margin: 0 4px;
 }
 
 /* ---- SourceBlock 样式（内容与形式分离） ---- */
 
-/* 基础容器 */
 .source-block {
   position: relative;
-  margin: 16px 0;
+  margin: 0.75rem 0;
   padding: 0;
   border-radius: 0 var(--border-radius) var(--border-radius) 0;
-  animation: blockSlideIn 0.35s ease;
+  animation: blockSlideIn 0.3s ease;
 }
 
-/* 来源标签行（标签 + 操作栏） */
 .source-block-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 8px 16px 4px 20px;
+  padding: 8px 16px 4px 16px;
   user-select: none;
 }
 
-/* 来源标签 */
 .source-block-label {
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.3px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: var(--editor-font-family);
 }
 
-/* hover 操作栏 */
 .source-block-toolbar {
   display: flex;
   gap: 4px;
@@ -219,7 +377,7 @@
   background: var(--color-bg-primary);
   border: 1px solid var(--color-border-primary);
   border-radius: 4px;
-  color: var(--color-text-tertiary);
+  color: var(--color-text-muted);
   cursor: pointer;
   transition: all 0.15s;
   font-family: inherit;
@@ -232,11 +390,10 @@
   background: var(--color-purple-light);
 }
 
-/* 发布表单 */
 .sb-publish-form {
   display: flex;
   gap: 6px;
-  padding: 6px 16px 6px 20px;
+  padding: 6px 16px;
   align-items: center;
   animation: blockSlideIn 0.2s ease;
 }
@@ -254,7 +411,7 @@
 }
 
 .sb-publish-input:focus {
-  border-color: var(--color-purple);
+  border-color: var(--color-border-focus);
 }
 
 .sb-publish-actions {
@@ -262,46 +419,38 @@
   gap: 4px;
 }
 
-.sb-btn-cancel {
-  color: var(--color-text-tertiary);
-}
-
+.sb-btn-cancel { color: var(--color-text-muted); }
 .sb-btn-confirm {
   background: var(--color-purple);
   color: white;
   border-color: var(--color-purple);
 }
+.sb-btn-confirm:hover { opacity: 0.9; color: white; }
 
-.sb-btn-confirm:hover {
-  opacity: 0.9;
-  color: white;
-}
-
-/* 可编辑内容区域 */
 .source-block-content {
-  padding: 4px 16px 12px 20px;
+  padding: 4px 16px 12px 16px;
 }
 
 .source-block-content p {
   color: var(--color-text-primary);
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .source-block-content p:last-child {
   margin-bottom: 0;
 }
 
-/* ---- AI 来源样式 ---- */
+/* AI 来源 */
 .source-block--ai {
-  border-left: 3px solid #d4a053;
-  background: linear-gradient(135deg, #fffdf5 0%, #fff9e6 100%);
+  border-left: 3px solid var(--color-accent-gold);
+  background: linear-gradient(135deg, #fffdf5 0%, var(--color-accent-gold-light) 100%);
 }
 
 .source-block--ai .source-block-label {
   color: #b8860b;
 }
 
-/* ---- 灵感来源样式 ---- */
+/* 灵感来源 */
 .source-block--inspiration {
   border-left: 3px solid var(--color-purple);
   background: linear-gradient(135deg, #f8f5ff 0%, var(--color-purple-light) 100%);
@@ -311,17 +460,17 @@
   color: var(--color-purple);
 }
 
-/* ---- 用户来源样式（用户手动标记的内容） ---- */
+/* 用户来源 */
 .source-block--user {
   border-left: 3px solid var(--color-border-secondary);
   background: var(--color-bg-secondary);
 }
 
 .source-block--user .source-block-label {
-  color: var(--color-text-tertiary);
+  color: var(--color-text-muted);
 }
 
-/* ---- 样式主题覆盖（预览模式隐藏标签和边框） ---- */
+/* 主题覆盖 */
 .editor-content.theme-preview .source-block {
   border-left-color: transparent;
   background: transparent;
@@ -331,17 +480,12 @@
   display: none;
 }
 
-/* ---- 样式主题覆盖（审阅模式淡化背景） ---- */
 .editor-content.theme-review .source-block--ai {
   background: #fffef5;
   border-left-color: #e0c080;
 }
 
-.editor-content.theme-review .source-block--ai .source-block-label {
-  color: #c0a060;
-}
-
 @keyframes blockSlideIn {
-  from { opacity: 0; transform: translateX(-8px); }
+  from { opacity: 0; transform: translateX(-6px); }
   to { opacity: 1; transform: translateX(0); }
 }

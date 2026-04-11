@@ -1,14 +1,64 @@
+/* ============================================================
+   BlockOS Design Tokens
+   参考 minimal-tiptap 视觉风格，纯 CSS 变量实现
+   ============================================================ */
+
 :root {
+  /* 背景 */
   --color-bg-primary: #ffffff;
   --color-bg-secondary: #f8f9fa;
+  --color-bg-tertiary: #f1f3f5;
+  --color-bg-hover: #f0f0f0;
+  --color-bg-active: #e8e8e8;
+
+  /* 边框 */
   --color-border-primary: #e1e4e8;
   --color-border-secondary: #d1d5da;
-  --color-text-primary: #24292e;
-  --color-text-secondary: #586069;
+  --color-border-focus: #7F77DD;
+
+  /* 文字 */
+  --color-text-primary: #1a1a1a;
+  --color-text-secondary: #4a4a4a;
   --color-text-tertiary: #6a737d;
+  --color-text-muted: #9ca3af;
+
+  /* 品牌色 */
   --color-purple: #7F77DD;
   --color-purple-light: #EEEDFE;
+  --color-purple-hover: #6e65d0;
+
+  /* 功能色 */
+  --color-accent-gold: #d4a053;
+  --color-accent-gold-light: #fff9e6;
+  --color-accent-green: #22a06b;
+  --color-accent-red: #c9372c;
+
+  /* 编辑器 */
+  --editor-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
+  --editor-font-mono: 'SF Mono', 'Monaco', 'Menlo', 'Consolas', monospace;
+  --editor-font-size: 15px;
+  --editor-line-height: 1.75;
+  --editor-max-width: 720px;
+
+  /* 代码块 */
+  --code-bg: #f6f8fa;
+  --code-border: #e1e4e8;
+  --code-color: #24292e;
+  --code-inline-bg: rgba(175, 184, 193, 0.2);
+
+  /* 工具栏 */
+  --toolbar-height: 44px;
+  --toolbar-btn-size: 32px;
+  --toolbar-btn-radius: 6px;
+
+  /* 圆角 */
   --border-radius: 6px;
+  --border-radius-lg: 8px;
+
+  /* 阴影 */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
 }
 
 * {
@@ -18,7 +68,7 @@
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
+  font-family: var(--editor-font-family);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background: var(--color-bg-primary);
