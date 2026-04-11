@@ -114,7 +114,7 @@ export function Editor({ onEditorReady, onTextSelected, documentId }: EditorProp
       if (updateTimeoutRef.current) {
         clearTimeout(updateTimeoutRef.current)
       }
-      updateTimeoutRef.current = setTimeout(() => {
+      updateTimeoutRef.current = window.setTimeout(() => {
         handleDocumentUpdate(editor)
       }, 1000) // 1秒后更新
     },

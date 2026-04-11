@@ -5,15 +5,19 @@ import { TabBar } from './components/layout/TabBar'
 import { Editor } from './components/editor/Editor'
 import { ResizeHandle } from './components/layout/ResizeHandle'
 import { RightPanel } from './components/panel/RightPanel'
+import { AuthPage } from './components/auth/AuthPage'
 import { initStorage } from './storage'
 import { markdownToHtml } from './utils/markdown'
 import { useAppLayout } from './hooks/useAppLayout'
 import { useTabs } from './hooks/useTabs'
+import { useAuth } from './hooks/useAuth'
 import './App.css'
 
 function App() {
   const [editor, setEditor] = useState<TiptapEditor | null>(null)
   const [selectedText, setSelectedText] = useState('')
+
+  const auth = useAuth()
 
   const {
     sidebarCollapsed,
@@ -78,6 +82,27 @@ function App() {
 
   const activeDocumentId = tabs.find(t => t.id === activeTabId)?.documentId
 
+  // 加载中
+  if (auth.loading && !auth.user) {
+    return (
+      <div className="app-loading">
+        <div className="loading-spinner">BlockOS</div>
+      </div>
+    )
+  }
+
+  // 未登录 → 显示登录页
+  if (!auth.isAuthenticated) {
+    return (
+      <AuthPage
+        onSignIn={auth.signIn}
+        onSignUp={auth.signUp}
+        loading={auth.loading}
+        error={auth.error}
+      />
+    )
+  }
+
   return (
     <div className={`app ${isFullscreen ? 'fullscreen' : ''}`}>
       {!isFullscreen && (
@@ -88,6 +113,8 @@ function App() {
           onSelectProject={selectProject}
           onOpenDocument={openDocument}
           currentProjectId={currentProjectId}
+          username={auth.user?.username}
+          onSignOut={auth.signOut}
         />
       )}
 

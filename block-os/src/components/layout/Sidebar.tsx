@@ -12,6 +12,8 @@ interface SidebarProps {
   onSelectProject: (projectId: string) => void
   onOpenDocument: (doc: Document) => void
   currentProjectId: string | null
+  username?: string
+  onSignOut?: () => void
 }
 
 export function Sidebar({
@@ -21,6 +23,8 @@ export function Sidebar({
   onSelectProject,
   onOpenDocument,
   currentProjectId,
+  username,
+  onSignOut,
 }: SidebarProps) {
   const [projects, setProjects] = useState<Project[]>([])
   const [expandedProjects, setExpandedProjects] = useState<Set<string>>(new Set())
@@ -451,6 +455,19 @@ export function Sidebar({
               <button className="btn-secondary" onClick={() => setMovingDoc(null)}>取消</button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* 用户信息 */}
+      {username && (
+        <div className="sidebar-user">
+          <span className="sidebar-user-avatar">👤</span>
+          <span className="sidebar-user-name">{username}</span>
+          {onSignOut && (
+            <button className="sidebar-signout" onClick={onSignOut} title="登出">
+              退出
+            </button>
+          )}
         </div>
       )}
     </div>
