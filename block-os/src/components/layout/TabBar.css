@@ -7,6 +7,7 @@
   padding: 0 8px;
   height: 44px;
   flex-shrink: 0;
+  position: relative;
 }
 
 .tab-list {
@@ -40,6 +41,7 @@
   white-space: nowrap;
   max-width: 200px;
   position: relative;
+  user-select: none;
 }
 
 .tab:hover {
@@ -51,6 +53,16 @@
   box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.05);
 }
 
+/* 拖拽中的标签 */
+.tab.dragging {
+  opacity: 0.4;
+}
+
+/* 拖拽放置目标 */
+.tab.drop-target {
+  border-left: 2px solid var(--color-purple, #7F77DD);
+}
+
 .tab-title {
   font-size: 14px;
   color: #333;
@@ -59,6 +71,11 @@
   display: flex;
   align-items: center;
   gap: 6px;
+}
+
+.tab-type-icon {
+  font-size: 12px;
+  flex-shrink: 0;
 }
 
 .tab-dirty-indicator {
@@ -80,6 +97,7 @@
   border-radius: 3px;
   transition: all 0.2s;
   opacity: 0;
+  flex-shrink: 0;
 }
 
 .tab:hover .tab-close {
@@ -137,4 +155,44 @@
 .tab-action-button:hover {
   background: #e0e0e0;
   color: #333;
+}
+
+/* ---- 右键菜单 ---- */
+.tab-context-menu {
+  position: fixed;
+  z-index: 1000;
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  padding: 4px 0;
+  min-width: 140px;
+  animation: ctxFadeIn 0.1s ease-out;
+}
+
+@keyframes ctxFadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.ctx-menu-item {
+  display: block;
+  width: 100%;
+  padding: 8px 16px;
+  border: none;
+  background: transparent;
+  font-size: 13px;
+  color: #333;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+.ctx-menu-item:hover:not(:disabled) {
+  background: #f0f0f0;
+}
+
+.ctx-menu-item:disabled {
+  color: #bbb;
+  cursor: not-allowed;
 }

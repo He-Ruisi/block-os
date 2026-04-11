@@ -10,6 +10,9 @@ interface TabsState {
   currentProjectId: string | null
   selectTab: (tabId: string) => void
   closeTab: (tabId: string) => void
+  closeOtherTabs: (tabId: string) => void
+  closeTabsToRight: (tabId: string) => void
+  reorderTabs: (fromIndex: number, toIndex: number) => void
   selectToday: () => void
   selectProject: (projectId: string) => void
   openDocument: (doc: Document) => void
@@ -62,7 +65,6 @@ export function useTabs(): TabsState {
     })
   }, [])
 
-  // 直接打开一个文档（从侧边栏点击）
   const openDocument = useCallback((doc: Document) => {
     const tabId = 'doc-' + doc.id
     setTabs(prev => {
@@ -92,6 +94,33 @@ export function useTabs(): TabsState {
     })
   }, [activeTabId])
 
+  const closeOtherTabs = useCallback((tabId: string) => {
+    setTabs(prev => prev.filter(t => t.id === tabId))
+    setActiveTabId(tabId)
+  }, [])
+
+  const closeTabsToRight = useCallback((tabId: string) => {
+    setTabs(prev => {
+      const idx = prev.findIndex(t => t.id === tabId)
+      if (idx === -1) return prev
+      const kept = prev.slice(0, idx + 1)
+      if (activeTabId !== tabId && !kept.find(t => t.id === activeTabId)) {
+        setActiveTabId(tabId)
+      }
+      return kept
+    })
+  }, [activeTabId])
+
+  const reorderTabs = useCallback((fromIndex: number, toIndex: number) => {
+    setTabs(prev => {
+      if (fromIndex === toIndex) return prev
+      const next = [...prev]
+      const [moved] = next.splice(fromIndex, 1)
+      next.splice(toIndex, 0, moved)
+      return next
+    })
+  }, [])
+
   const newTab = useCallback(async () => {
     const projectId = currentProjectId && currentProjectId !== 'today' ? currentProjectId : undefined
     const doc = await documentStore.createDocument('新文档', projectId)
@@ -116,6 +145,9 @@ export function useTabs(): TabsState {
     currentProjectId,
     selectTab: setActiveTabId,
     closeTab,
+    closeOtherTabs,
+    closeTabsToRight,
+    reorderTabs,
     selectToday,
     selectProject,
     openDocument,

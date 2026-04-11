@@ -36,6 +36,9 @@ function App() {
     currentProjectId,
     selectTab,
     closeTab,
+    closeOtherTabs,
+    closeTabsToRight,
+    reorderTabs,
     selectToday,
     selectProject,
     openDocument,
@@ -124,6 +127,9 @@ function App() {
           activeTabId={activeTabId}
           onSelectTab={selectTab}
           onCloseTab={closeTab}
+          onCloseOtherTabs={closeOtherTabs}
+          onCloseTabsToRight={closeTabsToRight}
+          onReorderTabs={reorderTabs}
           onNewTab={newTab}
           onToggleFullscreen={toggleFullscreen}
           isFullscreen={isFullscreen}
