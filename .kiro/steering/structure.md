@@ -20,13 +20,13 @@ src/
 ├── types/          # 类型定义（block, document, project, chat）
 ├── utils/          # 纯工具函数（uuid, markdown, date）
 ├── storage/        # IndexedDB Store（blockStore, documentStore, projectStore, sessionStore）
-├── services/       # 业务逻辑（aiService, blockCaptureService, sessionService）
-├── editor/         # TipTap 扩展（blockLink, blockReference, suggestion）
+├── services/       # 业务逻辑（aiService, exportService, blockCaptureService, sessionService）
+├── editor/         # TipTap 扩展（blockLink, blockReference, sourceBlock, suggestion）
 ├── hooks/          # React Hooks（useAppLayout, useTabs, useSession, useBlockSearch, useAuth）
 ├── components/
 │   ├── layout/     # 布局组件（Sidebar, TabBar, ResizeHandle, ActivityBar）
 │   ├── editor/     # 编辑器组件（Editor, SuggestionMenu）
-│   ├── panel/      # 右侧面板（RightPanel, BlockSpacePanel, DocumentBlocksPanel, SessionHistoryPanel）
+│   ├── panel/      # 右侧面板（RightPanel, BlockSpacePanel, PreviewPanel, DocumentBlocksPanel, SessionHistoryPanel）
 │   ├── auth/       # 认证页面
 │   └── shared/     # 通用组件（Toast）
 └── App.tsx         # 主应用入口
@@ -42,9 +42,18 @@ src/
 ## 文档结构
 ```
 docs/
-├── spec/           # 需求规格和 PRD
+├── spec/
+│   ├── architecture/   # 架构决策记录（ADR）
+│   ├── features/       # 功能需求（editor/ai/block-system/storage）
+│   ├── PRD/            # 产品需求文档
+│   └── prototype/      # 原型文件
 ├── guide/          # 使用指南（用户/开发者）
 ├── logs/           # 工作日志（按月/日组织）
 ├── tests/          # 测试指南
 └── attachs/        # 附件
 ```
+
+## 关键架构文档
+- `CLAUDE.md` — 快速上手指南（项目根目录）
+- `docs/ARCHITECTURE.md` — 架构概览 + ADR 链接
+- `docs/spec/architecture/` — 架构决策记录（每个重大决策一份）
