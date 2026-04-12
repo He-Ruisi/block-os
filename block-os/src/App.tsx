@@ -1,10 +1,13 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Editor as TiptapEditor } from '@tiptap/react'
+import { ActivityBar } from './components/layout/ActivityBar'
 import { Sidebar } from './components/layout/Sidebar'
 import { TabBar } from './components/layout/TabBar'
 import { Editor } from './components/editor/Editor'
 import { ResizeHandle } from './components/layout/ResizeHandle'
 import { RightPanel } from './components/panel/RightPanel'
+import { AIFloatPanel } from './components/ai/AIFloatPanel'
+import type { AIMode } from './components/ai/AIFloatPanel'
 import { AuthPage } from './components/auth/AuthPage'
 import { initStorage } from './storage'
 import { useAppLayout } from './hooks/useAppLayout'
@@ -29,11 +32,13 @@ function App() {
 
   const {
     sidebarCollapsed,
+    sidebarView,
     isFullscreen,
     editorWidth,
     toggleSidebar,
     toggleFullscreen,
     setEditorWidth,
+    setSidebarView,
     minEditorWidth,
     maxEditorWidth,
   } = useAppLayout()
@@ -63,7 +68,6 @@ function App() {
     const handleKeyDown = (e: KeyboardEvent) => {
       const isMod = e.metaKey || e.ctrlKey
       if (!isMod) return
-      // 输入框内不触发
       const target = e.target as HTMLElement
       if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') return
 
@@ -71,7 +75,6 @@ function App() {
         e.preventDefault()
         newTab()
       } else if (e.key === 'w') {
-        // 只有多于1个标签页时才拦截，避免关闭浏览器窗口
         if (tabs.length > 1) {
           e.preventDefault()
           closeTab(activeTabId)
@@ -84,6 +87,16 @@ function App() {
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
   }, [newTab, closeTab, activeTabId, toggleSidebar, tabs.length])
+
+  // ActivityBar 视图切换：点击已激活的图标折叠面板，否则切换视图并展开
+  const handleSidebarViewChange = useCallback((view: typeof sidebarView) => {
+    if (sidebarView === view && !sidebarCollapsed) {
+      toggleSidebar()
+    } else {
+      setSidebarView(view)
+      if (sidebarCollapsed) toggleSidebar()
+    }
+  }, [sidebarView, sidebarCollapsed, toggleSidebar, setSidebarView])
 
   const handleInsertAIContent = (content: string) => {
     if (editor) {
@@ -100,6 +113,26 @@ function App() {
   }
 
   const activeDocumentId = tabs.find(t => t.id === activeTabId)?.documentId
+
+  // AI 浮层面板状态
+  const [aiFloatPanel, setAIFloatPanel] = useState<{
+    mode: AIMode
+    contextText: string
+    position: { top: number; left: number }
+  } | null>(null)
+
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent<{ contextText?: string; position?: { top: number; left: number } }>).detail
+      setAIFloatPanel({
+        mode: 'bubble',
+        contextText: detail.contextText || '',
+        position: detail.position || { top: 200, left: 300 },
+      })
+    }
+    window.addEventListener('openAIChat', handler)
+    return () => window.removeEventListener('openAIChat', handler)
+  }, [])
 
   // 加载中
   if (auth.loading && !auth.user) {
@@ -125,18 +158,26 @@ function App() {
   return (
     <div className={`app ${isFullscreen ? 'fullscreen' : ''} ${theme === 'newsprint' ? 'theme-newsprint' : ''}`}>
       {!isFullscreen && (
-        <Sidebar
-          collapsed={sidebarCollapsed}
-          onToggle={toggleSidebar}
-          onSelectToday={selectToday}
-          onSelectProject={selectProject}
-          onOpenDocument={openDocument}
-          currentProjectId={currentProjectId}
-          username={auth.user?.username}
-          onSignOut={auth.signOut}
-          theme={theme}
-          onToggleTheme={toggleTheme}
-        />
+        <>
+          <ActivityBar
+            activeView={sidebarView}
+            onViewChange={handleSidebarViewChange}
+            sidebarCollapsed={sidebarCollapsed}
+            username={auth.user?.username}
+            onSignOut={auth.signOut}
+            theme={theme}
+            onToggleTheme={toggleTheme}
+          />
+          <Sidebar
+            activeView={sidebarView}
+            collapsed={sidebarCollapsed}
+            onSelectToday={selectToday}
+            onSelectProject={selectProject}
+            onOpenDocument={openDocument}
+            currentProjectId={currentProjectId}
+            documentId={activeDocumentId || null}
+          />
+        </>
       )}
 
       <div className="editor-area" style={{ width: isFullscreen ? '100%' : editorWidth }}>
@@ -157,6 +198,16 @@ function App() {
           onTextSelected={setSelectedText}
           documentId={activeDocumentId}
         />
+        {aiFloatPanel && (
+          <AIFloatPanel
+            mode={aiFloatPanel.mode}
+            initialContext={aiFloatPanel.contextText}
+            position={aiFloatPanel.position}
+            onModeChange={mode => setAIFloatPanel(prev => prev ? { ...prev, mode } : null)}
+            onInsertContent={handleInsertAIContent}
+            onClose={() => setAIFloatPanel(null)}
+          />
+        )}
       </div>
 
       {!isFullscreen && (

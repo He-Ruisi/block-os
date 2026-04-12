@@ -58,8 +58,9 @@ export function ResizeHandle({ onResize, minWidth, maxWidth }: ResizeHandleProps
   const handleDoubleClick = () => {
     // 双击恢复默认比例（60%）
     const windowWidth = window.innerWidth
-    const sidebarWidth = document.querySelector('.sidebar')?.clientWidth || 0
-    const defaultWidth = (windowWidth - sidebarWidth) * 0.6
+    const sidebarWidth = document.querySelector('.sidebar-panel')?.clientWidth || 0
+    const activityBarWidth = document.querySelector('.activity-bar')?.clientWidth || 48
+    const defaultWidth = (windowWidth - activityBarWidth - sidebarWidth) * 0.6
     onResize(defaultWidth)
   }
 

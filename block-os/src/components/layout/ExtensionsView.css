@@ -1,0 +1,36 @@
+.extensions-view {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.extensions-placeholder {
+  text-align: center;
+  padding: 20px;
+}
+
+.extensions-icon {
+  margin-bottom: 16px;
+  opacity: 0.5;
+  color: var(--color-text-tertiary);
+}
+
+.extensions-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: 8px;
+}
+
+.extensions-hint {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  margin-bottom: 12px;
+}
+
+.extensions-desc {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+}

@@ -311,12 +311,18 @@
 }
 
 /* 侧边栏 newsprint 适配 */
-.theme-newsprint .sidebar {
+.theme-newsprint .activity-bar {
+  border-right: 2px solid #111111;
+  background: #F5F5F0;
+}
+
+.theme-newsprint .sidebar-panel {
   border-right: 2px solid #111111;
   background: #F9F9F7;
 }
 
-.theme-newsprint .sidebar-item.active {
+.theme-newsprint .explorer-item.active,
+.theme-newsprint .explorer-project-item.active {
   background: #111111;
   color: #F9F9F7;
 }

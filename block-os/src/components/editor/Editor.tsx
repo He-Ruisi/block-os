@@ -222,6 +222,22 @@ export function Editor({ onEditorReady, onTextSelected, documentId }: EditorProp
     return { text, context, from, to }
   }, [editor])
 
+  /** 打开 AI 对话浮层 */
+  const handleOpenAIChat = useCallback(() => {
+    const sel = getSelectionContext()
+    if (!sel) return
+    // 计算选区在屏幕上的位置
+    const domSelection = window.getSelection()
+    let position = { top: 200, left: 300 }
+    if (domSelection && domSelection.rangeCount > 0) {
+      const rect = domSelection.getRangeAt(0).getBoundingClientRect()
+      position = { top: rect.top, left: rect.left }
+    }
+    window.dispatchEvent(new CustomEvent('openAIChat', {
+      detail: { contextText: sel.text, position },
+    }))
+  }, [getSelectionContext])
+
   /** 续写：在选中段落后插入 pending SourceBlock */
   const handleContinue = useCallback(async () => {
     if (!editor || !MIMO_API_KEY) return
@@ -691,6 +707,14 @@ export function Editor({ onEditorReady, onTextSelected, documentId }: EditorProp
             <button className={`toolbar-btn ${editor.isActive('italic') ? 'active' : ''}`}
               onClick={() => editor.chain().focus().toggleItalic().run()} title="斜体"><em>I</em></button>
             <div className="toolbar-sep" />
+            {/* AI 对话入口 */}
+            <button
+              className="toolbar-btn toolbar-btn--ai-chat"
+              onClick={handleOpenAIChat}
+              title="AI 对话">
+              ✦ AI
+            </button>
+            <div className="toolbar-sep" />
             {/* AI 操作组 */}
             <button
               className={`toolbar-btn toolbar-btn-wide${aiLoading === 'continue' ? ' ai-btn--loading' : ''}`}
@@ -739,8 +763,8 @@ export function Editor({ onEditorReady, onTextSelected, documentId }: EditorProp
               className="toolbar-btn toolbar-btn-wide"
               onClick={handleCapture}
               disabled={aiLoading !== null}
-              title="存为块：捕获选中文字为 Block">
-              存为块
+              title="存为块">
+              捕获
             </button>
           </div>
         </BubbleMenu>
