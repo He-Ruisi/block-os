@@ -160,6 +160,7 @@ export function BlockSpacePanel() {
             className="tag-filter"
             value={selectedTag}
             onChange={(e) => setSelectedTag(e.target.value)}
+            aria-label="按标签过滤 Block"
           >
             <option value="all">全部</option>
             {allTags.map(tag => (

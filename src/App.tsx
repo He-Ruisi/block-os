@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { Editor as TiptapEditor } from '@tiptap/react'
 import { ActivityBar } from './components/layout/ActivityBar'
 import { Sidebar } from './components/layout/Sidebar'
@@ -16,6 +16,7 @@ import { useAuth } from './hooks/useAuth'
 import './App.css'
 
 function App() {
+  const editorAreaRef = useRef<HTMLDivElement>(null)
   const [editor, setEditor] = useState<TiptapEditor | null>(null)
   const [selectedText, setSelectedText] = useState('')
   const [theme, setTheme] = useState<string>(() => localStorage.getItem('blockos-theme') || 'default')
@@ -62,6 +63,14 @@ function App() {
   useEffect(() => {
     initStorage().catch(console.error)
   }, [])
+
+  // 管理编辑器区域宽度样式
+  useEffect(() => {
+    if (editorAreaRef.current) {
+      const width = isFullscreen ? '100%' : `${editorWidth}px`
+      editorAreaRef.current.style.setProperty('--editor-width', width)
+    }
+  }, [isFullscreen, editorWidth])
 
   // 全局键盘快捷键
   useEffect(() => {
@@ -180,7 +189,7 @@ function App() {
         </>
       )}
 
-      <div className="editor-area" style={{ '--editor-width': isFullscreen ? '100%' : editorWidth } as React.CSSProperties}>
+      <div className="editor-area" ref={editorAreaRef}>
         <TabBar
           tabs={tabs}
           activeTabId={activeTabId}
