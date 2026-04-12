@@ -74,10 +74,10 @@ features/
 AI 对话、智能补全、内容生成等功能。
 
 **已完成**:
-- (待实施)
+- AI 对话集成 ([ai-integration.md](./ai/ai-integration.md))
+- Session 管理 ([session-management.md](./ai/session-management.md))
 
 **规划中**:
-- AI 对话集成
 - 上下文传递
 - 智能续写
 
@@ -85,23 +85,22 @@ AI 对话、智能补全、内容生成等功能。
 知识块管理、双向链接、块引用等核心功能。
 
 **已完成**:
-- (待实施)
+- Block 数据模型与核心功能 ([block-system-core.md](./block-system/block-system-core.md))
+- Block 捕获与上下文传递 ([block-capture.md](./block-system/block-capture.md))
+- Block 版本派生系统 ([block-derivative-system.md](./block-system/block-derivative-system.md))
 
 **规划中**:
-- Block 数据模型
-- 双向链接 `[[]]`
-- 块引用 `(())`
 - 块空间可视化
 
 ### 💾 Storage (存储)
 本地存储、Git 集成、数据同步等功能。
 
 **已完成**:
-- (待实施)
+- 本地存储需求 ([local-storage.md](./storage/local-storage.md))
+- Git 版本历史设计 ([git-version-history.md](./storage/git-version-history.md))
 
 **规划中**:
 - 文件系统读写
-- Git 自动提交
 - Session 管理
 
 ## 相关文档
