@@ -180,7 +180,7 @@ function App() {
         </>
       )}
 
-      <div className="editor-area" style={{ width: isFullscreen ? '100%' : editorWidth }}>
+      <div className="editor-area" style={{ '--editor-width': isFullscreen ? '100%' : editorWidth } as React.CSSProperties}>
         <TabBar
           tabs={tabs}
           activeTabId={activeTabId}
