@@ -10,10 +10,14 @@ import { AIFloatPanel } from './components/ai/AIFloatPanel'
 import type { AIMode } from './components/ai/AIFloatPanel'
 import { AuthPage } from './components/auth/AuthPage'
 import { SettingsPanel } from './components/panel/SettingsPanel'
+import { StatusBar } from './components/layout/StatusBar'
+import { Toast } from './components/shared/Toast'
 import { initStorage } from './storage'
+import { documentStore } from './storage/documentStore'
 import { useAppLayout } from './hooks/useAppLayout'
 import { useTabs } from './hooks/useTabs'
 import { useAuth } from './hooks/useAuth'
+import { useToast } from './hooks/useToast'
 import './App.css'
 
 function App() {
@@ -22,6 +26,15 @@ function App() {
   const [selectedText, setSelectedText] = useState('')
   const [theme, setTheme] = useState<string>(() => localStorage.getItem('blockos-theme') || 'default')
   const [showSettings, setShowSettings] = useState(false)
+  
+  // 文档统计状态
+  const [wordCount, setWordCount] = useState(0)
+  const [blockCount, setBlockCount] = useState(0)
+  const [linkCount, setLinkCount] = useState(0)
+  const [autoSaveStatus, setAutoSaveStatus] = useState<'saved' | 'saving' | 'unsaved'>('saved')
+  const [lastSaved, setLastSaved] = useState<Date | null>(null)
+  
+  const { toasts, showToast, removeToast } = useToast()
 
   const toggleTheme = useCallback(() => {
     setTheme(prev => {
@@ -108,6 +121,59 @@ function App() {
       if (sidebarCollapsed) toggleSidebar()
     }
   }, [sidebarView, sidebarCollapsed, toggleSidebar, setSidebarView])
+
+  // 保存文档
+  const handleSaveDocument = useCallback(async (tabId: string) => {
+    if (!editor) return
+    
+    const tab = tabs.find(t => t.id === tabId)
+    if (!tab || !tab.documentId) return
+    
+    setAutoSaveStatus('saving')
+    try {
+      await documentStore.updateDocumentBlocks(tab.documentId, editor.getJSON())
+      setAutoSaveStatus('saved')
+      setLastSaved(new Date())
+      showToast('文档已保存', 'success')
+    } catch (error) {
+      console.error('保存失败:', error)
+      showToast('保存失败', 'error')
+      setAutoSaveStatus('unsaved')
+    }
+  }, [editor, tabs, showToast])
+
+  // 监听编辑器内容变化，更新统计信息
+  useEffect(() => {
+    if (!editor) return
+    
+    const updateStats = () => {
+      const text = editor.getText()
+      const words = text.replace(/\s+/g, '').length // 中文字数
+      setWordCount(words)
+      
+      // 统计 SourceBlock 数量
+      let blocks = 0
+      let links = 0
+      editor.state.doc.descendants((node) => {
+        if (node.type.name === 'sourceBlock') blocks++
+        if (node.type.name === 'blockLink') links++
+      })
+      setBlockCount(blocks)
+      setLinkCount(links)
+      
+      // 标记为未保存
+      if (autoSaveStatus === 'saved') {
+        setAutoSaveStatus('unsaved')
+      }
+    }
+    
+    editor.on('update', updateStats)
+    updateStats() // 初始统计
+    
+    return () => {
+      editor.off('update', updateStats)
+    }
+  }, [editor, autoSaveStatus])
 
   const handleInsertAIContent = (content: string) => {
     if (editor) {
@@ -204,6 +270,7 @@ function App() {
           onReorderTabs={reorderTabs}
           onNewTab={newTab}
           onToggleFullscreen={toggleFullscreen}
+          onSaveTab={handleSaveDocument}
           isFullscreen={isFullscreen}
         />
         <Editor
@@ -221,6 +288,15 @@ function App() {
             onClose={() => setAIFloatPanel(null)}
           />
         )}
+        
+        {/* 底部状态栏 */}
+        <StatusBar
+          wordCount={wordCount}
+          blockCount={blockCount}
+          linkCount={linkCount}
+          autoSaveStatus={autoSaveStatus}
+          lastSaved={lastSaved}
+        />
       </div>
 
       {!isFullscreen && (
@@ -249,6 +325,19 @@ function App() {
           }}
         />
       )}
+      
+      {/* Toast 通知 */}
+      <div className="toast-container">
+        {toasts.map(toast => (
+          <Toast
+            key={toast.id}
+            message={toast.message}
+            type={toast.type}
+            duration={toast.duration}
+            onClose={() => removeToast(toast.id)}
+          />
+        ))}
+      </div>
     </div>
   )
 }

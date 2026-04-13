@@ -196,3 +196,9 @@
   color: #bbb;
   cursor: not-allowed;
 }
+
+.ctx-menu-separator {
+  height: 1px;
+  background: #e0e0e0;
+  margin: 4px 0;
+}

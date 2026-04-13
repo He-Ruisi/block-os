@@ -12,6 +12,7 @@ interface TabBarProps {
   onReorderTabs: (fromIndex: number, toIndex: number) => void
   onNewTab: () => void
   onToggleFullscreen: () => void
+  onSaveTab: (tabId: string) => void
   isFullscreen: boolean
 }
 
@@ -33,6 +34,7 @@ export function TabBar({
   onReorderTabs,
   onNewTab,
   onToggleFullscreen,
+  onSaveTab,
   isFullscreen,
 }: TabBarProps) {
   // ---- 拖拽状态 ----
@@ -148,6 +150,13 @@ export function TabBar({
           className="tab-context-menu"
           style={{ top: ctxMenu.y, left: ctxMenu.x }}
         >
+          <button
+            className="ctx-menu-item"
+            onClick={() => { onSaveTab(ctxMenu.tabId); setCtxMenu(p => ({ ...p, visible: false })) }}
+          >
+            💾 保存
+          </button>
+          <div className="ctx-menu-separator" />
           <button
             className="ctx-menu-item"
             onClick={() => { onCloseTab(ctxMenu.tabId); setCtxMenu(p => ({ ...p, visible: false })) }}
