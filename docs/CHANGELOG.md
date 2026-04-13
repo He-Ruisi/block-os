@@ -1,5 +1,28 @@
 # BlockOS 更新日志
 
+## [v1.6.1] - 2026-04-13 🗄️ Supabase Schema v2.0
+
+**重要基础设施更新**：数据库 schema 升级以支持最新功能。
+
+- **Blocks 表增强**：
+  - 新增 `source` (JSONB) - 统一的来源信息对象
+  - 新增 `edit_history` (JSONB) - 编辑历史追踪
+  - 新增 `style` (JSONB) - 自定义样式配置
+  - 新增 `template` (JSONB) - 结构角色和导出规则
+  - 新增 `releases` (JSONB) - 版本快照系统
+  - 新增 `annotations` (JSONB) - 附属层（翻译/解释/评论/脚注）
+  - 新增派生字段：`derived_from`、`context_document_id`、`context_title`、`modifications`
+- **Documents 表增强**：
+  - 新增 `blocks` (JSONB) - 存储文档中的隐式 Block
+- **新增 block_usages 表**：独立存储 Block 使用记录，不内嵌在 Block 中
+- **性能优化**：
+  - 添加 JSONB 字段 GIN 索引提升查询性能
+  - 添加 `updated_at` 自动更新触发器
+- **同步服务更新**：`syncService.ts` 支持所有新字段的序列化/反序列化
+- **迁移指南**：完整的数据迁移文档，支持全新安装和保留数据迁移两种方案
+
+⚠️ **现有用户需要执行数据库迁移**，详见 [迁移指南](./guide/SUPABASE_MIGRATION.md)。新用户直接执行 `supabase-schema.sql` 即可。
+
 ## [v1.6.0] - 2026-04-13 🤖 AI 沉浸式模式
 
 **重要里程碑**：实现 AI 沉浸式模式，提供全屏对话体验和平滑的编辑切换。
