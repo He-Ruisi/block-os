@@ -233,13 +233,6 @@
 
 .message-content {
   flex: 1;
-  font-size: 14px;
-  line-height: 1.6;
-  color: var(--color-text-primary);
-  word-wrap: break-word;
-  word-break: break-word;
-  overflow-wrap: break-word;
-  white-space: pre-wrap;
   min-width: 0;        /* 防止 flex 子元素撑开父容器 */
 }
 
@@ -247,10 +240,17 @@
   background: var(--color-bg-secondary);
   padding: 10px 12px;
   border-radius: 6px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--color-text-primary);
+  word-wrap: break-word;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
 }
 
 .message-assistant .message-content {
-  padding: 10px 0;
+  /* AI 回复使用 MarkdownRenderer，不需要额外样式 */
 }
 
 .insert-button {

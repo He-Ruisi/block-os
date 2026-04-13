@@ -23,6 +23,13 @@
   - [x] TypeScript 类型检查通过
   - [ ] 响应式适配（iPad/手机）- 待测试
   - [ ] 性能优化 - 待测试
+- [x] Phase 5: AI 回复渲染增强 - [详细文档](./spec/features/ai/ai-reply-markdown-rendering.md)
+  - [x] Markdown 完整支持（标题/段落/列表/引用/链接）
+  - [x] 代码块语法高亮（100+ 语言）
+  - [x] 表格渲染支持
+  - [x] 一键复制代码
+  - [x] 主题适配（default + newsprint）
+  - [x] 响应式优化
 
 ### iPad 响应式设计 📱 - [详细文档](./spec/features/responsive/ipad-responsive-design.md)
 - [x] Phase 1: 基础响应式布局
@@ -90,12 +97,14 @@
 - [x] 标签页拖拽重排序
 - [x] 标签页右键菜单（关闭/关闭其他/关闭右侧）
 - [x] 布局偏好持久化（localStorage）
-- [x] 置顶功能（Starred）- [详细文档](./spec/features/editor/starred-items.md)
+- [x] 置顶功能（Starred）- [详细文档](./spec/features/editor/starred-items-enhancement.md)
   - [x] 置顶视图组件（StarredView）
   - [x] 全局事件系统（toggleStar）
   - [x] 数据持久化（localStorage）
-  - [ ] ExplorerView 集成星标按钮
-  - [ ] 拖拽排序置顶项目
+  - [x] ExplorerView 集成星标按钮
+  - [x] 拖拽排序置顶项目
+  - [x] 置顶数量限制（最多 10 个）
+  - [x] 修复侧边栏闪退问题
 
 ### 代码架构重构 🏗️（模块化分层）
 - [x] 审查现有代码，诊断架构问题
@@ -240,6 +249,6 @@
 
 ---
 
-**更新时间**: 2026-04-13 20:50  
-**当前阶段**: 侧边栏置顶功能完成，待集成星标按钮  
-**下次评审**: ExplorerView 星标按钮集成 / AI 模式响应式测试
+**更新时间**: 2026-04-13 21:30  
+**当前阶段**: AI 回复 Markdown 渲染完成，置顶功能全部完成  
+**下次评审**: AI 模式响应式测试 / iPad 手势交互增强

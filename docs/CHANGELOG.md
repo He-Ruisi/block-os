@@ -1,5 +1,43 @@
 # BlockOS 更新日志
 
+## [v1.8.0] - 2026-04-13 ✨ AI 回复 Markdown 渲染增强
+
+**重要更新**：AI 回复从纯文本升级为完整 Markdown 渲染，支持代码高亮、表格、列表等丰富格式。
+
+- **Markdown 完整支持**：
+  - 标题（H1-H6）、段落、强调（粗体/斜体/删除线）
+  - 列表（有序/无序/嵌套）、引用、链接、分隔线
+  - 任务列表（GitHub 风格 GFM 扩展）
+- **代码渲染增强**：
+  - 语法高亮（支持 100+ 编程语言）
+  - 语言标签显示 + 一键复制按钮
+  - 行内代码带背景色和边框
+  - 主题适配（oneDark / oneLight）
+- **表格支持**：完整表格渲染，响应式横向滚动，悬停高亮
+- **主题适配**：Default 主题（圆角、柔和阴影）和 Newsprint 主题（直角、硬边框、衬线字体）
+- **响应式优化**：移动端字号自动调整，代码块和表格全宽显示
+- **性能优化**：只对 AI 回复使用 Markdown 渲染，用户消息保持纯文本
+
+新增 `MarkdownRenderer` 组件，使用 react-markdown + remark-gfm + react-syntax-highlighter 实现。→ [完整文档](./spec/features/ai/ai-reply-markdown-rendering.md)
+
+## [v1.7.1] - 2026-04-13 ⭐ 置顶功能增强
+
+**重要更新**：修复侧边栏闪退问题，完成置顶功能所有增强特性。
+
+- **Bug 修复**：修复 StarredView 组件异步加载导致的侧边栏闪退问题
+- **星标按钮**：
+  - 项目和文档行 hover 时显示星标按钮
+  - 已置顶项目显示金色填充星标 (#f59e0b)
+  - 点击切换置顶状态，实时同步
+- **拖拽排序**：
+  - 使用 HTML5 Drag and Drop API
+  - 拖拽时半透明显示 (opacity: 0.5)
+  - 支持任意位置放置，自动保存
+- **数量限制**：最多置顶 10 个项目，超限时弹出提示
+- **全局同步**：ExplorerView 和 StarredView 通过 toggleStar 事件实时同步
+
+修复了严重的侧边栏闪退 bug，完整实现所有置顶增强功能。→ [完整文档](./spec/features/editor/starred-items-enhancement.md)
+
 ## [v1.7.0] - 2026-04-13 ⭐ 侧边栏置顶功能
 
 **新功能**：参考 Claude AI 侧边栏设计，添加置顶功能快速访问常用项目和文档。
