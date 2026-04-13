@@ -160,6 +160,7 @@ function App() {
         onSignUp={auth.signUp}
         loading={auth.loading}
         error={auth.error}
+        isPullingData={auth.isPullingData}
       />
     )
   }

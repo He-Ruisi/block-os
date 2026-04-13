@@ -27,7 +27,13 @@ export class ProjectStore {
     return new Promise((resolve, reject) => {
       const tx = db.transaction([STORE_NAME], 'readwrite')
       const req = tx.objectStore(STORE_NAME).add(project)
-      req.onsuccess = () => resolve(project)
+      req.onsuccess = () => {
+        // 标记项目已变更，等待同步
+        import('../services/autoSyncService').then(({ autoSyncService }) => {
+          autoSyncService.markProjectChanged(project.id)
+        })
+        resolve(project)
+      }
       req.onerror = () => reject(req.error)
     })
   }
@@ -71,7 +77,13 @@ export class ProjectStore {
     return new Promise((resolve, reject) => {
       const tx = db.transaction([STORE_NAME], 'readwrite')
       const req = tx.objectStore(STORE_NAME).put(updatedProject)
-      req.onsuccess = () => resolve()
+      req.onsuccess = () => {
+        // 标记项目已变更，等待同步
+        import('../services/autoSyncService').then(({ autoSyncService }) => {
+          autoSyncService.markProjectChanged(id)
+        })
+        resolve()
+      }
       req.onerror = () => reject(req.error)
     })
   }

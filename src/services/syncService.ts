@@ -1,4 +1,4 @@
-import { supabase } from '../lib/supabase'
+import { supabase, isSupabaseEnabled } from '../lib/supabase'
 import type { Block } from '../types/block'
 import type { Project } from '../types/project'
 import type { Document } from '../types/document'
@@ -6,6 +6,11 @@ import type { Document } from '../types/document'
 // ============ Projects ============
 
 export async function syncProjectToSupabase(project: Project, userId: string): Promise<void> {
+  if (!isSupabaseEnabled) {
+    console.warn('[Sync] Supabase 未启用，跳过同步')
+    return
+  }
+  
   const { error } = await supabase
     .from('projects')
     .upsert({
@@ -27,6 +32,10 @@ export async function syncProjectToSupabase(project: Project, userId: string): P
 }
 
 export async function fetchProjectsFromSupabase(userId: string): Promise<Project[]> {
+  if (!isSupabaseEnabled) {
+    return []
+  }
+  
   const { data, error } = await supabase
     .from('projects')
     .select('*')
@@ -53,6 +62,8 @@ export async function fetchProjectsFromSupabase(userId: string): Promise<Project
 }
 
 export async function deleteProjectFromSupabase(projectId: string): Promise<void> {
+  if (!isSupabaseEnabled) return
+  
   const { error } = await supabase.from('projects').delete().eq('id', projectId)
   if (error) {
     console.error('[Sync] Failed to delete project:', error)
@@ -63,6 +74,11 @@ export async function deleteProjectFromSupabase(projectId: string): Promise<void
 // ============ Documents ============
 
 export async function syncDocumentToSupabase(doc: Document, userId: string): Promise<void> {
+  if (!isSupabaseEnabled) {
+    console.warn('[Sync] Supabase 未启用，跳过同步')
+    return
+  }
+  
   const { error } = await supabase
     .from('documents')
     .upsert({
@@ -82,6 +98,10 @@ export async function syncDocumentToSupabase(doc: Document, userId: string): Pro
 }
 
 export async function fetchDocumentsFromSupabase(userId: string): Promise<Document[]> {
+  if (!isSupabaseEnabled) {
+    return []
+  }
+  
   const { data, error } = await supabase
     .from('documents')
     .select('*')
@@ -107,6 +127,8 @@ export async function fetchDocumentsFromSupabase(userId: string): Promise<Docume
 }
 
 export async function deleteDocumentFromSupabase(documentId: string): Promise<void> {
+  if (!isSupabaseEnabled) return
+  
   const { error } = await supabase.from('documents').delete().eq('id', documentId)
   if (error) {
     console.error('[Sync] Failed to delete document:', error)
@@ -117,6 +139,11 @@ export async function deleteDocumentFromSupabase(documentId: string): Promise<vo
 // ============ Blocks (显式 Block / 卡片) ============
 
 export async function syncBlockToSupabase(block: Block, userId: string): Promise<void> {
+  if (!isSupabaseEnabled) {
+    console.warn('[Sync] Supabase 未启用，跳过同步')
+    return
+  }
+  
   const { error } = await supabase
     .from('blocks')
     .upsert({
@@ -146,6 +173,10 @@ export async function syncBlockToSupabase(block: Block, userId: string): Promise
 }
 
 export async function fetchBlocksFromSupabase(userId: string): Promise<Block[]> {
+  if (!isSupabaseEnabled) {
+    return []
+  }
+  
   const { data, error } = await supabase
     .from('blocks')
     .select('*')
@@ -186,6 +217,8 @@ export async function fetchBlocksFromSupabase(userId: string): Promise<Block[]> 
 }
 
 export async function deleteBlockFromSupabase(blockId: string): Promise<void> {
+  if (!isSupabaseEnabled) return
+  
   const { error } = await supabase.from('blocks').delete().eq('id', blockId)
   if (error) {
     console.error('[Sync] Failed to delete block:', error)

@@ -8,8 +8,8 @@
   },
   "then": {
     "type": "askAgent",
-    "prompt": "追加本轮工作日志到 /Users/mac/Documents/Programming/Coda/block-os/docs/logs/YYYY-MM/YYYY-MM-DD.md（如果文件不存在则创建，存在则追加到末尾）。格式：\n\n## HH:mm - 简短标题\n### 完成内容\n- 任务1\n- 任务2\n\n### 文件变更\n- 文件列表\n\n### 关键说明\n- 重要变更\n\n---\n\n如果本轮完成了重要里程碑（如完成某个 Phase），同时在 /Users/mac/Documents/Programming/Coda/block-os/docs/CHANGELOG.md 开头添加记录。保持简洁，只记录实质性工作。\n\n<ADDITIONAL_INSTRUCTIONS>\n分析本轮对话中的新需求和功能讨论。如果有新需求：\n1) 在 /Users/mac/Documents/Programming/Coda/block-os/docs/spec/features/<category>/ 下创建或更新需求文档（category 可选：editor/ai/block-system/storage），文件名：<feature-name>.md\n2) 在 /Users/mac/Documents/Programming/Coda/block-os/docs/todo.md 中添加或更新待办事项，按优先级排序（P0/P1/P2）\n3) 如果是重大功能变更，在 CHANGELOG.md 记录\n\n如果没有新需求则跳过。保持简洁明了。\n</ADDITIONAL_INSTRUCTIONS>"
+    "prompt": "追加本轮工作日志到 docs/logs/YYYY-MM/YYYY-MM-DD.md（如果文件不存在则创建，存在则追加到末尾）。格式：\n\n## HH:mm - 简短标题\n### 完成内容\n- 任务1\n- 任务2\n\n### 文件变更\n- 文件列表\n\n### 关键说明\n- 重要变更\n\n---\n\n如果本轮完成了重要里程碑（如完成某个 Phase），同时在 docs/CHANGELOG.md 开头添加记录。保持简洁，只记录实质性工作。\n\n<ADDITIONAL_INSTRUCTIONS>\n分析本轮对话中的新需求和功能讨论。如果有新需求：\n1) 在 docs/spec/features/<category>/ 下创建或更新需求文档（category 可选：editor/ai/block-system/storage），文件名：<feature-name>.md\n2) 在 docs/todo.md 中添加或更新待办事项，按优先级排序（P0/P1/P2）\n3) 如果是重大功能变更，在 CHANGELOG.md 记录\n\n如果没有新需求则跳过。保持简洁明了。\n</ADDITIONAL_INSTRUCTIONS>"
   },
-  "workspaceFolderName": "Coda",
+  "workspaceFolderName": "block-os",
   "shortName": "daily-changelog-logger"
 }

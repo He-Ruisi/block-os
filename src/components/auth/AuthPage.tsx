@@ -7,9 +7,10 @@ interface AuthPageProps {
   onSignUp: (username: string, password: string) => Promise<void>
   loading: boolean
   error: string | null
+  isPullingData?: boolean
 }
 
-export function AuthPage({ onSignIn, onSignUp, loading, error }: AuthPageProps) {
+export function AuthPage({ onSignIn, onSignUp, loading, error, isPullingData }: AuthPageProps) {
   const [isLogin, setIsLogin] = useState(true)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
@@ -125,7 +126,7 @@ export function AuthPage({ onSignIn, onSignUp, loading, error }: AuthPageProps) 
             className="auth-submit"
             disabled={loading}
           >
-            {loading ? '处理中...' : isLogin ? '登录' : '注册'}
+            {isPullingData ? '正在同步云端数据...' : loading ? '处理中...' : isLogin ? '登录' : '注册'}
           </button>
         </form>
 

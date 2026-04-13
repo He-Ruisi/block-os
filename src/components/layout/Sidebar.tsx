@@ -4,6 +4,7 @@ import { ExplorerView } from './ExplorerView'
 import { SearchView } from './SearchView'
 import { OutlineView } from './OutlineView'
 import { ExtensionsView } from './ExtensionsView'
+import { SyncStatusIndicator } from '../shared/SyncStatusIndicator'
 import './Sidebar.css'
 
 interface SidebarProps {
@@ -63,6 +64,10 @@ export function Sidebar({
         {activeView === 'extensions' && (
           <ExtensionsView />
         )}
+      </div>
+
+      <div className="sidebar-panel-footer">
+        <SyncStatusIndicator />
       </div>
     </div>
   )

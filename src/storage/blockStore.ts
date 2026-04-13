@@ -22,7 +22,13 @@ export class BlockStore {
       const tx = db.transaction([STORE_NAME], 'readwrite')
       const store = tx.objectStore(STORE_NAME)
       const req = store.put(block)
-      req.onsuccess = () => resolve(block.id)
+      req.onsuccess = () => {
+        // 标记 Block 已变更，等待同步
+        import('../services/autoSyncService').then(({ autoSyncService }) => {
+          autoSyncService.markBlockChanged(block.id)
+        })
+        resolve(block.id)
+      }
       req.onerror = () => reject(req.error)
     })
   }

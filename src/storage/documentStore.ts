@@ -27,7 +27,13 @@ export class DocumentStore {
     return new Promise((resolve, reject) => {
       const tx = db.transaction([STORE_NAME], 'readwrite')
       const req = tx.objectStore(STORE_NAME).put(doc)
-      req.onsuccess = () => resolve(doc.id)
+      req.onsuccess = () => {
+        // 标记文档已变更，等待同步
+        import('../services/autoSyncService').then(({ autoSyncService }) => {
+          autoSyncService.markDocumentChanged(doc.id)
+        })
+        resolve(doc.id)
+      }
       req.onerror = () => reject(req.error)
     })
   }

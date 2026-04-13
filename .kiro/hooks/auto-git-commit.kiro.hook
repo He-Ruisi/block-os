@@ -1,13 +1,13 @@
 {
   "enabled": true,
   "name": "Auto Git Commit",
-  "description": "每轮对话结束后自动将所有变更提交到 Git，使用时间戳和变更摘要作为提交信息",
+  "description": "每轮对话结束后自动将所有变更提交到 Git，使用时间戳作为提交信息",
   "version": "2",
   "when": {
     "type": "agentStop"
   },
   "then": {
     "type": "runCommand",
-    "command": "git add -A && CHANGES=$(git diff --cached --stat | head -3 | tr '\\n' ' ') && git commit -m \"$(date '+%Y-%m-%d %H:%M'): ${CHANGES:-Auto commit}\" || echo \"No changes to commit\""
+    "command": "git add -A && git commit -m \"Auto commit: $(date '+%Y-%m-%d %H:%M')\" || echo 'No changes to commit'"
   }
 }

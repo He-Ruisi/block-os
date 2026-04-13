@@ -1,4 +1,4 @@
-import { supabase } from '../lib/supabase'
+import { supabase, isSupabaseEnabled } from '../lib/supabase'
 import type { Session } from '@supabase/supabase-js'
 
 export interface AuthUser {
@@ -13,6 +13,10 @@ function usernameToEmail(username: string): string {
 
 // 注册（用户名 + 密码）
 export async function signUp(username: string, password: string): Promise<AuthUser> {
+  if (!isSupabaseEnabled) {
+    throw new Error('云同步功能未启用，请配置 Supabase 或使用本地模式')
+  }
+  
   const email = usernameToEmail(username)
 
   const { data, error } = await supabase.auth.signUp({
@@ -43,6 +47,10 @@ export async function signUp(username: string, password: string): Promise<AuthUs
 
 // 登录（用户名 + 密码）
 export async function signIn(username: string, password: string): Promise<AuthUser> {
+  if (!isSupabaseEnabled) {
+    throw new Error('云同步功能未启用，请配置 Supabase 或使用本地模式')
+  }
+  
   const email = usernameToEmail(username)
 
   const { data, error } = await supabase.auth.signInWithPassword({
@@ -69,12 +77,16 @@ export async function signIn(username: string, password: string): Promise<AuthUs
 
 // 登出
 export async function signOut(): Promise<void> {
+  if (!isSupabaseEnabled) return
+  
   const { error } = await supabase.auth.signOut()
   if (error) throw new Error(error.message)
 }
 
 // 获取当前用户
 export async function getCurrentUser(): Promise<AuthUser | null> {
+  if (!isSupabaseEnabled) return null
+  
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return null
 
@@ -86,12 +98,19 @@ export async function getCurrentUser(): Promise<AuthUser | null> {
 
 // 获取当前 session
 export async function getSession(): Promise<Session | null> {
+  if (!isSupabaseEnabled) return null
+  
   const { data: { session } } = await supabase.auth.getSession()
   return session
 }
 
 // 监听认证状态变化
 export function onAuthStateChange(callback: (user: AuthUser | null) => void) {
+  if (!isSupabaseEnabled) {
+    // 返回一个空的取消订阅函数
+    return { data: { subscription: { unsubscribe: () => {} } } }
+  }
+  
   return supabase.auth.onAuthStateChange((_event, session) => {
     if (session?.user) {
       callback({
