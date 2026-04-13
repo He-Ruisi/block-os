@@ -1,5 +1,21 @@
 # BlockOS 更新日志
 
+## [v1.5.0] - 2026-04-13 🤖 DeepSeek API 集成
+
+**多 AI 提供商支持**：用户可在小米 MiMo 和 DeepSeek 之间自由切换。
+
+- **多提供商架构**：统一的提供商配置接口，支持动态切换
+- **DeepSeek 模型支持**：
+  - deepseek-chat（非思考模式）：快速响应，适合日常对话
+  - deepseek-reasoner（思考模式）：深度推理，适合复杂任务
+  - 128K 上下文长度，最大输出 8K/64K
+- **温度参数优化**：根据 DeepSeek 官方建议，针对不同任务类型设置最佳温度（翻译 1.3、创作 1.5、通用 1.0）
+- **UI 集成**：设置面板新增 AI 提供商和模型选择下拉框，实时显示特点提示
+- **用户偏好持久化**：选择保存到 localStorage，下次自动恢复
+- **错误处理增强**：API Key 未配置时显示具体提示信息
+
+新增 `getCurrentProvider()`、`setCurrentProvider()`、`getCurrentModel()`、`setCurrentModel()` 等提供商管理函数。→ [完整文档](./spec/features/ai/deepseek-integration.md)
+
 ## [v1.4.0] - 2026-04-13 📱 iPad 响应式设计 Phase 2
 
 **触摸交互优化完成**：滑动手势、长按菜单、触摸反馈动画。

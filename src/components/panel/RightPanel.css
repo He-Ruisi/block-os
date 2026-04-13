@@ -486,3 +486,38 @@
   text-overflow: ellipsis;
   display: block;
 }
+
+
+/* AI 提供商选择 */
+.settings-select {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--color-border-primary);
+  border-radius: var(--border-radius);
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  font-size: 14px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.settings-select:hover {
+  border-color: var(--color-border-secondary);
+}
+
+.settings-select:focus {
+  outline: none;
+  border-color: var(--color-border-focus);
+  box-shadow: 0 0 0 3px var(--color-purple-light);
+}
+
+/* Newsprint 主题适配 */
+.theme-newsprint .settings-select {
+  border: 2px solid #111111;
+  border-radius: 0;
+}
+
+.theme-newsprint .settings-select:focus {
+  box-shadow: 2px 2px 0px 0px #111111;
+}

@@ -3,7 +3,76 @@ import { generateUUID } from '../utils/uuid'
 import { blockStore } from '../storage/blockStore'
 import type { Block } from '../types/block'
 
-const MIMO_API_URL = 'https://api.xiaomimimo.com/v1/chat/completions'
+// AI 提供商类型
+export type AIProvider = 'mimo' | 'deepseek'
+
+// AI 提供商配置
+interface AIProviderConfig {
+  name: string
+  apiUrl: string
+  defaultModel: string
+  supportedModels: string[]
+  headerKey: string // API Key 的 header 名称
+}
+
+const AI_PROVIDERS: Record<AIProvider, AIProviderConfig> = {
+  mimo: {
+    name: '小米 MiMo',
+    apiUrl: 'https://api.xiaomimimo.com/v1/chat/completions',
+    defaultModel: 'mimo-v2-flash',
+    supportedModels: ['mimo-v2-flash'],
+    headerKey: 'api-key',
+  },
+  deepseek: {
+    name: 'DeepSeek',
+    apiUrl: 'https://api.deepseek.com/chat/completions',
+    defaultModel: 'deepseek-chat',
+    supportedModels: ['deepseek-chat', 'deepseek-reasoner'],
+    headerKey: 'Authorization', // Bearer token
+  },
+}
+
+// 获取当前使用的 AI 提供商（从 localStorage 读取，默认 mimo）
+export function getCurrentProvider(): AIProvider {
+  const saved = localStorage.getItem('blockos-ai-provider')
+  return (saved as AIProvider) || 'mimo'
+}
+
+// 设置当前使用的 AI 提供商
+export function setCurrentProvider(provider: AIProvider): void {
+  localStorage.setItem('blockos-ai-provider', provider)
+}
+
+// 获取当前提供商的配置
+export function getProviderConfig(provider?: AIProvider): AIProviderConfig {
+  return AI_PROVIDERS[provider || getCurrentProvider()]
+}
+
+// 获取当前提供商的 API Key
+export function getProviderApiKey(provider?: AIProvider): string {
+  const p = provider || getCurrentProvider()
+  if (p === 'mimo') {
+    return import.meta.env.VITE_MIMO_API_KEY || ''
+  } else if (p === 'deepseek') {
+    return import.meta.env.VITE_DEEPSEEK_API_KEY || ''
+  }
+  return ''
+}
+
+// 获取当前使用的模型（从 localStorage 读取）
+export function getCurrentModel(): string {
+  const provider = getCurrentProvider()
+  const saved = localStorage.getItem('blockos-ai-model')
+  if (saved && AI_PROVIDERS[provider].supportedModels.includes(saved)) {
+    return saved
+  }
+  return AI_PROVIDERS[provider].defaultModel
+}
+
+// 设置当前使用的模型
+export function setCurrentModel(model: string): void {
+  localStorage.setItem('blockos-ai-model', model)
+}
 
 export interface SendMessageOptions {
   input: string
@@ -44,14 +113,26 @@ export function parseAIResponse(fullResponse: string): { reply: string; editorCo
 export async function sendMessage(options: SendMessageOptions): Promise<SendMessageResult> {
   const { input, history, systemPrompt, apiKey, onToken } = options
 
-  const response = await fetch(MIMO_API_URL, {
+  const provider = getCurrentProvider()
+  const config = getProviderConfig(provider)
+  const model = getCurrentModel()
+  
+  // 构建请求头
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  }
+  
+  if (config.headerKey === 'Authorization') {
+    headers[config.headerKey] = `Bearer ${apiKey}`
+  } else {
+    headers[config.headerKey] = apiKey
+  }
+
+  const response = await fetch(config.apiUrl, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'api-key': apiKey,
-    },
+    headers,
     body: JSON.stringify({
-      model: 'mimo-v2-flash',
+      model,
       messages: [
         {
           role: 'system',
@@ -62,7 +143,7 @@ export async function sendMessage(options: SendMessageOptions): Promise<SendMess
         ...history.map(m => ({ role: m.role, content: m.content })),
         { role: 'user', content: input },
       ],
-      temperature: 0.8,
+      temperature: provider === 'deepseek' ? 1.0 : 0.8,
       top_p: 0.95,
       stream: true,
     }),
@@ -157,19 +238,45 @@ export async function sendInlineAIRequest(req: InlineAIRequest): Promise<InlineA
     ? `上下文：\n${req.context}\n\n选中文字：\n${req.selectedText}`
     : req.selectedText
 
-  const response = await fetch(MIMO_API_URL, {
+  const provider = getCurrentProvider()
+  const config = getProviderConfig(provider)
+  const model = getCurrentModel()
+  
+  // 构建请求头
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  }
+  
+  if (config.headerKey === 'Authorization') {
+    headers[config.headerKey] = `Bearer ${req.apiKey}`
+  } else {
+    headers[config.headerKey] = req.apiKey
+  }
+
+  // DeepSeek 针对不同任务的温度建议
+  let temperature = 0.7
+  if (provider === 'deepseek') {
+    if (req.mode === 'translate') {
+      temperature = 1.3
+    } else if (req.mode === 'continue' || req.mode === 'expand') {
+      temperature = 1.5 // 创作类任务
+    } else {
+      temperature = 1.0 // 通用对话
+    }
+  } else {
+    temperature = req.mode === 'translate' ? 0.3 : 0.7
+  }
+
+  const response = await fetch(config.apiUrl, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'api-key': req.apiKey,
-    },
+    headers,
     body: JSON.stringify({
-      model: 'mimo-v2-flash',
+      model,
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: userContent },
       ],
-      temperature: req.mode === 'translate' ? 0.3 : 0.7,
+      temperature,
       top_p: 0.95,
       stream: true,
     }),

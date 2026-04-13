@@ -5,7 +5,17 @@ import { SessionHistoryPanel } from './SessionHistoryPanel'
 import { PreviewPanel } from './PreviewPanel'
 import { Toast } from '../shared/Toast'
 import { generateUUID } from '../../utils/uuid'
-import { sendMessage, createImplicitBlockFromAI } from '../../services/aiService'
+import { 
+  sendMessage, 
+  createImplicitBlockFromAI,
+  getCurrentProvider,
+  setCurrentProvider,
+  getCurrentModel,
+  setCurrentModel,
+  getProviderConfig,
+  getProviderApiKey,
+  type AIProvider,
+} from '../../services/aiService'
 import { captureMessageAsBlock } from '../../services/blockCaptureService'
 import { useSession } from '../../hooks/useSession'
 import { useViewport } from '../../hooks/useViewport'
@@ -20,8 +30,6 @@ interface RightPanelProps {
   onClose?: () => void
 }
 
-const MIMO_API_KEY = import.meta.env.VITE_MIMO_API_KEY || ''
-
 export function RightPanel({ onInsertContent, selectedText, onTextSentToAI, onClose }: RightPanelProps) {
   const [activeTab, setActiveTab] = useState<PanelTab>('chat')
   const [input, setInput] = useState('')
@@ -31,6 +39,8 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI, onCl
   const [showHistory, setShowHistory] = useState(false)
   const [toastMessage, setToastMessage] = useState<string | null>(null)
   const [toastType, setToastType] = useState<'success' | 'error' | 'info'>('success')
+  const [aiProvider, setAIProvider] = useState<AIProvider>(getCurrentProvider())
+  const [aiModel, setAIModel] = useState<string>(getCurrentModel())
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const viewport = useViewport()
 
@@ -136,12 +146,17 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI, onCl
 
     try {
       let assistantId = ''
+      const apiKey = getProviderApiKey(aiProvider)
+
+      if (!apiKey) {
+        throw new Error(`请配置 ${getProviderConfig(aiProvider).name} API Key`)
+      }
 
       const { assistantId: id, fullResponse } = await sendMessage({
         input: userMessage.content,
         history: messages,
         systemPrompt,
-        apiKey: MIMO_API_KEY,
+        apiKey,
         onToken: (aid, reply, editorContent) => {
           if (!assistantId) {
             assistantId = aid
@@ -166,9 +181,10 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI, onCl
       await createImplicitBlockFromAI(id, fullResponse)
     } catch (error) {
       console.error('发送消息失败:', error)
+      const errorMsg = error instanceof Error ? error.message : '未知错误'
       setMessages(prev => [
         ...prev,
-        { id: generateUUID(), role: 'assistant', content: '抱歉，发送消息时出现错误。请检查 API 配置。', insertedToEditor: false },
+        { id: generateUUID(), role: 'assistant', content: `抱歉，发送消息时出现错误：${errorMsg}`, insertedToEditor: false },
       ])
     } finally {
       setIsLoading(false)
@@ -267,6 +283,51 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI, onCl
               />
               <div className="settings-hint">系统提示词会影响 AI 的回复风格和行为</div>
             </div>
+            
+            {/* AI 提供商选择 */}
+            <div className="settings-group">
+              <label className="settings-label">AI 提供商</label>
+              <select 
+                className="settings-select"
+                value={aiProvider}
+                onChange={e => {
+                  const provider = e.target.value as AIProvider
+                  setAIProvider(provider)
+                  setCurrentProvider(provider)
+                  setAIModel(getCurrentModel())
+                }}
+              >
+                <option value="mimo">小米 MiMo</option>
+                <option value="deepseek">DeepSeek</option>
+              </select>
+              <div className="settings-hint">
+                {aiProvider === 'mimo' && '小米 MiMo API - 快速响应'}
+                {aiProvider === 'deepseek' && 'DeepSeek V3.2 - 深度推理'}
+              </div>
+            </div>
+
+            {/* 模型选择 */}
+            <div className="settings-group">
+              <label className="settings-label">模型</label>
+              <select 
+                className="settings-select"
+                value={aiModel}
+                onChange={e => {
+                  setAIModel(e.target.value)
+                  setCurrentModel(e.target.value)
+                }}
+              >
+                {getProviderConfig(aiProvider).supportedModels.map(model => (
+                  <option key={model} value={model}>{model}</option>
+                ))}
+              </select>
+              <div className="settings-hint">
+                {aiModel === 'deepseek-chat' && '非思考模式 - 快速响应'}
+                {aiModel === 'deepseek-reasoner' && '思考模式 - 深度推理'}
+                {aiModel === 'mimo-v2-flash' && 'MiMo Flash 模型'}
+              </div>
+            </div>
+
             <div className="settings-footer">
               <button className="btn-secondary" onClick={() => { setTempSystemPrompt(systemPrompt); setShowSettings(false) }}>取消</button>
               <button className="btn-primary" onClick={() => { setSystemPrompt(tempSystemPrompt); setShowSettings(false) }}>保存</button>
