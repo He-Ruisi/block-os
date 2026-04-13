@@ -18,6 +18,7 @@ import { useAppLayout } from './hooks/useAppLayout'
 import { useTabs } from './hooks/useTabs'
 import { useAuth } from './hooks/useAuth'
 import { useToast } from './hooks/useToast'
+import { useViewport } from './hooks/useViewport'
 import './App.css'
 
 function App() {
@@ -35,6 +36,7 @@ function App() {
   const [lastSaved, setLastSaved] = useState<Date | null>(null)
   
   const { toasts, showToast, removeToast } = useToast()
+  const viewport = useViewport()
 
   const toggleTheme = useCallback(() => {
     setTheme(prev => {
@@ -255,6 +257,7 @@ function App() {
             onOpenDocument={openDocument}
             currentProjectId={currentProjectId}
             documentId={activeDocumentId || null}
+            onClose={() => viewport.isTablet && toggleSidebar()}
           />
         </>
       )}

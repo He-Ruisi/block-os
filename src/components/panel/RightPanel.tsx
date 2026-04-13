@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
+import { X } from 'lucide-react'
 import { BlockSpacePanel } from './BlockSpacePanel'
 import { SessionHistoryPanel } from './SessionHistoryPanel'
 import { PreviewPanel } from './PreviewPanel'
@@ -7,6 +8,7 @@ import { generateUUID } from '../../utils/uuid'
 import { sendMessage, createImplicitBlockFromAI } from '../../services/aiService'
 import { captureMessageAsBlock } from '../../services/blockCaptureService'
 import { useSession } from '../../hooks/useSession'
+import { useViewport } from '../../hooks/useViewport'
 import type { PanelTab } from '../../types/chat'
 import './RightPanel.css'
 
@@ -14,11 +16,12 @@ interface RightPanelProps {
   onInsertContent?: (content: string) => void
   selectedText?: string
   onTextSentToAI?: () => void
+  onClose?: () => void
 }
 
 const MIMO_API_KEY = import.meta.env.VITE_MIMO_API_KEY || ''
 
-export function RightPanel({ onInsertContent, selectedText, onTextSentToAI }: RightPanelProps) {
+export function RightPanel({ onInsertContent, selectedText, onTextSentToAI, onClose }: RightPanelProps) {
   const [activeTab, setActiveTab] = useState<PanelTab>('chat')
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -28,6 +31,7 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI }: Ri
   const [toastMessage, setToastMessage] = useState<string | null>(null)
   const [toastType, setToastType] = useState<'success' | 'error' | 'info'>('success')
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const viewport = useViewport()
 
   // 监听 openBlockDetail 事件 → 切换到 Block 空间标签
   useEffect(() => {
@@ -186,7 +190,14 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI }: Ri
   }
 
   return (
-    <div className="right-panel">
+    <div className={`right-panel ${viewport.isTablet || viewport.isMobile ? 'expanded' : ''}`}>
+      {/* 响应式关闭按钮 - 仅在平板/手机模式显示 */}
+      {(viewport.isTablet || viewport.isMobile) && onClose && (
+        <button className="right-panel-close" onClick={onClose} title="关闭">
+          <X size={18} />
+        </button>
+      )}
+      
       <div className="panel-header">
         <div className="panel-tabs">
           {(['chat', 'blocks', 'preview'] as PanelTab[]).map(tab => (

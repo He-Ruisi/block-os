@@ -1,0 +1,416 @@
+/* ============================================================
+   BlockOS Responsive Design - iPad & Mobile Adaptation
+   ============================================================ */
+
+/* 响应式断点 */
+:root {
+  --breakpoint-mobile: 768px;
+  --breakpoint-tablet: 1024px;
+  --breakpoint-desktop: 1280px;
+}
+
+/* ============================================================
+   Tablet (iPad) - 768px to 1024px
+   ============================================================ */
+
+@media (max-width: 1024px) {
+  /* ActivityBar - 增加宽度便于触摸 */
+  .activity-bar {
+    width: 56px;
+  }
+  
+  .activity-icon {
+    width: 56px;
+    height: 56px;
+    font-size: 22px;
+  }
+  
+  /* Sidebar - 改为浮层模式 */
+  .sidebar-panel {
+    width: 280px;
+    position: fixed;
+    left: 56px;
+    top: 0;
+    height: 100vh;
+    z-index: 50;
+    box-shadow: var(--shadow-lg);
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+  
+  .sidebar-panel.expanded {
+    transform: translateX(0);
+  }
+  
+  /* 侧边栏遮罩层 */
+  .sidebar-overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.3);
+    z-index: 40;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+  
+  .sidebar-overlay.visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  
+  /* Editor Area - 全宽 */
+  .editor-area {
+    width: 100% !important;
+    min-width: 100%;
+    flex: 1;
+  }
+  
+  /* Editor Content - 优化阅读宽度 */
+  .editor-content {
+    max-width: 680px;
+    font-size: 16px;
+    line-height: 1.8;
+  }
+  
+  .editor-scroll {
+    padding: 24px 32px 80px;
+  }
+  
+  /* Toolbar - 触摸友好按钮 */
+  .toolbar-btn {
+    width: 40px;
+    height: 40px;
+    font-size: 16px;
+  }
+  
+  .toolbar-btn svg {
+    width: 18px;
+    height: 18px;
+  }
+  
+  .toolbar-sep {
+    margin: 0 6px;
+  }
+  
+  .toolbar-row {
+    padding: 6px 16px;
+    min-height: 44px;
+  }
+  
+  /* TabBar - 增加标签高度 */
+  .tab {
+    min-width: 140px;
+    height: 44px;
+    padding: 0 16px;
+    font-size: 15px;
+  }
+  
+  .tab-close {
+    width: 24px;
+    height: 24px;
+  }
+  
+  .tab-action-btn {
+    width: 40px;
+    height: 40px;
+  }
+  
+  /* RightPanel - 浮层模式 */
+  .right-panel {
+    position: fixed;
+    right: 0;
+    top: 0;
+    width: 400px;
+    height: 100vh;
+    z-index: 60;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    box-shadow: var(--shadow-lg);
+  }
+  
+  .right-panel.expanded {
+    transform: translateX(0);
+  }
+  
+  /* 右侧面板关闭按钮 */
+  .right-panel-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--color-bg-tertiary);
+    border: none;
+    cursor: pointer;
+    z-index: 10;
+    transition: all 0.15s;
+  }
+  
+  .right-panel-close:hover {
+    background: var(--color-bg-hover);
+  }
+  
+  /* ResizeHandle - iPad 上隐藏 */
+  .resize-handle {
+    display: none;
+  }
+  
+  /* StatusBar - 增加高度 */
+  .status-bar {
+    height: 36px;
+    padding: 0 16px;
+    font-size: 13px;
+  }
+  
+  .status-bar-section {
+    gap: 12px;
+  }
+}
+
+/* ============================================================
+   Mobile (Phone) - Below 768px
+   ============================================================ */
+
+@media (max-width: 768px) {
+  /* ActivityBar - 底部导航栏 */
+  .activity-bar {
+    width: 100%;
+    height: 60px;
+    flex-direction: row;
+    border-right: none;
+    border-top: 1px solid var(--color-border-primary);
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    z-index: 100;
+    background: var(--color-bg-secondary);
+  }
+  
+  .activity-bar-top,
+  .activity-bar-bottom {
+    flex-direction: row;
+    padding: 0;
+    margin: 0;
+    border: none;
+    flex: 1;
+    justify-content: space-around;
+  }
+  
+  .activity-icon {
+    width: 48px;
+    height: 48px;
+  }
+  
+  .activity-icon.active::before {
+    left: 8px;
+    right: 8px;
+    top: 0;
+    bottom: auto;
+    width: auto;
+    height: 2px;
+  }
+  
+  /* Sidebar - 全宽浮层 */
+  .sidebar-panel {
+    left: 0;
+    width: 85vw;
+    max-width: 320px;
+  }
+  
+  /* Editor Content - 移动端优化 */
+  .editor-content {
+    max-width: 100%;
+    font-size: 17px;
+    line-height: 1.85;
+  }
+  
+  .editor-scroll {
+    padding: 16px 20px 80px;
+  }
+  
+  /* Toolbar - 单行滚动 */
+  .toolbar-row:first-child {
+    border-bottom: none;
+  }
+  
+  .toolbar-row {
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  
+  .toolbar-row::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .toolbar-hint {
+    display: none;
+  }
+  
+  /* TabBar - 紧凑布局 */
+  .tab {
+    min-width: 120px;
+    padding: 0 12px;
+  }
+  
+  .tab-bar-actions {
+    gap: 8px;
+  }
+  
+  /* RightPanel - 全屏 */
+  .right-panel {
+    width: 100vw;
+  }
+  
+  /* StatusBar - 固定在底部导航栏上方 */
+  .status-bar {
+    position: fixed;
+    bottom: 60px;
+    left: 0;
+    right: 0;
+    z-index: 90;
+    background: var(--color-bg-primary);
+    border-top: 1px solid var(--color-border-primary);
+  }
+  
+  .status-bar-center {
+    display: none;
+  }
+  
+  .status-bar-right {
+    font-size: 12px;
+  }
+  
+  /* App 布局调整 */
+  .app {
+    padding-bottom: 60px;
+  }
+}
+
+/* ============================================================
+   Newsprint Theme Responsive Overrides
+   ============================================================ */
+
+.theme-newsprint {
+  @media (max-width: 1024px) {
+    /* 保持硬阴影风格 */
+    --shadow-sm: 3px 3px 0px 0px #111111;
+    --shadow-md: 5px 5px 0px 0px #111111;
+    --shadow-lg: 6px 6px 0px 0px #111111;
+    
+    /* 字号调整 */
+    --editor-font-size: 17px;
+    --editor-line-height: 1.7;
+  }
+}
+
+.theme-newsprint .editor-content h1 {
+  @media (max-width: 1024px) {
+    font-size: 2.25rem;
+  }
+}
+
+.theme-newsprint .editor-content h2 {
+  @media (max-width: 1024px) {
+    font-size: 1.375rem;
+  }
+}
+
+.theme-newsprint .activity-bar,
+.theme-newsprint .sidebar-panel {
+  @media (max-width: 1024px) {
+    border-width: 2px;
+  }
+}
+
+.theme-newsprint .sidebar-panel {
+  @media (max-width: 1024px) {
+    box-shadow: 6px 6px 0px 0px #111111;
+  }
+}
+
+.theme-newsprint .right-panel {
+  @media (max-width: 1024px) {
+    box-shadow: -6px 6px 0px 0px #111111;
+  }
+}
+
+/* ============================================================
+   Touch Interaction Enhancements
+   ============================================================ */
+
+@media (hover: none) and (pointer: coarse) {
+  /* 触摸设备：增加所有可点击元素的触摸目标 */
+  button,
+  .toolbar-btn,
+  .tab,
+  .activity-icon,
+  .explorer-item,
+  .panel-tab {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* 触摸反馈 */
+  button:active,
+  .toolbar-btn:active,
+  .tab:active {
+    transform: scale(0.95);
+    transition: transform 0.1s;
+  }
+  
+  /* 移除 hover 效果，使用 active 替代 */
+  .toolbar-btn:hover {
+    background: transparent;
+  }
+  
+  .toolbar-btn:active {
+    background: var(--color-bg-hover);
+  }
+}
+
+/* ============================================================
+   Landscape Orientation Optimizations
+   ============================================================ */
+
+@media (max-width: 1024px) and (orientation: landscape) {
+  /* 横屏模式：减少垂直间距 */
+  .editor-scroll {
+    padding-top: 16px;
+    padding-bottom: 60px;
+  }
+  
+  .toolbar-row {
+    min-height: 40px;
+    padding: 4px 12px;
+  }
+  
+  .tab {
+    height: 40px;
+  }
+}
+
+/* ============================================================
+   Safe Area Insets (iOS)
+   ============================================================ */
+
+@supports (padding: env(safe-area-inset-bottom)) {
+  @media (max-width: 768px) {
+    .activity-bar {
+      padding-bottom: env(safe-area-inset-bottom);
+      height: calc(60px + env(safe-area-inset-bottom));
+    }
+    
+    .status-bar {
+      bottom: calc(60px + env(safe-area-inset-bottom));
+    }
+    
+    .app {
+      padding-bottom: calc(60px + env(safe-area-inset-bottom));
+    }
+  }
+}

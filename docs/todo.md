@@ -2,6 +2,32 @@
 
 ## P0 - 核心功能（当前优先）
 
+### iPad 响应式设计 📱 - [详细文档](./spec/features/responsive/ipad-responsive-design.md)
+- [x] Phase 1: 基础响应式布局
+  - [x] 创建响应式样式文件和视口检测 Hook
+  - [x] ActivityBar 响应式适配（平板 56px，手机底部导航栏）
+  - [x] Sidebar 浮层模式（点击遮罩层关闭）
+  - [x] Editor Area 全宽布局，字号优化
+  - [x] Toolbar 触摸友好按钮（40x40px）
+  - [x] TabBar 增加标签高度（44px）
+  - [x] RightPanel 浮层模式 + 关闭按钮
+  - [x] StatusBar 响应式高度调整
+  - [x] ResizeHandle 在平板/手机隐藏
+  - [x] Newsprint 主题响应式适配
+  - [x] iOS Safe Area 支持
+- [ ] Phase 2: 触摸优化
+  - [ ] 增加所有按钮尺寸到 ≥ 44px
+  - [ ] 优化字号和行距
+  - [ ] 添加触摸反馈动画
+  - [ ] 测试触摸目标可达性
+- [ ] Phase 3: 手势交互
+  - [ ] 实现 useSwipeGesture Hook
+  - [ ] 侧边栏滑动开关
+  - [ ] 标签页滑动切换
+  - [ ] 长按菜单替代右键
+- [ ] Phase 4: 主题适配微调
+- [ ] Phase 5: 测试优化（iPad Mini/iPad/iPad Pro）
+
 ### Supabase 云端集成 🔐
 - [x] 用户认证（用户名+密码，无邮箱验证）
 - [x] 登录/注册页面

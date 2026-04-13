@@ -10,6 +10,11 @@
   overflow: hidden;
 }
 
+/* 遮罩层默认隐藏（桌面模式不需要） */
+.sidebar-overlay {
+  display: none;
+}
+
 .sidebar-panel-header {
   padding: 12px 16px;
   font-size: 11px;
