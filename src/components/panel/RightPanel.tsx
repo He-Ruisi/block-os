@@ -29,7 +29,7 @@ interface RightPanelProps {
   onTextSentToAI?: () => void
   onClose?: () => void
   viewMode?: 'ai-focus' | 'hybrid'
-  onSwitchToHybrid?: () => void
+  onSwitchToHybrid?: (content?: string) => void
 }
 
 export function RightPanel({ onInsertContent, selectedText, onTextSentToAI, onClose, viewMode = 'hybrid', onSwitchToHybrid }: RightPanelProps) {
@@ -113,12 +113,17 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI, onCl
 
   const insertToEditor = (messageId: string) => {
     const message = messages.find(m => m.id === messageId)
-    if (message?.role === 'assistant' && onInsertContent) {
-      onInsertContent(message.editorContent || message.content)
-      setMessages(prev => prev.map(m => m.id === messageId ? { ...m, insertedToEditor: true } : m))
-      // AI 模式下点击写入编辑器，切换到混合模式
+    if (message?.role === 'assistant') {
+      const content = message.editorContent || message.content
+      
+      // AI 模式下点击写入编辑器，切换到混合模式并传递内容
       if (isAIFocusMode && onSwitchToHybrid) {
-        onSwitchToHybrid()
+        onSwitchToHybrid(content)
+        setMessages(prev => prev.map(m => m.id === messageId ? { ...m, insertedToEditor: true } : m))
+      } else if (onInsertContent) {
+        // 混合模式下直接插入到当前编辑器
+        onInsertContent(content)
+        setMessages(prev => prev.map(m => m.id === messageId ? { ...m, insertedToEditor: true } : m))
       }
     }
   }

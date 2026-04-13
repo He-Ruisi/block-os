@@ -51,11 +51,6 @@ function App() {
     })
   }, [])
 
-  const switchToHybridMode = useCallback(() => {
-    setViewMode('hybrid')
-    localStorage.setItem('blockos-view-mode', 'hybrid')
-  }, [])
-
   const auth = useAuth()
 
   const {
@@ -67,6 +62,7 @@ function App() {
     toggleFullscreen,
     setEditorWidth,
     setSidebarView,
+    setSidebarCollapsed,
     minEditorWidth,
     maxEditorWidth,
   } = useAppLayout()
@@ -85,6 +81,40 @@ function App() {
     openDocument,
     newTab,
   } = useTabs()
+
+  const switchToHybridMode = useCallback(async (aiContent?: string) => {
+    // 创建新文档
+    const doc = await documentStore.createDocument('AI 对话笔记', undefined)
+    
+    // 切换到混合模式
+    setViewMode('hybrid')
+    localStorage.setItem('blockos-view-mode', 'hybrid')
+    
+    // 打开新文档
+    openDocument(doc)
+    
+    // 如果有内容，等待编辑器准备好后插入
+    if (aiContent && editor) {
+      setTimeout(() => {
+        const lines = aiContent.split('\n').filter(l => l.trim())
+        editor.chain().focus().insertContent({
+          type: 'sourceBlock',
+          attrs: { source: 'ai', sourceLabel: '◆ AI 生成' },
+          content: lines.map(line => ({
+            type: 'paragraph',
+            content: [{ type: 'text', text: line }],
+          })),
+        }).run()
+      }, 100)
+    }
+  }, [editor, openDocument])
+
+  // 切换到混合模式时，确保侧边栏默认隐藏
+  useEffect(() => {
+    if (viewMode === 'hybrid' && !sidebarCollapsed) {
+      setSidebarCollapsed(true)
+    }
+  }, [viewMode, sidebarCollapsed, setSidebarCollapsed])
 
   // 统一初始化所有 Store
   useEffect(() => {
