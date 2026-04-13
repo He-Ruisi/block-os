@@ -64,10 +64,39 @@ export class DocumentStore {
     })
   }
 
+  /**
+   * 生成唯一的文档标题，如果标题已存在则自动添加数字后缀
+   * @param baseTitle 基础标题
+   * @returns 唯一的文档标题
+   */
+  async generateUniqueDocumentTitle(baseTitle: string): Promise<string> {
+    const allDocs = await this.getAllDocuments()
+    const existingTitles = new Set(allDocs.map(doc => doc.title))
+    
+    // 如果标题不存在，直接返回
+    if (!existingTitles.has(baseTitle)) {
+      return baseTitle
+    }
+    
+    // 如果标题已存在，添加数字后缀
+    let counter = 1
+    let newTitle = `${baseTitle}${counter}`
+    
+    while (existingTitles.has(newTitle)) {
+      counter++
+      newTitle = `${baseTitle}${counter}`
+    }
+    
+    return newTitle
+  }
+
   async createDocument(title = '无标题文档', projectId?: string): Promise<Document> {
+    // 生成唯一标题
+    const uniqueTitle = await this.generateUniqueDocumentTitle(title)
+    
     const doc: Document = {
       id: generateUUID(),
-      title,
+      title: uniqueTitle,
       content: '',
       blocks: [],
       projectId,
