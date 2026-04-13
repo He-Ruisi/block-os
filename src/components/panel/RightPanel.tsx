@@ -458,19 +458,30 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI, onCl
                     <div key={msg.id} className={`message message-${msg.role}`}>
                       <div className="message-avatar">{msg.role === 'user' ? '👤' : '🤖'}</div>
                       <div className="message-wrapper">
-                        <div className="message-content">
-                          {msg.role === 'assistant' ? (
-                            <MarkdownRenderer content={msg.content || msg.editorContent || ''} />
-                          ) : (
-                            msg.content
-                          )}
-                        </div>
-                        {msg.role === 'assistant' && msg.content && msg.editorContent && (
-                          <div className="editor-content-preview">
-                            <div className="preview-label">📝 编辑器内容预览</div>
-                            <div className="preview-text">{msg.editorContent}</div>
+                        {/* AI 对话回复（如果存在） */}
+                        {msg.role === 'assistant' && msg.content && (
+                          <div className="message-content">
+                            <MarkdownRenderer content={msg.content} />
                           </div>
                         )}
+                        
+                        {/* 用户消息（纯文本） */}
+                        {msg.role === 'user' && (
+                          <div className="message-content">
+                            {msg.content}
+                          </div>
+                        )}
+                        
+                        {/* 编辑器内容（Markdown 渲染，重点展示） */}
+                        {msg.role === 'assistant' && msg.editorContent && (
+                          <div className="editor-content-preview">
+                            <div className="preview-label">📝 编辑器内容</div>
+                            <div className="preview-markdown">
+                              <MarkdownRenderer content={msg.editorContent} />
+                            </div>
+                          </div>
+                        )}
+                        
                         {msg.role === 'assistant' && (msg.content || msg.editorContent) && (
                           <div className="message-actions">
                             <button

@@ -87,11 +87,21 @@ MarkdownRenderer
 ```tsx
 import { MarkdownRenderer } from '../shared/MarkdownRenderer'
 
-// 在消息渲染中使用
-{msg.role === 'assistant' ? (
-  <MarkdownRenderer content={msg.content} theme="default" />
-) : (
-  msg.content
+// AI 对话回复（如果存在）
+{msg.role === 'assistant' && msg.content && (
+  <div className="message-content">
+    <MarkdownRenderer content={msg.content} />
+  </div>
+)}
+
+// 编辑器内容（Markdown 渲染，重点展示）
+{msg.role === 'assistant' && msg.editorContent && (
+  <div className="editor-content-preview">
+    <div className="preview-label">📝 编辑器内容</div>
+    <div className="preview-markdown">
+      <MarkdownRenderer content={msg.editorContent} />
+    </div>
+  </div>
 )}
 ```
 
@@ -103,7 +113,19 @@ import { MarkdownRenderer } from '../shared/MarkdownRenderer'
 
 ## 用户体验
 
+### AI 回复显示逻辑
+1. **对话回复**（`content`）：简短的回复文本，Markdown 渲染
+2. **编辑器内容**（`editorContent`）：要写入编辑器的完整内容，Markdown 渲染，重点展示
+3. 如果 AI 只返回一个内容，直接显示该内容
+4. 如果 AI 同时返回两个内容，分别显示对话回复和编辑器内容
+
 ### 视觉效果
+- **对话回复**：直接显示在消息区域
+- **编辑器内容**：
+  - 带标签"📝 编辑器内容"
+  - 独立的卡片样式（背景色、边框、圆角）
+  - 完整 Markdown 渲染（代码高亮、表格、列表等）
+  - Newsprint 主题：硬边框、硬阴影、衬线字体
 - **清晰的层级**：标题、段落、列表层次分明
 - **代码易读**：语法高亮 + 复制按钮
 - **表格整洁**：边框清晰，悬停反馈

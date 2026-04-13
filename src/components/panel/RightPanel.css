@@ -452,28 +452,38 @@
 .editor-content-preview {
   background: var(--color-bg-secondary);
   border: 1px solid var(--color-border-primary);
-  border-radius: 6px;
-  padding: 10px;
-  margin-top: 6px;
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 12px;
 }
 
 .preview-label {
-  font-size: 11px;
-  color: var(--color-text-tertiary);
-  margin-bottom: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  margin-bottom: 12px;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
-.preview-text {
-  font-size: 13px;
-  line-height: 1.6;
-  color: var(--color-text-secondary);
-  white-space: pre-wrap;
-  word-wrap: break-word;
-  max-height: 200px;
-  overflow-y: auto;
+.preview-markdown {
+  /* Markdown 渲染器会应用自己的样式 */
+}
+
+/* Newsprint 主题 - 编辑器内容预览 */
+.theme-newsprint .editor-content-preview {
+  background: #F5F5F0;
+  border: 2px solid #111111;
+  border-radius: 0;
+  box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+.theme-newsprint .preview-label {
+  color: #111111;
+  font-family: var(--editor-font-serif);
 }
 
 /* Panel Tabs */
