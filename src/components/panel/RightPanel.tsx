@@ -272,59 +272,99 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI, onCl
       {activeTab === 'chat' && (
         showSettings ? (
           <div className="settings-panel">
-            <div className="settings-header"><h3>系统提示词设置</h3></div>
-            <div className="settings-body">
-              <textarea
-                className="system-prompt-input"
-                value={tempSystemPrompt}
-                onChange={e => setTempSystemPrompt(e.target.value)}
-                rows={10}
-                placeholder="输入系统提示词..."
-              />
-              <div className="settings-hint">系统提示词会影响 AI 的回复风格和行为</div>
+            <div className="settings-header">
+              <h3 className="settings-title">运行设置</h3>
+              <button className="settings-close-btn" onClick={() => setShowSettings(false)} title="关闭">
+                ✕
+              </button>
             </div>
             
-            {/* AI 提供商选择 */}
-            <div className="settings-group">
-              <label className="settings-label">AI 提供商</label>
-              <select 
-                className="settings-select"
-                value={aiProvider}
-                onChange={e => {
-                  const provider = e.target.value as AIProvider
-                  setAIProvider(provider)
-                  setCurrentProvider(provider)
-                  setAIModel(getCurrentModel())
-                }}
-              >
-                <option value="mimo">小米 MiMo</option>
-                <option value="deepseek">DeepSeek</option>
-              </select>
-              <div className="settings-hint">
-                {aiProvider === 'mimo' && '小米 MiMo API - 快速响应'}
-                {aiProvider === 'deepseek' && 'DeepSeek V3.2 - 深度推理'}
+            <div className="settings-body">
+              {/* 模型选择 */}
+              <div className="settings-section">
+                <label className="settings-label">模型</label>
+                <select 
+                  className="settings-select settings-select-large"
+                  value={aiModel}
+                  onChange={e => {
+                    setAIModel(e.target.value)
+                    setCurrentModel(e.target.value)
+                  }}
+                >
+                  {getProviderConfig(aiProvider).supportedModels.map(model => (
+                    <option key={model} value={model}>
+                      {model === 'deepseek-chat' && 'deepseek-chat (快速模式)'}
+                      {model === 'deepseek-reasoner' && 'deepseek-reasoner (思考模式)'}
+                      {model === 'mimo-v2-flash' && 'MiMo Flash'}
+                    </option>
+                  ))}
+                </select>
               </div>
-            </div>
 
-            {/* 模型选择 */}
-            <div className="settings-group">
-              <label className="settings-label">模型</label>
-              <select 
-                className="settings-select"
-                value={aiModel}
-                onChange={e => {
-                  setAIModel(e.target.value)
-                  setCurrentModel(e.target.value)
-                }}
-              >
-                {getProviderConfig(aiProvider).supportedModels.map(model => (
-                  <option key={model} value={model}>{model}</option>
-                ))}
-              </select>
-              <div className="settings-hint">
-                {aiModel === 'deepseek-chat' && '非思考模式 - 快速响应'}
-                {aiModel === 'deepseek-reasoner' && '思考模式 - 深度推理'}
-                {aiModel === 'mimo-v2-flash' && 'MiMo Flash 模型'}
+              {/* Token 用量显示 */}
+              <div className="settings-section">
+                <div className="token-count-display">
+                  <span className="token-count-label">Token count</span>
+                  <span className="token-count-value">0 / 128,000</span>
+                </div>
+              </div>
+
+              {/* 系统提示词 */}
+              <div className="settings-section">
+                <label className="settings-label">系统提示词</label>
+                <textarea
+                  className="system-prompt-textarea"
+                  value={tempSystemPrompt}
+                  onChange={e => setTempSystemPrompt(e.target.value)}
+                  rows={6}
+                  placeholder="输入系统提示词，影响 AI 的回复风格和行为..."
+                />
+              </div>
+
+              {/* 思考模式（仅 DeepSeek Reasoner） */}
+              {aiProvider === 'deepseek' && (
+                <div className="settings-section">
+                  <div className="settings-section-title">思考</div>
+                  
+                  <div className="settings-toggle-item">
+                    <div className="toggle-item-info">
+                      <span className="toggle-item-label">思考模式</span>
+                      <span className="toggle-item-hint">
+                        {aiModel === 'deepseek-reasoner' ? '深度推理，适合复杂任务' : '快速响应，适合日常对话'}
+                      </span>
+                    </div>
+                    <label className="toggle-switch">
+                      <input
+                        type="checkbox"
+                        checked={aiModel === 'deepseek-reasoner'}
+                        onChange={e => {
+                          const newModel = e.target.checked ? 'deepseek-reasoner' : 'deepseek-chat'
+                          setAIModel(newModel)
+                          setCurrentModel(newModel)
+                        }}
+                      />
+                      <span className="toggle-slider"></span>
+                    </label>
+                  </div>
+                </div>
+              )}
+
+              {/* AI 提供商切换 */}
+              <div className="settings-section">
+                <label className="settings-label">AI 提供商</label>
+                <select 
+                  className="settings-select"
+                  value={aiProvider}
+                  onChange={e => {
+                    const provider = e.target.value as AIProvider
+                    setAIProvider(provider)
+                    setCurrentProvider(provider)
+                    setAIModel(getCurrentModel())
+                  }}
+                >
+                  <option value="mimo">小米 MiMo</option>
+                  <option value="deepseek">DeepSeek V3.2</option>
+                </select>
               </div>
             </div>
 
