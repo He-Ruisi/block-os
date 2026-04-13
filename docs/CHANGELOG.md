@@ -1,5 +1,17 @@
 # BlockOS 更新日志
 
+## [v1.0.0] - 2026-04-13 ☁️ Supabase 云端集成完成
+
+**重要里程碑**：Supabase 云端集成三大核心功能全部完成。
+
+- **自动同步**：后台定时任务（30s）自动上传本地变更，storage 层零侵入集成
+- **首次登录拉取**：登录后自动从云端拉取所有数据，支持多设备协作
+- **离线模式**：网络监控 + 待同步队列，断网正常工作，恢复后自动同步
+- **同步状态 UI**：Sidebar 底部实时显示离线/同步中/待同步/已同步状态
+- **本地模式支持**：Supabase 未配置时优雅降级，纯本地 IndexedDB 运行
+
+新增 `autoSyncService` 核心服务、`useAutoSync` Hook、`SyncStatusIndicator` 组件。→ [完整文档](./spec/features/storage/auto-sync.md)
+
 ## [v0.10.0] - 2026-04-11 ✦ AI 浮动工具栏编辑器层
 
 BubbleMenu 改为 AI 操作菜单（续写/改写/缩写/扩写/翻译/解释/存为块）。新增 `inlineAI` TipTap Extension（ProseMirror Plugin 封装），管理 AIReplaceDecoration 临时态和并发控制。SourceBlock 新增 `pending` 属性，续写结果以临时态插入，保留/丢弃按钮确认。翻译/解释写入 Block annotations 附属层并显示行内预览条。类型检查通过 ✅

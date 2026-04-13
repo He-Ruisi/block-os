@@ -9,6 +9,7 @@ import { RightPanel } from './components/panel/RightPanel'
 import { AIFloatPanel } from './components/ai/AIFloatPanel'
 import type { AIMode } from './components/ai/AIFloatPanel'
 import { AuthPage } from './components/auth/AuthPage'
+import { SettingsPanel } from './components/panel/SettingsPanel'
 import { initStorage } from './storage'
 import { useAppLayout } from './hooks/useAppLayout'
 import { useTabs } from './hooks/useTabs'
@@ -20,6 +21,7 @@ function App() {
   const [editor, setEditor] = useState<TiptapEditor | null>(null)
   const [selectedText, setSelectedText] = useState('')
   const [theme, setTheme] = useState<string>(() => localStorage.getItem('blockos-theme') || 'default')
+  const [showSettings, setShowSettings] = useState(false)
 
   const toggleTheme = useCallback(() => {
     setTheme(prev => {
@@ -175,6 +177,7 @@ function App() {
             sidebarCollapsed={sidebarCollapsed}
             username={auth.user?.username}
             onSignOut={auth.signOut}
+            onOpenSettings={() => setShowSettings(true)}
             theme={theme}
             onToggleTheme={toggleTheme}
           />
@@ -233,6 +236,18 @@ function App() {
             onTextSentToAI={() => setSelectedText('')}
           />
         </>
+      )}
+
+      {showSettings && auth.user && (
+        <SettingsPanel
+          username={auth.user.username}
+          userId={auth.user.id}
+          onClose={() => setShowSettings(false)}
+          onSignOut={() => {
+            setShowSettings(false)
+            auth.signOut()
+          }}
+        />
       )}
     </div>
   )

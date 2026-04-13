@@ -9,6 +9,7 @@ interface ActivityBarProps {
   sidebarCollapsed: boolean
   username?: string
   onSignOut?: () => void
+  onOpenSettings?: () => void
   theme?: string
   onToggleTheme?: () => void
 }
@@ -26,6 +27,7 @@ export function ActivityBar({
   sidebarCollapsed,
   username,
   onSignOut,
+  onOpenSettings,
   theme,
   onToggleTheme,
 }: ActivityBarProps) {
@@ -56,7 +58,11 @@ export function ActivityBar({
         )}
         {username && (
           <>
-            <div className="activity-icon user-icon" title={username}>
+            <div 
+              className="activity-icon user-icon" 
+              title={`${username} - 点击打开设置`}
+              onClick={onOpenSettings}
+            >
               <User size={20} />
             </div>
             {onSignOut && (
