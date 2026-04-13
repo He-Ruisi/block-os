@@ -52,14 +52,50 @@
 - `src/components/layout/Sidebar.css` - 添加遮罩层样式
 - `src/components/panel/RightPanel.tsx` - 添加关闭按钮
 
-### Phase 2: 触摸优化 (待实施)
+### Phase 2: 触摸优化 ✅
 
-**计划内容**:
-- 增加所有按钮尺寸到 ≥ 44px
-- 优化字号和行距（iPad 16-17px）
-- 添加触摸反馈动画（:active 状态）
-- 测试触摸目标可达性
-- 优化长按交互
+**完成内容**:
+- 创建 `src/hooks/useSwipeGesture.ts` 滑动手势检测 Hook
+  - 支持四个方向滑动（左/右/上/下）
+  - 可配置最小滑动距离
+  - 可选阻止滚动（全屏手势）
+- 创建 `src/hooks/useLongPress.ts` 长按检测 Hook
+  - 替代右键菜单，触摸友好
+  - 可配置延迟时间（默认 500ms）
+  - 支持移动阈值检测
+  - 区分长按和点击
+- 创建 `src/styles/touch-enhancements.css` 触摸增强样式
+  - 触摸反馈动画（scale + transition）
+  - 触摸目标尺寸优化（≥ 44px）
+  - 长按视觉反馈（ripple 动画）
+  - 滑动手势视觉提示
+  - 防止文本选择（拖动时）
+  - 滚动条优化（隐藏但保持功能）
+  - iOS 弹性滚动支持
+  - 键盘弹出布局调整
+  - 性能优化（硬件加速）
+- Sidebar 滑动手势集成
+  - 向左滑动关闭侧边栏
+  - 仅在平板/手机模式启用
+- RightPanel 滑动手势集成
+  - 向右滑动关闭右侧面板
+  - 仅在平板/手机模式启用
+- ExplorerView 长按支持
+  - 长按文档显示操作菜单
+  - 触摸设备单击直接打开
+  - 桌面设备保持原有行为
+- Newsprint 主题触摸适配
+  - 保持硬阴影风格的触摸反馈
+  - 滑动提示使用黑色
+
+**文件变更**:
+- `src/hooks/useSwipeGesture.ts` - 新建
+- `src/hooks/useLongPress.ts` - 新建
+- `src/styles/touch-enhancements.css` - 新建
+- `src/main.tsx` - 引入触摸增强样式
+- `src/components/layout/Sidebar.tsx` - 集成滑动手势
+- `src/components/panel/RightPanel.tsx` - 集成滑动手势
+- `src/components/layout/ExplorerView.tsx` - 集成长按支持
 
 ### Phase 3: 手势交互 (待实施)
 

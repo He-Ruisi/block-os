@@ -9,6 +9,7 @@ import { sendMessage, createImplicitBlockFromAI } from '../../services/aiService
 import { captureMessageAsBlock } from '../../services/blockCaptureService'
 import { useSession } from '../../hooks/useSession'
 import { useViewport } from '../../hooks/useViewport'
+import { useSwipeGesture } from '../../hooks/useSwipeGesture'
 import type { PanelTab } from '../../types/chat'
 import './RightPanel.css'
 
@@ -32,6 +33,15 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI, onCl
   const [toastType, setToastType] = useState<'success' | 'error' | 'info'>('success')
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const viewport = useViewport()
+
+  // 滑动手势：向右滑动关闭右侧面板
+  const swipeHandlers = useSwipeGesture({
+    onSwipeRight: () => {
+      if ((viewport.isTablet || viewport.isMobile) && onClose) {
+        onClose()
+      }
+    },
+  })
 
   // 监听 openBlockDetail 事件 → 切换到 Block 空间标签
   useEffect(() => {
@@ -190,7 +200,10 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI, onCl
   }
 
   return (
-    <div className={`right-panel ${viewport.isTablet || viewport.isMobile ? 'expanded' : ''}`}>
+    <div 
+      className={`right-panel ${viewport.isTablet || viewport.isMobile ? 'expanded' : ''}`}
+      {...((viewport.isTablet || viewport.isMobile) ? swipeHandlers : {})}
+    >
       {/* 响应式关闭按钮 - 仅在平板/手机模式显示 */}
       {(viewport.isTablet || viewport.isMobile) && onClose && (
         <button className="right-panel-close" onClick={onClose} title="关闭">

@@ -5,6 +5,8 @@ import { SearchView } from './SearchView'
 import { OutlineView } from './OutlineView'
 import { ExtensionsView } from './ExtensionsView'
 import { SyncStatusIndicator } from '../shared/SyncStatusIndicator'
+import { useSwipeGesture } from '../../hooks/useSwipeGesture'
+import { useViewport } from '../../hooks/useViewport'
 import './Sidebar.css'
 
 interface SidebarProps {
@@ -35,6 +37,17 @@ export function Sidebar({
   documentId,
   onClose,
 }: SidebarProps) {
+  const viewport = useViewport()
+  
+  // 滑动手势：向左滑动关闭侧边栏
+  const swipeHandlers = useSwipeGesture({
+    onSwipeLeft: () => {
+      if ((viewport.isTablet || viewport.isMobile) && onClose) {
+        onClose()
+      }
+    },
+  })
+
   if (collapsed) {
     return null
   }
@@ -47,7 +60,10 @@ export function Sidebar({
         onClick={onClose}
       />
       
-      <div className={`sidebar-panel ${!collapsed ? 'expanded' : ''}`}>
+      <div 
+        className={`sidebar-panel ${!collapsed ? 'expanded' : ''}`}
+        {...((viewport.isTablet || viewport.isMobile) ? swipeHandlers : {})}
+      >
         <div className="sidebar-panel-header">
           {VIEW_TITLES[activeView]}
         </div>

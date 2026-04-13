@@ -15,6 +15,8 @@ import type { Project } from '../../types/project'
 import type { Document } from '../../types/document'
 import { projectStore } from '../../storage/projectStore'
 import { documentStore } from '../../storage/documentStore'
+import { useLongPress } from '../../hooks/useLongPress'
+import { useViewport } from '../../hooks/useViewport'
 import './ExplorerView.css'
 
 interface ExplorerViewProps {
@@ -46,6 +48,7 @@ export function ExplorerView({
   // 文档操作弹出菜单
   const [docActionMenu, setDocActionMenu] = useState<Document | null>(null)
   const docActionMenuRef = useRef<HTMLDivElement>(null)
+  const viewport = useViewport()
 
   const loadProjects = async () => {
     try {
@@ -247,9 +250,10 @@ export function ExplorerView({
     }
   }
 
-  // 点击文档：打开操作菜单
+  // 点击文档：打开操作菜单（桌面）或直接打开（触摸设备双击）
   const handleDocClick = (e: React.MouseEvent, doc: Document) => {
     e.stopPropagation()
+    // 触摸设备上单击显示菜单
     setDocActionMenu(prev => prev?.id === doc.id ? null : doc)
   }
 
@@ -258,6 +262,24 @@ export function ExplorerView({
     e.stopPropagation()
     setDocActionMenu(null)
     onOpenDocument(doc)
+  }
+
+  // 长按文档：显示操作菜单（触摸设备）
+  const createDocLongPressHandlers = (doc: Document) => {
+    return useLongPress({
+      onLongPress: () => {
+        if (viewport.isTablet || viewport.isMobile) {
+          setDocActionMenu(doc)
+        }
+      },
+      onClick: () => {
+        // 触摸设备：单击直接打开
+        if (viewport.isTablet || viewport.isMobile) {
+          onOpenDocument(doc)
+        }
+      },
+      delay: 500,
+    })
   }
 
   // 从菜单中打开文档
@@ -368,12 +390,15 @@ export function ExplorerView({
                     {(projectDocs[project.id] || []).length === 0 ? (
                       <div className="explorer-doc-empty">暂无文档</div>
                     ) : (
-                      (projectDocs[project.id] || []).map(doc => (
+                      (projectDocs[project.id] || []).map(doc => {
+                        const longPressHandlers = createDocLongPressHandlers(doc)
+                        return (
                         <div key={doc.id} className="explorer-doc-item-wrapper">
                           <div
                             className="explorer-doc-item"
                             onClick={e => handleDocClick(e, doc)}
                             onDoubleClick={e => handleDocDoubleClick(e, doc)}
+                            {...longPressHandlers}
                           >
                             {renamingDocId === doc.id ? (
                               <input
@@ -420,7 +445,8 @@ export function ExplorerView({
                             </div>
                           )}
                         </div>
-                      ))
+                      )
+                      })
                     )}
                   </div>
                 )}

@@ -1,0 +1,363 @@
+/* ============================================================
+   Touch Interaction Enhancements
+   触摸交互增强样式
+   ============================================================ */
+
+/* ============================================================
+   触摸反馈动画
+   ============================================================ */
+
+@media (hover: none) and (pointer: coarse) {
+  /* 所有可交互元素的触摸反馈 */
+  button:active,
+  .toolbar-btn:active,
+  .tab:active,
+  .activity-icon:active,
+  .explorer-item:active,
+  .explorer-project-item:active,
+  .explorer-doc-item:active,
+  .panel-tab:active,
+  .explorer-action-btn:active,
+  .tab-action-btn:active {
+    transform: scale(0.95);
+    transition: transform 0.1s ease-out;
+  }
+
+  /* 移除 hover 效果，避免触摸后残留 */
+  .toolbar-btn:hover,
+  .tab:hover,
+  .activity-icon:hover,
+  .explorer-item:hover,
+  .panel-tab:hover {
+    background: transparent;
+    color: inherit;
+  }
+
+  /* 使用 active 状态替代 hover */
+  .toolbar-btn:active {
+    background: var(--color-bg-hover);
+    color: var(--color-text-primary);
+  }
+
+  .activity-icon:active {
+    color: var(--color-text-primary);
+  }
+
+  /* 链接和文本选择优化 */
+  a:active,
+  .block-link:active {
+    opacity: 0.7;
+  }
+
+  /* 输入框触摸优化 */
+  input:focus,
+  textarea:focus {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+}
+
+/* ============================================================
+   触摸目标尺寸优化
+   ============================================================ */
+
+@media (max-width: 1024px) {
+  /* 确保所有可点击元素至少 44x44px */
+  button,
+  .toolbar-btn,
+  .tab-close,
+  .activity-icon,
+  .panel-tab,
+  .explorer-action-btn,
+  .tab-action-btn {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* 小图标按钮增加内边距 */
+  .tab-close,
+  .explorer-action-btn {
+    padding: 10px;
+  }
+
+  /* 输入框增加高度 */
+  input[type="text"],
+  input[type="password"],
+  textarea {
+    min-height: 44px;
+    padding: 10px 12px;
+    font-size: 16px; /* 防止 iOS 自动缩放 */
+  }
+
+  /* 下拉选择框 */
+  select {
+    min-height: 44px;
+    padding: 10px 12px;
+    font-size: 16px;
+  }
+
+  /* 复选框和单选框 */
+  input[type="checkbox"],
+  input[type="radio"] {
+    min-width: 24px;
+    min-height: 24px;
+    margin: 10px;
+  }
+}
+
+/* ============================================================
+   长按反馈效果
+   ============================================================ */
+
+@media (hover: none) and (pointer: coarse) {
+  /* 长按时的视觉反馈 */
+  .explorer-doc-item,
+  .explorer-project-item,
+  .tab {
+    position: relative;
+  }
+
+  .explorer-doc-item:active::after,
+  .explorer-project-item:active::after,
+  .tab:active::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--color-bg-hover);
+    opacity: 0.5;
+    pointer-events: none;
+    animation: longPressRipple 0.5s ease-out;
+  }
+
+  @keyframes longPressRipple {
+    0% {
+      opacity: 0;
+      transform: scale(0.8);
+    }
+    50% {
+      opacity: 0.5;
+    }
+    100% {
+      opacity: 0;
+      transform: scale(1);
+    }
+  }
+}
+
+/* ============================================================
+   滑动手势视觉提示
+   ============================================================ */
+
+@media (max-width: 1024px) {
+  /* 侧边栏滑动提示 */
+  .sidebar-panel::before {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 60px;
+    background: var(--color-border-primary);
+    border-radius: 2px 0 0 2px;
+    opacity: 0.3;
+    transition: opacity 0.2s;
+  }
+
+  .sidebar-panel:active::before {
+    opacity: 0.6;
+  }
+
+  /* 右侧面板滑动提示 */
+  .right-panel::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 60px;
+    background: var(--color-border-primary);
+    border-radius: 0 2px 2px 0;
+    opacity: 0.3;
+    transition: opacity 0.2s;
+  }
+
+  .right-panel:active::before {
+    opacity: 0.6;
+  }
+}
+
+/* ============================================================
+   Newsprint 主题触摸优化
+   ============================================================ */
+
+.theme-newsprint {
+  @media (hover: none) and (pointer: coarse) {
+    /* 保持硬阴影风格的触摸反馈 */
+    button:active,
+    .toolbar-btn:active {
+      transform: scale(0.95) translate(1px, 1px);
+      box-shadow: 1px 1px 0px 0px #111111;
+    }
+
+    .explorer-item:active,
+    .panel-tab:active {
+      transform: translate(1px, 1px);
+    }
+  }
+
+  @media (max-width: 1024px) {
+    /* 滑动提示使用黑色 */
+    .sidebar-panel::before,
+    .right-panel::before {
+      background: #111111;
+      width: 3px;
+    }
+  }
+}
+
+/* ============================================================
+   防止文本选择（触摸拖动时）
+   ============================================================ */
+
+@media (hover: none) and (pointer: coarse) {
+  .sidebar-panel,
+  .right-panel,
+  .tab-bar,
+  .activity-bar {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+  }
+
+  /* 编辑器内容保持可选择 */
+  .editor-content,
+  .chat-input,
+  input,
+  textarea {
+    -webkit-user-select: text;
+    user-select: text;
+  }
+}
+
+/* ============================================================
+   滚动条优化（触摸设备）
+   ============================================================ */
+
+@media (max-width: 1024px) {
+  /* 隐藏滚动条，但保持滚动功能 */
+  .sidebar-panel-content,
+  .right-panel-content,
+  .editor-scroll,
+  .toolbar-row {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .sidebar-panel-content::-webkit-scrollbar,
+  .right-panel-content::-webkit-scrollbar,
+  .editor-scroll::-webkit-scrollbar,
+  .toolbar-row::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* iOS 弹性滚动 */
+  .sidebar-panel-content,
+  .right-panel-content,
+  .editor-scroll {
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* ============================================================
+   键盘弹出时的布局调整（iOS）
+   ============================================================ */
+
+@media (max-width: 768px) {
+  /* 输入框获得焦点时，确保可见 */
+  input:focus,
+  textarea:focus {
+    scroll-margin-bottom: 100px;
+  }
+
+  /* 聊天输入框固定在底部 */
+  .chat-input-container {
+    position: sticky;
+    bottom: 0;
+    background: var(--color-bg-primary);
+    z-index: 10;
+  }
+}
+
+/* ============================================================
+   加载和过渡动画优化
+   ============================================================ */
+
+@media (hover: none) and (pointer: coarse) {
+  /* 减少动画时长，提升响应速度 */
+  .sidebar-panel,
+  .right-panel,
+  .sidebar-overlay {
+    transition-duration: 0.25s;
+  }
+
+  /* 使用硬件加速 */
+  .sidebar-panel,
+  .right-panel,
+  .tab,
+  .activity-icon {
+    will-change: transform;
+  }
+}
+
+/* ============================================================
+   可访问性增强
+   ============================================================ */
+
+@media (max-width: 1024px) {
+  /* 焦点指示器更明显 */
+  button:focus-visible,
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible {
+    outline: 3px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+
+  /* 跳过链接（键盘导航） */
+  .skip-to-content {
+    position: absolute;
+    top: -40px;
+    left: 0;
+    background: var(--color-purple);
+    color: white;
+    padding: 8px 16px;
+    text-decoration: none;
+    z-index: 1000;
+  }
+
+  .skip-to-content:focus {
+    top: 0;
+  }
+}
+
+/* ============================================================
+   性能优化
+   ============================================================ */
+
+@media (max-width: 1024px) {
+  /* 使用 transform 而非 left/right 提升性能 */
+  .sidebar-panel,
+  .right-panel {
+    transform: translateX(0);
+    will-change: transform;
+  }
+
+  /* 减少重绘 */
+  .activity-icon,
+  .toolbar-btn,
+  .tab {
+    contain: layout style paint;
+  }
+}

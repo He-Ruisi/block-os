@@ -1,5 +1,46 @@
 # BlockOS 更新日志
 
+## [v1.4.0] - 2026-04-13 📱 iPad 响应式设计 Phase 2
+
+**触摸交互优化完成**：滑动手势、长按菜单、触摸反馈动画。
+
+- **滑动手势系统**：`useSwipeGesture` Hook 支持四方向滑动，可配置最小距离和滚动阻止
+- **长按检测**：`useLongPress` Hook 替代右键菜单，支持移动阈值和延迟配置
+- **触摸增强样式**：
+  - 触摸反馈动画（scale 0.95 + ripple 效果）
+  - 所有按钮触摸目标 ≥ 44px
+  - 输入框优化（44px 高度，16px 字号防止 iOS 缩放）
+  - 滑动手势视觉提示（边缘指示器）
+  - 滚动条优化（隐藏但保持功能）
+  - iOS 弹性滚动和键盘布局调整
+  - 性能优化（硬件加速，减少重绘）
+- **组件集成**：
+  - Sidebar/RightPanel：滑动关闭（仅平板/手机）
+  - ExplorerView：长按显示菜单，单击直接打开
+  - Newsprint 主题：硬阴影风格触摸反馈
+
+新增 `src/hooks/useSwipeGesture.ts`、`src/hooks/useLongPress.ts`、`src/styles/touch-enhancements.css`。→ [完整文档](./spec/features/responsive/ipad-responsive-design.md)
+
+## [v1.3.0] - 2026-04-13 📱 iPad 响应式设计 Phase 1
+
+**重要里程碑**：完成 iPad 和移动设备响应式适配基础布局。
+
+- **响应式样式系统**：三个断点（手机 <768px、平板 768-1024px、桌面 ≥1280px），支持横竖屏，iOS Safe Area 适配
+- **视口检测 Hook**：`useViewport` 实时检测设备类型和尺寸，监听窗口变化
+- **组件响应式适配**：
+  - ActivityBar：平板 56px，手机改为底部导航栏（60px）
+  - Sidebar：浮层模式 + 遮罩层，点击关闭
+  - Editor：全宽布局，字号优化（平板 16px，手机 17px）
+  - Toolbar：触摸友好按钮（40x40px）
+  - TabBar：标签高度 44px
+  - RightPanel：浮层模式 + 关闭按钮
+  - StatusBar：响应式高度，手机固定底部
+  - ResizeHandle：平板/手机隐藏
+- **主题适配**：Default 和 Newsprint 主题完整响应式支持，保持硬阴影和粗边框风格
+- **触摸交互**：所有按钮触摸目标 ≥ 44px，触摸反馈动画
+
+新增 `src/styles/responsive.css` 响应式样式文件、`src/hooks/useViewport.ts` 视口检测 Hook。→ [完整文档](./spec/features/responsive/ipad-responsive-design.md)
+
 ## [v1.2.1] - 2026-04-13 🐛 文档管理 Bug 修复
 
 修复严重的文档管理问题：同一文档出现多个标签页、所有文档显示相同内容。修复 `useTabs` 重复检查逻辑，修复 Editor 无 documentId 时自动加载导致内容共享。添加双击文档直接打开功能，单击显示操作菜单。每个文档现在有独立内容，标签页不再重复。

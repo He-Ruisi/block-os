@@ -15,16 +15,19 @@
   - [x] ResizeHandle 在平板/手机隐藏
   - [x] Newsprint 主题响应式适配
   - [x] iOS Safe Area 支持
-- [ ] Phase 2: 触摸优化
-  - [ ] 增加所有按钮尺寸到 ≥ 44px
-  - [ ] 优化字号和行距
-  - [ ] 添加触摸反馈动画
-  - [ ] 测试触摸目标可达性
-- [ ] Phase 3: 手势交互
-  - [ ] 实现 useSwipeGesture Hook
-  - [ ] 侧边栏滑动开关
+- [x] Phase 2: 触摸优化
+  - [x] 创建滑动手势检测 Hook（四方向）
+  - [x] 创建长按检测 Hook（替代右键菜单）
+  - [x] 触摸反馈动画（scale + ripple）
+  - [x] 触摸目标尺寸优化（所有按钮 ≥ 44px）
+  - [x] Sidebar/RightPanel 滑动手势集成
+  - [x] ExplorerView 长按支持
+  - [x] 滚动条优化和 iOS 弹性滚动
+  - [x] 性能优化（硬件加速）
+- [ ] Phase 3: 手势交互增强
   - [ ] 标签页滑动切换
-  - [ ] 长按菜单替代右键
+  - [ ] 编辑器捏合缩放
+  - [ ] 下拉刷新（同步数据）
 - [ ] Phase 4: 主题适配微调
 - [ ] Phase 5: 测试优化（iPad Mini/iPad/iPad Pro）
 
