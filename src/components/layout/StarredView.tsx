@@ -40,27 +40,43 @@ function saveStarredItems(items: StarredItem[]): void {
 export function StarredView({ onSelectProject, onOpenDocument }: StarredViewProps) {
   const [starredItems, setStarredItems] = useState<StarredItem[]>(loadStarredItems)
   const [itemNames, setItemNames] = useState<Record<string, string>>({})
+  const [draggedItem, setDraggedItem] = useState<StarredItem | null>(null)
 
   // 加载项目和文档名称
   useEffect(() => {
+    if (starredItems.length === 0) {
+      setItemNames({})
+      return
+    }
+
     const loadNames = async () => {
-      const names: Record<string, string> = {}
-      
-      for (const item of starredItems) {
-        if (item.type === 'project') {
-          const project = await projectStore.getProject(item.id)
-          if (project) {
-            names[item.id] = project.name
-          }
-        } else if (item.type === 'document') {
-          const doc = await documentStore.getDocument(item.id)
-          if (doc) {
-            names[item.id] = doc.title
+      try {
+        const names: Record<string, string> = {}
+        
+        for (const item of starredItems) {
+          try {
+            if (item.type === 'project') {
+              const project = await projectStore.getProject(item.id)
+              if (project) {
+                names[item.id] = project.name
+              }
+            } else if (item.type === 'document') {
+              const doc = await documentStore.getDocument(item.id)
+              if (doc) {
+                names[item.id] = doc.title
+              }
+            }
+          } catch (error) {
+            console.error(`Failed to load name for ${item.type} ${item.id}:`, error)
+            // 使用缓存的名称作为后备
+            names[item.id] = item.name
           }
         }
+        
+        setItemNames(names)
+      } catch (error) {
+        console.error('Failed to load starred item names:', error)
       }
-      
-      setItemNames(names)
     }
     
     loadNames()
@@ -107,13 +123,17 @@ export function StarredView({ onSelectProject, onOpenDocument }: StarredViewProp
   }, [])
 
   const handleItemClick = async (item: StarredItem) => {
-    if (item.type === 'project') {
-      onSelectProject(item.id)
-    } else if (item.type === 'document') {
-      const doc = await documentStore.getDocument(item.id)
-      if (doc) {
-        onOpenDocument(doc)
+    try {
+      if (item.type === 'project') {
+        onSelectProject(item.id)
+      } else if (item.type === 'document') {
+        const doc = await documentStore.getDocument(item.id)
+        if (doc) {
+          onOpenDocument(doc)
+        }
       }
+    } catch (error) {
+      console.error('Failed to handle starred item click:', error)
     }
   }
 
@@ -137,6 +157,49 @@ export function StarredView({ onSelectProject, onOpenDocument }: StarredViewProp
     }))
   }
 
+  // 拖拽开始
+  const handleDragStart = (e: React.DragEvent, item: StarredItem) => {
+    setDraggedItem(item)
+    e.dataTransfer.effectAllowed = 'move'
+  }
+
+  // 拖拽结束
+  const handleDragEnd = () => {
+    setDraggedItem(null)
+  }
+
+  // 拖拽经过
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.dataTransfer.dropEffect = 'move'
+  }
+
+  // 放置
+  const handleDrop = (e: React.DragEvent, targetItem: StarredItem) => {
+    e.preventDefault()
+    
+    if (!draggedItem || draggedItem.id === targetItem.id) {
+      setDraggedItem(null)
+      return
+    }
+
+    setStarredItems(prev => {
+      const draggedIndex = prev.findIndex(i => i.id === draggedItem.id && i.type === draggedItem.type)
+      const targetIndex = prev.findIndex(i => i.id === targetItem.id && i.type === targetItem.type)
+      
+      if (draggedIndex === -1 || targetIndex === -1) return prev
+      
+      const next = [...prev]
+      next.splice(draggedIndex, 1)
+      next.splice(targetIndex, 0, draggedItem)
+      
+      saveStarredItems(next)
+      return next
+    })
+    
+    setDraggedItem(null)
+  }
+
   if (starredItems.length === 0) {
     return (
       <div className="starred-view">
@@ -155,8 +218,13 @@ export function StarredView({ onSelectProject, onOpenDocument }: StarredViewProp
         {starredItems.map(item => (
           <div
             key={`${item.type}-${item.id}`}
-            className="starred-item"
+            className={`starred-item ${draggedItem?.id === item.id ? 'dragging' : ''}`}
             onClick={() => handleItemClick(item)}
+            draggable
+            onDragStart={e => handleDragStart(e, item)}
+            onDragEnd={handleDragEnd}
+            onDragOver={handleDragOver}
+            onDrop={e => handleDrop(e, item)}
           >
             {item.type === 'project' ? (
               <Folder size={16} className="starred-item-icon" />

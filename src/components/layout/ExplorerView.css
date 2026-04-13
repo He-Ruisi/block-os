@@ -293,6 +293,34 @@
   color: var(--color-accent-red);
 }
 
+/* 星标按钮 */
+.explorer-star-btn {
+  color: var(--color-text-tertiary);
+}
+
+.explorer-star-btn.starred {
+  color: #f59e0b;
+}
+
+.explorer-star-btn:hover {
+  color: #f59e0b;
+}
+
+/* 文档行内的星标按钮 */
+.explorer-doc-star {
+  opacity: 0;
+  transition: opacity 0.15s;
+  margin-left: auto;
+}
+
+.explorer-doc-item:hover .explorer-doc-star {
+  opacity: 1;
+}
+
+.explorer-doc-star.starred {
+  opacity: 1;
+}
+
 .explorer-rename-input {
   flex: 1;
   font-size: 13px;

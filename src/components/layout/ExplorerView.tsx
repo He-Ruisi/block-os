@@ -10,6 +10,7 @@ import {
   FolderInput,
   Plus,
   X,
+  Star,
 } from 'lucide-react'
 import type { Project } from '../../types/project'
 import type { Document } from '../../types/document'
@@ -18,6 +19,9 @@ import { documentStore } from '../../storage/documentStore'
 import { useLongPress } from '../../hooks/useLongPress'
 import { useViewport } from '../../hooks/useViewport'
 import './ExplorerView.css'
+
+const STORAGE_KEY = 'blockos-starred-items'
+const MAX_STARRED_ITEMS = 10
 
 interface ExplorerViewProps {
   onSelectToday: () => void
@@ -49,6 +53,8 @@ export function ExplorerView({
   const [docActionMenu, setDocActionMenu] = useState<Document | null>(null)
   const docActionMenuRef = useRef<HTMLDivElement>(null)
   const viewport = useViewport()
+  // 置顶状态
+  const [starredIds, setStarredIds] = useState<Set<string>>(new Set())
 
   const loadProjects = async () => {
     try {
@@ -59,8 +65,22 @@ export function ExplorerView({
     }
   }
 
+  // 加载置顶状态
+  const loadStarredIds = () => {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY)
+      if (raw) {
+        const items = JSON.parse(raw) as Array<{ id: string; type: string }>
+        setStarredIds(new Set(items.map(item => `${item.type}-${item.id}`)))
+      }
+    } catch (error) {
+      console.error('Failed to load starred ids:', error)
+    }
+  }
+
   useEffect(() => {
     loadProjects()
+    loadStarredIds()
   }, [])
 
   useEffect(() => {
@@ -87,6 +107,15 @@ export function ExplorerView({
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [docActionMenu])
+
+  // 监听全局置顶事件
+  useEffect(() => {
+    const handleToggleStar = () => {
+      loadStarredIds()
+    }
+    window.addEventListener('toggleStar', handleToggleStar)
+    return () => window.removeEventListener('toggleStar', handleToggleStar)
+  }, [])
 
   const loadProjectDocs = async (projectId: string) => {
     try {
@@ -294,6 +323,55 @@ export function ExplorerView({
     setMovingDoc(doc)
   }
 
+  // 切换置顶状态
+  const toggleStar = (e: React.MouseEvent, id: string, type: 'project' | 'document', name: string, projectId?: string) => {
+    e.stopPropagation()
+    
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY)
+      const items = raw ? JSON.parse(raw) : []
+      const exists = items.find((item: { id: string; type: string }) => item.id === id && item.type === type)
+      
+      let newItems
+      if (exists) {
+        // 取消置顶
+        newItems = items.filter((item: { id: string; type: string }) => !(item.id === id && item.type === type))
+      } else {
+        // 检查数量限制
+        if (items.length >= MAX_STARRED_ITEMS) {
+          alert(`最多只能置顶 ${MAX_STARRED_ITEMS} 个项目`)
+          return
+        }
+        // 添加置顶
+        newItems = [
+          ...items,
+          {
+            id,
+            type,
+            name,
+            projectId,
+            starredAt: new Date().toISOString(),
+          },
+        ]
+      }
+      
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(newItems))
+      loadStarredIds()
+      
+      // 触发全局事件
+      window.dispatchEvent(new CustomEvent('toggleStar', {
+        detail: { id, type, name, projectId },
+      }))
+    } catch (error) {
+      console.error('Failed to toggle star:', error)
+    }
+  }
+
+  // 检查是否已置顶
+  const isStarred = (id: string, type: 'project' | 'document'): boolean => {
+    return starredIds.has(`${type}-${id}`)
+  }
+
   // 在项目中新建文档
   const handleNewDocInProject = async (e: React.MouseEvent, projectId: string) => {
     e.stopPropagation()
@@ -371,6 +449,13 @@ export function ExplorerView({
                         <span className="explorer-project-count">{project.documents.length}</span>
                       )}
                       <div className="explorer-doc-actions explorer-project-actions">
+                        <button 
+                          className={`explorer-action-btn explorer-star-btn ${isStarred(project.id, 'project') ? 'starred' : ''}`}
+                          onClick={e => toggleStar(e, project.id, 'project', project.name)}
+                          title={isStarred(project.id, 'project') ? '取消置顶' : '置顶'}
+                        >
+                          <Star size={14} fill={isStarred(project.id, 'project') ? 'currentColor' : 'none'} />
+                        </button>
                         <button className="explorer-action-btn" onClick={e => handleNewDocInProject(e, project.id)} title="新建文档">
                           <Plus size={14} />
                         </button>
@@ -418,6 +503,13 @@ export function ExplorerView({
                               <>
                                 <FileText size={14} className="explorer-doc-icon" />
                                 <span className="explorer-doc-title">{doc.title}</span>
+                                <button
+                                  className={`explorer-action-btn explorer-star-btn explorer-doc-star ${isStarred(doc.id, 'document') ? 'starred' : ''}`}
+                                  onClick={e => toggleStar(e, doc.id, 'document', doc.title, doc.projectId)}
+                                  title={isStarred(doc.id, 'document') ? '取消置顶' : '置顶'}
+                                >
+                                  <Star size={12} fill={isStarred(doc.id, 'document') ? 'currentColor' : 'none'} />
+                                </button>
                               </>
                             )}
                           </div>

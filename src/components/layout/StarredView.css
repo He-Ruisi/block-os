@@ -44,12 +44,17 @@
   padding: 8px 12px;
   border-radius: var(--border-radius);
   cursor: pointer;
-  transition: background 0.15s;
+  transition: background 0.15s, opacity 0.15s;
   position: relative;
 }
 
 .starred-item:hover {
   background: var(--color-bg-hover);
+}
+
+.starred-item.dragging {
+  opacity: 0.5;
+  cursor: move;
 }
 
 .starred-item-icon {
