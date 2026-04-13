@@ -1,4 +1,4 @@
-import { Folder, Search, List, Puzzle, Newspaper, Palette, User, LogOut } from 'lucide-react'
+import { Folder, Search, List, Puzzle, Newspaper, Palette, User, LogOut, Star } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import type { SidebarView } from '../../types/layout'
 import './ActivityBar.css'
@@ -17,6 +17,7 @@ interface ActivityBarProps {
 const VIEWS: { view: SidebarView; Icon: LucideIcon; title: string }[] = [
   { view: 'explorer', Icon: Folder, title: '资源管理器' },
   { view: 'search', Icon: Search, title: '搜索' },
+  { view: 'starred', Icon: Star, title: '置顶' },
   { view: 'outline', Icon: List, title: '大纲' },
   { view: 'extensions', Icon: Puzzle, title: '插件' },
 ]

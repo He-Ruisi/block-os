@@ -2,6 +2,7 @@ import type { SidebarView } from '../../types/layout'
 import type { Document } from '../../types/document'
 import { ExplorerView } from './ExplorerView'
 import { SearchView } from './SearchView'
+import { StarredView } from './StarredView'
 import { OutlineView } from './OutlineView'
 import { ExtensionsView } from './ExtensionsView'
 import { SyncStatusIndicator } from '../shared/SyncStatusIndicator'
@@ -23,6 +24,7 @@ interface SidebarProps {
 const VIEW_TITLES: Record<SidebarView, string> = {
   explorer: '资源管理器',
   search: '搜索',
+  starred: '置顶',
   outline: '大纲',
   extensions: '插件',
 }
@@ -82,6 +84,12 @@ export function Sidebar({
               // Search results are blocks, not documents — open by creating a notification
               console.log('Search result clicked:', docId)
             }} />
+          )}
+          {activeView === 'starred' && (
+            <StarredView
+              onSelectProject={onSelectProject}
+              onOpenDocument={onOpenDocument}
+            />
           )}
           {activeView === 'outline' && (
             <OutlineView documentId={documentId} />
