@@ -86,6 +86,7 @@ export async function syncDocumentToSupabase(doc: Document, userId: string): Pro
       user_id: userId,
       title: doc.title,
       content: doc.content,
+      blocks: doc.blocks || [],  // 新增：同步隐式 Block
       project_id: doc.projectId || null,
       created_at: new Date(doc.metadata.createdAt).toISOString(),
       updated_at: new Date(doc.metadata.updatedAt).toISOString(),
@@ -117,7 +118,7 @@ export async function fetchDocumentsFromSupabase(userId: string): Promise<Docume
     id: row.id,
     title: row.title,
     content: row.content || '',
-    blocks: [], // blocks 从本地 IndexedDB 加载
+    blocks: row.blocks || [],  // 新增：加载隐式 Block
     projectId: row.project_id || undefined,
     metadata: {
       createdAt: new Date(row.created_at),
@@ -152,18 +153,34 @@ export async function syncBlockToSupabase(block: Block, userId: string): Promise
       content: block.content,
       type: block.type,
       implicit: block.implicit || false,
-      source_type: block.source.type,
-      source_document_id: block.source.documentId || null,
-      source_ai_message_id: block.source.aiMessageId || null,
-      captured_at: new Date(block.source.capturedAt).toISOString(),
+      
+      // 新结构：source 作为 JSONB
+      source: block.source,
+      
+      // 新增字段
+      edit_history: block.editHistory || [],
+      style: block.style || null,
+      template: block.template || null,
+      releases: block.releases || [],
+      annotations: block.annotations || {},
+      
+      // 元数据
       title: block.metadata.title || null,
       tags: block.metadata.tags,
-      outgoing_links: block.links?.outgoing || [],
-      incoming_links: block.links?.incoming || [],
-      is_derivative: block.derivation?.isDerivative || false,
-      source_block_id: block.derivation?.sourceBlockId || null,
       created_at: new Date(block.metadata.createdAt).toISOString(),
       updated_at: new Date(block.metadata.updatedAt).toISOString(),
+      
+      // 关系
+      outgoing_links: block.links?.outgoing || [],
+      incoming_links: block.links?.incoming || [],
+      
+      // 版本派生
+      is_derivative: block.derivation?.isDerivative || false,
+      source_block_id: block.derivation?.sourceBlockId || null,
+      derived_from: block.derivation?.derivedFrom || null,
+      context_document_id: block.derivation?.contextDocumentId || null,
+      context_title: block.derivation?.contextTitle || null,
+      modifications: block.derivation?.modifications || null,
     })
 
   if (error) {
@@ -193,25 +210,42 @@ export async function fetchBlocksFromSupabase(userId: string): Promise<Block[]> 
     content: row.content,
     type: row.type,
     implicit: row.implicit || false,
-    source: {
-      type: row.source_type,
-      documentId: row.source_document_id || undefined,
-      aiMessageId: row.source_ai_message_id || undefined,
-      capturedAt: new Date(row.captured_at),
+    
+    // 新结构：source 从 JSONB 读取
+    source: row.source || {
+      type: 'editor',
+      capturedAt: new Date(row.created_at),
     },
+    
+    // 新增字段
+    editHistory: row.edit_history || [],
+    style: row.style || undefined,
+    template: row.template || undefined,
+    releases: row.releases || [],
+    annotations: row.annotations || {},
+    
+    // 元数据
     metadata: {
       title: row.title || undefined,
       tags: row.tags || [],
       createdAt: new Date(row.created_at),
       updatedAt: new Date(row.updated_at),
     },
+    
+    // 关系
     links: {
       outgoing: row.outgoing_links || [],
       incoming: row.incoming_links || [],
     },
+    
+    // 版本派生
     derivation: row.is_derivative ? {
       isDerivative: true,
       sourceBlockId: row.source_block_id || undefined,
+      derivedFrom: row.derived_from || undefined,
+      contextDocumentId: row.context_document_id || undefined,
+      contextTitle: row.context_title || undefined,
+      modifications: row.modifications || undefined,
     } : undefined,
   }))
 }
