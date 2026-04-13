@@ -10,6 +10,127 @@
   max-width: 480px;
 }
 
+/* AI 沉浸式模式 */
+.right-panel.ai-focus-mode {
+  border-left: none;
+  max-width: none;
+  width: 100%;
+}
+
+/* AI 欢迎界面 */
+.ai-welcome-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  background: var(--color-bg-primary);
+}
+
+.ai-welcome-content {
+  width: 100%;
+  max-width: 800px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 48px;
+}
+
+.ai-welcome-greeting {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.ai-welcome-icon {
+  font-size: 64px;
+  line-height: 1;
+}
+
+.ai-welcome-title {
+  font-size: 2.5rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+/* 大号输入框 */
+.ai-input-large-wrapper {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ai-input-large {
+  width: 100%;
+  padding: 20px 24px;
+  border: 2px solid var(--color-border-primary);
+  border-radius: var(--border-radius-lg);
+  font-size: 18px;
+  font-family: inherit;
+  line-height: 1.6;
+  resize: none;
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  outline: none;
+  transition: all 0.2s;
+  box-shadow: var(--shadow-sm);
+}
+
+.ai-input-large:focus {
+  border-color: var(--color-border-focus);
+  box-shadow: var(--shadow-md);
+}
+
+.ai-input-large:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.ai-input-large::placeholder {
+  color: var(--color-text-muted);
+  font-size: 18px;
+}
+
+.ai-input-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 4px;
+}
+
+.ai-model-indicator {
+  font-size: 13px;
+  color: var(--color-text-tertiary);
+  font-weight: 500;
+}
+
+.ai-send-button-large {
+  padding: 12px 32px;
+  background: var(--color-purple);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius);
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.ai-send-button-large:hover:not(:disabled) {
+  background: var(--color-purple-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.ai-send-button-large:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .panel-header {
   padding: 10px 14px;
   border-bottom: 1px solid var(--color-border-primary);
@@ -828,4 +949,35 @@
 .theme-newsprint .btn-primary:hover {
   background: #CC0000;
   border-color: #CC0000;
+}
+
+/* Newsprint 主题 - AI 沉浸式模式 */
+.theme-newsprint .ai-welcome-title {
+  font-family: var(--editor-font-serif);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+}
+
+.theme-newsprint .ai-input-large {
+  border: 3px solid #111111;
+  border-radius: 0;
+  box-shadow: 4px 4px 0px 0px #111111;
+  font-family: var(--editor-font-family);
+}
+
+.theme-newsprint .ai-input-large:focus {
+  box-shadow: 6px 6px 0px 0px #111111;
+}
+
+.theme-newsprint .ai-send-button-large {
+  background: #111111;
+  color: #F9F9F7;
+  border: 2px solid #111111;
+  border-radius: 0;
+}
+
+.theme-newsprint .ai-send-button-large:hover:not(:disabled) {
+  background: #CC0000;
+  border-color: #CC0000;
+  box-shadow: 2px 2px 0px 0px #111111;
 }

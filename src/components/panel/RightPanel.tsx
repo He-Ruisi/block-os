@@ -28,9 +28,11 @@ interface RightPanelProps {
   selectedText?: string
   onTextSentToAI?: () => void
   onClose?: () => void
+  viewMode?: 'ai-focus' | 'hybrid'
+  onSwitchToHybrid?: () => void
 }
 
-export function RightPanel({ onInsertContent, selectedText, onTextSentToAI, onClose }: RightPanelProps) {
+export function RightPanel({ onInsertContent, selectedText, onTextSentToAI, onClose, viewMode = 'hybrid', onSwitchToHybrid }: RightPanelProps) {
   const [activeTab, setActiveTab] = useState<PanelTab>('chat')
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -43,6 +45,8 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI, onCl
   const [aiModel, setAIModel] = useState<string>(getCurrentModel())
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const viewport = useViewport()
+  
+  const isAIFocusMode = viewMode === 'ai-focus'
 
   // 滑动手势：向右滑动关闭右侧面板
   const swipeHandlers = useSwipeGesture({
@@ -72,6 +76,8 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI, onCl
     persistSession,
     refreshSessions,
   } = useSession()
+  
+  const hasMessages = messages.length > 0
 
   // 监听选中文字事件
   useEffect(() => {
@@ -110,6 +116,10 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI, onCl
     if (message?.role === 'assistant' && onInsertContent) {
       onInsertContent(message.editorContent || message.content)
       setMessages(prev => prev.map(m => m.id === messageId ? { ...m, insertedToEditor: true } : m))
+      // AI 模式下点击写入编辑器，切换到混合模式
+      if (isAIFocusMode && onSwitchToHybrid) {
+        onSwitchToHybrid()
+      }
     }
   }
 
@@ -217,7 +227,7 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI, onCl
 
   return (
     <div 
-      className={`right-panel ${viewport.isTablet || viewport.isMobile ? 'expanded' : ''}`}
+      className={`right-panel ${viewport.isTablet || viewport.isMobile ? 'expanded' : ''} ${isAIFocusMode ? 'ai-focus-mode' : ''}`}
       {...((viewport.isTablet || viewport.isMobile) ? swipeHandlers : {})}
     >
       {/* 响应式关闭按钮 - 仅在平板/手机模式显示 */}
@@ -227,7 +237,46 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI, onCl
         </button>
       )}
       
-      <div className="panel-header">
+      {/* AI 沉浸式模式 - 初始状态 */}
+      {isAIFocusMode && !hasMessages && (
+        <div className="ai-welcome-container">
+          <div className="ai-welcome-content">
+            <div className="ai-welcome-greeting">
+              <span className="ai-welcome-icon">🤖</span>
+              <h1 className="ai-welcome-title">下午好</h1>
+            </div>
+            
+            <div className="ai-input-large-wrapper">
+              <textarea
+                className="ai-input-large"
+                placeholder="How can I help you today?"
+                value={input}
+                onChange={e => setInput(e.target.value)}
+                onKeyDown={handleKeyDown}
+                disabled={isLoading}
+                rows={4}
+              />
+              <div className="ai-input-footer">
+                <div className="ai-model-indicator">
+                  {getProviderConfig(aiProvider).name} · {aiModel}
+                </div>
+                <button 
+                  className="ai-send-button-large" 
+                  onClick={handleSendMessage} 
+                  disabled={!input.trim() || isLoading}
+                >
+                  {isLoading ? '发送中...' : '发送'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* AI 沉浸式模式 - 对话状态 OR 混合模式 */}
+      {(!isAIFocusMode || hasMessages) && (
+        <>
+          <div className="panel-header">
         <div className="panel-tabs">
           {(['chat', 'blocks', 'preview'] as PanelTab[]).map(tab => (
             <button
@@ -463,6 +512,8 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI, onCl
 
       {toastMessage && (
         <Toast message={toastMessage} type={toastType} onClose={() => setToastMessage(null)} />
+      )}
+        </>
       )}
     </div>
   )

@@ -2,6 +2,25 @@
 
 ## P0 - 核心功能（当前优先）
 
+### AI 沉浸式模式 🤖 - [详细文档](./spec/features/ai/ai-immersive-mode.md)
+- [x] Phase 1: 基础架构
+  - [x] 添加 viewMode 状态管理（ai-focus / hybrid）
+  - [x] 实现布局切换逻辑
+  - [x] 创建 AI 模式容器组件
+- [x] Phase 2: AI 模式 UI
+  - [x] 问候语组件（大号居中）
+  - [x] 大号输入框（初始状态）
+  - [x] 模型选择显示
+  - [x] 输入框位置动画（居中 → 底部）
+- [x] Phase 3: 模式切换
+  - [x] 写入编辑器触发切换到混合模式
+  - [x] 过渡动画（0.3s ease）
+- [x] Phase 4: 优化和测试
+  - [x] 主题适配（default + newsprint）
+  - [x] TypeScript 类型检查通过
+  - [ ] 响应式适配（iPad/手机）- 待测试
+  - [ ] 性能优化 - 待测试
+
 ### iPad 响应式设计 📱 - [详细文档](./spec/features/responsive/ipad-responsive-design.md)
 - [x] Phase 1: 基础响应式布局
   - [x] 创建响应式样式文件和视口检测 Hook
@@ -210,6 +229,6 @@
 
 ---
 
-**更新时间**: 2026-04-13 14:30  
-**当前阶段**: Supabase 云端集成全部完成（v1.0.0）  
-**下次评审**: Block 空间 annotations 展示 / 阶段三交互模式重构
+**更新时间**: 2026-04-13 16:40  
+**当前阶段**: AI 沉浸式模式核心功能完成，待测试  
+**下次评审**: 响应式适配测试 / Block 空间 annotations 展示

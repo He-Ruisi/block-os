@@ -57,3 +57,38 @@
 .toast-container > * {
   pointer-events: auto;
 }
+
+/* AI 沉浸式模式布局 */
+.app.app-ai-focus {
+  display: block;
+}
+
+.app.app-ai-focus .right-panel {
+  width: 100vw;
+  height: 100vh;
+}
+
+/* AI 模式过渡动画 */
+.layout-transition {
+  transition: all 0.3s ease;
+}
+
+.fade-enter {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.fade-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.3s, transform 0.3s;
+}
+
+.fade-exit {
+  opacity: 1;
+}
+
+.fade-exit-active {
+  opacity: 0;
+  transition: opacity 0.2s;
+}

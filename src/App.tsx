@@ -28,6 +28,11 @@ function App() {
   const [theme, setTheme] = useState<string>(() => localStorage.getItem('blockos-theme') || 'default')
   const [showSettings, setShowSettings] = useState(false)
   
+  // 视图模式：AI 沉浸式 or 混合模式
+  const [viewMode, setViewMode] = useState<'ai-focus' | 'hybrid'>(() => {
+    return (localStorage.getItem('blockos-view-mode') as 'ai-focus' | 'hybrid') || 'ai-focus'
+  })
+  
   // 文档统计状态
   const [wordCount, setWordCount] = useState(0)
   const [blockCount, setBlockCount] = useState(0)
@@ -44,6 +49,11 @@ function App() {
       localStorage.setItem('blockos-theme', next)
       return next
     })
+  }, [])
+
+  const switchToHybridMode = useCallback(() => {
+    setViewMode('hybrid')
+    localStorage.setItem('blockos-view-mode', 'hybrid')
   }, [])
 
   const auth = useAuth()
@@ -236,84 +246,102 @@ function App() {
   }
 
   return (
-    <div className={`app ${isFullscreen ? 'fullscreen' : ''} ${theme === 'newsprint' ? 'theme-newsprint' : ''}`}>
-      {!isFullscreen && (
-        <>
-          <ActivityBar
-            activeView={sidebarView}
-            onViewChange={handleSidebarViewChange}
-            sidebarCollapsed={sidebarCollapsed}
-            username={auth.user?.username}
-            onSignOut={auth.signOut}
-            onOpenSettings={() => setShowSettings(true)}
-            theme={theme}
-            onToggleTheme={toggleTheme}
-          />
-          <Sidebar
-            activeView={sidebarView}
-            collapsed={sidebarCollapsed}
-            onSelectToday={selectToday}
-            onSelectProject={selectProject}
-            onOpenDocument={openDocument}
-            currentProjectId={currentProjectId}
-            documentId={activeDocumentId || null}
-            onClose={() => viewport.isTablet && toggleSidebar()}
-          />
-        </>
+    <div className={`app ${isFullscreen ? 'fullscreen' : ''} ${theme === 'newsprint' ? 'theme-newsprint' : ''} ${viewMode === 'ai-focus' ? 'app-ai-focus' : ''}`}>
+      {/* AI 沉浸式模式 */}
+      {viewMode === 'ai-focus' && (
+        <RightPanel
+          onInsertContent={handleInsertAIContent}
+          selectedText={selectedText}
+          onTextSentToAI={() => setSelectedText('')}
+          viewMode={viewMode}
+          onSwitchToHybrid={switchToHybridMode}
+        />
       )}
-
-      <div className="editor-area" ref={editorAreaRef}>
-        <TabBar
-          tabs={tabs}
-          activeTabId={activeTabId}
-          onSelectTab={selectTab}
-          onCloseTab={closeTab}
-          onCloseOtherTabs={closeOtherTabs}
-          onCloseTabsToRight={closeTabsToRight}
-          onReorderTabs={reorderTabs}
-          onNewTab={newTab}
-          onToggleFullscreen={toggleFullscreen}
-          onSaveTab={handleSaveDocument}
-          isFullscreen={isFullscreen}
-        />
-        <Editor
-          onEditorReady={setEditor}
-          onTextSelected={setSelectedText}
-          documentId={activeDocumentId}
-        />
-        {aiFloatPanel && (
-          <AIFloatPanel
-            mode={aiFloatPanel.mode}
-            initialContext={aiFloatPanel.contextText}
-            position={aiFloatPanel.position}
-            onModeChange={mode => setAIFloatPanel(prev => prev ? { ...prev, mode } : null)}
-            onInsertContent={handleInsertAIContent}
-            onClose={() => setAIFloatPanel(null)}
-          />
-        )}
-        
-        {/* 底部状态栏 */}
-        <StatusBar
-          wordCount={wordCount}
-          blockCount={blockCount}
-          linkCount={linkCount}
-          autoSaveStatus={autoSaveStatus}
-          lastSaved={lastSaved}
-        />
-      </div>
-
-      {!isFullscreen && (
+      
+      {/* 混合模式 */}
+      {viewMode === 'hybrid' && (
         <>
-          <ResizeHandle
-            onResize={setEditorWidth}
-            minWidth={minEditorWidth}
-            maxWidth={maxEditorWidth}
-          />
-          <RightPanel
-            onInsertContent={handleInsertAIContent}
-            selectedText={selectedText}
-            onTextSentToAI={() => setSelectedText('')}
-          />
+          {!isFullscreen && (
+            <>
+              <ActivityBar
+                activeView={sidebarView}
+                onViewChange={handleSidebarViewChange}
+                sidebarCollapsed={sidebarCollapsed}
+                username={auth.user?.username}
+                onSignOut={auth.signOut}
+                onOpenSettings={() => setShowSettings(true)}
+                theme={theme}
+                onToggleTheme={toggleTheme}
+              />
+              <Sidebar
+                activeView={sidebarView}
+                collapsed={sidebarCollapsed}
+                onSelectToday={selectToday}
+                onSelectProject={selectProject}
+                onOpenDocument={openDocument}
+                currentProjectId={currentProjectId}
+                documentId={activeDocumentId || null}
+                onClose={() => viewport.isTablet && toggleSidebar()}
+              />
+            </>
+          )}
+
+          <div className="editor-area" ref={editorAreaRef}>
+            <TabBar
+              tabs={tabs}
+              activeTabId={activeTabId}
+              onSelectTab={selectTab}
+              onCloseTab={closeTab}
+              onCloseOtherTabs={closeOtherTabs}
+              onCloseTabsToRight={closeTabsToRight}
+              onReorderTabs={reorderTabs}
+              onNewTab={newTab}
+              onToggleFullscreen={toggleFullscreen}
+              onSaveTab={handleSaveDocument}
+              isFullscreen={isFullscreen}
+            />
+            <Editor
+              onEditorReady={setEditor}
+              onTextSelected={setSelectedText}
+              documentId={activeDocumentId}
+            />
+            {aiFloatPanel && (
+              <AIFloatPanel
+                mode={aiFloatPanel.mode}
+                initialContext={aiFloatPanel.contextText}
+                position={aiFloatPanel.position}
+                onModeChange={mode => setAIFloatPanel(prev => prev ? { ...prev, mode } : null)}
+                onInsertContent={handleInsertAIContent}
+                onClose={() => setAIFloatPanel(null)}
+              />
+            )}
+            
+            {/* 底部状态栏 */}
+            <StatusBar
+              wordCount={wordCount}
+              blockCount={blockCount}
+              linkCount={linkCount}
+              autoSaveStatus={autoSaveStatus}
+              lastSaved={lastSaved}
+            />
+          </div>
+
+          {!isFullscreen && (
+            <>
+              <ResizeHandle
+                onResize={setEditorWidth}
+                minWidth={minEditorWidth}
+                maxWidth={maxEditorWidth}
+              />
+              <RightPanel
+                onInsertContent={handleInsertAIContent}
+                selectedText={selectedText}
+                onTextSentToAI={() => setSelectedText('')}
+                viewMode={viewMode}
+                onSwitchToHybrid={switchToHybridMode}
+              />
+            </>
+          )}
         </>
       )}
 
