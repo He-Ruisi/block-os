@@ -460,18 +460,18 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI, onCl
                       <div className="message-wrapper">
                         <div className="message-content">
                           {msg.role === 'assistant' ? (
-                            <MarkdownRenderer content={msg.content} />
+                            <MarkdownRenderer content={msg.content || msg.editorContent || ''} />
                           ) : (
                             msg.content
                           )}
                         </div>
-                        {msg.role === 'assistant' && msg.editorContent && (
+                        {msg.role === 'assistant' && msg.content && msg.editorContent && (
                           <div className="editor-content-preview">
                             <div className="preview-label">📝 编辑器内容预览</div>
                             <div className="preview-text">{msg.editorContent}</div>
                           </div>
                         )}
-                        {msg.role === 'assistant' && msg.content && (
+                        {msg.role === 'assistant' && (msg.content || msg.editorContent) && (
                           <div className="message-actions">
                             <button
                               className={`insert-button ${msg.insertedToEditor ? 'inserted' : ''}`}
