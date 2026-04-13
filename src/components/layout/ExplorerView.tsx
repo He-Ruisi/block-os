@@ -253,6 +253,13 @@ export function ExplorerView({
     setDocActionMenu(prev => prev?.id === doc.id ? null : doc)
   }
 
+  // 双击文档：直接打开
+  const handleDocDoubleClick = (e: React.MouseEvent, doc: Document) => {
+    e.stopPropagation()
+    setDocActionMenu(null)
+    onOpenDocument(doc)
+  }
+
   // 从菜单中打开文档
   const handleDocOpen = (doc: Document) => {
     setDocActionMenu(null)
@@ -366,6 +373,7 @@ export function ExplorerView({
                           <div
                             className="explorer-doc-item"
                             onClick={e => handleDocClick(e, doc)}
+                            onDoubleClick={e => handleDocDoubleClick(e, doc)}
                           >
                             {renamingDocId === doc.id ? (
                               <input

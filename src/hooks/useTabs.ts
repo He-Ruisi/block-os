@@ -70,24 +70,33 @@ export function useTabs(): TabsState {
   const openDocument = useCallback((doc: Document) => {
     const tabId = 'doc-' + doc.id
 
-    // 同步检查是否已有该文档的 tab（防止 React 批处理导致重复添加）
-    if (documentIdsRef.current.has(doc.id)) {
+    // 检查是否已经有该文档的标签页
+    setTabs(prev => {
+      const existing = prev.find(t => t.documentId === doc.id)
+      if (existing) {
+        setActiveTabId(existing.id)
+        if (doc.projectId) setCurrentProjectId(doc.projectId)
+        return prev
+      }
+
+      // 添加到 ref 追踪
+      documentIdsRef.current.add(doc.id)
+
+      // 创建新标签页
+      const newTab: Tab = {
+        id: tabId,
+        type: 'document',
+        documentId: doc.id,
+        projectId: doc.projectId,
+        title: doc.title,
+        isDirty: false,
+      }
+      
       setActiveTabId(tabId)
       if (doc.projectId) setCurrentProjectId(doc.projectId)
-      return
-    }
-    documentIdsRef.current.add(doc.id)
-
-    setTabs(prev => [...prev, {
-      id: tabId,
-      type: 'document',
-      documentId: doc.id,
-      projectId: doc.projectId,
-      title: doc.title,
-      isDirty: false,
-    }])
-    setActiveTabId(tabId)
-    if (doc.projectId) setCurrentProjectId(doc.projectId)
+      
+      return [...prev, newTab]
+    })
   }, [])
 
   const closeTab = useCallback((tabId: string) => {

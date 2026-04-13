@@ -501,7 +501,7 @@ export function Editor({ onEditorReady, onTextSelected, documentId }: EditorProp
 
       // 切换文档前，先保存当前文档
       const prevDocId = currentDocIdRef.current
-      if (prevDocId) {
+      if (prevDocId && prevDocId !== documentId) {
         try {
           await documentStore.updateDocumentBlocks(prevDocId, editor.getJSON())
         } catch { /* ignore */ }
@@ -513,7 +513,11 @@ export function Editor({ onEditorReady, onTextSelected, documentId }: EditorProp
         await documentStore.init()
         if (documentId) {
           const doc = await documentStore.getDocument(documentId)
-          if (!doc) { editor.commands.setContent('<p></p>'); return }
+          if (!doc) { 
+            editor.commands.setContent('<p>文档不存在</p>')
+            setCurrentDocId('')
+            return 
+          }
           if (doc.content?.trim()) {
             try { editor.commands.setContent(JSON.parse(doc.content)) }
             catch { editor.commands.setContent('<p></p>') }
@@ -523,20 +527,23 @@ export function Editor({ onEditorReady, onTextSelected, documentId }: EditorProp
           setCurrentDocId(doc.id)
           documentStore.setCurrentDocument(doc.id)
         } else {
-          const docs = await documentStore.getAllDocuments()
-          let doc
-          if (docs.length === 0) {
-            doc = await documentStore.createDocument('我的第一篇文档')
-            editor.commands.setContent('<h1>我的第一篇文档</h1><p>开始写作...</p>')
-          } else {
-            doc = docs[0]
-            if (doc.content?.trim()) {
-              try { editor.commands.setContent(JSON.parse(doc.content)) }
-              catch { /* keep */ }
-            }
-          }
-          setCurrentDocId(doc.id)
-          documentStore.setCurrentDocument(doc.id)
+          // 没有 documentId 时，显示欢迎页面，不自动加载任何文档
+          editor.commands.setContent(`
+            <h1>欢迎使用 BlockOS</h1>
+            <p>这是一个写作优先的知识操作系统。</p>
+            <h2>开始写作</h2>
+            <p>支持 Markdown 语法：</p>
+            <ul>
+              <li>使用 # 创建标题</li>
+              <li>使用 ** 加粗文字</li>
+              <li>使用 * 创建斜体</li>
+            </ul>
+            <h2>Block 系统</h2>
+            <p>使用 <code>[[</code> 创建双向链接，使用 <code>((</code> 引用其他 Block。</p>
+            <p>现在就开始写作吧...</p>
+          `)
+          setCurrentDocId('')
+          documentStore.setCurrentDocument('')
         }
       } catch (error) {
         console.error('[Editor] Failed to load document:', error)
