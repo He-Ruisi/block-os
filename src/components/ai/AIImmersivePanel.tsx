@@ -53,22 +53,24 @@ export function AIImmersivePanel({ onClose, onInsertContent }: AIImmersivePanelP
   }
 
   const handleToggleHistory = () => {
-    if (showHistory) {
-      setShowHistory(false)
-    } else {
-      setShowHistory(true)
-      setShowSettings(false)
-    }
+    console.log('handleToggleHistory called, current showHistory:', showHistory)
+    setShowHistory(prev => {
+      const newValue = !prev
+      console.log('Setting showHistory to:', newValue)
+      return newValue
+    })
+    setShowSettings(false)
   }
 
   const handleOpenSettings = () => {
-    if (showSettings) {
-      setShowSettings(false)
-    } else {
-      setTempSystemPrompt(systemPrompt)
-      setShowSettings(true)
-      setShowHistory(false)
-    }
+    console.log('handleOpenSettings called, current showSettings:', showSettings)
+    setTempSystemPrompt(systemPrompt)
+    setShowSettings(prev => {
+      const newValue = !prev
+      console.log('Setting showSettings to:', newValue)
+      return newValue
+    })
+    setShowHistory(false)
   }
 
   const handleNewChat = async () => {
@@ -94,9 +96,15 @@ export function AIImmersivePanel({ onClose, onInsertContent }: AIImmersivePanelP
   }
 
   const showSidebar = showHistory || showSettings
+  console.log('AIImmersivePanel render - showHistory:', showHistory, 'showSettings:', showSettings, 'showSidebar:', showSidebar)
 
   return (
     <div className="ai-immersive-container">
+      {/* 调试信息 */}
+      <div style={{ position: 'fixed', top: 0, right: 0, background: 'red', color: 'white', padding: '4px', zIndex: 9999, fontSize: '12px' }}>
+        History: {showHistory ? 'true' : 'false'} | Settings: {showSettings ? 'true' : 'false'} | Sidebar: {showSidebar ? 'true' : 'false'}
+      </div>
+      
       {/* 左侧 AI 对话区 */}
       <div className={`ai-immersive-main ${showSidebar ? 'ai-immersive-main--with-sidebar' : ''}`}>
         <ChatLayout

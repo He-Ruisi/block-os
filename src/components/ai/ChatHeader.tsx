@@ -47,14 +47,20 @@ export function ChatHeader({
         </button>
         <button
           className={`chat-header__btn ${showHistory ? 'chat-header__btn--active' : ''}`}
-          onClick={onToggleHistory}
+          onClick={() => {
+            console.log('History button clicked')
+            onToggleHistory?.()
+          }}
           title="历史对话"
         >
           <MenuIcon size={18} />
         </button>
         <button
           className={`chat-header__btn ${showSettings ? 'chat-header__btn--active' : ''}`}
-          onClick={onOpenSettings}
+          onClick={() => {
+            console.log('Settings button clicked')
+            onOpenSettings?.()
+          }}
           title="设置"
         >
           <Settings size={18} />
