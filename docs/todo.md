@@ -50,6 +50,14 @@
   - [x] 一键复制代码
   - [x] 主题适配（default + newsprint）
   - [x] 响应式优化
+- [x] Phase 6: 沉浸式界面优化
+  - [x] 创建 ChatLayout 组件（全屏布局容器）
+  - [x] 创建 ChatHeader 组件（顶部导航栏）
+  - [x] 创建 MessageContent 组件（AI 回答内容区）
+  - [x] 创建 ChatInput 组件（底部输入框）
+  - [x] 创建 AIImmersivePanel 组件（整合所有子组件）
+  - [x] 集成到 RightPanel（AI 沉浸模式使用新界面）
+  - [x] TypeScript 类型检查通过
 
 ### iPad 响应式设计 📱 - [详细文档](./spec/features/responsive/ipad-responsive-design.md)
 - [x] Phase 1: 基础响应式布局

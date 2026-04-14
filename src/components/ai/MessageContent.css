@@ -1,0 +1,110 @@
+.message-content {
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.message-content__inner {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.message-content__item {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.message-content__item--user {
+  align-items: flex-end;
+}
+
+.message-content__item--assistant {
+  align-items: flex-start;
+}
+
+.message-content__text {
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--color-text-primary);
+  word-break: break-word;
+  white-space: pre-wrap;
+  max-width: 100%;
+}
+
+.message-content__item--user .message-content__text {
+  background: var(--color-purple-light);
+  padding: 12px 16px;
+  border-radius: var(--border-radius-lg);
+  max-width: 80%;
+}
+
+.message-content__item--assistant .message-content__text {
+  background: transparent;
+}
+
+/* Markdown 样式 */
+.message-content__text strong {
+  font-weight: 600;
+}
+
+.message-content__text code {
+  background: var(--color-bg-code);
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-family: monospace;
+  font-size: 13px;
+}
+
+.message-content__text ol {
+  padding-left: 24px;
+  margin: 0;
+}
+
+.message-content__text ol li {
+  margin-bottom: 16px;
+}
+
+.message-content__text ol li::marker {
+  font-weight: 600;
+}
+
+/* Streaming cursor */
+.message-content__item--streaming {
+  padding: 12px 0;
+}
+
+.message-content__cursor {
+  display: inline-block;
+  width: 2px;
+  height: 18px;
+  background: var(--color-purple);
+  animation: cursor-blink 0.8s step-end infinite;
+}
+
+@keyframes cursor-blink {
+  50% { opacity: 0; }
+}
+
+/* Toolbar */
+.message-content__toolbar {
+  display: flex;
+  gap: 4px;
+}
+
+.message-content__toolbar-btn {
+  font-size: 12px;
+  padding: 4px 12px;
+  border: none;
+  border-radius: var(--border-radius);
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.message-content__toolbar-btn:hover {
+  background: var(--color-bg-hover);
+  color: var(--color-text-secondary);
+}

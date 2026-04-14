@@ -5,6 +5,7 @@ import { SessionHistoryPanel } from './SessionHistoryPanel'
 import { PreviewPanel } from './PreviewPanel'
 import { Toast } from '../shared/Toast'
 import { MarkdownRenderer } from '../shared/MarkdownRenderer'
+import { AIImmersivePanel } from '../ai/AIImmersivePanel'
 import { generateUUID } from '../../utils/uuid'
 import { 
   sendMessage, 
@@ -126,6 +127,14 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI, onCl
         onInsertContent(content)
         setMessages(prev => prev.map(m => m.id === messageId ? { ...m, insertedToEditor: true } : m))
       }
+    }
+  }
+
+  const handleInsertContentFromImmersive = (content: string) => {
+    if (isAIFocusMode && onSwitchToHybrid) {
+      onSwitchToHybrid(content)
+    } else if (onInsertContent) {
+      onInsertContent(content)
     }
   }
 
@@ -279,8 +288,16 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI, onCl
         </div>
       )}
       
-      {/* AI 沉浸式模式 - 对话状态 OR 混合模式 */}
-      {(!isAIFocusMode || hasMessages) && (
+      {/* AI 沉浸式模式 - 对话状态（使用新的沉浸式面板） */}
+      {isAIFocusMode && hasMessages && (
+        <AIImmersivePanel
+          onClose={onClose}
+          onInsertContent={handleInsertContentFromImmersive}
+        />
+      )}
+      
+      {/* 混合模式 */}
+      {!isAIFocusMode && (
         <>
           <div className="panel-header">
         <div className="panel-tabs">
