@@ -33,6 +33,11 @@
   color: var(--color-text-primary);
 }
 
+.chat-header__btn--active {
+  background: var(--color-purple-light);
+  color: var(--color-purple);
+}
+
 .chat-header__title-group {
   display: flex;
   flex-direction: column;

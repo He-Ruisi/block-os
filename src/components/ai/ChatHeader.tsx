@@ -1,30 +1,34 @@
-import { Menu, Plus, Share2 } from 'lucide-react'
+import { Minimize2, Plus, Menu as MenuIcon, Settings } from 'lucide-react'
 import './ChatHeader.css'
 
 interface ChatHeaderProps {
   title: string
   subtitle?: string
-  onToggleSidebar?: () => void
+  onExitFullscreen?: () => void
   onNewChat?: () => void
-  onShare?: () => void
+  onToggleHistory?: () => void
+  onOpenSettings?: () => void
+  showHistory?: boolean
 }
 
 export function ChatHeader({
   title,
   subtitle,
-  onToggleSidebar,
+  onExitFullscreen,
   onNewChat,
-  onShare,
+  onToggleHistory,
+  onOpenSettings,
+  showHistory,
 }: ChatHeaderProps) {
   return (
     <header className="chat-header">
       <div className="chat-header__left">
         <button
           className="chat-header__btn"
-          onClick={onToggleSidebar}
-          title="折叠侧边栏"
+          onClick={onExitFullscreen}
+          title="退出全屏"
         >
-          <Menu size={18} />
+          <Minimize2 size={18} />
         </button>
         <div className="chat-header__title-group">
           <h1 className="chat-header__title">{title}</h1>
@@ -40,11 +44,18 @@ export function ChatHeader({
           <Plus size={18} />
         </button>
         <button
-          className="chat-header__btn"
-          onClick={onShare}
-          title="分享"
+          className={`chat-header__btn ${showHistory ? 'chat-header__btn--active' : ''}`}
+          onClick={onToggleHistory}
+          title="历史对话"
         >
-          <Share2 size={18} />
+          <MenuIcon size={18} />
+        </button>
+        <button
+          className="chat-header__btn"
+          onClick={onOpenSettings}
+          title="设置"
+        >
+          <Settings size={18} />
         </button>
       </div>
     </header>
