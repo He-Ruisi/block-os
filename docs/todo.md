@@ -57,6 +57,10 @@
   - [x] 创建 ChatInput 组件（底部输入框）
   - [x] 创建 AIImmersivePanel 组件（整合所有子组件）
   - [x] 集成到 RightPanel（AI 沉浸模式使用新界面）
+  - [x] 添加全屏按钮（混合模式 → AI 沉浸模式）
+  - [x] 同步功能按钮到 AI 沉浸模式（退出全屏、新建对话、历史对话、设置）
+  - [x] 集成历史对话面板和设置面板
+  - [x] 实现双向模式切换
   - [x] TypeScript 类型检查通过
 
 ### iPad 响应式设计 📱 - [详细文档](./spec/features/responsive/ipad-responsive-design.md)

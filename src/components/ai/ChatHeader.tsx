@@ -9,6 +9,7 @@ interface ChatHeaderProps {
   onToggleHistory?: () => void
   onOpenSettings?: () => void
   showHistory?: boolean
+  showSettings?: boolean
 }
 
 export function ChatHeader({
@@ -19,6 +20,7 @@ export function ChatHeader({
   onToggleHistory,
   onOpenSettings,
   showHistory,
+  showSettings,
 }: ChatHeaderProps) {
   return (
     <header className="chat-header">
@@ -51,7 +53,7 @@ export function ChatHeader({
           <MenuIcon size={18} />
         </button>
         <button
-          className="chat-header__btn"
+          className={`chat-header__btn ${showSettings ? 'chat-header__btn--active' : ''}`}
           onClick={onOpenSettings}
           title="设置"
         >
