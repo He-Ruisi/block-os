@@ -12,6 +12,7 @@ import { AuthPage } from './components/auth/AuthPage'
 import { SettingsPanel } from './components/panel/SettingsPanel'
 import { StatusBar } from './components/layout/StatusBar'
 import { Toast } from './components/shared/Toast'
+import { ProjectOverview } from './components/project/ProjectOverview'
 import { initStorage } from './storage'
 import { documentStore } from './storage/documentStore'
 import { useAppLayout } from './hooks/useAppLayout'
@@ -27,6 +28,8 @@ function App() {
   const [selectedText, setSelectedText] = useState('')
   const [theme, setTheme] = useState<string>(() => localStorage.getItem('blockos-theme') || 'default')
   const [showSettings, setShowSettings] = useState(false)
+  const [showProjectOverview, setShowProjectOverview] = useState(false)
+  const [pendingAIInsert, setPendingAIInsert] = useState<{ documentId: string; content: string } | null>(null)
   
   // 视图模式：AI 沉浸式 or 混合模式
   const [viewMode, setViewMode] = useState<'ai-focus' | 'hybrid'>(() => {
@@ -82,6 +85,28 @@ function App() {
     newTab,
   } = useTabs()
 
+  const handleSelectProject = useCallback((projectId: string) => {
+    // 显示项目概览页面
+    setShowProjectOverview(true)
+    selectProject(projectId)
+  }, [selectProject])
+
+  const handleOpenProjectFromOverview = useCallback((projectId: string) => {
+    // 从项目概览打开项目（关闭概览，切换到项目）
+    setShowProjectOverview(false)
+    selectProject(projectId)
+  }, [selectProject])
+
+  const handleOpenDocument = useCallback((doc: Parameters<typeof openDocument>[0]) => {
+    setShowProjectOverview(false)
+    openDocument(doc)
+  }, [openDocument])
+
+  const handleCreateProject = useCallback(() => {
+    // TODO: 实现新建项目对话框
+    console.log('Create new project')
+  }, [])
+
   const switchToHybridMode = useCallback(async (aiContent?: string) => {
     // 创建新文档
     const doc = await documentStore.createDocument('AI 对话笔记', undefined)
@@ -91,23 +116,13 @@ function App() {
     localStorage.setItem('blockos-view-mode', 'hybrid')
     
     // 打开新文档
-    openDocument(doc)
+    handleOpenDocument(doc)
     
-    // 如果有内容，等待编辑器准备好后插入
-    if (aiContent && editor) {
-      setTimeout(() => {
-        const lines = aiContent.split('\n').filter(l => l.trim())
-        editor.chain().focus().insertContent({
-          type: 'sourceBlock',
-          attrs: { source: 'ai', sourceLabel: '◆ AI 生成' },
-          content: lines.map(line => ({
-            type: 'paragraph',
-            content: [{ type: 'text', text: line }],
-          })),
-        }).run()
-      }, 100)
+    // 记录待插入内容，等目标文档真正加载到编辑器后再写入
+    if (aiContent?.trim()) {
+      setPendingAIInsert({ documentId: doc.id, content: aiContent })
     }
-  }, [editor, openDocument])
+  }, [handleOpenDocument])
 
   // 切换到混合模式时，确保侧边栏默认隐藏
   useEffect(() => {
@@ -233,6 +248,23 @@ function App() {
 
   const activeDocumentId = tabs.find(t => t.id === activeTabId)?.documentId
 
+  useEffect(() => {
+    if (!editor || !pendingAIInsert) return
+    if (activeDocumentId !== pendingAIInsert.documentId) return
+
+    const lines = pendingAIInsert.content.split('\n').filter(l => l.trim())
+    editor.chain().focus().insertContent({
+      type: 'sourceBlock',
+      attrs: { source: 'ai', sourceLabel: '◆ AI 生成' },
+      content: lines.map(line => ({
+        type: 'paragraph',
+        content: [{ type: 'text', text: line }],
+      })),
+    }).run()
+
+    setPendingAIInsert(null)
+  }, [editor, activeDocumentId, pendingAIInsert])
+
   // AI 浮层面板状态
   const [aiFloatPanel, setAIFloatPanel] = useState<{
     mode: AIMode
@@ -307,8 +339,8 @@ function App() {
                 activeView={sidebarView}
                 collapsed={sidebarCollapsed}
                 onSelectToday={selectToday}
-                onSelectProject={selectProject}
-                onOpenDocument={openDocument}
+                onSelectProject={handleSelectProject}
+                onOpenDocument={handleOpenDocument}
                 currentProjectId={currentProjectId}
                 documentId={activeDocumentId || null}
                 onClose={() => viewport.isTablet && toggleSidebar()}
@@ -317,43 +349,54 @@ function App() {
           )}
 
           <div className="editor-area" ref={editorAreaRef}>
-            <TabBar
-              tabs={tabs}
-              activeTabId={activeTabId}
-              onSelectTab={selectTab}
-              onCloseTab={closeTab}
-              onCloseOtherTabs={closeOtherTabs}
-              onCloseTabsToRight={closeTabsToRight}
-              onReorderTabs={reorderTabs}
-              onNewTab={newTab}
-              onToggleFullscreen={toggleFullscreen}
-              onSaveTab={handleSaveDocument}
-              isFullscreen={isFullscreen}
-            />
-            <Editor
-              onEditorReady={setEditor}
-              onTextSelected={setSelectedText}
-              documentId={activeDocumentId}
-            />
-            {aiFloatPanel && (
-              <AIFloatPanel
-                mode={aiFloatPanel.mode}
-                initialContext={aiFloatPanel.contextText}
-                position={aiFloatPanel.position}
-                onModeChange={mode => setAIFloatPanel(prev => prev ? { ...prev, mode } : null)}
-                onInsertContent={handleInsertAIContent}
-                onClose={() => setAIFloatPanel(null)}
+            {showProjectOverview ? (
+              /* 项目概览页面 */
+              <ProjectOverview
+                onSelectProject={handleOpenProjectFromOverview}
+                onCreateProject={handleCreateProject}
               />
+            ) : (
+              /* 编辑器视图 */
+              <>
+                <TabBar
+                  tabs={tabs}
+                  activeTabId={activeTabId}
+                  onSelectTab={selectTab}
+                  onCloseTab={closeTab}
+                  onCloseOtherTabs={closeOtherTabs}
+                  onCloseTabsToRight={closeTabsToRight}
+                  onReorderTabs={reorderTabs}
+                  onNewTab={newTab}
+                  onToggleFullscreen={toggleFullscreen}
+                  onSaveTab={handleSaveDocument}
+                  isFullscreen={isFullscreen}
+                />
+                <Editor
+                  onEditorReady={setEditor}
+                  onTextSelected={setSelectedText}
+                  documentId={activeDocumentId}
+                />
+                {aiFloatPanel && (
+                  <AIFloatPanel
+                    mode={aiFloatPanel.mode}
+                    initialContext={aiFloatPanel.contextText}
+                    position={aiFloatPanel.position}
+                    onModeChange={mode => setAIFloatPanel(prev => prev ? { ...prev, mode } : null)}
+                    onInsertContent={handleInsertAIContent}
+                    onClose={() => setAIFloatPanel(null)}
+                  />
+                )}
+                
+                {/* 底部状态栏 */}
+                <StatusBar
+                  wordCount={wordCount}
+                  blockCount={blockCount}
+                  linkCount={linkCount}
+                  autoSaveStatus={autoSaveStatus}
+                  lastSaved={lastSaved}
+                />
+              </>
             )}
-            
-            {/* 底部状态栏 */}
-            <StatusBar
-              wordCount={wordCount}
-              blockCount={blockCount}
-              linkCount={linkCount}
-              autoSaveStatus={autoSaveStatus}
-              lastSaved={lastSaved}
-            />
           </div>
 
           {!isFullscreen && (

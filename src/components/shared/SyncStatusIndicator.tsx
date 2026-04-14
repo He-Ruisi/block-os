@@ -1,4 +1,5 @@
 import { useAutoSync } from '../../hooks/useAutoSync'
+import { isSupabaseEnabled } from '../../lib/supabase'
 import './SyncStatusIndicator.css'
 
 export function SyncStatusIndicator() {
@@ -20,7 +21,14 @@ export function SyncStatusIndicator() {
 
   return (
     <div className="sync-status-indicator">
-      {isOffline && (
+      {!isSupabaseEnabled && (
+        <div className="sync-status local" title="本地模式，数据仅保存在当前设备">
+          <span className="status-icon">💾</span>
+          <span className="status-text">本地模式</span>
+        </div>
+      )}
+
+      {isSupabaseEnabled && isOffline && (
         <div className="sync-status offline" title="网络离线，数据将在恢复网络后自动同步">
           <span className="status-icon">⚠️</span>
           <span className="status-text">离线模式</span>
@@ -30,21 +38,21 @@ export function SyncStatusIndicator() {
         </div>
       )}
 
-      {!isOffline && isSyncing && (
+      {isSupabaseEnabled && !isOffline && isSyncing && (
         <div className="sync-status syncing" title="正在同步到云端...">
           <span className="status-icon spinning">🔄</span>
           <span className="status-text">同步中...</span>
         </div>
       )}
 
-      {!isOffline && !isSyncing && pendingChangesCount > 0 && (
+      {isSupabaseEnabled && !isOffline && !isSyncing && pendingChangesCount > 0 && (
         <div className="sync-status pending" title={`${pendingChangesCount} 项变更等待同步`}>
           <span className="status-icon">⏳</span>
           <span className="status-text">{pendingChangesCount} 项待同步</span>
         </div>
       )}
 
-      {!isOffline && !isSyncing && pendingChangesCount === 0 && lastSyncTime && (
+      {isSupabaseEnabled && !isOffline && !isSyncing && pendingChangesCount === 0 && lastSyncTime && (
         <div className="sync-status synced" title={`上次同步: ${formatLastSyncTime(lastSyncTime)}`}>
           <span className="status-icon">✓</span>
           <span className="status-text">已同步</span>

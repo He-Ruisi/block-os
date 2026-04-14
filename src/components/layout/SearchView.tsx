@@ -5,10 +5,10 @@ import type { SuggestionItem } from '../../editor/extensions/suggestion'
 import './SearchView.css'
 
 interface SearchViewProps {
-  onOpenDocument: (docId: string) => void
+  onOpenBlock: (blockId: string) => void
 }
 
-export function SearchView({ onOpenDocument }: SearchViewProps) {
+export function SearchView({ onOpenBlock }: SearchViewProps) {
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<SuggestionItem[]>([])
   const [isSearching, setIsSearching] = useState(false)
@@ -82,11 +82,11 @@ export function SearchView({ onOpenDocument }: SearchViewProps) {
           <>
             <div className="search-result-count">{results.length} 个结果</div>
             {results.map(item => (
-              <div
-                key={item.id}
-                className="search-result"
-                onClick={() => onOpenDocument(item.id)}
-              >
+                <div
+                  key={item.id}
+                  className="search-result"
+                  onClick={() => onOpenBlock(item.id)}
+                >
                 <div className="search-result-title">{item.title}</div>
                 <div className="search-result-snippet">{truncate(item.content)}</div>
               </div>

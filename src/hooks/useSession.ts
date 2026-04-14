@@ -4,6 +4,7 @@ import { sessionStore } from '../storage/sessionStore'
 import { saveSession } from '../services/sessionService'
 
 const DEFAULT_SYSTEM_PROMPT = '你是厾，是一个辅助用户完成输入到输出的AI智能助手，你能引导用户发现深层需求并解决问题。今天的日期：2026-04-09，你的知识截止日期是2024年12月。'
+const STORAGE_KEY = 'blockos-current-session-id'
 
 interface UseSessionReturn {
   currentSession: Session
@@ -27,12 +28,30 @@ export function useSession(): UseSessionReturn {
   const [systemPrompt, setSystemPromptState] = useState(DEFAULT_SYSTEM_PROMPT)
 
   const refreshSessions = useCallback(async () => {
+    await sessionStore.init()
     const sessions = await sessionStore.getAllSessions()
     setAllSessions(sessions)
   }, [])
 
   useEffect(() => {
-    refreshSessions()
+    const loadInitialSession = async () => {
+      await sessionStore.init()
+      const sessions = await sessionStore.getAllSessions()
+      setAllSessions(sessions)
+
+      const persistedSessionId = localStorage.getItem(STORAGE_KEY)
+      const restoredSession = persistedSessionId
+        ? sessions.find(session => session.id === persistedSessionId) || null
+        : (sessions[0] || null)
+
+      if (restoredSession) {
+        setCurrentSession(restoredSession)
+        setMessages(restoredSession.messages)
+        setSystemPromptState(restoredSession.systemPrompt)
+      }
+    }
+
+    loadInitialSession().catch(console.error)
   }, [refreshSessions])
 
   // 保存当前 Session 到 DB
@@ -40,6 +59,7 @@ export function useSession(): UseSessionReturn {
     if (msgs.length === 0) return
     const updated = await saveSession({ ...currentSession, systemPrompt }, msgs)
     setCurrentSession(updated)
+    localStorage.setItem(STORAGE_KEY, updated.id)
     await refreshSessions()
   }, [currentSession, systemPrompt, refreshSessions])
 
@@ -51,6 +71,7 @@ export function useSession(): UseSessionReturn {
     const fresh = sessionStore.createNew(systemPrompt)
     setCurrentSession(fresh)
     setMessages([])
+    localStorage.setItem(STORAGE_KEY, fresh.id)
   }, [messages, persistSession, systemPrompt])
 
   // 加载历史 Session
@@ -58,6 +79,7 @@ export function useSession(): UseSessionReturn {
     setCurrentSession(session)
     setMessages(session.messages)
     setSystemPromptState(session.systemPrompt)
+    localStorage.setItem(STORAGE_KEY, session.id)
   }, [])
 
   const setSystemPrompt = useCallback((prompt: string) => {

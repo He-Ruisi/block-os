@@ -42,6 +42,14 @@ export function StarredView({ onSelectProject, onOpenDocument }: StarredViewProp
   const [itemNames, setItemNames] = useState<Record<string, string>>({})
   const [draggedItem, setDraggedItem] = useState<StarredItem | null>(null)
 
+  const removeStaleItem = (target: StarredItem) => {
+    setStarredItems(prev => {
+      const next = prev.filter(item => !(item.id === target.id && item.type === target.type))
+      saveStarredItems(next)
+      return next
+    })
+  }
+
   // 加载项目和文档名称
   useEffect(() => {
     if (starredItems.length === 0) {
@@ -123,16 +131,23 @@ export function StarredView({ onSelectProject, onOpenDocument }: StarredViewProp
   }, [])
 
   const handleItemClick = async (item: StarredItem) => {
-    try {
-      if (item.type === 'project') {
-        onSelectProject(item.id)
-      } else if (item.type === 'document') {
-        const doc = await documentStore.getDocument(item.id)
-        if (doc) {
-          onOpenDocument(doc)
+      try {
+        if (item.type === 'project') {
+          const project = await projectStore.getProject(item.id)
+          if (project) {
+            onSelectProject(item.id)
+          } else {
+            removeStaleItem(item)
+          }
+        } else if (item.type === 'document') {
+          const doc = await documentStore.getDocument(item.id)
+          if (doc) {
+            onOpenDocument(doc)
+          } else {
+            removeStaleItem(item)
+          }
         }
-      }
-    } catch (error) {
+      } catch (error) {
       console.error('Failed to handle starred item click:', error)
     }
   }

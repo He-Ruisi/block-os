@@ -1,5 +1,6 @@
 import { useAutoSync } from '../../hooks/useAutoSync'
 import { Cloud, CloudOff, Save, FileText, Link } from 'lucide-react'
+import { isSupabaseEnabled } from '../../lib/supabase'
 import './StatusBar.css'
 
 interface StatusBarProps {
@@ -36,7 +37,12 @@ export function StatusBar({
     <div className="status-bar">
       {/* 左侧：同步状态 */}
       <div className="status-bar-section status-bar-left">
-        {syncState.isOffline ? (
+        {!isSupabaseEnabled ? (
+          <div className="status-item status-local" title="本地模式，数据仅保存在当前设备">
+            <CloudOff size={14} />
+            <span>本地模式</span>
+          </div>
+        ) : syncState.isOffline ? (
           <div className="status-item status-offline" title="网络离线">
             <CloudOff size={14} />
             <span>离线</span>
@@ -51,10 +57,15 @@ export function StatusBar({
             <Cloud size={14} />
             <span>{syncState.pendingChangesCount} 项待同步</span>
           </div>
-        ) : (
+        ) : syncState.lastSyncTime ? (
           <div className="status-item status-synced" title="已同步到云端">
             <Cloud size={14} />
             <span>已同步</span>
+          </div>
+        ) : (
+          <div className="status-item status-local" title="尚未执行过云端同步">
+            <Cloud size={14} />
+            <span>未同步</span>
           </div>
         )}
       </div>

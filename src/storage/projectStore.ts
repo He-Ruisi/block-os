@@ -6,6 +6,10 @@ export type { Project, Tab }
 
 const STORE_NAME = 'projects'
 
+interface ProjectStoreOptions {
+  skipSyncMark?: boolean
+}
+
 export class ProjectStore {
   async init(): Promise<void> {
     await initDatabase()
@@ -15,7 +19,7 @@ export class ProjectStore {
     return isDatabaseInitialized()
   }
 
-  async createProject(name: string, description?: string): Promise<Project> {
+  async createProject(name: string, description?: string, options: ProjectStoreOptions = {}): Promise<Project> {
     const db = getDatabase()
     const project: Project = {
       id: generateUUID(),
@@ -28,10 +32,12 @@ export class ProjectStore {
       const tx = db.transaction([STORE_NAME], 'readwrite')
       const req = tx.objectStore(STORE_NAME).add(project)
       req.onsuccess = () => {
-        // 标记项目已变更，等待同步
-        import('../services/autoSyncService').then(({ autoSyncService }) => {
-          autoSyncService.markProjectChanged(project.id)
-        })
+        if (!options.skipSyncMark) {
+          // 标记项目已变更，等待同步
+          import('../services/autoSyncService').then(({ autoSyncService }) => {
+            autoSyncService.markProjectChanged(project.id)
+          })
+        }
         resolve(project)
       }
       req.onerror = () => reject(req.error)
@@ -64,7 +70,7 @@ export class ProjectStore {
     })
   }
 
-  async updateProject(id: string, updates: Partial<Project>): Promise<void> {
+  async updateProject(id: string, updates: Partial<Project>, options: ProjectStoreOptions = {}): Promise<void> {
     const db = getDatabase()
     const project = await this.getProject(id)
     if (!project) throw new Error('Project not found')
@@ -78,22 +84,31 @@ export class ProjectStore {
       const tx = db.transaction([STORE_NAME], 'readwrite')
       const req = tx.objectStore(STORE_NAME).put(updatedProject)
       req.onsuccess = () => {
-        // 标记项目已变更，等待同步
-        import('../services/autoSyncService').then(({ autoSyncService }) => {
-          autoSyncService.markProjectChanged(id)
-        })
+        if (!options.skipSyncMark) {
+          // 标记项目已变更，等待同步
+          import('../services/autoSyncService').then(({ autoSyncService }) => {
+            autoSyncService.markProjectChanged(id)
+          })
+        }
         resolve()
       }
       req.onerror = () => reject(req.error)
     })
   }
 
-  async deleteProject(id: string): Promise<void> {
+  async deleteProject(id: string, options: ProjectStoreOptions = {}): Promise<void> {
     const db = getDatabase()
     return new Promise((resolve, reject) => {
       const tx = db.transaction([STORE_NAME], 'readwrite')
       const req = tx.objectStore(STORE_NAME).delete(id)
-      req.onsuccess = () => resolve()
+      req.onsuccess = () => {
+        if (!options.skipSyncMark) {
+          import('../services/autoSyncService').then(({ autoSyncService }) => {
+            autoSyncService.markProjectDeleted(id)
+          })
+        }
+        resolve()
+      }
       req.onerror = () => reject(req.error)
     })
   }

@@ -7,6 +7,10 @@ export { generateUUID }
 
 const STORE_NAME = 'blocks'
 
+interface BlockStoreOptions {
+  skipSyncMark?: boolean
+}
+
 export class BlockStore {
   async init(): Promise<void> {
     await initDatabase()
@@ -16,17 +20,19 @@ export class BlockStore {
     return isDatabaseInitialized()
   }
 
-  async saveBlock(block: Block): Promise<string> {
+  async saveBlock(block: Block, options: BlockStoreOptions = {}): Promise<string> {
     const db = getDatabase()
     return new Promise((resolve, reject) => {
       const tx = db.transaction([STORE_NAME], 'readwrite')
       const store = tx.objectStore(STORE_NAME)
       const req = store.put(block)
       req.onsuccess = () => {
-        // 标记 Block 已变更，等待同步
-        import('../services/autoSyncService').then(({ autoSyncService }) => {
-          autoSyncService.markBlockChanged(block.id)
-        })
+        if (!options.skipSyncMark) {
+          // 标记 Block 已变更，等待同步
+          import('../services/autoSyncService').then(({ autoSyncService }) => {
+            autoSyncService.markBlockChanged(block.id)
+          })
+        }
         resolve(block.id)
       }
       req.onerror = () => reject(req.error)
@@ -92,12 +98,19 @@ export class BlockStore {
     return Array.from(tagsSet).sort()
   }
 
-  async deleteBlock(id: string): Promise<void> {
+  async deleteBlock(id: string, options: BlockStoreOptions = {}): Promise<void> {
     const db = getDatabase()
     return new Promise((resolve, reject) => {
       const tx = db.transaction([STORE_NAME], 'readwrite')
       const req = tx.objectStore(STORE_NAME).delete(id)
-      req.onsuccess = () => resolve()
+      req.onsuccess = () => {
+        if (!options.skipSyncMark) {
+          import('../services/autoSyncService').then(({ autoSyncService }) => {
+            autoSyncService.markBlockDeleted(id)
+          })
+        }
+        resolve()
+      }
       req.onerror = () => reject(req.error)
     })
   }

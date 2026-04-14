@@ -187,6 +187,8 @@ export function ExplorerView({
             : p
         ))
       }
+      await documentStore.deleteDocument(doc.id)
+      window.dispatchEvent(new CustomEvent('documentDeleted', { detail: { documentId: doc.id } }))
     } catch (error) {
       console.error('Failed to delete doc:', error)
     }
@@ -274,6 +276,7 @@ export function ExplorerView({
       await projectStore.deleteProject(project.id)
       setProjects(prev => prev.filter(p => p.id !== project.id))
       setExpandedProjects(prev => { const n = new Set(prev); n.delete(project.id); return n })
+      window.dispatchEvent(new CustomEvent('projectDeleted', { detail: { projectId: project.id } }))
     } catch (error) {
       console.error('Failed to delete project:', error)
     }

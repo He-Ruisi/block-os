@@ -80,9 +80,8 @@ export function Sidebar({
             />
           )}
           {activeView === 'search' && (
-            <SearchView onOpenDocument={(docId) => {
-              // Search results are blocks, not documents — open by creating a notification
-              console.log('Search result clicked:', docId)
+            <SearchView onOpenBlock={(blockId) => {
+              window.dispatchEvent(new CustomEvent('openBlockDetail', { detail: blockId }))
             }} />
           )}
           {activeView === 'starred' && (

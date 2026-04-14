@@ -3,6 +3,9 @@ import {
   syncProjectToSupabase,
   syncDocumentToSupabase,
   syncBlockToSupabase,
+  deleteProjectFromSupabase,
+  deleteDocumentFromSupabase,
+  deleteBlockFromSupabase,
   fetchProjectsFromSupabase,
   fetchDocumentsFromSupabase,
   fetchBlocksFromSupabase,
@@ -22,9 +25,23 @@ interface SyncState {
     projects: Set<string>
     documents: Set<string>
     blocks: Set<string>
+    deletedProjects: Set<string>
+    deletedDocuments: Set<string>
+    deletedBlocks: Set<string>
   }
   isOnline: boolean
 }
+
+interface PersistedSyncQueue {
+  projects: string[]
+  documents: string[]
+  blocks: string[]
+  deletedProjects: string[]
+  deletedDocuments: string[]
+  deletedBlocks: string[]
+}
+
+const SYNC_QUEUE_STORAGE_KEY = 'blockos-sync-queue'
 
 class AutoSyncService {
   private state: SyncState = {
@@ -34,6 +51,9 @@ class AutoSyncService {
       projects: new Set(),
       documents: new Set(),
       blocks: new Set(),
+      deletedProjects: new Set(),
+      deletedDocuments: new Set(),
+      deletedBlocks: new Set(),
     },
     isOnline: navigator.onLine,
   }
@@ -43,6 +63,7 @@ class AutoSyncService {
   private listeners: Array<(state: SyncState) => void> = []
 
   constructor() {
+    this.loadPendingChanges()
     // 监听网络状态变化
     window.addEventListener('online', () => this.handleOnlineStatusChange(true))
     window.addEventListener('offline', () => this.handleOnlineStatusChange(false))
@@ -65,6 +86,34 @@ class AutoSyncService {
     this.listeners.forEach(listener => listener(this.getState()))
   }
 
+  private persistPendingChanges(): void {
+    const payload: PersistedSyncQueue = {
+      projects: Array.from(this.state.pendingChanges.projects),
+      documents: Array.from(this.state.pendingChanges.documents),
+      blocks: Array.from(this.state.pendingChanges.blocks),
+      deletedProjects: Array.from(this.state.pendingChanges.deletedProjects),
+      deletedDocuments: Array.from(this.state.pendingChanges.deletedDocuments),
+      deletedBlocks: Array.from(this.state.pendingChanges.deletedBlocks),
+    }
+    localStorage.setItem(SYNC_QUEUE_STORAGE_KEY, JSON.stringify(payload))
+  }
+
+  private loadPendingChanges(): void {
+    try {
+      const raw = localStorage.getItem(SYNC_QUEUE_STORAGE_KEY)
+      if (!raw) return
+      const persisted = JSON.parse(raw) as Partial<PersistedSyncQueue>
+      this.state.pendingChanges.projects = new Set(persisted.projects || [])
+      this.state.pendingChanges.documents = new Set(persisted.documents || [])
+      this.state.pendingChanges.blocks = new Set(persisted.blocks || [])
+      this.state.pendingChanges.deletedProjects = new Set(persisted.deletedProjects || [])
+      this.state.pendingChanges.deletedDocuments = new Set(persisted.deletedDocuments || [])
+      this.state.pendingChanges.deletedBlocks = new Set(persisted.deletedBlocks || [])
+    } catch (error) {
+      console.error('[AutoSync] 加载待同步队列失败:', error)
+    }
+  }
+
   private handleOnlineStatusChange(isOnline: boolean): void {
     console.log(`[AutoSync] 网络状态变更: ${isOnline ? '在线' : '离线'}`)
     this.state.isOnline = isOnline
@@ -80,17 +129,44 @@ class AutoSyncService {
   // ---------- 待处理变更管理 ----------
 
   markProjectChanged(projectId: string): void {
+    this.state.pendingChanges.deletedProjects.delete(projectId)
     this.state.pendingChanges.projects.add(projectId)
+    this.persistPendingChanges()
     this.notifyListeners()
   }
 
   markDocumentChanged(documentId: string): void {
+    this.state.pendingChanges.deletedDocuments.delete(documentId)
     this.state.pendingChanges.documents.add(documentId)
+    this.persistPendingChanges()
     this.notifyListeners()
   }
 
   markBlockChanged(blockId: string): void {
+    this.state.pendingChanges.deletedBlocks.delete(blockId)
     this.state.pendingChanges.blocks.add(blockId)
+    this.persistPendingChanges()
+    this.notifyListeners()
+  }
+
+  markProjectDeleted(projectId: string): void {
+    this.state.pendingChanges.projects.delete(projectId)
+    this.state.pendingChanges.deletedProjects.add(projectId)
+    this.persistPendingChanges()
+    this.notifyListeners()
+  }
+
+  markDocumentDeleted(documentId: string): void {
+    this.state.pendingChanges.documents.delete(documentId)
+    this.state.pendingChanges.deletedDocuments.add(documentId)
+    this.persistPendingChanges()
+    this.notifyListeners()
+  }
+
+  markBlockDeleted(blockId: string): void {
+    this.state.pendingChanges.blocks.delete(blockId)
+    this.state.pendingChanges.deletedBlocks.add(blockId)
+    this.persistPendingChanges()
     this.notifyListeners()
   }
 
@@ -98,7 +174,10 @@ class AutoSyncService {
     return (
       this.state.pendingChanges.projects.size > 0 ||
       this.state.pendingChanges.documents.size > 0 ||
-      this.state.pendingChanges.blocks.size > 0
+      this.state.pendingChanges.blocks.size > 0 ||
+      this.state.pendingChanges.deletedProjects.size > 0 ||
+      this.state.pendingChanges.deletedDocuments.size > 0 ||
+      this.state.pendingChanges.deletedBlocks.size > 0
     )
   }
 
@@ -166,12 +245,42 @@ class AutoSyncService {
     try {
       console.log('[AutoSync] 开始同步待处理变更')
 
+      // 先同步删除，避免同一对象出现“先更新后删除”的状态竞争
+      for (const blockId of Array.from(this.state.pendingChanges.deletedBlocks)) {
+        try {
+          await deleteBlockFromSupabase(blockId)
+          this.state.pendingChanges.deletedBlocks.delete(blockId)
+        } catch (error) {
+          console.error(`[AutoSync] 删除 Block 失败 ${blockId}:`, error)
+        }
+      }
+
+      for (const documentId of Array.from(this.state.pendingChanges.deletedDocuments)) {
+        try {
+          await deleteDocumentFromSupabase(documentId)
+          this.state.pendingChanges.deletedDocuments.delete(documentId)
+        } catch (error) {
+          console.error(`[AutoSync] 删除文档失败 ${documentId}:`, error)
+        }
+      }
+
+      for (const projectId of Array.from(this.state.pendingChanges.deletedProjects)) {
+        try {
+          await deleteProjectFromSupabase(projectId)
+          this.state.pendingChanges.deletedProjects.delete(projectId)
+        } catch (error) {
+          console.error(`[AutoSync] 删除项目失败 ${projectId}:`, error)
+        }
+      }
+
       // 同步 Projects
-      for (const projectId of this.state.pendingChanges.projects) {
+      for (const projectId of Array.from(this.state.pendingChanges.projects)) {
         try {
           const project = await projectStore.getProject(projectId)
           if (project) {
             await syncProjectToSupabase(project, userId)
+            this.state.pendingChanges.projects.delete(projectId)
+          } else {
             this.state.pendingChanges.projects.delete(projectId)
           }
         } catch (error) {
@@ -180,11 +289,13 @@ class AutoSyncService {
       }
 
       // 同步 Documents
-      for (const documentId of this.state.pendingChanges.documents) {
+      for (const documentId of Array.from(this.state.pendingChanges.documents)) {
         try {
           const document = await documentStore.getDocument(documentId)
           if (document) {
             await syncDocumentToSupabase(document, userId)
+            this.state.pendingChanges.documents.delete(documentId)
+          } else {
             this.state.pendingChanges.documents.delete(documentId)
           }
         } catch (error) {
@@ -193,11 +304,13 @@ class AutoSyncService {
       }
 
       // 同步 Blocks
-      for (const blockId of this.state.pendingChanges.blocks) {
+      for (const blockId of Array.from(this.state.pendingChanges.blocks)) {
         try {
           const block = await blockStore.getBlock(blockId)
           if (block) {
             await syncBlockToSupabase(block, userId)
+            this.state.pendingChanges.blocks.delete(blockId)
+          } else {
             this.state.pendingChanges.blocks.delete(blockId)
           }
         } catch (error) {
@@ -206,6 +319,7 @@ class AutoSyncService {
       }
 
       this.state.lastSyncTime = new Date()
+      this.persistPendingChanges()
       console.log('[AutoSync] 同步完成')
     } catch (error) {
       console.error('[AutoSync] 同步过程出错:', error)
@@ -241,9 +355,9 @@ class AutoSyncService {
 
     try {
       // 拉取 Projects
-      const cloudProjects = await fetchProjectsFromSupabase(userId)
-      for (const project of cloudProjects) {
-        await projectStore.updateProject(project.id, project).catch(async () => {
+        const cloudProjects = await fetchProjectsFromSupabase(userId)
+        for (const project of cloudProjects) {
+        await projectStore.updateProject(project.id, project, { skipSyncMark: true }).catch(async () => {
           // 如果不存在则创建
           const db = (await import('../storage/database')).getDatabase()
           await new Promise<void>((resolve, reject) => {
@@ -258,13 +372,13 @@ class AutoSyncService {
       // 拉取 Documents
       const cloudDocuments = await fetchDocumentsFromSupabase(userId)
       for (const document of cloudDocuments) {
-        await documentStore.saveDocument(document)
+        await documentStore.saveDocument(document, { skipSyncMark: true })
       }
 
       // 拉取 Blocks
       const cloudBlocks = await fetchBlocksFromSupabase(userId)
       for (const block of cloudBlocks) {
-        await blockStore.saveBlock(block)
+        await blockStore.saveBlock(block, { skipSyncMark: true })
       }
 
       console.log('[AutoSync] 云端数据拉取完成', {
@@ -296,7 +410,10 @@ class AutoSyncService {
     return (
       this.state.pendingChanges.projects.size +
       this.state.pendingChanges.documents.size +
-      this.state.pendingChanges.blocks.size
+      this.state.pendingChanges.blocks.size +
+      this.state.pendingChanges.deletedProjects.size +
+      this.state.pendingChanges.deletedDocuments.size +
+      this.state.pendingChanges.deletedBlocks.size
     )
   }
 }
