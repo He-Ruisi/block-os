@@ -125,7 +125,13 @@ function App() {
     if (aiContent?.trim()) {
       setPendingAIInsert({ documentId: doc.id, content: aiContent })
     }
-  }, [handleOpenDocument])
+  }, [handleOpenDocument, setSidebarCollapsed])
+
+  const switchToAIFocus = useCallback(() => {
+    // 切换到 AI 沉浸模式
+    setViewMode('ai-focus')
+    localStorage.setItem('blockos-view-mode', 'ai-focus')
+  }, [])
 
   // 切换到混合模式时，确保侧边栏默认隐藏
   useEffect(() => {
@@ -423,6 +429,7 @@ function App() {
                 onTextSentToAI={() => setSelectedText('')}
                 viewMode={viewMode}
                 onSwitchToHybrid={switchToHybridMode}
+                onSwitchToAIFocus={switchToAIFocus}
               />
             </>
           )}

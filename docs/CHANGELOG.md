@@ -1,5 +1,32 @@
 # BlockOS 更新日志
 
+## [v1.10.0] - 2026-04-14 🎨 AI 沉浸模式界面优化（Phase 6）
+
+**重要更新**：AI 沉浸模式对话界面全面升级，采用全新的组件化设计。
+
+- **新组件架构**：
+  - `ChatLayout`：全屏布局容器（100vh，三区域：顶部导航、中间内容、底部输入）
+  - `ChatHeader`：顶部导航栏（折叠按钮、标题、副标题、新建对话、分享按钮）
+  - `MessageContent`：AI 回答内容区（水平居中，max-width: 760px，支持 Markdown 渲染）
+  - `ChatInput`：底部输入框（圆角 16px，功能按钮组，附件按钮，圆形发送按钮）
+  - `AIImmersivePanel`：整合所有子组件的沉浸式面板
+- **设计亮点**：
+  - 内容区水平居中，最大宽度 760px，最佳阅读体验
+  - 正文字号 15px，行高 1.7，使用 CSS 变量
+  - 行内代码块：背景 `var(--color-bg-code)`，圆角 4px，padding 2px 6px
+  - 底部输入框固定在底部，与内容区宽度一致
+  - 功能按钮组（DeepThink、Search）pill 形状，有 icon + 文字
+  - 发送按钮圆形（36x36px），主色背景，hover 效果
+  - 底部说明文字居中显示，小字，颜色 `var(--color-text-muted)`
+- **技术约束**：
+  - ✅ 未引入任何新的组件库或第三方库
+  - ✅ 所有颜色、字号、圆角使用项目已有的 CSS design token
+  - ✅ Props 用 TypeScript interface 定义
+  - ✅ 组件拆分遵循单一职责原则
+  - ✅ TypeScript 类型检查通过
+
+AI 沉浸模式界面优化完成，Phase 6 全部完成。新界面在 AI 沉浸模式且有消息时自动启用。→ [完整文档](./spec/features/ai/ai-immersive-mode.md)
+
 ## [v1.9.2] - 2026-04-14 🐛 修复 Block 发布版本和引用记录
 
 **核心功能 Bug 修复**：修复 Block 编辑后发布版本无响应和引用记录一直为 0 的问题。

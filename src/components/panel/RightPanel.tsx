@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { X } from 'lucide-react'
+import { X, Maximize2 } from 'lucide-react'
 import { BlockSpacePanel } from './BlockSpacePanel'
 import { SessionHistoryPanel } from './SessionHistoryPanel'
 import { PreviewPanel } from './PreviewPanel'
@@ -32,9 +32,10 @@ interface RightPanelProps {
   onClose?: () => void
   viewMode?: 'ai-focus' | 'hybrid'
   onSwitchToHybrid?: (content?: string) => void
+  onSwitchToAIFocus?: () => void
 }
 
-export function RightPanel({ onInsertContent, selectedText, onTextSentToAI, onClose, viewMode = 'hybrid', onSwitchToHybrid }: RightPanelProps) {
+export function RightPanel({ onInsertContent, selectedText, onTextSentToAI, onClose, viewMode = 'hybrid', onSwitchToHybrid, onSwitchToAIFocus }: RightPanelProps) {
   const [activeTab, setActiveTab] = useState<PanelTab>('chat')
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -315,6 +316,13 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI, onCl
         {/* 对话标签页的操作按钮 */}
         {activeTab === 'chat' && (
           <div className="chat-header-actions">
+            <button
+              className="icon-button"
+              onClick={onSwitchToAIFocus}
+              title="全屏模式"
+            >
+              <Maximize2 size={14} />
+            </button>
             <button
               className="icon-button"
               onClick={handleNewSession}
