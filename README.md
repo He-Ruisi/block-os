@@ -42,17 +42,22 @@ bun run build
 ## 📚 文档导航
 
 - **新手必读**
-  - [快速开始](docs/QUICK_START.md) - 5 分钟上手
+  - [快速开始](docs/guide/QUICK_START.md) - 5 分钟上手
   - [项目架构](docs/ARCHITECTURE.md) - 深入了解结构
-  - [改进总结](docs/IMPROVEMENTS_SUMMARY.md) - 架构优化说明
+  - [CLAUDE.md](CLAUDE.md) - 项目指南和关键约束
 
 - **功能需求**
   - [功能概览](docs/spec/features/README.md)
   - [编辑器功能](docs/spec/features/editor/)
   - [待办清单](docs/todo.md)
 
+- **测试文档**
+  - [测试文档中心](docs/tests/README.md) - 测试文档总入口
+  - [开始响应式测试](docs/tests/start-responsive-test.md) - 快速上手
+  - [测试进度跟踪](docs/tests/test-progress.md) - 实时进度
+
 - **开发日志**
-  - [今日日志](docs/logs/2026-04/2026-04-09.md)
+  - [今日日志](docs/logs/2026-04/2026-04-14.md)
   - [月度索引](docs/logs/2026-04/index.md)
 
 ## 项目特色

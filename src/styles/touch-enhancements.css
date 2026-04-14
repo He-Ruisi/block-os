@@ -18,7 +18,7 @@
   .explorer-doc-item:active,
   .panel-tab:active,
   .explorer-action-btn:active,
-  .tab-action-btn:active {
+  .tab-action-button:active {
     transform: scale(0.95);
     transition: transform 0.1s ease-out;
   }
@@ -69,7 +69,7 @@
   .activity-icon,
   .panel-tab,
   .explorer-action-btn,
-  .tab-action-btn {
+  .tab-action-button {
     min-height: 44px;
     min-width: 44px;
   }
@@ -192,28 +192,24 @@
    Newsprint 主题触摸优化
    ============================================================ */
 
-.theme-newsprint {
-  @media (hover: none) and (pointer: coarse) {
-    /* 保持硬阴影风格的触摸反馈 */
-    button:active,
-    .toolbar-btn:active {
-      transform: scale(0.95) translate(1px, 1px);
-      box-shadow: 1px 1px 0px 0px #111111;
-    }
-
-    .explorer-item:active,
-    .panel-tab:active {
-      transform: translate(1px, 1px);
-    }
+@media (hover: none) and (pointer: coarse) {
+  .theme-newsprint button:active,
+  .theme-newsprint .toolbar-btn:active {
+    transform: scale(0.95) translate(1px, 1px);
+    box-shadow: 1px 1px 0px 0px #111111;
   }
 
-  @media (max-width: 1024px) {
-    /* 滑动提示使用黑色 */
-    .sidebar-panel::before,
-    .right-panel::before {
-      background: #111111;
-      width: 3px;
-    }
+  .theme-newsprint .explorer-item:active,
+  .theme-newsprint .panel-tab:active {
+    transform: translate(1px, 1px);
+  }
+}
+
+@media (max-width: 1024px) {
+  .theme-newsprint .sidebar-panel::before,
+  .theme-newsprint .right-panel::before {
+    background: #111111;
+    width: 3px;
   }
 }
 
@@ -248,7 +244,7 @@
 @media (max-width: 1024px) {
   /* 隐藏滚动条，但保持滚动功能 */
   .sidebar-panel-content,
-  .right-panel-content,
+  .panel-body,
   .editor-scroll,
   .toolbar-row {
     scrollbar-width: none;
@@ -256,7 +252,7 @@
   }
 
   .sidebar-panel-content::-webkit-scrollbar,
-  .right-panel-content::-webkit-scrollbar,
+  .panel-body::-webkit-scrollbar,
   .editor-scroll::-webkit-scrollbar,
   .toolbar-row::-webkit-scrollbar {
     display: none;
@@ -264,7 +260,7 @@
 
   /* iOS 弹性滚动 */
   .sidebar-panel-content,
-  .right-panel-content,
+  .panel-body,
   .editor-scroll {
     -webkit-overflow-scrolling: touch;
   }
@@ -281,8 +277,8 @@
     scroll-margin-bottom: 100px;
   }
 
-  /* 聊天输入框固定在底部 */
-  .chat-input-container {
+  /* 聊天输入区固定在底部 */
+  .panel-footer {
     position: sticky;
     bottom: 0;
     background: var(--color-bg-primary);

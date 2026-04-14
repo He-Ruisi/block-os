@@ -1,5 +1,25 @@
 # BlockOS 更新日志
 
+## [v1.8.1] - 2026-04-13 ✨ AI 回复 Markdown 渲染增强 v2
+
+**重要更新**：编辑器内容（editorContent）现在也使用完整 Markdown 渲染，视觉层级更清晰。
+
+- **编辑器内容 Markdown 渲染**：
+  - `editorContent` 使用完整 Markdown 渲染（代码高亮、表格、列表等）
+  - 独立卡片样式，带"📝 编辑器内容"标签
+  - 更大的内边距（16px）和更清晰的视觉层级
+  - 完整主题适配（default + newsprint）
+- **显示逻辑优化**：
+  - AI 对话回复（`content`）：简短回复，Markdown 渲染
+  - 编辑器内容（`editorContent`）：完整内容，Markdown 渲染，重点展示
+  - 支持三种场景：只有对话/只有编辑器内容/同时存在两者
+- **视觉增强**：
+  - 编辑器内容卡片有独立背景色和边框
+  - Newsprint 主题：硬边框、硬阴影、衬线字体标签
+  - 更清晰的内容层级和视觉分离
+
+所有 AI 回复内容（对话和编辑器）都拥有完整的 Markdown 渲染效果。→ [完整文档](./spec/features/ai/ai-reply-markdown-rendering.md)
+
 ## [v1.8.0] - 2026-04-13 ✨ AI 回复 Markdown 渲染增强
 
 **重要更新**：AI 回复从纯文本升级为完整 Markdown 渲染，支持代码高亮、表格、列表等丰富格式。
