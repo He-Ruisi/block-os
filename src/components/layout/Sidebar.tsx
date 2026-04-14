@@ -50,20 +50,19 @@ export function Sidebar({
     },
   })
 
-  if (collapsed) {
-    return null
-  }
-
   return (
     <>
       {/* 响应式遮罩层 - 仅在平板/手机模式显示 */}
-      <div 
-        className={`sidebar-overlay ${!collapsed ? 'visible' : ''}`}
-        onClick={onClose}
-      />
+      {!collapsed && (
+        <div 
+          className={`sidebar-overlay ${!collapsed ? 'visible' : ''}`}
+          onClick={onClose}
+        />
+      )}
       
       <div 
         className={`sidebar-panel ${!collapsed ? 'expanded' : ''}`}
+        style={{ display: collapsed ? 'none' : 'flex' }}
         {...((viewport.isTablet || viewport.isMobile) ? swipeHandlers : {})}
       >
         <div className="sidebar-panel-header">

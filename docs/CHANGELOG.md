@@ -1,5 +1,37 @@
 # BlockOS 更新日志
 
+## [v1.9.0] - 2026-04-14 📋 响应式测试文档体系
+
+**重要基础设施**：建立完整的响应式测试文档体系，支持桌面/平板/手机全矩阵测试。
+
+- **核心测试文档**（8个）：
+  - 测试文档中心（README.md）- 总入口和导航
+  - 开始响应式测试（start-responsive-test.md）- 新手必读
+  - 响应式测试矩阵（responsive-test-matrix.md）- 完整设备×浏览器矩阵
+  - 响应式快速测试（responsive-quick-test.md）- 5分钟快速验证
+  - 响应式测试检查清单（responsive-checklist.md）- 可打印清单
+  - 测试报告模板（test-report-template.md）- 标准化报告格式
+  - 测试进度跟踪（test-progress.md）- 实时进度和问题统计
+  - 响应式测试脚本（responsive-test-script.js）- 浏览器控制台自动化测试
+- **辅助文档**（3个）：
+  - 测试文档总结（SUMMARY.md）- 文档体系概览
+  - 项目测试指南（TEST.md）- 根目录快速指南
+  - 启动脚本（test-responsive.bat / test-responsive.sh）- 快速启动测试
+- **测试覆盖范围**：
+  - 设备：桌面（≥1280px）/ 平板（768-1280px）/ 手机（<768px）
+  - 浏览器：Chrome / Safari / Edge / Firefox
+  - 真机：iPad Pro / iPad Air / iPad Mini / iPhone 15 Pro Max / iPhone SE / Android
+  - 功能：AI 对话、布局响应式、触摸交互、编辑器、项目管理、Block 系统、主题、性能、数据持久化
+- **测试流程**：准备（10分钟）→ 浏览器模拟（30分钟）→ 真机测试（1小时）→ 自动化验证（5分钟）→ 报告提交（10分钟）
+- **文档特点**：
+  - 分层设计：从快速验证到完整测试
+  - 真机友好：可打印清单，支持局域网和 ngrok 访问
+  - 自动化支持：浏览器控制台脚本快速验证
+  - 标准化流程：统一的测试流程、报告格式和进度跟踪
+  - 优先级明确：P0/P1/P2 三级优先级，聚焦核心功能
+
+测试文档体系已完整建立，可以开始实际测试工作。预计完整测试时间 1.5-2 小时。→ [测试文档中心](./tests/README.md)
+
 ## [v1.8.1] - 2026-04-13 ✨ AI 回复 Markdown 渲染增强 v2
 
 **重要更新**：编辑器内容（editorContent）现在也使用完整 Markdown 渲染，视觉层级更清晰。

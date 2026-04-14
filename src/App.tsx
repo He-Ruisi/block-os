@@ -172,12 +172,14 @@ function App() {
   // ActivityBar 视图切换：点击已激活的图标折叠面板，否则切换视图并展开
   const handleSidebarViewChange = useCallback((view: typeof sidebarView) => {
     if (sidebarView === view && !sidebarCollapsed) {
-      toggleSidebar()
+      // 点击已激活的视图 → 折叠侧边栏
+      setSidebarCollapsed(true)
     } else {
+      // 切换到新视图 → 展开侧边栏
       setSidebarView(view)
-      if (sidebarCollapsed) toggleSidebar()
+      setSidebarCollapsed(false)
     }
-  }, [sidebarView, sidebarCollapsed, toggleSidebar, setSidebarView])
+  }, [sidebarView, sidebarCollapsed, setSidebarView, setSidebarCollapsed])
 
   // 保存文档
   const handleSaveDocument = useCallback(async (tabId: string) => {

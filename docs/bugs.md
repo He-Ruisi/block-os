@@ -3,9 +3,9 @@
 > 记录所有已修复的 bug，便于查找相似问题和积累经验。每个记录控制在 400 字以内。
 
 ## 📊 统计
-- **总计**: 0 个
-- **本月**: 0 个
-- **最近更新**: 2026-04-09
+- **总计**: 1 个
+- **本月**: 1 个
+- **最近更新**: 2026-04-14
 
 ## 🔍 快速查找
 
@@ -51,7 +51,27 @@
 
 ### UI/样式问题
 
-*暂无记录*
+## #001 - 左侧边栏点击后闪一下不显示 (2026-04-14) 🔴
+
+**问题描述**:
+- 现象：点击 ActivityBar 上方的项目、大纲等按钮后，左侧边栏快速闪一下但不显示
+- 触发：点击任意 ActivityBar 图标（资源管理器/搜索/置顶/大纲/插件）
+- 影响：用户无法正常呼出左侧边栏，核心功能完全不可用
+
+**根本原因**:
+1. `handleSidebarViewChange` 使用 `toggleSidebar()` 切换状态，异步状态更新导致不一致
+2. `Sidebar` 组件在 `collapsed=true` 时直接返回 `null`，导致重新挂载闪烁
+
+**解决方案**:
+- 修改文件：`src/App.tsx`, `src/components/layout/Sidebar.tsx`
+- 核心改动：
+  - App.tsx: 将 `toggleSidebar()` 改为直接设置 `setSidebarCollapsed(true/false)`
+  - Sidebar.tsx: 移除 `if (collapsed) return null`，改用 `style={{ display: collapsed ? 'none' : 'flex' }}`
+- 预防措施：避免使用 toggle 函数，直接设置状态更可靠；使用 CSS 控制显示避免重新挂载
+
+**相关问题**: 无
+
+**详细文档**: [bug-fix-sidebar-flash.md](./tests/bug-fix-sidebar-flash.md)
 
 ---
 
@@ -106,4 +126,4 @@ if (!editor) return null
 
 **维护者**: BlockOS Team  
 **创建日期**: 2026-04-09  
-**最后更新**: 2026-04-09
+**最后更新**: 2026-04-14
