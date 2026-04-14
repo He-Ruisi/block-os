@@ -1,5 +1,6 @@
 import { Node, mergeAttributes } from '@tiptap/core'
 import { blockStore } from '../../storage/blockStore'
+import { publishBlockRelease, recordBlockUsage, trackBlockWorkingCopyChange } from '../../services/blockReleaseService'
 
 /**
  * SourceBlock — 内容与形式分离的核心节点
@@ -67,6 +68,7 @@ export const SourceBlock = Node.create({
       const isPending: boolean = node.attrs.pending === true
       const label = node.attrs.sourceLabel || (source === 'ai' ? '◆ AI 生成' : '💡 灵感')
       const bId: string | null = node.attrs.blockId
+      const currentReleaseVersion: number | null = node.attrs.releaseVersion ?? null
 
       // ---- DOM ----
       const dom = document.createElement('div')
@@ -143,7 +145,7 @@ export const SourceBlock = Node.create({
         publishBtn.addEventListener('mousedown', (e) => {
           e.preventDefault()
           e.stopPropagation()
-          showPublishForm(dom, bId, labelEl)
+          showPublishForm(dom, bId, labelEl, currentReleaseVersion, getPos, editor, node.attrs)
         })
         toolbar.appendChild(publishBtn)
 
@@ -178,9 +180,11 @@ export const SourceBlock = Node.create({
           syncTimer = setTimeout(() => {
             const text = contentDOM.textContent || ''
             if (text.trim()) {
-              blockStore.updateBlock(bId, { content: text }).catch(err =>
-                console.error('[SourceBlock] Failed to sync content:', err)
-              )
+              blockStore.updateBlock(bId, { content: text })
+                .then(() => {
+                  trackBlockWorkingCopyChange(bId)
+                })
+                .catch(err => console.error('[SourceBlock] Failed to sync content:', err))
             }
           }, 500)
         })
@@ -199,11 +203,18 @@ export const SourceBlock = Node.create({
 })
 
 // ---- 发布新版本 inline 表单 ----
-function showPublishForm(dom: HTMLElement, blockId: string, labelEl: HTMLElement) {
+function showPublishForm(
+  dom: HTMLElement,
+  blockId: string,
+  labelEl: HTMLElement,
+  _currentReleaseVersion: number | null,
+  getPos: (() => number) | boolean,
+  editor: any,
+  nodeAttrs: Record<string, unknown>
+) {
   if (dom.querySelector('.sb-publish-form')) return
 
   const contentEl = dom.querySelector('.source-block-content')
-  const currentContent = contentEl?.textContent || ''
 
   const form = document.createElement('div')
   form.classList.add('sb-publish-form')
@@ -231,12 +242,28 @@ function showPublishForm(dom: HTMLElement, blockId: string, labelEl: HTMLElement
   confirmBtn.type = 'button'
   confirmBtn.addEventListener('mousedown', async (e) => {
     e.preventDefault()
-    const title = input.value.trim()
-    if (!title) { input.focus(); return }
+    const title = input.value.trim() || `版本 ${new Date().toLocaleString('zh-CN', { hour12: false })}`
+    const currentContent = contentEl?.textContent || ''
 
     try {
-      await blockStore.updateBlock(blockId, { content: currentContent })
-      const release = await blockStore.createRelease(blockId, title)
+      const release = await publishBlockRelease(blockId, title, currentContent)
+      
+      // 更新节点的 releaseVersion 和 sourceLabel
+      if (typeof getPos === 'function') {
+        const pos = getPos()
+        editor.chain().focus().command(({ tr }: { tr: any }) => {
+          tr.setNodeMarkup(pos, undefined, {
+            ...nodeAttrs,
+            releaseVersion: release.version,
+            sourceLabel: `📦 v${release.version} · ${release.title}`,
+          })
+          return true
+        }).run()
+      }
+      
+      // 记录 usage（每次发布新版本都记录）
+      await recordBlockUsage(blockId, release.version)
+      
       labelEl.textContent = `📦 v${release.version} · ${title}`
       form.remove()
       window.dispatchEvent(new Event('blockUpdated'))

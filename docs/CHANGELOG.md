@@ -1,5 +1,26 @@
 # BlockOS 更新日志
 
+## [v1.9.1] - 2026-04-14 🐛 修复左侧边栏点击不显示
+
+**严重 Bug 修复**：修复点击 ActivityBar 图标后左侧边栏闪一下不显示的问题。
+
+- **问题描述**：
+  - 点击 ActivityBar 上方的项目、大纲等按钮后，左侧边栏快速闪一下但不显示
+  - 用户无法正常呼出左侧边栏，核心功能完全不可用
+  - 影响范围：桌面/平板/手机所有设备
+- **根本原因**：
+  - `handleSidebarViewChange` 使用 `toggleSidebar()` 切换状态，异步状态更新导致不一致
+  - `Sidebar` 组件在 `collapsed=true` 时直接返回 `null`，导致重新挂载闪烁
+- **修复方案**：
+  - App.tsx: 将 `toggleSidebar()` 改为直接设置 `setSidebarCollapsed(true/false)`
+  - Sidebar.tsx: 移除 `if (collapsed) return null`，改用 `style={{ display: collapsed ? 'none' : 'flex' }}`
+- **经验教训**：
+  - 避免使用 toggle 函数，直接设置状态更可靠
+  - 使用 CSS 控制显示避免重新挂载
+  - 状态更新是异步的，不要依赖状态更新的时序
+
+修复后左侧边栏可以正常展开/折叠，无闪烁，交互流畅。→ [Bug 修复文档](./tests/bug-fix-sidebar-flash.md) | [Bug 记录 #001](./bugs.md)
+
 ## [v1.9.0] - 2026-04-14 📋 响应式测试文档体系
 
 **重要基础设施**：建立完整的响应式测试文档体系，支持桌面/平板/手机全矩阵测试。

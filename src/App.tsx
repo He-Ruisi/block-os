@@ -29,7 +29,9 @@ function App() {
   const [theme, setTheme] = useState<string>(() => localStorage.getItem('blockos-theme') || 'default')
   const [showSettings, setShowSettings] = useState(false)
   const [showProjectOverview, setShowProjectOverview] = useState(false)
+  const [storageReady, setStorageReady] = useState(false)
   const [pendingAIInsert, setPendingAIInsert] = useState<{ documentId: string; content: string } | null>(null)
+  const previousViewModeRef = useRef<'ai-focus' | 'hybrid' | null>(null)
   
   // 视图模式：AI 沉浸式 or 混合模式
   const [viewMode, setViewMode] = useState<'ai-focus' | 'hybrid'>(() => {
@@ -114,6 +116,7 @@ function App() {
     // 切换到混合模式
     setViewMode('hybrid')
     localStorage.setItem('blockos-view-mode', 'hybrid')
+    setSidebarCollapsed(true)
     
     // 打开新文档
     handleOpenDocument(doc)
@@ -126,14 +129,20 @@ function App() {
 
   // 切换到混合模式时，确保侧边栏默认隐藏
   useEffect(() => {
-    if (viewMode === 'hybrid' && !sidebarCollapsed) {
+    const previousViewMode = previousViewModeRef.current
+    if (previousViewMode === 'ai-focus' && viewMode === 'hybrid') {
       setSidebarCollapsed(true)
     }
-  }, [viewMode, sidebarCollapsed, setSidebarCollapsed])
+    previousViewModeRef.current = viewMode
+  }, [viewMode, setSidebarCollapsed])
 
   // 统一初始化所有 Store
   useEffect(() => {
-    initStorage().catch(console.error)
+    initStorage()
+      .then(() => setStorageReady(true))
+      .catch(error => {
+        console.error(error)
+      })
   }, [])
 
   // 管理编辑器区域宽度样式
@@ -288,7 +297,7 @@ function App() {
   }, [])
 
   // 加载中
-  if (auth.loading && !auth.user) {
+  if ((auth.loading && !auth.user) || !storageReady) {
     return (
       <div className="app-loading">
         <div className="loading-spinner">BlockOS</div>

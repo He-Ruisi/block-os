@@ -13,8 +13,17 @@ interface PersistedTabsState {
 }
 
 const DEFAULT_TABS: Tab[] = [
-  { id: 'today', type: 'today', title: '今日', isDirty: false },
+  { id: 'today', type: 'today', title: '今天', isDirty: false },
 ]
+
+function dedupeTabs(tabs: Tab[]): Tab[] {
+  const seen = new Set<string>()
+  return tabs.filter(tab => {
+    if (seen.has(tab.id)) return false
+    seen.add(tab.id)
+    return true
+  })
+}
 
 function loadPersistedState(): PersistedTabsState {
   try {
@@ -29,7 +38,7 @@ function loadPersistedState(): PersistedTabsState {
 
     const parsed = JSON.parse(raw) as Partial<PersistedTabsState>
     const tabs = Array.isArray(parsed.tabs) && parsed.tabs.length > 0
-      ? parsed.tabs
+      ? dedupeTabs(parsed.tabs)
       : DEFAULT_TABS
     const activeTabId = typeof parsed.activeTabId === 'string' && tabs.some(tab => tab.id === parsed.activeTabId)
       ? parsed.activeTabId
@@ -68,18 +77,21 @@ export function useTabs(): TabsState {
   const [tabs, setTabs] = useState<Tab[]>(initialState.tabs)
   const [activeTabId, setActiveTabId] = useState(initialState.activeTabId)
   const [currentProjectId, setCurrentProjectId] = useState<string | null>(initialState.currentProjectId)
-  // 用 ref 同步跟踪 documentIds，避免 React 批处理导致重复添加
   const documentIdsRef = useRef<Set<string>>(
     new Set(initialState.tabs.filter(tab => tab.documentId).map(tab => tab.documentId as string))
   )
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({
-      tabs,
+      tabs: dedupeTabs(tabs),
       activeTabId,
       currentProjectId,
     }))
   }, [tabs, activeTabId, currentProjectId])
+
+  useEffect(() => {
+    setTabs(prev => dedupeTabs(prev))
+  }, [])
 
   useEffect(() => {
     const handleDocumentDeleted = (e: Event) => {
@@ -140,7 +152,7 @@ export function useTabs(): TabsState {
         setActiveTabId(existing.id)
         return prev
       }
-      const tab: Tab = { id: 'today-' + Date.now(), type: 'today', title: '今日', isDirty: false }
+      const tab: Tab = { id: 'today-' + Date.now(), type: 'today', title: '今天', isDirty: false }
       setActiveTabId(tab.id)
       return [...prev, tab]
     })
@@ -148,33 +160,39 @@ export function useTabs(): TabsState {
 
   const selectProject = useCallback((projectId: string) => {
     setCurrentProjectId(projectId)
-    setTabs(prev => {
-      const existing = prev.find(t => t.projectId === projectId && t.type === 'project')
-      if (existing) {
-        setActiveTabId(existing.id)
-        return prev
+
+    const existing = tabs.find(t => t.projectId === projectId && t.type === 'project')
+    if (existing) {
+      setActiveTabId(existing.id)
+      return
+    }
+
+    projectStore.getProject(projectId).then(project => {
+      if (!project) return
+
+      const tabId = `project-${projectId}`
+      const tab: Tab = {
+        id: tabId,
+        type: 'project',
+        projectId,
+        title: project.name,
+        isDirty: false,
       }
-      projectStore.getProject(projectId).then(project => {
-        if (project) {
-          const tab: Tab = {
-            id: 'project-' + projectId,
-            type: 'project',
-            projectId,
-            title: project.name,
-            isDirty: false,
-          }
-          setTabs(p => [...p, tab])
-          setActiveTabId(tab.id)
+
+      setTabs(prev => {
+        const existingTab = prev.find(t => t.id === tabId)
+        if (existingTab) {
+          return prev.map(t => t.id === tabId ? { ...t, title: project.name } : t)
         }
+        return [...prev, tab]
       })
-      return prev
+      setActiveTabId(tabId)
     })
-  }, [])
+  }, [tabs])
 
   const openDocument = useCallback((doc: Document) => {
     const tabId = 'doc-' + doc.id
 
-    // 检查是否已经有该文档的标签页
     setTabs(prev => {
       const existing = prev.find(t => t.documentId === doc.id)
       if (existing) {
@@ -183,10 +201,8 @@ export function useTabs(): TabsState {
         return prev
       }
 
-      // 添加到 ref 追踪
       documentIdsRef.current.add(doc.id)
 
-      // 创建新标签页
       const newTab: Tab = {
         id: tabId,
         type: 'document',
@@ -195,10 +211,10 @@ export function useTabs(): TabsState {
         title: doc.title,
         isDirty: false,
       }
-      
+
       setActiveTabId(tabId)
       if (doc.projectId) setCurrentProjectId(doc.projectId)
-      
+
       return [...prev, newTab]
     })
   }, [])
@@ -219,7 +235,6 @@ export function useTabs(): TabsState {
   const closeOtherTabs = useCallback((tabId: string) => {
     setTabs(prev => {
       const kept = prev.find(t => t.id === tabId)
-      // 清理 ref，只保留当前 tab
       documentIdsRef.current.clear()
       if (kept?.documentId) documentIdsRef.current.add(kept.documentId)
       return kept ? [kept] : prev

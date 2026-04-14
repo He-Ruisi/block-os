@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import type { Block, BlockRelease, BlockUsage } from '../../types/block'
 import { blockStore } from '../../storage/blockStore'
 import { usageStore } from '../../storage/usageStore'
+import { publishBlockRelease } from '../../services/blockReleaseService'
 import { formatRelativeTime } from '../../utils/date'
 import './BlockDetailPanel.css'
 
@@ -38,12 +39,13 @@ export function BlockDetailPanel({ blockId, onClose, onInsertRelease }: BlockDet
   useEffect(() => { loadData() }, [loadData])
 
   const handleCreateRelease = async () => {
-    if (!newReleaseTitle.trim() || !block) return
+    if (!block) return
     try {
-      await blockStore.createRelease(blockId, newReleaseTitle.trim())
+      await publishBlockRelease(blockId, newReleaseTitle.trim(), block.content)
       setNewReleaseTitle('')
       setShowNewRelease(false)
       await loadData()
+      window.dispatchEvent(new Event('blockUpdated'))
     } catch (error) {
       console.error('Failed to create release:', error)
     }
@@ -115,7 +117,7 @@ export function BlockDetailPanel({ blockId, onClose, onInsertRelease }: BlockDet
             <span className="section-label">版本 ({releases.length})</span>
             <button
               className="new-release-btn"
-              onClick={() => setShowNewRelease(!showNewRelease)}
+              onClick={handleCreateRelease}
             >
               + 发布新版本
             </button>
@@ -137,7 +139,6 @@ export function BlockDetailPanel({ blockId, onClose, onInsertRelease }: BlockDet
                 <button
                   className="btn-sm btn-primary-sm"
                   onClick={handleCreateRelease}
-                  disabled={!newReleaseTitle.trim()}
                 >
                   发布
                 </button>
