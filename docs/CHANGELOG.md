@@ -1,5 +1,29 @@
 # BlockOS 更新日志
 
+## [v1.12.2] - 2026-04-15 🔧 CORS 问题深度修复 + 配置清理工具
+
+**Bug 修复**：解决 localStorage 旧配置导致的 CORS 问题持续出现。
+
+- **问题根因**：
+  - localStorage 中保存了旧的 HTTPS URL 配置
+  - 代码只在配置为空时设置默认值，不会覆盖已存在的旧配置
+  - 即使重启服务器，localStorage 持久化存储导致旧配置仍然生效
+- **代码修复**：
+  - 强制更新旧配置：检测到 HTTPS URL 时自动替换为代理路径
+  - 添加详细调试日志：插件激活时输出当前配置，API 调用时输出请求 URL 和响应状态
+  - 改进配置初始化逻辑：`if (!apiUrl || apiUrl.startsWith('https://'))`
+- **配置清理工具**（`scripts/clear-ocr-config.html`）：
+  - 可视化界面，一键查看/清理/重置配置
+  - 提供详细的使用步骤说明
+  - 自动检测旧配置并给出建议
+- **故障排查指南**（`docs/guide/ocr-plugin-troubleshooting.md`）：
+  - 3 种解决方案（清理工具/手动清理/自动修复）
+  - 详细的调试技巧和验证步骤
+  - 常见问题 FAQ 和终极解决方案
+  - 生产环境部署建议
+
+**用户操作**：刷新页面即可自动修复，或使用 `http://localhost:5173/scripts/clear-ocr-config.html` 手动清理配置。
+
 ## [v1.12.1] - 2026-04-15 🔧 OCR 插件 UI 优化 + CORS 问题修复
 
 **Bug 修复和优化**：
