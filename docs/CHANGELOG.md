@@ -1,5 +1,44 @@
 # BlockOS 更新日志
 
+## [v1.16.0] - 2026-04-15 🎨 Tailwind CSS + Shadcn/UI 安装完成
+
+**重要里程碑**：完成主题样式重塑的第一步，安装并配置 Tailwind CSS 和 Shadcn/UI。
+
+- **Tailwind CSS 安装**：
+  - 安装核心依赖（tailwindcss、postcss、autoprefixer）
+  - 创建 tailwind.config.js（支持暗色模式、CSS 变量）
+  - 创建 postcss.config.js
+- **Shadcn/UI 配置**：
+  - 安装工具库（class-variance-authority、clsx、tailwind-merge）
+  - 创建 components.json 配置文件
+  - 创建 src/lib/utils.ts（cn() 工具函数）
+  - 创建 src/components/ui/ 目录
+- **Design Token 系统**：
+  - 创建 src/index.css（完整的 CSS 变量系统，基于 HSL 格式）
+  - 定义 20+ CSS 变量（background、foreground、primary、secondary 等）
+  - 支持亮色和暗色主题（.dark 类切换）
+- **路径别名配置**：
+  - 更新 tsconfig.json（添加 @/* 路径别名）
+  - 更新 vite.config.ts（添加路径别名解析）
+  - 安装 @types/node（path 模块类型定义）
+- **验证通过**：
+  - TypeScript 类型检查通过（bun run type-check）
+  - 开发服务器正常启动（bun run dev）
+
+**核心特性**：
+1. CSS 变量系统（HSL 格式，适合主题切换）
+2. 暗色模式支持（通过 .dark 类切换）
+3. 路径别名（@/components、@/lib/utils）
+4. 类型安全（100% TypeScript 类型检查通过）
+5. 完全遵循 Shadcn/UI 官方推荐配置
+
+**下一步**：
+- 安装具体的 Shadcn UI 组件（Button、Card、Dialog 等）
+- 自定义 CSS 变量调整主题
+- 使用 Tailwind 工具类重构现有组件
+
+---
+
 ## [v1.15.0] - 2026-04-15 🎨 OCR 增强 UI 设计文档完成
 
 **重要里程碑**：完成专业级 OCR 解析工作站的完整设计文档（2180 行）。

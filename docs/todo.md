@@ -22,6 +22,48 @@
 
 ## P0 - 核心功能（当前优先）
 
+### 主题样式重塑 🎨 - [需求文档](./spec/features/styles/style.md)
+- [x] Phase 1: Tailwind CSS + Shadcn/UI 安装（2026-04-15 完成）
+  - [x] 安装 Tailwind CSS 核心依赖（tailwindcss、postcss、autoprefixer）
+  - [x] 安装 Shadcn/UI 工具库（class-variance-authority、clsx、tailwind-merge）
+  - [x] 创建 tailwind.config.js 配置
+  - [x] 创建 postcss.config.js 配置
+  - [x] 创建 components.json 配置
+  - [x] 创建 src/index.css（Design Token 系统）
+  - [x] 创建 src/lib/utils.ts（cn() 工具函数）
+  - [x] 更新 tsconfig.json（路径别名）
+  - [x] 更新 vite.config.ts（路径别名解析）
+  - [x] TypeScript 类型检查通过
+  - [x] 开发服务器正常启动
+- [ ] Phase 2: 安装常用 Shadcn UI 组件
+  - [ ] Button（按钮）
+  - [ ] Card（卡片）
+  - [ ] Dialog（对话框）
+  - [ ] Input（输入框）
+  - [ ] Textarea（文本域）
+  - [ ] Select（选择器）
+  - [ ] Tabs（标签页）
+  - [ ] Toast（通知）
+  - [ ] Dropdown Menu（下拉菜单）
+  - [ ] Popover（弹出层）
+- [ ] Phase 3: 自定义主题 CSS 变量
+  - [ ] 定义品牌色（primary、secondary）
+  - [ ] 定义语义色（success、warning、error、info）
+  - [ ] 定义中性色（gray 色阶）
+  - [ ] 定义圆角（radius）
+  - [ ] 定义阴影（shadow）
+  - [ ] 定义字体（font-family、font-size）
+  - [ ] 定义间距（spacing）
+  - [ ] 暗色模式适配
+- [ ] Phase 4: 重构现有组件
+  - [ ] 重构 Sidebar（使用 Tailwind 工具类）
+  - [ ] 重构 TabBar（使用 Shadcn Tabs）
+  - [ ] 重构 Editor（使用 Tailwind 样式）
+  - [ ] 重构 AIFloatPanel（使用 Shadcn Card）
+  - [ ] 重构 RightPanel（使用 Tailwind 布局）
+  - [ ] 重构 Toast（使用 Shadcn Toast）
+  - [ ] 重构 AuthPage（使用 Shadcn Form 组件）
+
 ### OCR 插件系统 🔌 - [技术设计](../.kiro/specs/ocr-plugin-system/design.md)
 - [x] Phase 1: 插件系统核心（Week 1）
   - [x] 创建插件类型定义（src/types/plugin.ts）
