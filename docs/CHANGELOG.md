@@ -1,5 +1,29 @@
 # BlockOS 更新日志
 
+## [v1.11.0] - 2026-04-15 🔌 OCR 插件系统技术设计
+
+**重要里程碑**：完成通用可插拔插件系统架构设计，OCR 文字识别作为首个示例插件。
+
+- **通用插件架构**：
+  - 标准插件接口（IPlugin）定义生命周期（activate/deactivate/render）
+  - 插件注册表（PluginRegistry）管理插件状态和实例
+  - 插件 API（PluginAPI）提供主应用功能桥接
+  - 插件配置存储（PluginConfigStore）基于 localStorage 持久化
+- **权限系统**：7 种权限类型（editor:read/write、block:read/write、storage:read/write、network），装饰器模式权限检查
+- **OCR 插件设计**：
+  - 完整 UI 组件（摄像头拍照、图片上传、识别结果展示）
+  - PaddleOCR API 集成（Base64 编码、流式响应）
+  - 识别结果可插入编辑器（SourceBlock）或保存为 Block
+  - 配置持久化（API URL、Token）
+- **ExtensionsView 增强**：插件列表、安装/卸载、打开/设置、状态管理
+- **完全可插拔**：插件独立加载和卸载，卸载后自动清理所有资源和配置
+- **类型安全**：所有接口使用 TypeScript 严格类型，完整的错误处理机制
+- **安全考虑**：权限管理、API Token 保护、HTTPS Only、XSS 防护、CSP 策略
+- **实施路径**：4 周计划（插件系统核心 → OCR 插件实现 → 集成测试 → 文档优化）
+- **未来扩展**：插件市场、翻译插件、图表生成插件、代码格式化插件、插件 SDK
+
+新增技术设计文档 `.kiro/specs/ocr-plugin-system/design.md`，包含 3 个 Mermaid 架构图、完整的 TypeScript 接口定义、组件实现代码、测试策略。→ [技术设计](../.kiro/specs/ocr-plugin-system/design.md)
+
 ## [v1.10.2] - 2026-04-14 🐛 修复 AI 沉浸模式右侧边栏显示问题
 
 **重要 Bug 修复**：修复 AI 沉浸模式下点击历史对话和设置按钮无法显示右侧边栏的问题。

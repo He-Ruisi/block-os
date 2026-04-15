@@ -22,6 +22,32 @@
 
 ## P0 - 核心功能（当前优先）
 
+### OCR 插件系统 🔌 - [技术设计](../.kiro/specs/ocr-plugin-system/design.md)
+- [ ] Phase 1: 插件系统核心（Week 1）
+  - [ ] 创建插件类型定义（src/types/plugin.ts）
+  - [ ] 实现插件 API（src/services/pluginAPI.ts）
+  - [ ] 实现插件注册表（src/services/pluginRegistry.ts）
+  - [ ] 实现插件配置存储（src/storage/pluginConfigStore.ts）
+  - [ ] 更新 ExtensionsView 组件
+- [ ] Phase 2: OCR 插件实现（Week 2）
+  - [ ] 创建 OCR 插件目录结构
+  - [ ] 实现 OCR 服务（ocrService.ts）
+  - [ ] 实现 OCR UI 组件（OCRPanel.tsx）
+  - [ ] 实现 OCR 插件入口（index.ts）
+  - [ ] 添加 OCR 样式（OCRPanel.css）
+- [ ] Phase 3: 集成与测试（Week 3）
+  - [ ] 在 App.tsx 中初始化插件系统
+  - [ ] 注册 OCR 插件
+  - [ ] 编写单元测试
+  - [ ] 编写集成测试
+  - [ ] 手动测试完整流程
+- [ ] Phase 4: 文档与优化（Week 4）
+  - [ ] 编写插件开发文档
+  - [ ] 编写用户使用文档
+  - [ ] 优化 UI/UX
+  - [ ] 性能优化
+  - [ ] 安全审计
+
 ### AI 沉浸式模式 🤖 - [详细文档](./spec/features/ai/ai-immersive-mode.md)
 - [x] Phase 1: 基础架构
   - [x] 添加 viewMode 状态管理（ai-focus / hybrid）
@@ -282,6 +308,6 @@
 
 ---
 
-**更新时间**: 2026-04-13 21:30  
-**当前阶段**: AI 回复 Markdown 渲染完成，置顶功能全部完成  
-**下次评审**: AI 模式响应式测试 / iPad 手势交互增强
+**更新时间**: 2026-04-15 16:45  
+**当前阶段**: OCR 插件系统技术设计完成，待实施开发  
+**下次评审**: 插件系统核心模块实现 / OCR 插件开发
