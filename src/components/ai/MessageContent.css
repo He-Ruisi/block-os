@@ -29,7 +29,6 @@
   line-height: 1.7;
   color: var(--color-text-primary);
   word-break: break-word;
-  white-space: pre-wrap;
   max-width: 100%;
 }
 
@@ -38,39 +37,33 @@
   padding: 12px 16px;
   border-radius: var(--border-radius-lg);
   max-width: 80%;
+  white-space: pre-wrap;
 }
 
 .message-content__item--assistant .message-content__text {
+  width: 100%;
   background: transparent;
 }
 
-/* Markdown 样式 */
-.message-content__text strong {
+.message-content__editor-preview {
+  width: 100%;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border-primary);
+  border-radius: 12px;
+  padding: 14px;
+}
+
+.message-content__editor-label {
+  font-size: 12px;
   font-weight: 600;
+  color: var(--color-text-secondary);
+  margin-bottom: 10px;
 }
 
-.message-content__text code {
-  background: var(--color-bg-code);
-  border-radius: 4px;
-  padding: 2px 6px;
-  font-family: monospace;
-  font-size: 13px;
+.message-content__editor-markdown {
+  color: var(--color-text-primary);
 }
 
-.message-content__text ol {
-  padding-left: 24px;
-  margin: 0;
-}
-
-.message-content__text ol li {
-  margin-bottom: 16px;
-}
-
-.message-content__text ol li::marker {
-  font-weight: 600;
-}
-
-/* Streaming cursor */
 .message-content__item--streaming {
   padding: 12px 0;
 }
@@ -87,24 +80,38 @@
   50% { opacity: 0; }
 }
 
-/* Toolbar */
 .message-content__toolbar {
   display: flex;
-  gap: 4px;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 .message-content__toolbar-btn {
   font-size: 12px;
-  padding: 4px 12px;
-  border: none;
-  border-radius: var(--border-radius);
-  background: transparent;
-  color: var(--color-text-muted);
+  padding: 6px 12px;
+  border: 1px solid var(--color-border-primary);
+  border-radius: 999px;
+  background: var(--color-bg-primary);
+  color: var(--color-text-secondary);
   cursor: pointer;
   transition: all 0.15s;
 }
 
-.message-content__toolbar-btn:hover {
+.message-content__toolbar-btn:hover:not(:disabled) {
   background: var(--color-bg-hover);
-  color: var(--color-text-secondary);
+}
+
+.message-content__toolbar-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.message-content__toolbar-btn--primary {
+  border-color: var(--color-purple);
+  color: var(--color-purple);
+}
+
+.message-content__toolbar-btn--primary.is-inserted {
+  border-color: #0F6E56;
+  color: #0F6E56;
 }

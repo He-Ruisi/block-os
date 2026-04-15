@@ -1,11 +1,7 @@
 import { useRef, useEffect } from 'react'
+import type { Message } from '../../types/chat'
+import { MarkdownRenderer } from '../shared/MarkdownRenderer'
 import './MessageContent.css'
-
-interface Message {
-  id: string
-  role: 'user' | 'assistant'
-  content: string
-}
 
 interface MessageContentProps {
   messages: Message[]
@@ -34,16 +30,29 @@ export function MessageContent({
         {messages.map(msg => (
           <div key={msg.id} className={`message-content__item message-content__item--${msg.role}`}>
             <div className="message-content__text">
-              {msg.content}
+              {msg.role === 'assistant' ? (
+                <MarkdownRenderer content={msg.content} />
+              ) : (
+                msg.content
+              )}
             </div>
+            {msg.role === 'assistant' && msg.editorContent && (
+              <div className="message-content__editor-preview">
+                <div className="message-content__editor-label">编辑器内容</div>
+                <div className="message-content__editor-markdown">
+                  <MarkdownRenderer content={msg.editorContent} />
+                </div>
+              </div>
+            )}
             {msg.role === 'assistant' && (
               <div className="message-content__toolbar">
                 <button
-                  className="message-content__toolbar-btn"
+                  className={`message-content__toolbar-btn message-content__toolbar-btn--primary ${msg.insertedToEditor ? 'is-inserted' : ''}`}
                   onClick={() => onInsertToEditor?.(msg.id)}
+                  disabled={msg.insertedToEditor}
                   title="写入编辑器"
                 >
-                  写入编辑器
+                  {msg.insertedToEditor ? '已写入编辑器' : '写入编辑器'}
                 </button>
                 <button
                   className="message-content__toolbar-btn"

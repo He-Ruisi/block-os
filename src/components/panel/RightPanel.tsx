@@ -132,14 +132,6 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI, onCl
     }
   }
 
-  const handleInsertContentFromImmersive = (content: string) => {
-    if (isAIFocusMode && onSwitchToHybrid) {
-      onSwitchToHybrid(content)
-    } else if (onInsertContent) {
-      onInsertContent(content)
-    }
-  }
-
   const handleDragStart = (e: React.DragEvent, messageId: string) => {
     const message = messages.find(m => m.id === messageId)
     if (!message) return
@@ -303,7 +295,24 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI, onCl
       {isAIFocusMode && hasMessages && (
         <AIImmersivePanel
           onClose={onClose}
-          onInsertContent={handleInsertContentFromImmersive}
+          messages={messages}
+          isLoading={isLoading}
+          input={input}
+          setInput={setInput}
+          onSendMessage={handleSendMessage}
+          onNewSession={handleNewSession}
+          onInsertToEditor={insertToEditor}
+          currentSession={currentSession}
+          allSessions={allSessions}
+          systemPrompt={systemPrompt}
+          setSystemPrompt={setSystemPrompt}
+          loadSession={handleLoadSession}
+          refreshSessions={refreshSessions}
+          onDeleteSession={handleDeleteSession}
+          aiProvider={aiProvider}
+          setAIProvider={setAIProvider}
+          aiModel={aiModel}
+          setAIModel={setAIModel}
         />
       )}
       

@@ -1048,6 +1048,11 @@
   justify-content: space-between;
   gap: 12px;
   padding: 16px;
+  width: 100%;
+  border: none;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
 }
 
 .settings-card-copy {

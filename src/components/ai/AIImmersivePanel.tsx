@@ -1,55 +1,79 @@
 import { useState } from 'react'
-import { useAIChat } from '../../hooks/useAIChat'
-import { useSession } from '../../hooks/useSession'
+import type { Message, Session } from '../../types/chat'
 import { ChatLayout } from './ChatLayout'
 import { ChatHeader } from './ChatHeader'
 import { MessageContent } from './MessageContent'
 import { ChatInput } from './ChatInput'
 import { SessionHistoryPanel } from '../panel/SessionHistoryPanel'
-import { 
-  getCurrentProvider,
+import {
   setCurrentProvider,
-  getCurrentModel,
   setCurrentModel,
   getProviderConfig,
+  getProviderApiKey,
   type AIProvider,
 } from '../../services/aiService'
-import '../panel/RightPanel.css' // 导入设置面板样式
-import './AIImmersivePanel.css' // 导入沉浸式面板样式
+import '../panel/RightPanel.css'
+import './AIImmersivePanel.css'
 
 interface AIImmersivePanelProps {
   onClose?: () => void
-  onInsertContent?: (content: string) => void
+  messages: Message[]
+  isLoading: boolean
+  input: string
+  setInput: (value: string) => void
+  onSendMessage: () => Promise<void>
+  onNewSession: () => Promise<void>
+  onInsertToEditor: (messageId: string) => void
+  currentSession: Session
+  allSessions: Session[]
+  systemPrompt: string
+  setSystemPrompt: (prompt: string) => void
+  loadSession: (session: Session) => void
+  refreshSessions: () => Promise<void>
+  onDeleteSession: (sessionId: string) => void
+  aiProvider: AIProvider
+  setAIProvider: (provider: AIProvider) => void
+  aiModel: string
+  setAIModel: (model: string) => void
 }
 
-export function AIImmersivePanel({ onClose, onInsertContent }: AIImmersivePanelProps) {
-  const { messages, isLoading, input, setInput, handleSend, handleNewSession, insertToEditor } = useAIChat()
-  const { currentSession, allSessions, systemPrompt, setSystemPrompt, loadSession, newSession: sessionNewSession, refreshSessions } = useSession()
+export function AIImmersivePanel({
+  onClose,
+  messages,
+  isLoading,
+  input,
+  setInput,
+  onSendMessage,
+  onNewSession,
+  onInsertToEditor,
+  currentSession,
+  allSessions,
+  systemPrompt,
+  setSystemPrompt,
+  loadSession,
+  refreshSessions,
+  onDeleteSession,
+  aiProvider,
+  setAIProvider,
+  aiModel,
+  setAIModel,
+}: AIImmersivePanelProps) {
   const [showDeepThink] = useState(true)
   const [showSearch] = useState(true)
   const [showHistory, setShowHistory] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
   const [tempSystemPrompt, setTempSystemPrompt] = useState('')
-  const [aiProvider, setAIProvider] = useState<AIProvider>(getCurrentProvider())
-  const [aiModel, setAIModel] = useState<string>(getCurrentModel())
+  const [settingsProvider, setSettingsProvider] = useState<AIProvider>(aiProvider)
+  const [settingsModel, setSettingsModel] = useState<string>(aiModel)
 
-  const handleSendMessage = async () => {
-    if (!input.trim() || isLoading) return
-    await handleSend()
-  }
+  const showSidebar = showHistory || showSettings
+  const hasApiKey = Boolean(getProviderApiKey(settingsProvider))
 
-  const handleInsertToEditor = (messageId: string) => {
-    insertToEditor(messageId, onInsertContent)
-  }
-
-  const handleCapture = (messageId: string) => {
-    // TODO: 实现捕获为 Block 的逻辑
-    console.log('Capture message:', messageId)
-  }
-
-  const handleDrag = (messageId: string) => {
-    // TODO: 实现拖拽逻辑
-    console.log('Drag message:', messageId)
+  const getModelLabel = (model: string) => {
+    if (model === 'deepseek-chat') return 'deepseek-chat (Fast)'
+    if (model === 'deepseek-reasoner') return 'deepseek-reasoner (Reasoning)'
+    if (model === 'mimo-v2-flash') return 'MiMo Flash'
+    return model
   }
 
   const handleToggleHistory = () => {
@@ -59,37 +83,28 @@ export function AIImmersivePanel({ onClose, onInsertContent }: AIImmersivePanelP
 
   const handleOpenSettings = () => {
     setTempSystemPrompt(systemPrompt)
+    setSettingsProvider(aiProvider)
+    setSettingsModel(aiModel)
     setShowSettings(prev => !prev)
     setShowHistory(false)
   }
 
-  const handleNewChat = async () => {
-    await handleNewSession()
-    setShowHistory(false)
-    setShowSettings(false)
-  }
-
-  const handleLoadSession = (session: typeof currentSession) => {
+  const handleLoadSession = (session: Session) => {
     loadSession(session)
     setShowHistory(false)
   }
 
-  const handleDeleteSession = (sessionId: string) => {
-    if (sessionId === currentSession.id) {
-      sessionNewSession()
-    }
-  }
-
   const handleSaveSettings = () => {
     setSystemPrompt(tempSystemPrompt)
+    setAIProvider(settingsProvider)
+    setCurrentProvider(settingsProvider)
+    setAIModel(settingsModel)
+    setCurrentModel(settingsModel)
     setShowSettings(false)
   }
 
-  const showSidebar = showHistory || showSettings
-
   return (
     <div className="ai-immersive-container">
-      {/* 左侧 AI 对话区 */}
       <div className={`ai-immersive-main ${showSidebar ? 'ai-immersive-main--with-sidebar' : ''}`}>
         <ChatLayout
           header={
@@ -97,7 +112,7 @@ export function AIImmersivePanel({ onClose, onInsertContent }: AIImmersivePanelP
               title="AI 助手"
               subtitle={`${messages.length} 条消息`}
               onExitFullscreen={onClose}
-              onNewChat={handleNewChat}
+              onNewChat={onNewSession}
               onToggleHistory={handleToggleHistory}
               onOpenSettings={handleOpenSettings}
               showHistory={showHistory}
@@ -108,16 +123,14 @@ export function AIImmersivePanel({ onClose, onInsertContent }: AIImmersivePanelP
             <MessageContent
               messages={messages}
               isLoading={isLoading}
-              onInsertToEditor={handleInsertToEditor}
-              onCapture={handleCapture}
-              onDrag={handleDrag}
+              onInsertToEditor={onInsertToEditor}
             />
           }
           input={
             <ChatInput
               value={input}
               onChange={setInput}
-              onSend={handleSendMessage}
+              onSend={() => { void onSendMessage() }}
               disabled={isLoading}
               placeholder="输入消息..."
               showDeepThink={showDeepThink}
@@ -127,7 +140,6 @@ export function AIImmersivePanel({ onClose, onInsertContent }: AIImmersivePanelP
         />
       </div>
 
-      {/* 右侧边栏 */}
       {showSidebar && (
         <div className="ai-immersive-sidebar">
           {showHistory && (
@@ -141,7 +153,7 @@ export function AIImmersivePanel({ onClose, onInsertContent }: AIImmersivePanelP
                   sessions={allSessions}
                   currentSessionId={currentSession.id}
                   onSelect={handleLoadSession}
-                  onDelete={handleDeleteSession}
+                  onDelete={onDeleteSession}
                   onRefresh={refreshSessions}
                 />
               </div>
@@ -156,97 +168,112 @@ export function AIImmersivePanel({ onClose, onInsertContent }: AIImmersivePanelP
               <div className="ai-immersive-sidebar-body">
                 <div className="settings-panel">
                   <div className="settings-body">
-                    {/* 模型选择 */}
-                    <div className="settings-section">
-                      <label className="settings-label">模型</label>
-                      <select 
-                        className="settings-select settings-select-large"
-                        value={aiModel}
-                        onChange={e => {
-                          setAIModel(e.target.value)
-                          setCurrentModel(e.target.value)
-                        }}
-                      >
-                        {getProviderConfig(aiProvider).supportedModels.map(model => (
-                          <option key={model} value={model}>
-                            {model === 'deepseek-chat' && 'deepseek-chat (快速模式)'}
-                            {model === 'deepseek-reasoner' && 'deepseek-reasoner (思考模式)'}
-                            {model === 'mimo-v2-flash' && 'MiMo Flash'}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-
-                    {/* Token 用量显示 */}
-                    <div className="settings-section">
-                      <div className="token-count-display">
-                        <span className="token-count-label">Token count</span>
-                        <span className="token-count-value">0 / 128,000</span>
+                    <div className="settings-card expanded">
+                      <button className="settings-card-summary" type="button">
+                        <div className="settings-card-copy">
+                          <span className="settings-card-title">Model</span>
+                          <span className="settings-card-description">{getProviderConfig(settingsProvider).name} · {getModelLabel(settingsModel)}</span>
+                        </div>
+                      </button>
+                      <div className="settings-card-detail">
+                        <label className="settings-label">Select model</label>
+                        <select
+                          className="settings-select settings-select-large"
+                          value={settingsModel}
+                          onChange={e => setSettingsModel(e.target.value)}
+                        >
+                          {getProviderConfig(settingsProvider).supportedModels.map(model => (
+                            <option key={model} value={model}>
+                              {getModelLabel(model)}
+                            </option>
+                          ))}
+                        </select>
                       </div>
                     </div>
 
-                    {/* 系统提示词 */}
-                    <div className="settings-section">
-                      <label className="settings-label">系统提示词</label>
-                      <textarea
-                        className="system-prompt-textarea"
-                        value={tempSystemPrompt}
-                        onChange={e => setTempSystemPrompt(e.target.value)}
-                        rows={6}
-                        placeholder="输入系统提示词，影响 AI 的回复风格和行为..."
-                      />
+                    <div className="settings-card expanded">
+                      <button className="settings-card-summary" type="button">
+                        <div className="settings-card-copy">
+                          <span className="settings-card-title">System instructions</span>
+                          <span className="settings-card-description">
+                            {tempSystemPrompt.trim() ? `${tempSystemPrompt.trim().slice(0, 40)}${tempSystemPrompt.trim().length > 40 ? '...' : ''}` : 'Optional tone and style instructions for the model'}
+                          </span>
+                        </div>
+                      </button>
+                      <div className="settings-card-detail">
+                        <label className="settings-label">System instructions</label>
+                        <textarea
+                          className="system-prompt-textarea"
+                          value={tempSystemPrompt}
+                          onChange={e => setTempSystemPrompt(e.target.value)}
+                          rows={6}
+                          placeholder="Optional tone and style instructions for the model..."
+                        />
+                      </div>
                     </div>
 
-                    {/* 思考模式（仅 DeepSeek Reasoner） */}
-                    {aiProvider === 'deepseek' && (
-                      <div className="settings-section">
-                        <div className="settings-section-title">思考</div>
-                        
-                        <div className="settings-toggle-item">
-                          <div className="toggle-item-info">
-                            <span className="toggle-item-label">思考模式</span>
-                            <span className="toggle-item-hint">
-                              {aiModel === 'deepseek-reasoner' ? '深度推理，适合复杂任务' : '快速响应，适合日常对话'}
+                    {settingsProvider === 'deepseek' && (
+                      <div className="settings-card expanded">
+                        <button className="settings-card-summary" type="button">
+                          <div className="settings-card-copy">
+                            <span className="settings-card-title">Reasoning</span>
+                            <span className="settings-card-description">
+                              {settingsModel === 'deepseek-reasoner' ? 'Deeper reasoning for complex tasks' : 'Faster responses for daily chat'}
                             </span>
                           </div>
-                          <label className="toggle-switch">
-                            <input
-                              type="checkbox"
-                              checked={aiModel === 'deepseek-reasoner'}
-                              onChange={e => {
-                                const newModel = e.target.checked ? 'deepseek-reasoner' : 'deepseek-chat'
-                                setAIModel(newModel)
-                                setCurrentModel(newModel)
-                              }}
-                            />
-                            <span className="toggle-slider"></span>
-                          </label>
+                        </button>
+                        <div className="settings-card-detail">
+                          <div className="settings-toggle-item">
+                            <div className="toggle-item-info">
+                              <span className="toggle-item-label">Use reasoning model</span>
+                              <span className="toggle-item-hint">Switch between `deepseek-chat` and `deepseek-reasoner`</span>
+                            </div>
+                            <label className="toggle-switch">
+                              <input
+                                type="checkbox"
+                                checked={settingsModel === 'deepseek-reasoner'}
+                                onChange={e => setSettingsModel(e.target.checked ? 'deepseek-reasoner' : 'deepseek-chat')}
+                              />
+                              <span className="toggle-slider"></span>
+                            </label>
+                          </div>
                         </div>
                       </div>
                     )}
 
-                    {/* AI 提供商切换 */}
-                    <div className="settings-section">
-                      <label className="settings-label">AI 提供商</label>
-                      <select 
-                        className="settings-select"
-                        value={aiProvider}
-                        onChange={e => {
-                          const provider = e.target.value as AIProvider
-                          setAIProvider(provider)
-                          setCurrentProvider(provider)
-                          setAIModel(getCurrentModel())
-                        }}
-                      >
-                        <option value="mimo">小米 MiMo</option>
-                        <option value="deepseek">DeepSeek V3.2</option>
-                      </select>
+                    <div className="settings-card expanded">
+                      <button className="settings-card-summary" type="button">
+                        <div className="settings-card-copy">
+                          <span className="settings-card-title">{hasApiKey ? 'AI Provider' : 'No API Key'}</span>
+                          <span className="settings-card-description">
+                            {hasApiKey ? `${getProviderConfig(settingsProvider).name} connected` : 'Switch to a provider with a configured API key'}
+                          </span>
+                        </div>
+                      </button>
+                      <div className="settings-card-detail">
+                        <label className="settings-label">AI Provider</label>
+                        <select
+                          className="settings-select"
+                          value={settingsProvider}
+                          onChange={e => {
+                            const provider = e.target.value as AIProvider
+                            setSettingsProvider(provider)
+                            setSettingsModel(getProviderConfig(provider).defaultModel)
+                          }}
+                        >
+                          <option value="mimo">Xiaomi MiMo</option>
+                          <option value="deepseek">DeepSeek V3.2</option>
+                        </select>
+                        <div className="settings-inline-hint">
+                          {hasApiKey ? 'API key detected for the current provider.' : 'No API key detected for the current provider yet.'}
+                        </div>
+                      </div>
                     </div>
                   </div>
 
                   <div className="settings-footer">
-                    <button className="btn-secondary" onClick={() => { setTempSystemPrompt(systemPrompt); setShowSettings(false) }}>取消</button>
-                    <button className="btn-primary" onClick={handleSaveSettings}>保存</button>
+                    <button className="btn-secondary" onClick={() => { setTempSystemPrompt(systemPrompt); setShowSettings(false) }}>Cancel</button>
+                    <button className="btn-primary" onClick={handleSaveSettings}>Save</button>
                   </div>
                 </div>
               </div>

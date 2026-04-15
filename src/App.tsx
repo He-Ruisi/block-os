@@ -134,6 +134,12 @@ function App() {
   }, [])
 
   // 切换到混合模式时，确保侧边栏默认隐藏
+  const exitAIFocus = useCallback(() => {
+    setViewMode('hybrid')
+    localStorage.setItem('blockos-view-mode', 'hybrid')
+    setSidebarCollapsed(true)
+  }, [setSidebarCollapsed])
+
   useEffect(() => {
     const previousViewMode = previousViewModeRef.current
     if (previousViewMode === 'ai-focus' && viewMode === 'hybrid') {
@@ -334,6 +340,7 @@ function App() {
           onTextSentToAI={() => setSelectedText('')}
           viewMode={viewMode}
           onSwitchToHybrid={switchToHybridMode}
+          onClose={exitAIFocus}
         />
       )}
       

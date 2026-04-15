@@ -31,6 +31,31 @@ export async function publishBlockRelease(
   return release
 }
 
+export interface PublishBlockVersionOptions {
+  blockId: string
+  title?: string
+  contentOverride?: string
+  recordUsage?: boolean
+}
+
+export async function publishBlockVersion(options: PublishBlockVersionOptions): Promise<BlockRelease> {
+  const {
+    blockId,
+    title,
+    contentOverride,
+    recordUsage: shouldRecordUsage = false,
+  } = options
+
+  const release = await publishBlockRelease(blockId, title, contentOverride)
+
+  if (shouldRecordUsage) {
+    await recordBlockUsage(blockId, release.version)
+  }
+
+  window.dispatchEvent(new Event('blockUpdated'))
+  return release
+}
+
 export function trackBlockWorkingCopyChange(blockId: string): void {
   gitIntegration.trackChange(`blocks/${blockId}.md`)
 }

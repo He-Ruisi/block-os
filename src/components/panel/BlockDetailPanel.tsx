@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import type { Block, BlockRelease, BlockUsage } from '../../types/block'
 import { blockStore } from '../../storage/blockStore'
 import { usageStore } from '../../storage/usageStore'
-import { publishBlockRelease } from '../../services/blockReleaseService'
+import { publishBlockVersion } from '../../services/blockReleaseService'
 import { formatRelativeTime } from '../../utils/date'
 import './BlockDetailPanel.css'
 
@@ -41,11 +41,14 @@ export function BlockDetailPanel({ blockId, onClose, onInsertRelease }: BlockDet
   const handleCreateRelease = async () => {
     if (!block) return
     try {
-      await publishBlockRelease(blockId, newReleaseTitle.trim(), block.content)
+      await publishBlockVersion({
+        blockId,
+        title: newReleaseTitle.trim(),
+        contentOverride: block.content,
+      })
       setNewReleaseTitle('')
       setShowNewRelease(false)
       await loadData()
-      window.dispatchEvent(new Event('blockUpdated'))
     } catch (error) {
       console.error('Failed to create release:', error)
     }
