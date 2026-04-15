@@ -1,0 +1,122 @@
+/* src/plugins/ocr-plugin/OCRPanel.css */
+
+.ocr-panel {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.ocr-panel h3 {
+  font-size: 16px;
+  font-weight: 500;
+  margin: 0;
+}
+
+.ocr-preview {
+  width: 100%;
+  min-height: 200px;
+  background: var(--color-background-secondary);
+  border-radius: var(--border-radius-md, 8px);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ocr-video,
+.ocr-image {
+  width: 100%;
+  max-height: 300px;
+  object-fit: contain;
+  display: block;
+}
+
+.ocr-placeholder {
+  color: var(--color-text-secondary);
+  font-size: 14px;
+  text-align: center;
+  padding: 2rem;
+}
+
+.ocr-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.ocr-actions button,
+.file-upload-btn {
+  padding: 8px 16px;
+  border-radius: var(--border-radius-md, 8px);
+  border: 0.5px solid var(--color-border-secondary);
+  background: var(--color-background-primary);
+  color: var(--color-text-primary);
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.ocr-actions button:hover,
+.file-upload-btn:hover {
+  background: var(--color-background-secondary);
+}
+
+.ocr-actions button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.ocr-error {
+  color: var(--color-text-danger);
+  font-size: 13px;
+  padding: 8px;
+  background: var(--color-background-danger);
+  border-radius: var(--border-radius-md, 8px);
+}
+
+.ocr-result {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ocr-result h4 {
+  font-size: 14px;
+  font-weight: 500;
+  margin: 0;
+}
+
+.ocr-result-text {
+  white-space: pre-wrap;
+  font-size: 14px;
+  line-height: 1.7;
+  background: var(--color-background-secondary);
+  border-radius: var(--border-radius-md, 8px);
+  padding: 12px;
+  max-height: 300px;
+  overflow-y: auto;
+  margin: 0;
+}
+
+.ocr-result-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.ocr-result-actions button {
+  padding: 8px 16px;
+  border-radius: var(--border-radius-md, 8px);
+  border: 0.5px solid var(--color-border-secondary);
+  background: var(--color-background-info);
+  color: var(--color-text-info);
+  font-size: 14px;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.ocr-result-actions button:hover {
+  opacity: 0.85;
+}

@@ -23,21 +23,22 @@
 ## P0 - 核心功能（当前优先）
 
 ### OCR 插件系统 🔌 - [技术设计](../.kiro/specs/ocr-plugin-system/design.md)
-- [ ] Phase 1: 插件系统核心（Week 1）
-  - [ ] 创建插件类型定义（src/types/plugin.ts）
-  - [ ] 实现插件 API（src/services/pluginAPI.ts）
-  - [ ] 实现插件注册表（src/services/pluginRegistry.ts）
-  - [ ] 实现插件配置存储（src/storage/pluginConfigStore.ts）
-  - [ ] 更新 ExtensionsView 组件
-- [ ] Phase 2: OCR 插件实现（Week 2）
-  - [ ] 创建 OCR 插件目录结构
-  - [ ] 实现 OCR 服务（ocrService.ts）
-  - [ ] 实现 OCR UI 组件（OCRPanel.tsx）
-  - [ ] 实现 OCR 插件入口（index.ts）
-  - [ ] 添加 OCR 样式（OCRPanel.css）
-- [ ] Phase 3: 集成与测试（Week 3）
-  - [ ] 在 App.tsx 中初始化插件系统
-  - [ ] 注册 OCR 插件
+- [x] Phase 1: 插件系统核心（Week 1）
+  - [x] 创建插件类型定义（src/types/plugin.ts）
+  - [x] 实现插件 API（src/services/pluginAPI.ts）
+  - [x] 实现插件注册表（src/services/pluginRegistry.ts）
+  - [x] 实现插件配置存储（src/storage/pluginConfigStore.ts）
+  - [x] 更新 ExtensionsView 组件
+- [x] Phase 2: OCR 插件实现（Week 2）
+  - [x] 创建 OCR 插件目录结构
+  - [x] 实现 OCR 服务（ocrService.ts）
+  - [x] 实现 OCR UI 组件（OCRPanel.tsx）
+  - [x] 实现 OCR 插件入口（index.ts）
+  - [x] 添加 OCR 样式（OCRPanel.css）
+- [x] Phase 3: 集成与测试（Week 3）
+  - [x] 在 App.tsx 中初始化插件系统
+  - [x] 注册 OCR 插件
+  - [x] TypeScript 类型检查通过
   - [ ] 编写单元测试
   - [ ] 编写集成测试
   - [ ] 手动测试完整流程
@@ -308,6 +309,6 @@
 
 ---
 
-**更新时间**: 2026-04-15 16:45  
-**当前阶段**: OCR 插件系统技术设计完成，待实施开发  
-**下次评审**: 插件系统核心模块实现 / OCR 插件开发
+**更新时间**: 2026-04-15 17:30  
+**当前阶段**: OCR 插件系统 Phase 1-3 完成，Phase 4 待实施  
+**下次评审**: 插件系统文档编写 / 手动测试 / 性能优化

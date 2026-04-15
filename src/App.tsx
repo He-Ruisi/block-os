@@ -20,11 +20,15 @@ import { useTabs } from './hooks/useTabs'
 import { useAuth } from './hooks/useAuth'
 import { useToast } from './hooks/useToast'
 import { useViewport } from './hooks/useViewport'
+import { pluginRegistry } from './services/pluginRegistry'
+import { PluginAPI } from './services/pluginAPI'
+import { OCRPlugin } from './plugins/ocr-plugin'
 import './App.css'
 
 function App() {
   const editorAreaRef = useRef<HTMLDivElement>(null)
   const [editor, setEditor] = useState<TiptapEditor | null>(null)
+  const editorRef = useRef<TiptapEditor | null>(null)
   const [selectedText, setSelectedText] = useState('')
   const [theme, setTheme] = useState<string>(() => localStorage.getItem('blockos-theme') || 'default')
   const [showSettings, setShowSettings] = useState(false)
@@ -156,6 +160,45 @@ function App() {
         console.error(error)
       })
   }, [])
+
+  // 初始化插件系统
+  useEffect(() => {
+    if (!storageReady) return
+    
+    // 创建插件 API 实例
+    const pluginAPI = new PluginAPI(
+      {
+        pluginId: 'system', // 系统级 API
+        permissions: [
+          'editor:read',
+          'editor:write',
+          'block:read',
+          'block:write',
+          'storage:read',
+          'storage:write',
+          'network',
+        ],
+      },
+      editorRef
+    )
+    
+    // 设置插件 API
+    pluginRegistry.setPluginAPI(pluginAPI)
+    
+    // 注册 OCR 插件
+    pluginRegistry.registerPlugin(OCRPlugin)
+      .then(() => {
+        console.log('[App] OCR Plugin registered successfully')
+      })
+      .catch(error => {
+        console.error('[App] Failed to register OCR Plugin:', error)
+      })
+  }, [storageReady])
+
+  // 同步 editor 到 editorRef
+  useEffect(() => {
+    editorRef.current = editor
+  }, [editor])
 
   // 管理编辑器区域宽度样式
   useEffect(() => {

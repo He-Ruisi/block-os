@@ -1,5 +1,38 @@
 # BlockOS 更新日志
 
+## [v1.12.0] - 2026-04-15 🔌 OCR 插件系统实施完成（Phase 1-3）
+
+**重要里程碑**：完成通用可插拔插件系统核心实现，OCR 文字识别插件已集成到应用中。
+
+- **Phase 1: 插件系统核心**：
+  - ✅ 插件类型定义（src/types/plugin.ts）：PluginMetadata、PluginPermission、IPlugin、PluginStatus、PluginRegistryEntry
+  - ✅ 插件配置存储（src/storage/pluginConfigStore.ts）：基于 localStorage 的配置持久化，get/set/remove/getAll/clearAll 方法
+  - ✅ 插件 API（src/services/pluginAPI.ts）：编辑器操作、Block 操作、配置存储、通知系统、权限检查机制
+  - ✅ 插件注册表（src/services/pluginRegistry.ts）：插件注册、激活、停用、卸载、实例管理、状态追踪
+- **Phase 2: OCR 插件实现**：
+  - ✅ OCR 服务（ocrService.ts）：PaddleOCR API 调用封装、Base64 图片识别、错误处理
+  - ✅ OCR UI 组件（OCRPanel.tsx）：摄像头拍照、图片上传、识别结果展示、插入编辑器/保存为 Block
+  - ✅ OCR 插件入口（index.tsx）：OCRPlugin 类实现 IPlugin 接口、生命周期管理、设置面板
+  - ✅ OCR 样式（OCRPanel.css）：响应式布局、主题适配（CSS 变量）
+- **Phase 3: 集成与测试**：
+  - ✅ 更新 ExtensionsView 组件：插件列表展示、插件状态显示、插件操作（打开/设置/卸载）、插件 UI 渲染容器
+  - ✅ 在 App.tsx 中初始化插件系统：创建 PluginAPI 实例、设置插件注册表、注册 OCR 插件
+  - ✅ TypeScript 类型检查通过（bun run type-check）
+- **技术亮点**：
+  - 通用插件架构：完全可插拔，支持多种类型插件扩展
+  - 权限系统：7 种权限类型，细粒度控制插件访问
+  - 类型安全：所有接口使用 TypeScript 严格类型定义
+  - 配置持久化：基于 localStorage，插件配置独立存储
+  - 生命周期管理：activate/deactivate 钩子，优雅的插件加载/卸载
+  - 依赖层级遵守：严格遵循项目架构约束（types → storage → services → components）
+- **用户体验**：
+  - 用户可以在 ActivityBar 点击"插件"图标查看已安装插件
+  - OCR 插件支持摄像头拍照和图片上传两种方式
+  - 识别结果可以插入编辑器（作为 SourceBlock）或保存为显式 Block
+  - 插件配置（API URL 和 Token）可在设置面板中修改
+
+新增 8 个文件，修改 3 个文件，所有代码通过 TypeScript 类型检查。下一步：Phase 4 文档与优化（插件开发文档、用户使用文档、性能优化、安全审计）。
+
 ## [v1.11.0] - 2026-04-15 🔌 OCR 插件系统技术设计
 
 **重要里程碑**：完成通用可插拔插件系统架构设计，OCR 文字识别作为首个示例插件。
