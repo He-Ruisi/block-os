@@ -7,6 +7,7 @@
 - 应用已启动（`bun run dev`）
 - 已登录用户账号
 - 浏览器支持摄像头访问（HTTPS 或 localhost）
+- **重要**：如果修改了 `vite.config.ts`，必须重启开发服务器以应用代理配置
 
 ## 测试步骤
 
@@ -174,6 +175,7 @@
 - 摄像头权限被拒绝后，需要刷新页面重新请求
 - 识别超大图片（> 10MB）可能导致浏览器卡顿
 - 部分浏览器不支持 `facingMode: 'environment'`（后置摄像头）
+- **CORS 问题**：开发环境必须使用代理路径 `/api/ocr/layout-parsing`，直接访问 HTTPS URL 会被浏览器阻止
 
 ---
 

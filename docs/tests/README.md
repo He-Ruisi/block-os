@@ -203,3 +203,6 @@ graph LR
 **祝测试顺利！** 🚀
 
 如有任何问题或建议，欢迎反馈。
+
+## OCR 插件测试
+- [OCR 插件测试指南](./ocr-plugin-test-guide.md) - OCR 插件完整功能测试（v1.12.0）

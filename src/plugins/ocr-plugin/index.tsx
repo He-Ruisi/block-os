@@ -32,7 +32,8 @@ export class OCRPlugin implements IPlugin {
     const apiToken = this.api.getConfig<string>('apiToken')
     
     if (!apiUrl) {
-      this.api.setConfig('apiUrl', 'https://lao3t2m4beyceb6c.aistudio-app.com/layout-parsing')
+      // 使用代理路径避免 CORS 问题
+      this.api.setConfig('apiUrl', '/api/ocr/layout-parsing')
     }
     if (!apiToken) {
       this.api.setConfig('apiToken', '74fc1211d4321e9438158dae3d22f8005fd5e4e2')
@@ -72,8 +73,11 @@ function OCRSettingsPanel({ api }: { api: IPluginAPI }) {
           type="text"
           value={apiUrl}
           onChange={e => setApiUrl(e.target.value)}
-          placeholder="https://..."
+          placeholder="/api/ocr/layout-parsing（使用代理避免 CORS）"
         />
+        <small style={{ color: 'var(--color-text-tertiary)', fontSize: '11px', marginTop: '4px', display: 'block' }}>
+          开发环境使用 /api/ocr/ 前缀会自动代理到 PaddleOCR 服务器
+        </small>
       </div>
       <div className="form-group">
         <label>API Token</label>
