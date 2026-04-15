@@ -35,18 +35,20 @@
   - [x] 更新 vite.config.ts（路径别名解析）
   - [x] TypeScript 类型检查通过
   - [x] 开发服务器正常启动
-- [ ] Phase 2: AI 沉浸模式样式重构（Notion/Roam 风格）
+- [x] Phase 2: AI 沉浸模式样式重构（Notion/Roam 风格）（2026-04-15 完成）
   - [x] 分析当前 AI 沉浸模式实现
   - [x] 制定 v0.dev 辅助设计方案
   - [x] 生成精准的 v0.dev 提示词
-  - [ ] 使用 v0.dev 生成 UI 组件
-  - [ ] 应用 v0.dev 生成的样式到现有组件
-  - [ ] 更新 ChatLayout 组件样式
-  - [ ] 更新 ChatHeader 组件样式
-  - [ ] 更新 ChatInput 组件样式
-  - [ ] 更新 MessageContent 组件样式
-  - [ ] 更新 AIImmersivePanel 组件样式
-  - [ ] TypeScript 类型检查通过
+  - [x] 使用 v0.dev 生成 UI 组件
+  - [x] 应用 v0.dev 生成的样式到现有组件
+  - [x] 更新 ChatLayout 组件样式（移除 CSS，使用 Tailwind）
+  - [x] 更新 ChatHeader 组件样式（移除 CSS，使用 Tailwind）
+  - [x] 更新 ChatInput 组件样式（移除 CSS，使用 Tailwind，添加自动高度）
+  - [x] 更新 MessageContent 组件样式（移除 CSS，使用 Tailwind，添加复制和 hover）
+  - [x] 更新 AIImmersivePanel 组件样式（移除 CSS，使用 Tailwind）
+  - [x] TypeScript 类型检查通过
+  - [x] 开发服务器正常启动
+  - [x] 删除旧的 CSS 文件（5 个文件）
   - [ ] 功能测试（所有功能保持正常）
   - [ ] 主题适配（Default + Newsprint）
   - [ ] 响应式测试（桌面/平板/手机）

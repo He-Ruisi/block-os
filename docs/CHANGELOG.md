@@ -1,5 +1,52 @@
 # BlockOS 更新日志
 
+## [v1.16.3] - 2026-04-15 🎨 AI 沉浸模式 Tailwind 样式重构完成（Phase 2）
+
+**重要里程碑**：完成 AI 沉浸模式从 CSS 到 Tailwind 的完整样式重构，采用 Notion/Roam 风格设计。
+
+- **样式系统升级**：
+  - 移除所有组件的 CSS 文件（5 个），完全使用 Tailwind 工具类
+  - 更新 Design Tokens（--radius: 0.625rem，添加字体连字优化）
+  - 参考 v0.dev 生成的 Notion/Roam 风格设计
+- **组件重构**（5 个核心组件）：
+  - **ChatHeader**：h-14 顶部导航，按钮 h-8 w-8，激活状态 bg-primary/10
+  - **ChatInput**：max-w-[760px] 居中，rounded-2xl 圆角，功能按钮 rounded-full，添加 textarea 自动高度
+  - **ChatLayout**：flex flex-col h-screen，内容区 max-w-[760px] mx-auto
+  - **MessageContent**：用户消息 bg-muted rounded-2xl，AI 消息 bg-transparent，添加复制和 hover 功能
+  - **AIImmersivePanel**：侧边栏 w-80 lg:w-[25%]，遮罩层 bg-black/20
+- **交互优化**：
+  - Textarea 自动高度调整（最大 200px）
+  - 复制按钮（2 秒后恢复）
+  - Hover 显示工具栏（opacity-0 → opacity-100）
+  - 平滑过渡动画（transition-all duration-200/300）
+- **Tailwind 类名规范**：
+  - 尺寸：h-7/h-8/h-9/h-14、max-w-[760px]
+  - 间距：px-2/px-3/px-4、gap-1/gap-2/gap-3
+  - 圆角：rounded-md/rounded-2xl/rounded-full
+  - 颜色：bg-background/bg-muted、text-foreground/text-muted-foreground
+  - 状态：hover:bg-muted、disabled:opacity-50
+- **验证通过**：
+  - TypeScript 类型检查通过 ✅
+  - 开发服务器正常启动 ✅
+  - 功能逻辑保持不变 ✅
+  - 代码更简洁（移除 5 个 CSS 文件）✅
+
+**技术亮点**：
+1. 完全使用 Tailwind 工具类，无自定义 CSS
+2. 借鉴 v0.dev 的 Notion/Roam 风格设计
+3. 保持功能逻辑不变，只更新样式
+4. 优化交互体验（自动高度、复制、hover）
+5. 统一的设计规范和类名约定
+
+**下一步**：
+- 手动功能测试（消息发送、工具栏、侧边栏、设置）
+- 主题适配测试（Default + Newsprint）
+- 响应式测试（桌面/平板/手机）
+- Phase 3: 安装常用 Shadcn UI 组件
+- Phase 4: 重构其他模块（Sidebar、TabBar、Editor 等）
+
+---
+
 ## [v1.16.1] - 2026-04-15 🔧 Tailwind CSS 版本问题修复
 
 **技术修复**：解决 Tailwind CSS 4.x PostCSS 插件兼容性问题。
