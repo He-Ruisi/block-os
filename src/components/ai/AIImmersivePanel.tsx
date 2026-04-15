@@ -174,114 +174,132 @@ export function AIImmersivePanel({
               )}
 
               {showSettings && (
-                <div className="settings-panel">
-                  <div className="settings-body">
-                    <div className="settings-card expanded">
-                      <button className="settings-card-summary" type="button">
-                        <div className="settings-card-copy">
-                          <span className="settings-card-title">Model</span>
-                          <span className="settings-card-description">{getProviderConfig(settingsProvider).name} · {getModelLabel(settingsModel)}</span>
-                        </div>
-                      </button>
-                      <div className="settings-card-detail">
-                        <label className="settings-label">Select model</label>
-                        <select
-                          className="settings-select settings-select-large"
-                          value={settingsModel}
-                          onChange={e => setSettingsModel(e.target.value)}
-                        >
-                          {getProviderConfig(settingsProvider).supportedModels.map(model => (
-                            <option key={model} value={model}>
-                              {getModelLabel(model)}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
+                <div className="p-4 space-y-6">
+                  {/* Model Selection */}
+                  <div className="space-y-3">
+                    <div>
+                      <h3 className="text-sm font-medium text-foreground">模型</h3>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {getProviderConfig(settingsProvider).name} · {getModelLabel(settingsModel)}
+                      </p>
                     </div>
-
-                    <div className="settings-card expanded">
-                      <button className="settings-card-summary" type="button">
-                        <div className="settings-card-copy">
-                          <span className="settings-card-title">System instructions</span>
-                          <span className="settings-card-description">
-                            {tempSystemPrompt.trim() ? `${tempSystemPrompt.trim().slice(0, 40)}${tempSystemPrompt.trim().length > 40 ? '...' : ''}` : 'Optional tone and style instructions for the model'}
-                          </span>
-                        </div>
-                      </button>
-                      <div className="settings-card-detail">
-                        <label className="settings-label">System instructions</label>
-                        <textarea
-                          className="system-prompt-textarea"
-                          value={tempSystemPrompt}
-                          onChange={e => setTempSystemPrompt(e.target.value)}
-                          rows={6}
-                          placeholder="Optional tone and style instructions for the model..."
-                        />
-                      </div>
-                    </div>
-
-                    {settingsProvider === 'deepseek' && (
-                      <div className="settings-card expanded">
-                        <button className="settings-card-summary" type="button">
-                          <div className="settings-card-copy">
-                            <span className="settings-card-title">Reasoning</span>
-                            <span className="settings-card-description">
-                              {settingsModel === 'deepseek-reasoner' ? 'Deeper reasoning for complex tasks' : 'Faster responses for daily chat'}
-                            </span>
-                          </div>
-                        </button>
-                        <div className="settings-card-detail">
-                          <div className="settings-toggle-item">
-                            <div className="toggle-item-info">
-                              <span className="toggle-item-label">Use reasoning model</span>
-                              <span className="toggle-item-hint">Switch between `deepseek-chat` and `deepseek-reasoner`</span>
-                            </div>
-                            <label className="toggle-switch">
-                              <input
-                                type="checkbox"
-                                checked={settingsModel === 'deepseek-reasoner'}
-                                onChange={e => setSettingsModel(e.target.checked ? 'deepseek-reasoner' : 'deepseek-chat')}
-                              />
-                              <span className="toggle-slider"></span>
-                            </label>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    <div className="settings-card expanded">
-                      <button className="settings-card-summary" type="button">
-                        <div className="settings-card-copy">
-                          <span className="settings-card-title">{hasApiKey ? 'AI Provider' : 'No API Key'}</span>
-                          <span className="settings-card-description">
-                            {hasApiKey ? `${getProviderConfig(settingsProvider).name} connected` : 'Switch to a provider with a configured API key'}
-                          </span>
-                        </div>
-                      </button>
-                      <div className="settings-card-detail">
-                        <label className="settings-label">AI Provider</label>
-                        <select
-                          className="settings-select"
-                          value={settingsProvider}
-                          onChange={e => {
-                            const provider = e.target.value as AIProvider
-                            setSettingsProvider(provider)
-                            setSettingsModel(getProviderConfig(provider).defaultModel)
-                          }}
-                        >
-                          <option value="mimo">Xiaomi MiMo</option>
-                          <option value="deepseek">DeepSeek V3.2</option>
-                        </select>
-                        <div className="settings-inline-hint">
-                          {hasApiKey ? 'API key detected for the current provider.' : 'No API key detected for the current provider yet.'}
-                        </div>
-                      </div>
+                    <div className="space-y-2">
+                      <label className="text-xs text-muted-foreground">选择模型</label>
+                      <select
+                        className="w-full px-3 py-2 text-sm bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
+                        value={settingsModel}
+                        onChange={e => setSettingsModel(e.target.value)}
+                      >
+                        {getProviderConfig(settingsProvider).supportedModels.map(model => (
+                          <option key={model} value={model}>
+                            {getModelLabel(model)}
+                          </option>
+                        ))}
+                      </select>
                     </div>
                   </div>
 
-                  <div className="settings-footer">
-                    <button className="btn-secondary" onClick={() => { setTempSystemPrompt(systemPrompt); setShowSettings(false) }}>Cancel</button>
-                    <button className="btn-primary" onClick={handleSaveSettings}>Save</button>
+                  {/* System Instructions */}
+                  <div className="border-t border-border pt-6 space-y-3">
+                    <div>
+                      <h3 className="text-sm font-medium text-foreground">系统指令</h3>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {tempSystemPrompt.trim() 
+                          ? `${tempSystemPrompt.trim().slice(0, 40)}${tempSystemPrompt.trim().length > 40 ? '...' : ''}`
+                          : '为模型设置可选的语气和风格指令'}
+                      </p>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-xs text-muted-foreground">系统指令</label>
+                      <textarea
+                        className="w-full px-3 py-2 text-sm bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring resize-none"
+                        value={tempSystemPrompt}
+                        onChange={e => setTempSystemPrompt(e.target.value)}
+                        rows={6}
+                        placeholder="为模型设置可选的语气和风格指令..."
+                      />
+                    </div>
+                  </div>
+
+                  {/* Reasoning Toggle (DeepSeek only) */}
+                  {settingsProvider === 'deepseek' && (
+                    <div className="border-t border-border pt-6 space-y-3">
+                      <div>
+                        <h3 className="text-sm font-medium text-foreground">推理模式</h3>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {settingsModel === 'deepseek-reasoner' 
+                            ? '深度推理，适合复杂任务' 
+                            : '快速响应，适合日常对话'}
+                        </p>
+                      </div>
+                      <div className="flex items-center justify-between py-2">
+                        <div className="flex-1">
+                          <p className="text-sm text-foreground">使用推理模型</p>
+                          <p className="text-xs text-muted-foreground mt-0.5">
+                            在 deepseek-chat 和 deepseek-reasoner 之间切换
+                          </p>
+                        </div>
+                        <label className="relative inline-flex items-center cursor-pointer">
+                          <input
+                            type="checkbox"
+                            className="sr-only peer"
+                            checked={settingsModel === 'deepseek-reasoner'}
+                            onChange={e => setSettingsModel(e.target.checked ? 'deepseek-reasoner' : 'deepseek-chat')}
+                          />
+                          <div className="w-11 h-6 bg-muted peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-ring rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                        </label>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* AI Provider */}
+                  <div className="border-t border-border pt-6 space-y-3">
+                    <div>
+                      <h3 className="text-sm font-medium text-foreground">
+                        {hasApiKey ? 'AI 提供商' : '未配置 API Key'}
+                      </h3>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {hasApiKey 
+                          ? `${getProviderConfig(settingsProvider).name} 已连接` 
+                          : '切换到已配置 API Key 的提供商'}
+                      </p>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-xs text-muted-foreground">AI 提供商</label>
+                      <select
+                        className="w-full px-3 py-2 text-sm bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
+                        value={settingsProvider}
+                        onChange={e => {
+                          const provider = e.target.value as AIProvider
+                          setSettingsProvider(provider)
+                          setSettingsModel(getProviderConfig(provider).defaultModel)
+                        }}
+                      >
+                        <option value="mimo">Xiaomi MiMo</option>
+                        <option value="deepseek">DeepSeek V3.2</option>
+                      </select>
+                      <p className="text-xs text-muted-foreground">
+                        {hasApiKey 
+                          ? '已检测到当前提供商的 API Key' 
+                          : '尚未检测到当前提供商的 API Key'}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="border-t border-border pt-6 flex gap-2">
+                    <button 
+                      className="flex-1 px-4 py-2 text-sm font-medium text-foreground bg-secondary hover:bg-secondary/80 rounded-md transition-colors"
+                      onClick={() => { setTempSystemPrompt(systemPrompt); setShowSettings(false) }}
+                    >
+                      取消
+                    </button>
+                    <button 
+                      className="flex-1 px-4 py-2 text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 rounded-md transition-colors"
+                      onClick={handleSaveSettings}
+                    >
+                      保存
+                    </button>
                   </div>
                 </div>
               )}
