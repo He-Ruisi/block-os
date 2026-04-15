@@ -13,7 +13,6 @@ import {
   type AIProvider,
 } from '../../services/aiService'
 import '../panel/RightPanel.css'
-import './AIImmersivePanel.css'
 
 interface AIImmersivePanelProps {
   onClose?: () => void
@@ -104,8 +103,8 @@ export function AIImmersivePanel({
   }
 
   return (
-    <div className="ai-immersive-container">
-      <div className={`ai-immersive-main ${showSidebar ? 'ai-immersive-main--with-sidebar' : ''}`}>
+    <div className="h-screen w-full bg-background flex overflow-hidden">
+      <div className={`flex-1 flex flex-col transition-all duration-300 ease-in-out ${showSidebar ? 'lg:mr-[25%]' : ''}`}>
         <ChatLayout
           header={
             <ChatHeader
@@ -141,31 +140,40 @@ export function AIImmersivePanel({
       </div>
 
       {showSidebar && (
-        <div className="ai-immersive-sidebar">
-          {showHistory && (
-            <div className="ai-immersive-sidebar-content">
-              <div className="ai-immersive-sidebar-header">
-                <h3 className="ai-immersive-sidebar-title">历史对话</h3>
-                <span className="ai-immersive-sidebar-subtitle">{allSessions.length} 个会话</span>
-              </div>
-              <div className="ai-immersive-sidebar-body">
-                <SessionHistoryPanel
-                  sessions={allSessions}
-                  currentSessionId={currentSession.id}
-                  onSelect={handleLoadSession}
-                  onDelete={onDeleteSession}
-                  onRefresh={refreshSessions}
-                />
+        <>
+          <div
+            className="fixed inset-0 bg-black/20 z-40 lg:hidden"
+            onClick={() => {
+              setShowHistory(false)
+              setShowSettings(false)
+            }}
+          />
+          <aside className="fixed top-0 right-0 h-full w-80 lg:w-[25%] max-w-sm bg-background border-l border-border z-50 flex flex-col">
+            <div className="h-14 flex items-center justify-between px-4 border-b border-border shrink-0">
+              <div>
+                <h2 className="font-semibold text-foreground">
+                  {showHistory ? '历史对话' : '运行设置'}
+                </h2>
+                <p className="text-xs text-muted-foreground">
+                  {showHistory ? `${allSessions.length} 个会话` : '配置 AI 助手'}
+                </p>
               </div>
             </div>
-          )}
 
-          {showSettings && (
-            <div className="ai-immersive-sidebar-content">
-              <div className="ai-immersive-sidebar-header">
-                <h3 className="ai-immersive-sidebar-title">运行设置</h3>
-              </div>
-              <div className="ai-immersive-sidebar-body">
+            <div className="flex-1 overflow-y-auto">
+              {showHistory && (
+                <div className="p-4">
+                  <SessionHistoryPanel
+                    sessions={allSessions}
+                    currentSessionId={currentSession.id}
+                    onSelect={handleLoadSession}
+                    onDelete={onDeleteSession}
+                    onRefresh={refreshSessions}
+                  />
+                </div>
+              )}
+
+              {showSettings && (
                 <div className="settings-panel">
                   <div className="settings-body">
                     <div className="settings-card expanded">
@@ -276,10 +284,10 @@ export function AIImmersivePanel({
                     <button className="btn-primary" onClick={handleSaveSettings}>Save</button>
                   </div>
                 </div>
-              </div>
+              )}
             </div>
-          )}
-        </div>
+          </aside>
+        </>
       )}
     </div>
   )

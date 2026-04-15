@@ -1,6 +1,5 @@
-import { useState, useRef, KeyboardEvent } from 'react'
+import { useState, useRef, KeyboardEvent, useEffect } from 'react'
 import { Send, Paperclip, Zap, Search } from 'lucide-react'
-import './ChatInput.css'
 
 interface ChatInputProps {
   value: string
@@ -29,6 +28,13 @@ export function ChatInput({
   const [searchActive, setSearchActive] = useState(false)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto'
+      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 200)}px`
+    }
+  }, [value])
+
   const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
@@ -49,69 +55,77 @@ export function ChatInput({
   }
 
   return (
-    <div className="chat-input">
-      <div className="chat-input__container">
-        <div className="chat-input__wrapper">
-          {/* 功能按钮组 */}
-          <div className="chat-input__features">
-            {showDeepThink && (
-              <button
-                className={`chat-input__feature-btn ${deepThinkActive ? 'chat-input__feature-btn--active' : ''}`}
-                onClick={handleDeepThinkToggle}
-                title="深度思考"
-              >
-                <Zap size={14} />
-                <span>DeepThink</span>
-              </button>
-            )}
-            {showSearch && (
-              <button
-                className={`chat-input__feature-btn ${searchActive ? 'chat-input__feature-btn--active' : ''}`}
-                onClick={handleSearchToggle}
-                title="搜索"
-              >
-                <Search size={14} />
-                <span>Search</span>
-              </button>
-            )}
-          </div>
-
-          {/* 输入框 */}
-          <div className="chat-input__input-wrapper">
-            <textarea
-              ref={textareaRef}
-              className="chat-input__textarea"
-              placeholder={placeholder}
-              value={value}
-              onChange={e => onChange(e.target.value)}
-              onKeyDown={handleKeyDown}
-              disabled={disabled}
-              rows={1}
-            />
-            <div className="chat-input__actions">
-              <button
-                className="chat-input__action-btn"
-                title="附件"
-              >
-                <Paperclip size={18} />
-              </button>
-              <button
-                className="chat-input__send-btn"
-                onClick={onSend}
-                disabled={disabled || !value.trim()}
-                title="发送"
-              >
-                <Send size={18} />
-              </button>
-            </div>
-          </div>
+    <div className="w-full max-w-[760px] mx-auto px-4 pb-4">
+      <div className="bg-background border border-border rounded-2xl shadow-sm overflow-hidden">
+        {/* 功能按钮组 */}
+        <div className="flex items-center gap-2 px-3 pt-3">
+          {showDeepThink && (
+            <button
+              type="button"
+              onClick={handleDeepThinkToggle}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200 ${
+                deepThinkActive
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-muted text-muted-foreground hover:bg-muted/80'
+              }`}
+            >
+              <Zap className="h-3.5 w-3.5" />
+              DeepThink
+            </button>
+          )}
+          {showSearch && (
+            <button
+              type="button"
+              onClick={handleSearchToggle}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200 ${
+                searchActive
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-muted text-muted-foreground hover:bg-muted/80'
+              }`}
+            >
+              <Search className="h-3.5 w-3.5" />
+              Search
+            </button>
+          )}
         </div>
 
-        {/* 底部说明文字 */}
-        <div className="chat-input__footer">
-          BlockOS AI 可能会出错，请核实重要信息
+        {/* 输入框 */}
+        <div className="flex items-end gap-2 p-3">
+          <button
+            type="button"
+            className="h-9 w-9 shrink-0 flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors"
+            aria-label="附件"
+          >
+            <Paperclip className="h-4 w-4" />
+          </button>
+
+          <textarea
+            ref={textareaRef}
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder={placeholder}
+            disabled={disabled}
+            rows={1}
+            className="flex-1 resize-none bg-transparent text-[15px] leading-relaxed text-foreground placeholder:text-muted-foreground focus:outline-none disabled:opacity-50 py-2"
+          />
+
+          <button
+            type="button"
+            onClick={onSend}
+            disabled={!value.trim() || disabled}
+            className="h-9 w-9 shrink-0 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center"
+            aria-label="发送"
+          >
+            <Send className="h-4 w-4" />
+          </button>
         </div>
       </div>
+
+      {/* 底部说明 */}
+      <p className="text-center text-xs text-muted-foreground mt-2">
+        BlockOS AI 可能会出错，请核实重要信息
+      </p>
     </div>
   )
 }

@@ -1,5 +1,4 @@
 import { Minimize2, Plus, Menu as MenuIcon, Settings } from 'lucide-react'
-import './ChatHeader.css'
 
 interface ChatHeaderProps {
   title: string
@@ -23,41 +22,55 @@ export function ChatHeader({
   showSettings,
 }: ChatHeaderProps) {
   return (
-    <header className="chat-header">
-      <div className="chat-header__left">
+    <header className="h-14 flex items-center justify-between px-4 border-b border-border bg-background">
+      <div className="flex items-center gap-3">
         <button
-          className="chat-header__btn"
+          className="flex items-center justify-center h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors rounded-md"
           onClick={onExitFullscreen}
           title="退出全屏"
         >
-          <Minimize2 size={18} />
+          <Minimize2 size={16} />
         </button>
-        <div className="chat-header__title-group">
-          <h1 className="chat-header__title">{title}</h1>
-          {subtitle && <span className="chat-header__subtitle">{subtitle}</span>}
+        <div className="flex flex-col">
+          <h1 className="text-lg font-semibold text-foreground leading-tight">
+            {title}
+          </h1>
+          {subtitle && (
+            <span className="text-xs text-muted-foreground">
+              {subtitle}
+            </span>
+          )}
         </div>
       </div>
-      <div className="chat-header__right">
+      <div className="flex items-center gap-1">
         <button
-          className="chat-header__btn"
+          className="flex items-center justify-center h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors rounded-md"
           onClick={onNewChat}
           title="新建对话"
         >
-          <Plus size={18} />
+          <Plus size={16} />
         </button>
         <button
-          className={`chat-header__btn ${showHistory ? 'chat-header__btn--active' : ''}`}
+          className={`flex items-center justify-center h-8 w-8 transition-colors rounded-md ${
+            showHistory
+              ? 'bg-primary/10 text-primary'
+              : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+          }`}
           onClick={onToggleHistory}
           title="历史对话"
         >
-          <MenuIcon size={18} />
+          <MenuIcon size={16} />
         </button>
         <button
-          className={`chat-header__btn ${showSettings ? 'chat-header__btn--active' : ''}`}
+          className={`flex items-center justify-center h-8 w-8 transition-colors rounded-md ${
+            showSettings
+              ? 'bg-primary/10 text-primary'
+              : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+          }`}
           onClick={onOpenSettings}
           title="设置"
         >
-          <Settings size={18} />
+          <Settings size={16} />
         </button>
       </div>
     </header>

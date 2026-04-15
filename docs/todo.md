@@ -35,7 +35,22 @@
   - [x] 更新 vite.config.ts（路径别名解析）
   - [x] TypeScript 类型检查通过
   - [x] 开发服务器正常启动
-- [ ] Phase 2: 安装常用 Shadcn UI 组件
+- [ ] Phase 2: AI 沉浸模式样式重构（Notion/Roam 风格）
+  - [x] 分析当前 AI 沉浸模式实现
+  - [x] 制定 v0.dev 辅助设计方案
+  - [x] 生成精准的 v0.dev 提示词
+  - [ ] 使用 v0.dev 生成 UI 组件
+  - [ ] 应用 v0.dev 生成的样式到现有组件
+  - [ ] 更新 ChatLayout 组件样式
+  - [ ] 更新 ChatHeader 组件样式
+  - [ ] 更新 ChatInput 组件样式
+  - [ ] 更新 MessageContent 组件样式
+  - [ ] 更新 AIImmersivePanel 组件样式
+  - [ ] TypeScript 类型检查通过
+  - [ ] 功能测试（所有功能保持正常）
+  - [ ] 主题适配（Default + Newsprint）
+  - [ ] 响应式测试（桌面/平板/手机）
+- [ ] Phase 3: 安装常用 Shadcn UI 组件
   - [ ] Button（按钮）
   - [ ] Card（卡片）
   - [ ] Dialog（对话框）
