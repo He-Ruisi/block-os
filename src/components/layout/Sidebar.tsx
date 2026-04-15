@@ -8,7 +8,6 @@ import { ExtensionsView } from './ExtensionsView'
 import { SyncStatusIndicator } from '../shared/SyncStatusIndicator'
 import { useSwipeGesture } from '../../hooks/useSwipeGesture'
 import { useViewport } from '../../hooks/useViewport'
-import './Sidebar.css'
 
 interface SidebarProps {
   activeView: SidebarView
@@ -50,26 +49,33 @@ export function Sidebar({
     },
   })
 
+  if (collapsed) {
+    return null
+  }
+
   return (
     <>
       {/* 响应式遮罩层 - 仅在平板/手机模式显示 */}
-      {!collapsed && (
+      {(viewport.isTablet || viewport.isMobile) && (
         <div 
-          className={`sidebar-overlay ${!collapsed ? 'visible' : ''}`}
+          className="fixed inset-0 bg-black/20 z-40 lg:hidden"
           onClick={onClose}
         />
       )}
       
-      <div 
-        className={`sidebar-panel ${!collapsed ? 'expanded' : ''}`}
-        style={{ display: collapsed ? 'none' : 'flex' }}
+      <aside 
+        className="fixed lg:relative inset-y-0 left-0 z-50 lg:z-0 w-60 bg-background border-r border-border flex flex-col transition-transform duration-200 ease-linear"
         {...((viewport.isTablet || viewport.isMobile) ? swipeHandlers : {})}
       >
-        <div className="sidebar-panel-header">
-          {VIEW_TITLES[activeView]}
+        {/* Header */}
+        <div className="h-12 flex items-center px-4 border-b border-border shrink-0">
+          <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+            {VIEW_TITLES[activeView]}
+          </h2>
         </div>
 
-        <div className="sidebar-panel-content">
+        {/* Content */}
+        <div className="flex-1 overflow-y-auto">
           {activeView === 'explorer' && (
             <ExplorerView
               onSelectToday={onSelectToday}
@@ -97,10 +103,11 @@ export function Sidebar({
           )}
         </div>
 
-        <div className="sidebar-panel-footer">
+        {/* Footer */}
+        <div className="h-10 flex items-center px-3 border-t border-border shrink-0">
           <SyncStatusIndicator />
         </div>
-      </div>
+      </aside>
     </>
   )
 }

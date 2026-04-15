@@ -184,7 +184,7 @@ export function AIImmersivePanel({
                       </p>
                     </div>
                     <div className="space-y-2">
-                      <label className="text-xs text-muted-foreground">选择模型</label>
+          
                       <select
                         className="w-full px-3 py-2 text-sm bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
                         value={settingsModel}
@@ -199,39 +199,10 @@ export function AIImmersivePanel({
                     </div>
                   </div>
 
-                  {/* System Instructions */}
-                  <div className="border-t border-border pt-6 space-y-3">
-                    <div>
-                      <h3 className="text-sm font-medium text-foreground">系统指令</h3>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        {tempSystemPrompt.trim() 
-                          ? `${tempSystemPrompt.trim().slice(0, 40)}${tempSystemPrompt.trim().length > 40 ? '...' : ''}`
-                          : '为模型设置可选的语气和风格指令'}
-                      </p>
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-xs text-muted-foreground">系统指令</label>
-                      <textarea
-                        className="w-full px-3 py-2 text-sm bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring resize-none"
-                        value={tempSystemPrompt}
-                        onChange={e => setTempSystemPrompt(e.target.value)}
-                        rows={6}
-                        placeholder="为模型设置可选的语气和风格指令..."
-                      />
-                    </div>
-                  </div>
-
                   {/* Reasoning Toggle (DeepSeek only) */}
                   {settingsProvider === 'deepseek' && (
                     <div className="border-t border-border pt-6 space-y-3">
-                      <div>
-                        <h3 className="text-sm font-medium text-foreground">推理模式</h3>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          {settingsModel === 'deepseek-reasoner' 
-                            ? '深度推理，适合复杂任务' 
-                            : '快速响应，适合日常对话'}
-                        </p>
-                      </div>
+                    
                       <div className="flex items-center justify-between py-2">
                         <div className="flex-1">
                           <p className="text-sm text-foreground">使用推理模型</p>
@@ -252,6 +223,24 @@ export function AIImmersivePanel({
                     </div>
                   )}
 
+                  {/* System Instructions */}
+                  <div className="border-t border-border pt-6 space-y-3">
+                    <div>
+                      <h3 className="text-sm font-medium text-foreground">系统指令</h3>
+                      <div className="space-y-2">
+                      <textarea
+                        className="w-full px-3 py-2 text-sm bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring resize-none"
+                        value={tempSystemPrompt}
+                        onChange={e => setTempSystemPrompt(e.target.value)}
+                        rows={6}
+                        placeholder="为模型设置可选的语气和风格指令..."
+                      />
+                      </div>
+                    </div>
+                  </div>
+
+                  
+
                   {/* AI Provider */}
                   <div className="border-t border-border pt-6 space-y-3">
                     <div>
@@ -265,7 +254,6 @@ export function AIImmersivePanel({
                       </p>
                     </div>
                     <div className="space-y-2">
-                      <label className="text-xs text-muted-foreground">AI 提供商</label>
                       <select
                         className="w-full px-3 py-2 text-sm bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
                         value={settingsProvider}
