@@ -49,7 +49,7 @@
   - [ ] 性能优化
   - [ ] 安全审计
 
-### OCR 增强 UI 🎨 - [需求文档](../.kiro/specs/ocr-enhanced-ui/requirements.md)
+### OCR 增强 UI 🎨 - [需求文档](../.kiro/specs/ocr-enhanced-ui/requirements.md) (2026-04-16实现)
 - [ ] Phase 1: 基础三栏布局 + 历史记录列表
   - [ ] 创建 OCREnhancedPanel 组件（三栏布局容器）
   - [ ] 创建 HistoryList 组件（左侧历史记录列表）

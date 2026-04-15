@@ -1,5 +1,25 @@
 # BlockOS 更新日志
 
+## [v1.15.0] - 2026-04-15 🎨 OCR 增强 UI 设计文档完成
+
+**重要里程碑**：完成专业级 OCR 解析工作站的完整设计文档（2180 行）。
+
+- **设计文档分阶段补充**：从 747 行扩展到 **2180 行**（增加 1433 行）
+- **PreviewArea Component 设计**：Bounding_Box 渲染核心算法、点击检测、交互功能
+- **ResultEditor Component 设计**：多视图切换、模型选择、置信度标记、快捷操作
+- **Data Models and Storage 设计**：IndexedDB Schema、PhotoRecordStore、OCR Service 集成
+- **Implementation Plan**：5 个阶段详细任务清单和验收标准
+- **Testing Strategy**：单元测试、集成测试、性能测试计划
+
+**核心技术亮点**：
+1. Canvas 叠加层渲染（高性能 Bounding_Box 可视化）
+2. 坐标转换算法（API 坐标 → Canvas 坐标）
+3. 双向交互联动（预览区域 ↔ 结果编辑器）
+4. IndexedDB 持久化（可靠的本地存储）
+5. 模块化组件设计（清晰的职责划分）
+
+---
+
 ## [v1.14.0] - 2026-04-15 🎨 OCR 增强 UI 设计文档创建
 
 **重要里程碑**：完成专业级 OCR 解析工作站的需求审核和设计文档创建。
