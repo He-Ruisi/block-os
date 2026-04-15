@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { X, Maximize2 } from 'lucide-react'
+import { X, Maximize2, ChevronDown } from 'lucide-react'
 import { BlockSpacePanel } from './BlockSpacePanel'
 import { SessionHistoryPanel } from './SessionHistoryPanel'
 import { PreviewPanel } from './PreviewPanel'
@@ -40,6 +40,7 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI, onCl
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
+  const [expandedSettingsSection, setExpandedSettingsSection] = useState<'model' | 'prompt' | 'reasoning' | 'provider' | 'context'>('model')
   const [tempSystemPrompt, setTempSystemPrompt] = useState('')
   const [showHistory, setShowHistory] = useState(false)
   const [toastMessage, setToastMessage] = useState<string | null>(null)
@@ -241,6 +242,15 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI, onCl
     }
   }
 
+  const hasApiKey = Boolean(getProviderApiKey(aiProvider))
+
+  const getModelLabel = (model: string) => {
+    if (model === 'deepseek-chat') return 'deepseek-chat (Fast)'
+    if (model === 'deepseek-reasoner') return 'deepseek-reasoner (Reasoning)'
+    if (model === 'mimo-v2-flash') return 'MiMo Flash'
+    return model
+  }
+
   return (
     <div 
       className={`right-panel ${viewport.isTablet || viewport.isMobile ? 'expanded' : ''} ${isAIFocusMode ? 'ai-focus-mode' : ''}`}
@@ -274,7 +284,7 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI, onCl
               />
               <div className="ai-input-footer">
                 <div className="ai-model-indicator">
-                  {getProviderConfig(aiProvider).name} · {aiModel}
+                  {getProviderConfig(aiProvider).name} ? {aiModel}
                 </div>
                 <button 
                   className="ai-send-button-large" 
@@ -339,7 +349,11 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI, onCl
             </button>
             <button
               className="icon-button"
-              onClick={() => { setTempSystemPrompt(systemPrompt); setShowSettings(!showSettings) }}
+              onClick={() => {
+                setTempSystemPrompt(systemPrompt)
+                setExpandedSettingsSection('model')
+                setShowSettings(!showSettings)
+              }}
               title="设置"
             >
               ⚙
@@ -360,97 +374,160 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI, onCl
             </div>
             
             <div className="settings-body">
-              {/* 模型选择 */}
-              <div className="settings-section">
-                <label className="settings-label">模型</label>
-                <select 
-                  className="settings-select settings-select-large"
-                  value={aiModel}
-                  onChange={e => {
-                    setAIModel(e.target.value)
-                    setCurrentModel(e.target.value)
-                  }}
-                >
-                  {getProviderConfig(aiProvider).supportedModels.map(model => (
-                    <option key={model} value={model}>
-                      {model === 'deepseek-chat' && 'deepseek-chat (快速模式)'}
-                      {model === 'deepseek-reasoner' && 'deepseek-reasoner (思考模式)'}
-                      {model === 'mimo-v2-flash' && 'MiMo Flash'}
-                    </option>
-                  ))}
-                </select>
+              <div
+                className={`settings-card ${expandedSettingsSection === 'model' ? 'expanded' : ''}`}
+              >
+                <button className="settings-card-summary" onClick={() => setExpandedSettingsSection('model')} type="button">
+                  <div className="settings-card-copy">
+                    <span className="settings-card-title">Model</span>
+                    <span className="settings-card-description">{getProviderConfig(aiProvider).name} · {getModelLabel(aiModel)}</span>
+                  </div>
+                  <ChevronDown size={16} className="settings-card-chevron" />
+                </button>
+                {expandedSettingsSection === 'model' && (
+                  <div className="settings-card-detail" onClick={e => e.stopPropagation()}>
+                    <label className="settings-label">Select model</label>
+                    <select
+                      className="settings-select settings-select-large"
+                      value={aiModel}
+                      onChange={e => {
+                        setAIModel(e.target.value)
+                        setCurrentModel(e.target.value)
+                      }}
+                    >
+                      {getProviderConfig(aiProvider).supportedModels.map(model => (
+                        <option key={model} value={model}>
+                          {getModelLabel(model)}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
               </div>
 
-              {/* Token 用量显示 */}
-              <div className="settings-section">
-                <div className="token-count-display">
-                  <span className="token-count-label">Token count</span>
-                  <span className="token-count-value">0 / 128,000</span>
-                </div>
+              <div
+                className={`settings-card ${expandedSettingsSection === 'prompt' ? 'expanded' : ''}`}
+              >
+                <button className="settings-card-summary" onClick={() => setExpandedSettingsSection('prompt')} type="button">
+                  <div className="settings-card-copy">
+                    <span className="settings-card-title">System instructions</span>
+                    <span className="settings-card-description">
+                      {tempSystemPrompt.trim() ? `${tempSystemPrompt.trim().slice(0, 40)}${tempSystemPrompt.trim().length > 40 ? '...' : ''}` : 'Optional tone and style instructions for the model'}
+                    </span>
+                  </div>
+                  <ChevronDown size={16} className="settings-card-chevron" />
+                </button>
+                {expandedSettingsSection === 'prompt' && (
+                  <div className="settings-card-detail" onClick={e => e.stopPropagation()}>
+                    <label className="settings-label">System instructions</label>
+                    <textarea
+                      className="system-prompt-textarea"
+                      value={tempSystemPrompt}
+                      onChange={e => setTempSystemPrompt(e.target.value)}
+                      rows={6}
+                      placeholder="Optional tone and style instructions for the model..."
+                    />
+                  </div>
+                )}
               </div>
 
-              {/* 系统提示词 */}
-              <div className="settings-section">
-                <label className="settings-label">系统提示词</label>
-                <textarea
-                  className="system-prompt-textarea"
-                  value={tempSystemPrompt}
-                  onChange={e => setTempSystemPrompt(e.target.value)}
-                  rows={6}
-                  placeholder="输入系统提示词，影响 AI 的回复风格和行为..."
-                />
-              </div>
-
-              {/* 思考模式（仅 DeepSeek Reasoner） */}
               {aiProvider === 'deepseek' && (
-                <div className="settings-section">
-                  <div className="settings-section-title">思考</div>
-                  
-                  <div className="settings-toggle-item">
-                    <div className="toggle-item-info">
-                      <span className="toggle-item-label">思考模式</span>
-                      <span className="toggle-item-hint">
-                        {aiModel === 'deepseek-reasoner' ? '深度推理，适合复杂任务' : '快速响应，适合日常对话'}
+                <div
+                  className={`settings-card ${expandedSettingsSection === 'reasoning' ? 'expanded' : ''}`}
+                >
+                  <button className="settings-card-summary" onClick={() => setExpandedSettingsSection('reasoning')} type="button">
+                    <div className="settings-card-copy">
+                      <span className="settings-card-title">Reasoning</span>
+                      <span className="settings-card-description">
+                        {aiModel === 'deepseek-reasoner' ? 'Deeper reasoning for complex tasks' : 'Faster responses for daily chat'}
                       </span>
                     </div>
-                    <label className="toggle-switch">
-                      <input
-                        type="checkbox"
-                        checked={aiModel === 'deepseek-reasoner'}
-                        onChange={e => {
-                          const newModel = e.target.checked ? 'deepseek-reasoner' : 'deepseek-chat'
-                          setAIModel(newModel)
-                          setCurrentModel(newModel)
-                        }}
-                      />
-                      <span className="toggle-slider"></span>
-                    </label>
-                  </div>
+                    <ChevronDown size={16} className="settings-card-chevron" />
+                  </button>
+                  {expandedSettingsSection === 'reasoning' && (
+                    <div className="settings-card-detail" onClick={e => e.stopPropagation()}>
+                      <div className="settings-toggle-item">
+                        <div className="toggle-item-info">
+                          <span className="toggle-item-label">Use reasoning model</span>
+                          <span className="toggle-item-hint">Switch between `deepseek-chat` and `deepseek-reasoner`</span>
+                        </div>
+                        <label className="toggle-switch">
+                          <input
+                            type="checkbox"
+                            checked={aiModel === 'deepseek-reasoner'}
+                            onChange={e => {
+                              const newModel = e.target.checked ? 'deepseek-reasoner' : 'deepseek-chat'
+                              setAIModel(newModel)
+                              setCurrentModel(newModel)
+                            }}
+                          />
+                          <span className="toggle-slider"></span>
+                        </label>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
 
-              {/* AI 提供商切换 */}
-              <div className="settings-section">
-                <label className="settings-label">AI 提供商</label>
-                <select 
-                  className="settings-select"
-                  value={aiProvider}
-                  onChange={e => {
-                    const provider = e.target.value as AIProvider
-                    setAIProvider(provider)
-                    setCurrentProvider(provider)
-                    setAIModel(getCurrentModel())
-                  }}
-                >
-                  <option value="mimo">小米 MiMo</option>
-                  <option value="deepseek">DeepSeek V3.2</option>
-                </select>
+              <div
+                className={`settings-card ${expandedSettingsSection === 'provider' ? 'expanded' : ''}`}
+              >
+                <button className="settings-card-summary" onClick={() => setExpandedSettingsSection('provider')} type="button">
+                  <div className="settings-card-copy">
+                    <span className="settings-card-title">{hasApiKey ? 'AI Provider' : 'No API Key'}</span>
+                    <span className="settings-card-description">
+                      {hasApiKey ? `${getProviderConfig(aiProvider).name} connected` : 'Switch to a provider with a configured API key'}
+                    </span>
+                  </div>
+                  <ChevronDown size={16} className="settings-card-chevron" />
+                </button>
+                {expandedSettingsSection === 'provider' && (
+                  <div className="settings-card-detail" onClick={e => e.stopPropagation()}>
+                    <label className="settings-label">AI Provider</label>
+                    <select
+                      className="settings-select"
+                      value={aiProvider}
+                      onChange={e => {
+                        const provider = e.target.value as AIProvider
+                        setAIProvider(provider)
+                        setCurrentProvider(provider)
+                        setAIModel(getCurrentModel())
+                      }}
+                    >
+                      <option value="mimo">Xiaomi MiMo</option>
+                      <option value="deepseek">DeepSeek V3.2</option>
+                    </select>
+                    <div className="settings-inline-hint">
+                      {hasApiKey ? 'API key detected for the current provider.' : 'No API key detected for the current provider yet.'}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div
+                className={`settings-card ${expandedSettingsSection === 'context' ? 'expanded' : ''}`}
+              >
+                <button className="settings-card-summary" onClick={() => setExpandedSettingsSection('context')} type="button">
+                  <div className="settings-card-copy">
+                    <span className="settings-card-title">Context</span>
+                    <span className="settings-card-description">Token count · 0 / 128,000</span>
+                  </div>
+                  <ChevronDown size={16} className="settings-card-chevron" />
+                </button>
+                {expandedSettingsSection === 'context' && (
+                  <div className="settings-card-detail" onClick={e => e.stopPropagation()}>
+                    <div className="token-count-display">
+                      <span className="token-count-label">Token count</span>
+                      <span className="token-count-value">0 / 128,000</span>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
             <div className="settings-footer">
-              <button className="btn-secondary" onClick={() => { setTempSystemPrompt(systemPrompt); setShowSettings(false) }}>取消</button>
-              <button className="btn-primary" onClick={() => { setSystemPrompt(tempSystemPrompt); setShowSettings(false) }}>保存</button>
+              <button className="btn-secondary" onClick={() => { setTempSystemPrompt(systemPrompt); setShowSettings(false) }}>Cancel</button>
+              <button className="btn-primary" onClick={() => { setSystemPrompt(tempSystemPrompt); setShowSettings(false) }}>Save</button>
             </div>
           </div>
         ) : showHistory ? (
