@@ -2,7 +2,6 @@ import { useState, useCallback } from 'react'
 import { Search } from 'lucide-react'
 import { searchBlocks } from '../../editor/extensions/suggestion'
 import type { SuggestionItem } from '../../editor/extensions/suggestion'
-import './SearchView.css'
 
 interface SearchViewProps {
   onOpenBlock: (blockId: string) => void
@@ -42,10 +41,10 @@ export function SearchView({ onOpenBlock }: SearchViewProps) {
   }
 
   return (
-    <div className="search-view">
-      <div className="search-input-wrapper">
+    <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex gap-2 p-3 border-b border-border">
         <input
-          className="search-input"
+          className="flex-1 px-2.5 py-2 border border-border rounded text-sm bg-background text-foreground outline-none transition-colors focus:border-ring placeholder:text-muted-foreground"
           type="text"
           placeholder="搜索 Block..."
           value={query}
@@ -54,7 +53,7 @@ export function SearchView({ onOpenBlock }: SearchViewProps) {
           autoFocus
         />
         <button
-          className="search-button"
+          className="w-8 h-8 border border-border bg-background rounded cursor-pointer flex items-center justify-center transition-all shrink-0 hover:bg-muted hover:border-ring disabled:opacity-50 disabled:cursor-not-allowed"
           onClick={handleSearch}
           disabled={!query.trim() || isSearching}
           title="搜索"
@@ -63,32 +62,32 @@ export function SearchView({ onOpenBlock }: SearchViewProps) {
         </button>
       </div>
 
-      <div className="search-results">
+      <div className="flex-1 overflow-y-auto p-2">
         {isSearching ? (
-          <div className="search-empty">
-            <div className="search-empty-text">搜索中...</div>
+          <div className="py-10 px-5 text-center">
+            <div className="text-sm text-muted-foreground mb-1">搜索中...</div>
           </div>
         ) : !hasSearched ? (
-          <div className="search-empty">
-            <div className="search-empty-text">输入关键词搜索 Block</div>
-            <div className="search-empty-hint">按 Enter 搜索</div>
+          <div className="py-10 px-5 text-center">
+            <div className="text-sm text-muted-foreground mb-1">输入关键词搜索 Block</div>
+            <div className="text-xs text-muted-foreground">按 Enter 搜索</div>
           </div>
         ) : results.length === 0 ? (
-          <div className="search-empty">
-            <div className="search-empty-text">未找到结果</div>
-            <div className="search-empty-hint">尝试其他关键词</div>
+          <div className="py-10 px-5 text-center">
+            <div className="text-sm text-muted-foreground mb-1">未找到结果</div>
+            <div className="text-xs text-muted-foreground">尝试其他关键词</div>
           </div>
         ) : (
           <>
-            <div className="search-result-count">{results.length} 个结果</div>
+            <div className="py-1 px-2 text-xs text-muted-foreground uppercase tracking-wider">{results.length} 个结果</div>
             {results.map(item => (
                 <div
                   key={item.id}
-                  className="search-result"
+                  className="px-3 py-2.5 rounded cursor-pointer transition-colors mb-0.5 hover:bg-muted"
                   onClick={() => onOpenBlock(item.id)}
                 >
-                <div className="search-result-title">{item.title}</div>
-                <div className="search-result-snippet">{truncate(item.content)}</div>
+                <div className="text-sm font-medium text-foreground mb-1 overflow-hidden text-ellipsis whitespace-nowrap">{item.title}</div>
+                <div className="text-xs text-muted-foreground leading-relaxed overflow-hidden text-ellipsis whitespace-nowrap">{truncate(item.content)}</div>
               </div>
             ))}
           </>

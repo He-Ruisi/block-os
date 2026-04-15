@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { FilePenLine, List } from 'lucide-react'
 import { documentStore } from '../../storage/documentStore'
-import './OutlineView.css'
 
 interface OutlineItem {
   id: string
@@ -90,37 +89,37 @@ export function OutlineView({ documentId }: OutlineViewProps) {
 
   if (!documentId) {
     return (
-      <div className="outline-view">
-        <div className="outline-empty">
-          <div className="outline-empty-icon"><FilePenLine size={32} /></div>
-          <div className="outline-empty-text">没有打开的文档</div>
-          <div className="outline-empty-hint">打开文档后显示大纲</div>
+      <div className="flex-1 overflow-y-auto p-2">
+        <div className="py-10 px-5 text-center">
+          <div className="mb-3 opacity-50 text-muted-foreground flex justify-center"><FilePenLine size={32} /></div>
+          <div className="text-sm text-muted-foreground mb-1">没有打开的文档</div>
+          <div className="text-xs text-muted-foreground">打开文档后显示大纲</div>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="outline-view">
+    <div className="flex-1 overflow-y-auto p-2">
       {outline.length === 0 ? (
-        <div className="outline-empty">
-          <div className="outline-empty-icon"><List size={32} /></div>
-          <div className="outline-empty-text">暂无标题</div>
-          <div className="outline-empty-hint">使用标题（H1-H6）生成文档大纲</div>
+        <div className="py-10 px-5 text-center">
+          <div className="mb-3 opacity-50 text-muted-foreground flex justify-center"><List size={32} /></div>
+          <div className="text-sm text-muted-foreground mb-1">暂无标题</div>
+          <div className="text-xs text-muted-foreground">使用标题（H1-H6）生成文档大纲</div>
         </div>
       ) : (
-        <div className="outline-list">
-          <div className="outline-doc-title">{documentTitle}</div>
+        <div className="flex flex-col">
+          <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider py-1 px-3 pb-2 overflow-hidden text-ellipsis whitespace-nowrap">{documentTitle}</div>
           {outline.map((item) => (
             <div
               key={item.id}
-              className="outline-item"
+              className="flex items-center gap-2 py-1.5 px-3 rounded cursor-pointer transition-colors mb-px hover:bg-muted"
               style={{ paddingLeft: `${(item.level - 1) * 16 + 12}px` }}
               onClick={() => handleHeadingClick(item)}
               title={item.text}
             >
-              <span className="outline-level-indicator">H{item.level}</span>
-              <span className="outline-item-text">{item.text}</span>
+              <span className="text-[10px] font-semibold text-muted-foreground bg-muted px-1 py-0.5 rounded shrink-0 min-w-[24px] text-center font-mono">H{item.level}</span>
+              <span className={`text-sm overflow-hidden text-ellipsis whitespace-nowrap flex-1 ${item.level === 1 ? 'font-semibold text-foreground' : 'text-muted-foreground'}`}>{item.text}</span>
             </div>
           ))}
         </div>

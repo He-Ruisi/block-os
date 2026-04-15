@@ -4,7 +4,6 @@ import type { StarredItem } from '../../types/layout'
 import type { Document } from '../../types/document'
 import { projectStore } from '../../storage/projectStore'
 import { documentStore } from '../../storage/documentStore'
-import './StarredView.css'
 
 interface StarredViewProps {
   onSelectProject: (projectId: string) => void
@@ -217,23 +216,25 @@ export function StarredView({ onSelectProject, onOpenDocument }: StarredViewProp
 
   if (starredItems.length === 0) {
     return (
-      <div className="starred-view">
-        <div className="starred-empty">
-          <Star size={32} className="starred-empty-icon" />
-          <div className="starred-empty-text">还没有置顶项目</div>
-          <div className="starred-empty-hint">在项目或文档上点击星标图标即可置顶</div>
+      <div className="flex-1 overflow-y-auto p-2">
+        <div className="flex flex-col items-center justify-center py-10 px-5 text-center">
+          <Star size={32} className="text-muted-foreground mb-3 opacity-50" />
+          <div className="text-sm text-muted-foreground mb-1.5">还没有置顶项目</div>
+          <div className="text-xs text-muted-foreground leading-relaxed">在项目或文档上点击星标图标即可置顶</div>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="starred-view">
-      <div className="starred-list">
+    <div className="flex-1 overflow-y-auto p-2">
+      <div className="flex flex-col gap-0.5">
         {starredItems.map(item => (
           <div
             key={`${item.type}-${item.id}`}
-            className={`starred-item ${draggedItem?.id === item.id ? 'dragging' : ''}`}
+            className={`flex items-center gap-2 px-3 py-2 rounded cursor-pointer transition-all relative ${
+              draggedItem?.id === item.id ? 'opacity-50 cursor-move' : 'hover:bg-muted'
+            }`}
             onClick={() => handleItemClick(item)}
             draggable
             onDragStart={e => handleDragStart(e, item)}
@@ -242,15 +243,15 @@ export function StarredView({ onSelectProject, onOpenDocument }: StarredViewProp
             onDrop={e => handleDrop(e, item)}
           >
             {item.type === 'project' ? (
-              <Folder size={16} className="starred-item-icon" />
+              <Folder size={16} className="text-muted-foreground shrink-0" />
             ) : (
-              <FileText size={16} className="starred-item-icon" />
+              <FileText size={16} className="text-muted-foreground shrink-0" />
             )}
-            <span className="starred-item-name">
+            <span className="flex-1 text-sm text-foreground whitespace-nowrap overflow-hidden text-ellipsis">
               {itemNames[item.id] || item.name}
             </span>
             <button
-              className="starred-item-unstar"
+              className="opacity-0 group-hover:opacity-100 hover:opacity-100 bg-transparent border-none p-1 cursor-pointer text-yellow-500 rounded transition-all shrink-0 hover:bg-muted"
               onClick={e => handleUnstar(e, item)}
               title="取消置顶"
             >

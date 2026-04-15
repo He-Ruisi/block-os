@@ -1,7 +1,6 @@
 import { Folder, Search, List, Puzzle, Newspaper, Palette, User, LogOut, Star } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import type { SidebarView } from '../../types/layout'
-import './ActivityBar.css'
 
 interface ActivityBarProps {
   activeView: SidebarView
@@ -33,12 +32,17 @@ export function ActivityBar({
   onToggleTheme,
 }: ActivityBarProps) {
   return (
-    <div className="activity-bar">
-      <div className="activity-bar-top">
+    <div className="flex h-screen w-12 flex-shrink-0 flex-col border-r border-border bg-secondary">
+      {/* Top icons */}
+      <div className="flex flex-col items-center gap-1 py-2">
         {VIEWS.map(({ view, Icon, title }) => (
           <div
             key={view}
-            className={`activity-icon ${activeView === view && !sidebarCollapsed ? 'active' : ''}`}
+            className={`relative flex h-12 w-12 cursor-pointer items-center justify-center text-muted-foreground transition-colors hover:text-foreground ${
+              activeView === view && !sidebarCollapsed
+                ? 'bg-background text-purple-600 before:absolute before:left-0 before:top-2 before:bottom-2 before:w-0.5 before:rounded-r before:bg-purple-600'
+                : ''
+            }`}
             onClick={() => onViewChange(view)}
             title={title}
           >
@@ -47,10 +51,11 @@ export function ActivityBar({
         ))}
       </div>
 
-      <div className="activity-bar-bottom">
+      {/* Bottom icons */}
+      <div className="mt-auto flex flex-col items-center gap-1 border-t border-border py-2">
         {onToggleTheme && (
           <div
-            className="activity-icon"
+            className="flex h-12 w-12 cursor-pointer items-center justify-center text-muted-foreground transition-colors hover:text-foreground"
             onClick={onToggleTheme}
             title={theme === 'newsprint' ? 'Newsprint' : '默认主题'}
           >
@@ -60,7 +65,7 @@ export function ActivityBar({
         {username && (
           <>
             <div 
-              className="activity-icon user-icon" 
+              className="flex h-12 w-12 cursor-pointer items-center justify-center text-muted-foreground transition-colors hover:rounded hover:bg-muted hover:text-foreground" 
               title={`${username} - 点击打开设置`}
               onClick={onOpenSettings}
             >
@@ -68,7 +73,7 @@ export function ActivityBar({
             </div>
             {onSignOut && (
               <div
-                className="activity-icon"
+                className="flex h-12 w-12 cursor-pointer items-center justify-center text-muted-foreground transition-colors hover:text-foreground"
                 onClick={onSignOut}
                 title="登出"
               >
