@@ -26,6 +26,8 @@ export async function recognizeText(
   apiUrl: string,
   apiToken: string
 ): Promise<string> {
+  console.log('[OCRService] Calling API:', apiUrl)
+  
   const payload: OCRRequest = {
     file: base64Image,
     fileType: 1,
@@ -42,6 +44,8 @@ export async function recognizeText(
     },
     body: JSON.stringify(payload),
   })
+  
+  console.log('[OCRService] Response status:', response.status)
   
   if (!response.ok) {
     throw new Error(`HTTP ${response.status} ${response.statusText}`)

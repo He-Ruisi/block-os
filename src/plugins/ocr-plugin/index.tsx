@@ -12,7 +12,7 @@ export class OCRPlugin implements IPlugin {
     version: '1.0.0',
     description: '使用 PaddleOCR 识别图片中的文字，支持摄像头拍照和图片上传',
     author: 'BlockOS Team',
-    icon: 'Camera',
+    icon: '',
     permissions: [
       'editor:write',
       'block:write',
@@ -27,17 +27,26 @@ export class OCRPlugin implements IPlugin {
   async activate(): Promise<void> {
     console.log('[OCRPlugin] Activated')
     
-    // 初始化默认配置
+    // 强制更新配置，清理旧的 HTTPS URL
     const apiUrl = this.api.getConfig<string>('apiUrl')
-    const apiToken = this.api.getConfig<string>('apiToken')
     
-    if (!apiUrl) {
-      // 使用代理路径避免 CORS 问题
+    // 如果配置为空或者是旧的 HTTPS URL，强制更新为代理路径
+    if (!apiUrl || apiUrl.startsWith('https://')) {
+      console.log('[OCRPlugin] Updating API URL to use proxy')
       this.api.setConfig('apiUrl', '/api/ocr/layout-parsing')
     }
+    
+    // 确保 Token 存在
+    const apiToken = this.api.getConfig<string>('apiToken')
     if (!apiToken) {
       this.api.setConfig('apiToken', '74fc1211d4321e9438158dae3d22f8005fd5e4e2')
     }
+    
+    // 输出当前配置用于调试
+    console.log('[OCRPlugin] Current config:', {
+      apiUrl: this.api.getConfig<string>('apiUrl'),
+      apiToken: this.api.getConfig<string>('apiToken')?.substring(0, 10) + '...'
+    })
   }
   
   async deactivate(): Promise<void> {
