@@ -52,6 +52,19 @@
   - [ ] 功能测试（所有功能保持正常）
   - [ ] 主题适配（Default + Newsprint）
   - [ ] 响应式测试（桌面/平板/手机）
+- [ ] Phase 2.5: 左侧边栏样式重构（进行中）
+  - [x] 重构 Sidebar 主容器（移除 CSS，使用 Tailwind）
+  - [x] 重构 ExplorerView 组件（资源管理器）
+  - [ ] 重构 StarredView 组件（置顶视图）
+  - [ ] 重构 SearchView 组件（搜索视图）
+  - [ ] 重构 OutlineView 组件（大纲视图）
+  - [ ] 重构 ExtensionsView 组件（插件视图）
+  - [ ] TypeScript 类型检查通过
+  - [ ] 功能测试（项目管理、文档管理、置顶、搜索等）
+  - [x] 删除旧的 CSS 文件（5 个文件）
+  - [ ] 功能测试（所有功能保持正常）
+  - [ ] 主题适配（Default + Newsprint）
+  - [ ] 响应式测试（桌面/平板/手机）
 - [ ] Phase 3: 安装常用 Shadcn UI 组件
   - [ ] Button（按钮）
   - [ ] Card（卡片）

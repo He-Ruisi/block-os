@@ -18,7 +18,6 @@ import { projectStore } from '../../storage/projectStore'
 import { documentStore } from '../../storage/documentStore'
 import { useLongPress } from '../../hooks/useLongPress'
 import { useViewport } from '../../hooks/useViewport'
-import './ExplorerView.css'
 
 const STORAGE_KEY = 'blockos-starred-items'
 const MAX_STARRED_ITEMS = 10
