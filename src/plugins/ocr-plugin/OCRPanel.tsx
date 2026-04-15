@@ -153,7 +153,20 @@ export function OCRPanel({ api }: OCRPanelProps) {
           <video ref={videoRef} autoPlay playsInline muted className="ocr-video" />
         )}
         {previewSrc && status !== 'camera' && (
-          <img src={previewSrc} alt="预览" className="ocr-image" />
+          <>
+            <img src={previewSrc} alt="预览" className="ocr-image" />
+            {status === 'loading' && (
+              <div className="ocr-loading-overlay">
+                <div className="ocr-loading-spinner">
+                  <div className="spinner-ring"></div>
+                  <div className="spinner-ring"></div>
+                  <div className="spinner-ring"></div>
+                </div>
+                <div className="ocr-loading-text">正在识别文字...</div>
+                <div className="ocr-loading-hint">请稍候，这可能需要几秒钟</div>
+              </div>
+            )}
+          </>
         )}
         {status === 'idle' && (
           <div className="ocr-placeholder">
@@ -182,7 +195,7 @@ export function OCRPanel({ api }: OCRPanelProps) {
             <button onClick={runOCR} disabled={status === 'loading'}>
               {status === 'loading' ? '识别中...' : '识别文字'}
             </button>
-            <button onClick={reset}>重置</button>
+            <button onClick={reset} disabled={status === 'loading'}>重置</button>
           </>
         )}
       </div>

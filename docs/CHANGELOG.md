@@ -1,5 +1,62 @@
 # BlockOS 更新日志
 
+## [v1.12.4] - 2026-04-15 🎨 OCR 加载动画 + 手机访问支持
+
+**用户体验优化**：
+
+- **OCR 识别加载动画**：
+  - 三环旋转动画（绿色、蓝色、橙色），动态效果流畅
+  - 半透明遮罩 + 毛玻璃效果（backdrop-filter: blur）
+  - 文字提示："正在识别文字..." + "请稍候，这可能需要几秒钟"
+  - 脉冲动画，吸引用户注意力
+  - 识别中禁用按钮，防止重复点击
+- **手机访问支持**：
+  - 配置 Vite 允许局域网访问（host: '0.0.0.0'）
+  - 手机可通过局域网 IP 访问开发服务器
+  - 创建完整的手机访问指南（mobile-access.md）
+  - 包含 HTTPS 配置、防火墙设置、常见问题解答
+- **移动端体验优化**：
+  - 加载动画在手机上流畅显示
+  - 解决手机识别慢时用户焦虑问题
+  - 视觉反馈明显，用户体验提升
+
+**技术细节**：
+- 使用 CSS transform 实现 GPU 加速动画
+- 使用 cubic-bezier 缓动函数，动画更自然
+- 使用 backdrop-filter 实现毛玻璃效果
+- 性能优化，动画流畅不卡顿
+
+**访问地址**：
+- 电脑：`http://localhost:5173`
+- 手机：`http://192.168.2.101:5173`（局域网 IP）
+
+## [v1.12.3] - 2026-04-15 🔧 OCR 403 错误分析 + 备用方案
+
+**问题诊断和多方案支持**：
+
+- **403 Forbidden 错误分析**：
+  - 原因：PaddleOCR API 服务器拒绝代理请求
+  - 可能：Token 验证失败、请求头缺失、IP 限制、代理被检测
+- **代理配置优化**：
+  - 添加必要的请求头（User-Agent、Origin、Referer、Accept）
+  - 添加代理日志（proxyReq、proxyRes、error）方便调试
+  - 模拟真实浏览器请求，避免被服务器检测
+- **Tesseract.js 备用方案**（`src/plugins/ocr-plugin/ocrService.tesseract.ts`）：
+  - 纯前端 OCR 实现，完全免费，无需 API Key
+  - 无 CORS 问题，离线可用
+  - 支持中文和英文，识别速度 3-10 秒
+  - 准确率略低于 PaddleOCR，适合测试和离线场景
+- **完整文档体系**：
+  - `docs/guide/ocr-403-fix.md` - 403 错误 4 种解决方案
+  - `docs/guide/ocr-solutions-comparison.md` - OCR 方案对比和选择指南
+  - `docs/guide/ocr-quick-fix.md` - CORS 问题快速修复参考
+  - `docs/guide/README.md` - 使用指南索引
+
+**推荐操作**：
+1. 重启开发服务器（`bun run dev`）测试优化后的代理
+2. 如果仍然 403，切换到 Tesseract.js（`bun add tesseract.js`）
+3. 长期方案：注册百度 OCR API（免费额度足够个人使用）
+
 ## [v1.12.2] - 2026-04-15 🔧 CORS 问题深度修复 + 配置清理工具
 
 **Bug 修复**：解决 localStorage 旧配置导致的 CORS 问题持续出现。
