@@ -9,7 +9,7 @@
 
 ---
 
-## ✅ 已完成（14个）
+## ✅ 已完成（15个）
 
 | 文件 | 组件 | 完成时间 |
 |------|------|---------|
@@ -31,6 +31,7 @@
 | src/components/shared/SyncStatusIndicator.css | SyncStatusIndicator | 2026-04-15 23:55 |
 | src/components/layout/TabBar.css | TabBar | 2026-04-16 16:30 |
 | src/components/panel/RightPanel.css | RightPanel | 2026-04-16 17:30 |
+| src/components/panel/PreviewPanel.css | PreviewPanel | 2026-04-16 18:00 |
 
 ---
 
@@ -77,11 +78,11 @@
 |------|------|------|------|------|
 | src/components/layout/TabBar.css | TabBar | 🟡 中 | ✅ 完成 | 标签页栏 |
 | src/components/panel/RightPanel.css | RightPanel | 🟡 中 | ✅ 完成 | 主面板容器 |
+| src/components/panel/PreviewPanel.css | PreviewPanel | 🟡 中 | ✅ 完成 | 预览面板 |
 | src/components/panel/BlockSpacePanel.css | BlockSpacePanel | 🟡 中 | ⏸️ 待开始 | Block 空间面板 |
 | src/components/panel/BlockDetailPanel.css | BlockDetailPanel | 🟡 中 | ⏸️ 待开始 | Block 详情面板 |
 | src/components/panel/BlockDerivativeSelector.css | BlockDerivativeSelector | 🟡 中 | ⏸️ 待开始 | Block 派生选择器 |
 | src/components/panel/DocumentBlocksPanel.css | DocumentBlocksPanel | 🟡 中 | ⏸️ 待开始 | 文档 Block 面板 |
-| src/components/panel/PreviewPanel.css | PreviewPanel | 🟡 中 | ⏸️ 待开始 | 预览面板 |
 | src/components/panel/SessionHistoryPanel.css | SessionHistoryPanel | 🟡 中 | ⏸️ 待开始 | 会话历史面板 |
 
 **明日总计**：约 3-4小时
@@ -177,7 +178,7 @@
 
 ---
 
-**更新时间**：2026-04-16 17:30
-**当前进度**：14/28 完成（50%）
-**今日成果**：完成 TabBar 和 RightPanel 组件迁移（Phase 4 进度：2/8 完成）
-**下一步**：继续 Phase 4 中风险组件迁移（PreviewPanel、BlockSpacePanel 等）
+**更新时间**：2026-04-16 18:00
+**当前进度**：15/28 完成（54%）
+**今日成果**：完成 TabBar、RightPanel、PreviewPanel 组件迁移（Phase 4 进度：3/8 完成）
+**下一步**：安装 Badge、ScrollArea、Separator 组件，继续迁移剩余 5 个组件

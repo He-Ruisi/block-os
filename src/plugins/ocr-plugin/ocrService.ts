@@ -20,12 +20,39 @@ interface OCRResponse {
   }
 }
 
+export interface OCRRecognizeResult {
+  text: string
+  rawText: string
+}
+
+function cleanOCRText(rawText: string): string {
+  const withoutImageBlocks = rawText
+    .replace(/<div[^>]*>\s*<img[^>]*\/?>\s*<\/div>/gi, '')
+    .replace(/<img[^>]*\/?>/gi, '')
+    .replace(/<\/?div[^>]*>/gi, '')
+
+  const normalizedLines = withoutImageBlocks
+    .split('\n')
+    .map((line) => line.trimEnd())
+    .filter((line, index, lines) => {
+      if (line.trim() !== '') {
+        return true
+      }
+
+      const prevLine = lines[index - 1]?.trim()
+      return prevLine !== ''
+    })
+
+  const cleanedText = normalizedLines.join('\n').replace(/\n{3,}/g, '\n\n').trim()
+  return cleanedText || '（未识别到可用文本内容）'
+}
+
 /** 调用 PaddleOCR API 识别文字 */
 export async function recognizeText(
   base64Image: string,
   apiUrl: string,
   apiToken: string
-): Promise<string> {
+): Promise<OCRRecognizeResult> {
   console.log('[OCRService] Calling API:', apiUrl)
   
   const payload: OCRRequest = {
@@ -56,8 +83,16 @@ export async function recognizeText(
   const texts = results.map(r => r?.markdown?.text || '').filter(Boolean)
   
   if (texts.length === 0) {
-    return '（未识别到文字内容）'
+    return {
+      text: '（未识别到文字内容）',
+      rawText: '',
+    }
   }
-  
-  return texts.join('\n\n---\n\n')
+
+  const rawText = texts.join('\n\n---\n\n')
+
+  return {
+    text: cleanOCRText(rawText),
+    rawText,
+  }
 }

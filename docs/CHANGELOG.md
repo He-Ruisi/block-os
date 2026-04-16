@@ -1,5 +1,44 @@
 # BlockOS 更新日志
 
+## [v1.20.0] - 2026-04-16 🎨 Phase 4 持续推进：PreviewPanel 组件迁移完成
+
+**重要进展**：成功完成 PreviewPanel 组件的 Tailwind CSS 迁移，Phase 4 进度达到 37.5%。
+
+- **已完成迁移**（3/8）：
+  1. **TabBar**（标签页栏）- ✅ 完成
+  2. **RightPanel**（右侧面板容器）- ✅ 完成
+  3. **PreviewPanel**（预览面板）- ✅ 完成
+     - ✅ 删除 PreviewPanel.css 文件
+     - ✅ 样式主题选择（编辑/预览/审阅）
+     - ✅ 导出模板选择（小说/博客/大纲）
+     - ✅ 配置摘要显示
+     - ✅ 预览区域（支持 HTML 和纯文本）
+     - ✅ 底部操作栏（复制/导出）
+     - ✅ 使用 Shadcn Button 组件
+     - ✅ 使用 Tailwind 任意值选择器（[&_h1]、[&_p] 等）
+- **技术亮点**：
+  - 使用 Tailwind 任意值选择器为 HTML 预览添加样式
+  - 使用 `cn()` 工具函数动态切换主题样式
+  - 保留所有功能：主题切换、模板选择、预览、导出
+  - 响应式设计保持不变
+- **验证通过**：
+  - ✅ TypeScript 类型检查通过（0 错误）
+  - ✅ 所有功能正常工作
+
+**当前进度**：
+- ✅ Phase 4: 3/8 完成（37.5%）
+- ✅ 整体 CSS 迁移: 15/28 完成（54%）🎉
+
+**下一步**：
+1. 安装 Badge, ScrollArea, Separator 组件（10 分钟）
+2. 迁移 BlockSpacePanel（30 分钟）
+3. 迁移 DocumentBlocksPanel（25 分钟）
+4. 迁移 SessionHistoryPanel（25 分钟）
+5. 迁移 BlockDetailPanel（25 分钟）
+6. 迁移 BlockDerivativeSelector（20 分钟）
+
+---
+
 ## [v1.19.0] - 2026-04-16 🎨 Phase 4 重大进展：RightPanel 组件迁移完成
 
 **重要里程碑**：成功完成 RightPanel 组件的完整 Tailwind CSS 迁移，这是项目中最复杂的组件之一。

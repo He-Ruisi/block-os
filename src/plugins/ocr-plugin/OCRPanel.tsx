@@ -36,6 +36,7 @@ import './OCRPanel.css'
 
 type HistoryTab = 'recent' | 'favorite'
 type MobileTab = 'history' | 'preview' | 'result'
+type ResultView = 'text' | 'raw'
 
 interface OCRPanelProps {
   api: IPluginAPI
@@ -53,6 +54,7 @@ export function OCRPanel({ api }: OCRPanelProps) {
   const [mobileTab, setMobileTab] = useState<MobileTab>('preview')
   const [searchQuery, setSearchQuery] = useState<string>('')
   const [draftText, setDraftText] = useState<string>('')
+  const [resultView, setResultView] = useState<ResultView>('text')
   const [previewScale, setPreviewScale] = useState<number>(1)
   const [isHydrating, setIsHydrating] = useState<boolean>(true)
   const [isRecognizing, setIsRecognizing] = useState<boolean>(false)
@@ -117,6 +119,7 @@ export function OCRPanel({ api }: OCRPanelProps) {
 
   useEffect(() => {
     setDraftText(selectedRecord?.ocrText ?? '')
+    setResultView('text')
     setPreviewScale(1)
     if (selectedRecord) {
       setMobileTab('preview')
@@ -319,15 +322,17 @@ export function OCRPanel({ api }: OCRPanelProps) {
     await persistRecord(processingRecord)
 
     try {
-      const text = await recognizeText(dataUrlToBase64(selectedRecord.imageDataUrl), apiUrl, apiToken)
+      const result = await recognizeText(dataUrlToBase64(selectedRecord.imageDataUrl), apiUrl, apiToken)
       const nextRecord: OCRPhotoRecord = {
         ...processingRecord,
         ocrStatus: 'done',
-        ocrText: text,
+        ocrText: result.text,
+        ocrRawText: result.rawText,
         updatedAt: new Date().toISOString(),
       }
 
-      setDraftText(text)
+      setDraftText(result.text)
+      setResultView('text')
       await persistRecord(nextRecord)
       setMobileTab('result')
       api.showSuccess('识别成功')
@@ -349,7 +354,7 @@ export function OCRPanel({ api }: OCRPanelProps) {
   }, [api, persistRecord, selectedRecord])
 
   const handleCopy = useCallback(async (): Promise<void> => {
-    const text = draftText.trim()
+    const text = getCurrentResultText(resultView, draftText, selectedRecord?.ocrRawText).trim()
     if (!text) {
       return
     }
@@ -362,7 +367,7 @@ export function OCRPanel({ api }: OCRPanelProps) {
       setErrorMessage(message)
       api.showError(message)
     }
-  }, [api, draftText])
+  }, [api, draftText, resultView, selectedRecord?.ocrRawText])
 
   const handleInsert = useCallback(async (): Promise<void> => {
     const text = draftText.trim()
@@ -405,6 +410,7 @@ export function OCRPanel({ api }: OCRPanelProps) {
   }, [api])
 
   const canOperateResult = draftText.trim().length > 0
+  const hasRawResult = Boolean(selectedRecord?.ocrRawText?.trim())
 
   return (
     <div className="ocr-workspace">
@@ -618,15 +624,32 @@ export function OCRPanel({ api }: OCRPanelProps) {
           </div>
         </div>
 
+        <div className="ocr-result-view-tabs">
+          <Tabs value={resultView} onValueChange={(value) => setResultView(value as ResultView)}>
+            <TabsList className="ocr-result-tabs-list">
+              <TabsTrigger value="text">文本视图</TabsTrigger>
+              <TabsTrigger value="raw" disabled={!hasRawResult}>
+                原始视图
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </div>
+
         <div className="ocr-result-body">
-          <Textarea
-            value={draftText}
-            onChange={(event) => setDraftText(event.target.value)}
-            onBlur={() => void handleSaveDraft()}
-            placeholder={selectedRecord ? '点击“识别文字”开始识别，或在这里编辑结果。' : '请选择图片后开始识别'}
-            disabled={!selectedRecord}
-            className="ocr-result-textarea"
-          />
+          {resultView === 'text' ? (
+            <Textarea
+              value={draftText}
+              onChange={(event) => setDraftText(event.target.value)}
+              onBlur={() => void handleSaveDraft()}
+              placeholder={selectedRecord ? '点击“识别文字”开始识别，或在这里编辑结果。' : '请选择图片后开始识别'}
+              disabled={!selectedRecord}
+              className="ocr-result-textarea"
+            />
+          ) : (
+            <pre className="ocr-result-raw-view">
+              {selectedRecord?.ocrRawText?.trim() || '当前没有原始 OCR 结果'}
+            </pre>
+          )}
           {selectedRecord?.ocrError ? <div className="ocr-inline-error">{selectedRecord.ocrError}</div> : null}
           {errorMessage ? <div className="ocr-inline-error">{errorMessage}</div> : null}
         </div>
@@ -653,6 +676,14 @@ export function OCRPanel({ api }: OCRPanelProps) {
       <canvas ref={canvasRef} className="ocr-hidden-input" />
     </div>
   )
+}
+
+function getCurrentResultText(view: ResultView, text: string, rawText?: string): string {
+  if (view === 'raw') {
+    return rawText ?? ''
+  }
+
+  return text
 }
 
 function getStatusLabel(status: OCRPhotoRecord['ocrStatus']): string {

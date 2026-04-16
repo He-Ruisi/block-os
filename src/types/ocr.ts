@@ -12,5 +12,6 @@ export interface OCRPhotoRecord {
   isFavorite: boolean
   ocrStatus: OCRPhotoStatus
   ocrText?: string
+  ocrRawText?: string
   ocrError?: string
 }

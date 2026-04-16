@@ -269,10 +269,36 @@
   padding: 12px;
 }
 
+.ocr-result-view-tabs {
+  padding: 12px 12px 0;
+}
+
+.ocr-result-tabs-list {
+  display: grid;
+  width: 100%;
+  max-width: 240px;
+  grid-template-columns: repeat(2, 1fr);
+}
+
 .ocr-result-textarea {
   min-height: 100%;
   resize: none;
   line-height: 1.6;
+}
+
+.ocr-result-raw-view {
+  min-height: 100%;
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--muted);
+  padding: 12px;
+  line-height: 1.6;
+  color: var(--foreground);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 13px;
 }
 
 .ocr-inline-error {

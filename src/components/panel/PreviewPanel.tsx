@@ -4,7 +4,8 @@ import { DEFAULT_STYLE_THEMES, DEFAULT_DOCUMENT_TEMPLATES } from '../../types/bl
 import { blockStore } from '../../storage/blockStore'
 import { documentStore } from '../../storage/documentStore'
 import { exportBlocks } from '../../services/exportService'
-import './PreviewPanel.css'
+import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 
 export function PreviewPanel() {
   const [blocks, setBlocks] = useState<Block[]>([])
@@ -95,16 +96,21 @@ export function PreviewPanel() {
   }
 
   return (
-    <div className="preview-panel">
-      {/* 样式主题选择 */}
-      <div className="preview-controls">
-        <div className="control-group">
-          <label className="control-label">样式主题</label>
-          <div className="theme-chips">
+    <div className="flex h-full flex-col overflow-hidden">
+      {/* 控制区域 */}
+      <div className="flex flex-shrink-0 flex-col gap-2.5 border-b border-border p-3">
+        <div className="flex flex-col gap-1.5">
+          <label className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+            样式主题
+          </label>
+          <div className="flex flex-wrap gap-1.5">
             {DEFAULT_STYLE_THEMES.map(theme => (
               <button
                 key={theme.id}
-                className={`theme-chip ${selectedThemeId === theme.id ? 'active' : ''}`}
+                className={cn(
+                  "whitespace-nowrap rounded-2xl border border-border bg-background px-2.5 py-1.5 text-xs text-muted-foreground transition-all hover:border-border hover:text-foreground",
+                  selectedThemeId === theme.id && "border-purple-600 bg-purple-600/10 font-medium text-purple-600"
+                )}
                 onClick={() => setSelectedThemeId(theme.id)}
               >
                 {theme.id === 'editing' ? '✏️' : theme.id === 'preview' ? '👁' : '📝'}
@@ -114,13 +120,18 @@ export function PreviewPanel() {
           </div>
         </div>
 
-        <div className="control-group">
-          <label className="control-label">导出模板</label>
-          <div className="template-chips">
+        <div className="flex flex-col gap-1.5">
+          <label className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+            导出模板
+          </label>
+          <div className="flex flex-wrap gap-1.5">
             {DEFAULT_DOCUMENT_TEMPLATES.map(tmpl => (
               <button
                 key={tmpl.id}
-                className={`template-chip ${selectedTemplateId === tmpl.id ? 'active' : ''}`}
+                className={cn(
+                  "whitespace-nowrap rounded-2xl border border-border bg-background px-2.5 py-1.5 text-xs text-muted-foreground transition-all hover:border-border hover:text-foreground",
+                  selectedTemplateId === tmpl.id && "border-purple-600 bg-purple-600/10 font-medium text-purple-600"
+                )}
                 onClick={() => setSelectedTemplateId(tmpl.id)}
               >
                 {tmpl.id === 'novel' ? '📖' : tmpl.id === 'blog' ? '📰' : '📋'}
@@ -131,55 +142,85 @@ export function PreviewPanel() {
         </div>
 
         {/* 当前配置摘要 */}
-        <div className="config-summary">
-          <span className="summary-item">
+        <div className="flex flex-wrap items-center gap-1.5 rounded bg-secondary px-2.5 py-1.5">
+          <span className="text-[11px] text-muted-foreground">
             AI块: {selectedTemplate.exportRules.aiBlocks === 'merge-as-paragraph' ? '融入正文' : selectedTemplate.exportRules.aiBlocks === 'keep-as-quote' ? '保留引用' : '移除'}
           </span>
-          <span className="summary-divider">·</span>
-          <span className="summary-item">
+          <span className="text-[11px] text-border">·</span>
+          <span className="text-[11px] text-muted-foreground">
             格式: {selectedTemplate.exportRules.format === 'markdown' ? 'Markdown' : selectedTemplate.exportRules.format === 'html' ? 'HTML' : '纯文本'}
           </span>
-          <span className="summary-divider">·</span>
-          <span className="summary-item">
+          <span className="text-[11px] text-border">·</span>
+          <span className="text-[11px] text-muted-foreground">
             来源标签: {selectedTheme.showSourceLabels ? '显示' : '隐藏'}
           </span>
         </div>
       </div>
 
       {/* 预览区域 */}
-      <div className={`preview-body theme-${selectedThemeId}`}>
+      <div className={cn(
+        "min-h-0 flex-1 overflow-y-auto px-4 py-5",
+        selectedThemeId === 'editing' && "text-foreground",
+        selectedThemeId === 'preview' && "font-serif text-muted-foreground leading-8",
+        selectedThemeId === 'review' && "text-foreground"
+      )}>
         {isLoading ? (
-          <div className="preview-empty">
-            <div className="empty-icon">⏳</div>
-            <div className="empty-text">加载中...</div>
+          <div className="flex h-full flex-col items-center justify-center px-5 py-10 text-center">
+            <div className="mb-3 text-5xl opacity-50">⏳</div>
+            <div className="mb-1.5 text-sm text-muted-foreground">加载中...</div>
           </div>
         ) : blocks.length === 0 ? (
-          <div className="preview-empty">
-            <div className="empty-icon">📄</div>
-            <div className="empty-text">当前文档为空</div>
-            <div className="empty-hint">在编辑器中写入内容后，这里会显示预览</div>
+          <div className="flex h-full flex-col items-center justify-center px-5 py-10 text-center">
+            <div className="mb-3 text-5xl opacity-50">📄</div>
+            <div className="mb-1.5 text-sm text-muted-foreground">当前文档为空</div>
+            <div className="text-xs text-muted-foreground">在编辑器中写入内容后，这里会显示预览</div>
           </div>
         ) : previewFormat === 'html' ? (
           <div
-            className="preview-content preview-html"
+            className={cn(
+              "break-words text-sm leading-relaxed text-foreground",
+              "[&_h1]:mb-4 [&_h1]:text-2xl [&_h1]:font-semibold",
+              "[&_h2]:mb-3 [&_h2]:mt-5 [&_h2]:text-lg [&_h2]:font-semibold",
+              "[&_p]:mb-3",
+              "[&_blockquote]:my-3 [&_blockquote]:rounded-r [&_blockquote]:border-l-[3px] [&_blockquote]:border-border [&_blockquote]:bg-secondary [&_blockquote]:px-4 [&_blockquote]:py-2 [&_blockquote]:text-muted-foreground",
+              "[&_pre]:my-3 [&_pre]:overflow-x-auto [&_pre]:rounded-md [&_pre]:bg-secondary [&_pre]:p-3",
+              "[&_hr]:my-5 [&_hr]:border-0 [&_hr]:border-t [&_hr]:border-border",
+              selectedThemeId === 'review' && "rounded-md border border-[#f0e6c0] bg-[#fffef5] p-4"
+            )}
             dangerouslySetInnerHTML={{ __html: previewContent }}
           />
         ) : (
-          <pre className="preview-content preview-text">{previewContent}</pre>
+          <pre className={cn(
+            "m-0 whitespace-pre-wrap break-words bg-transparent text-sm leading-relaxed text-foreground",
+            selectedThemeId === 'review' && "rounded-md border border-[#f0e6c0] bg-[#fffef5] p-4"
+          )}>
+            {previewContent}
+          </pre>
         )}
       </div>
 
       {/* 底部操作栏 */}
       {blocks.length > 0 && (
-        <div className="preview-footer">
-          <span className="block-count">{blocks.length} 个段落</span>
-          <div className="footer-actions">
-            <button className="action-btn" onClick={handleCopy} disabled={!previewContent}>
+        <div className="flex flex-shrink-0 items-center justify-between border-t border-border bg-secondary px-3 py-2.5">
+          <span className="text-[11px] text-muted-foreground">{blocks.length} 个段落</span>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-7 px-3 text-xs"
+              onClick={handleCopy}
+              disabled={!previewContent}
+            >
               {copySuccess ? '✓ 已复制' : '📋 复制'}
-            </button>
-            <button className="action-btn action-btn-primary" onClick={handleDownload} disabled={!previewContent}>
+            </Button>
+            <Button
+              size="sm"
+              className="h-7 bg-purple-600 px-3 text-xs hover:bg-purple-700"
+              onClick={handleDownload}
+              disabled={!previewContent}
+            >
               ⬇ 导出文件
-            </button>
+            </Button>
           </div>
         </div>
       )}
