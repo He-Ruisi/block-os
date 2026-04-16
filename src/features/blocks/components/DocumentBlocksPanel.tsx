@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import type { DocumentBlock } from '@/types/models/document'
 import { documentStore } from '@/storage/documentStore'
 import '@/styles/modules/blocks.css'
+import '@/styles/modules/common-patterns.css'
 
 export function DocumentBlocksPanel() {
   const [blocks, setBlocks] = useState<DocumentBlock[]>([])
@@ -62,27 +63,27 @@ export function DocumentBlocksPanel() {
         <div className="document-blocks-panel__subtitle">隐式 Block 结构</div>
       </div>
 
-      <div className="document-blocks-panel__body">
+      <div className="document-blocks-panel__body scroll-area">
         {isLoading ? (
-          <div className="document-blocks-panel__empty">
-            <div className="document-blocks-panel__empty-icon">⏳</div>
-            <div className="document-blocks-panel__empty-text">加载中...</div>
+          <div className="empty-state">
+            <span className="empty-state__icon">⏳</span>
+            <p className="empty-state__text">加载中...</p>
           </div>
         ) : blocks.length === 0 ? (
-          <div className="document-blocks-panel__empty">
-            <div className="document-blocks-panel__empty-icon">📝</div>
-            <div className="document-blocks-panel__empty-text">开始写作</div>
-            <div className="document-blocks-panel__empty-hint">每个段落都会自动成为一个 Block</div>
+          <div className="empty-state">
+            <span className="empty-state__icon">📝</span>
+            <p className="empty-state__text">开始写作</p>
+            <p className="empty-state__hint">每个段落都会自动成为一个 Block</p>
           </div>
         ) : (
           <div className="document-blocks-panel__tree">
             {blocks.map((block, index) => (
-              <div key={block.id} className="document-blocks-panel__node">
+              <div key={block.id} className="card-base document-blocks-panel__node">
                 <div className="document-blocks-panel__node-header">
                   <span className="document-blocks-panel__icon">{getNodeIcon(block.nodeType)}</span>
                   <span className="document-blocks-panel__index">#{index + 1}</span>
                   {block.links.length > 0 && (
-                    <span className="document-blocks-panel__links-count" title={`${block.links.length} 个链接`}>
+                    <span className="badge-primary document-blocks-panel__links-count" title={`${block.links.length} 个链接`}>
                       🔗 {block.links.length}
                     </span>
                   )}
@@ -93,7 +94,7 @@ export function DocumentBlocksPanel() {
                 {block.links.length > 0 && (
                   <div className="document-blocks-panel__node-links">
                     {block.links.map((linkId, i) => (
-                      <span key={i} className="document-blocks-panel__link-badge" title={linkId}>
+                      <span key={i} className="badge-outline document-blocks-panel__link-badge" title={linkId}>
                         → {linkId.substring(0, 8)}
                       </span>
                     ))}

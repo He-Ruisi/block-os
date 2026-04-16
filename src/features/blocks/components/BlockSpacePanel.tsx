@@ -4,6 +4,7 @@ import { blockStore } from '@/storage/blockStore'
 import { formatRelativeTime } from '@/utils/date'
 import { BlockDetailPanel } from './BlockDetailPanel'
 import '@/styles/modules/blocks.css'
+import '@/styles/modules/common-patterns.css'
 
 export function BlockSpacePanel() {
   const [blocks, setBlocks] = useState<Block[]>([])
@@ -134,11 +135,11 @@ export function BlockSpacePanel() {
   return (
     <div className="block-space-panel">
       <div className="block-space-panel__header">
-        <div className="block-space-panel__search-box">
-          <span className="block-space-panel__search-icon">🔍</span>
+        <div className="input-search">
+          <span className="input-search__icon">🔍</span>
           <input
             type="text"
-            className="block-space-panel__search-input"
+            className="input-search__field"
             placeholder="搜索 Block..."
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
@@ -161,19 +162,19 @@ export function BlockSpacePanel() {
         </div>
       </div>
 
-      <div className="block-space-panel__body">
+      <div className="block-space-panel__body scroll-area">
         {isLoading ? (
-          <div className="block-space-panel__empty">
-            <div className="block-space-panel__empty-icon">⏳</div>
-            <div className="block-space-panel__empty-text">加载中...</div>
+          <div className="empty-state">
+            <div className="empty-state__icon">⏳</div>
+            <div className="empty-state__text">加载中...</div>
           </div>
         ) : filteredBlocks.length === 0 ? (
-          <div className="block-space-panel__empty">
-            <div className="block-space-panel__empty-icon">📦</div>
-            <div className="block-space-panel__empty-text">
+          <div className="empty-state">
+            <div className="empty-state__icon">📦</div>
+            <div className="empty-state__text">
               {blocks.length === 0 ? '还没有 Block' : '没有找到匹配的 Block'}
             </div>
-            <div className="block-space-panel__empty-hint">
+            <div className="empty-state__hint">
               {blocks.length === 0 ? '捕获 AI 回复或选中文字来创建 Block' : '尝试其他搜索条件'}
             </div>
           </div>
@@ -182,7 +183,7 @@ export function BlockSpacePanel() {
             {filteredBlocks.map(block => (
               <div
                 key={block.id}
-                className={`block-space-panel__card ${highlightedBlockId === block.id ? 'block-space-panel__card--highlighted' : ''}`}
+                className={`card-interactive block-space-panel__card ${highlightedBlockId === block.id ? 'card-highlighted' : ''}`}
                 data-block-id={block.id}
                 draggable
                 onDragStart={event => handleBlockDragStart(event, block)}
@@ -197,7 +198,7 @@ export function BlockSpacePanel() {
                 <div className="block-space-panel__meta">
                   <div className="block-space-panel__tags">
                     {block.metadata.tags.map(tag => (
-                      <span key={tag} className="block-space-panel__tag">#{tag}</span>
+                      <span key={tag} className="badge-tag">#{tag}</span>
                     ))}
                   </div>
                   <div className="block-space-panel__info">

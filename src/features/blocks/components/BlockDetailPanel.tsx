@@ -5,6 +5,7 @@ import { usageStore } from '@/storage/usageStore'
 import { publishBlockVersion } from '../services/blockReleaseService'
 import { formatRelativeTime } from '@/utils/date'
 import '@/styles/modules/blocks.css'
+import '@/styles/modules/common-patterns.css'
 
 interface BlockDetailPanelProps {
   blockId: string
@@ -98,11 +99,14 @@ export function BlockDetailPanel({ blockId, onClose, onInsertRelease }: BlockDet
   return (
     <div className="block-detail-panel">
       <div className="block-detail-panel__header">
-        <button className="block-detail-panel__back" onClick={onClose}>← 返回</button>
+        <button className="btn-ghost block-detail-panel__back" onClick={onClose}>
+          <span className="block-detail-panel__back-icon">←</span>
+          返回
+        </button>
         <span className="block-detail-panel__title">{block.metadata.title || 'Block 详情'}</span>
       </div>
 
-      <div className="block-detail-panel__body">
+      <div className="block-detail-panel__body scroll-area">
         <section className="block-detail-panel__section">
           <div className="block-detail-panel__section-label">当前内容</div>
           <div className="block-detail-panel__content-box">
@@ -110,14 +114,14 @@ export function BlockDetailPanel({ blockId, onClose, onInsertRelease }: BlockDet
             {block.content.length > 200 ? '...' : ''}
           </div>
           <div className="block-detail-panel__meta-row">
-            <span className="block-detail-panel__meta-chip">
+            <span className="badge-outline">
               {block.type === 'ai-generated' ? 'AI' : '编辑器'}
             </span>
-            <span className="block-detail-panel__meta-chip">
+            <span className="badge-outline">
               {formatRelativeTime(block.metadata.createdAt)}
             </span>
             {block.metadata.tags.map(tag => (
-              <span key={tag} className="block-detail-panel__meta-chip block-detail-panel__meta-chip--tag">
+              <span key={tag} className="badge-tag">
                 #{tag}
               </span>
             ))}
@@ -128,7 +132,7 @@ export function BlockDetailPanel({ blockId, onClose, onInsertRelease }: BlockDet
           <div className="block-detail-panel__section-label-row">
             <span className="block-detail-panel__section-label">版本 ({releases.length})</span>
             <button
-              className="block-detail-panel__new-release-btn"
+              className="btn-primary block-detail-panel__new-release-btn"
               onClick={() => setShowNewRelease(true)}
             >
               + 发布新版本
@@ -147,13 +151,13 @@ export function BlockDetailPanel({ blockId, onClose, onInsertRelease }: BlockDet
               />
               <div className="block-detail-panel__release-form-actions">
                 <button
-                  className="block-detail-panel__button block-detail-panel__button--secondary"
+                  className="btn-secondary"
                   onClick={() => setShowNewRelease(false)}
                 >
                   取消
                 </button>
                 <button
-                  className="block-detail-panel__button block-detail-panel__button--primary"
+                  className="btn-primary"
                   onClick={() => void handleCreateRelease()}
                 >
                   发布
@@ -169,11 +173,11 @@ export function BlockDetailPanel({ blockId, onClose, onInsertRelease }: BlockDet
               {[...releases].reverse().map(release => (
                 <div
                   key={release.version}
-                  className={`block-detail-panel__release-card ${selectedVersion === release.version ? 'block-detail-panel__release-card--selected' : ''}`}
+                  className={`card-interactive block-detail-panel__release-card ${selectedVersion === release.version ? 'card-highlighted' : ''}`}
                   onClick={() => setSelectedVersion(selectedVersion === release.version ? null : release.version)}
                 >
                   <div className="block-detail-panel__release-card-header">
-                    <span className="block-detail-panel__release-version">v{release.version}</span>
+                    <span className="badge-success">v{release.version}</span>
                     <span className="block-detail-panel__release-title-text">{release.title}</span>
                     <span className="block-detail-panel__release-time">{formatRelativeTime(release.releasedAt)}</span>
                   </div>
@@ -193,7 +197,7 @@ export function BlockDetailPanel({ blockId, onClose, onInsertRelease }: BlockDet
               {usages.map(usage => (
                 <div key={usage.id} className="block-detail-panel__usage-item">
                   <span className="block-detail-panel__usage-doc">{usage.documentTitle}</span>
-                  <span className="block-detail-panel__usage-version">v{usage.releaseVersion}</span>
+                  <span className="badge-success">v{usage.releaseVersion}</span>
                   <span className="block-detail-panel__usage-time">{formatRelativeTime(usage.insertedAt)}</span>
                 </div>
               ))}
@@ -205,7 +209,7 @@ export function BlockDetailPanel({ blockId, onClose, onInsertRelease }: BlockDet
       {selectedVersion !== null && (
         <div className="block-detail-panel__footer">
           <span className="block-detail-panel__footer-hint">已选择 v{selectedVersion}</span>
-          <button className="block-detail-panel__button block-detail-panel__button--primary" onClick={handleInsert}>
+          <button className="btn-primary" onClick={handleInsert}>
             插入到编辑器
           </button>
         </div>

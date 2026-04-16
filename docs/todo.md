@@ -24,80 +24,27 @@
 
 ### 主题样式重塑 🎨 - [需求文档](./spec/features/styles/style.md)
 - [x] Phase 1: Tailwind CSS + Shadcn/UI 安装（2026-04-15 完成）
-  - [x] 安装 Tailwind CSS 核心依赖（tailwindcss、postcss、autoprefixer）
-  - [x] 安装 Shadcn/UI 工具库（class-variance-authority、clsx、tailwind-merge）
-  - [x] 创建 tailwind.config.js 配置
-  - [x] 创建 postcss.config.js 配置
-  - [x] 创建 components.json 配置
-  - [x] 创建 src/index.css（Design Token 系统）
-  - [x] 创建 src/lib/utils.ts（cn() 工具函数）
-  - [x] 更新 tsconfig.json（路径别名）
-  - [x] 更新 vite.config.ts（路径别名解析）
-  - [x] TypeScript 类型检查通过
-  - [x] 开发服务器正常启动
-- [x] Phase 2: AI 沉浸模式样式重构（Notion/Roam 风格）（2026-04-15 完成）
-  - [x] 分析当前 AI 沉浸模式实现
-  - [x] 制定 v0.dev 辅助设计方案
-  - [x] 生成精准的 v0.dev 提示词
-  - [x] 使用 v0.dev 生成 UI 组件
-  - [x] 应用 v0.dev 生成的样式到现有组件
-  - [x] 更新 ChatLayout 组件样式（移除 CSS，使用 Tailwind）
-  - [x] 更新 ChatHeader 组件样式（移除 CSS，使用 Tailwind）
-  - [x] 更新 ChatInput 组件样式（移除 CSS，使用 Tailwind，添加自动高度）
-  - [x] 更新 MessageContent 组件样式（移除 CSS，使用 Tailwind，添加复制和 hover）
-  - [x] 更新 AIImmersivePanel 组件样式（移除 CSS，使用 Tailwind）
-  - [x] TypeScript 类型检查通过
-  - [x] 开发服务器正常启动
-  - [x] 删除旧的 CSS 文件（5 个文件）
-  - [ ] 功能测试（所有功能保持正常）
-  - [ ] 主题适配（Default + Newsprint）
-  - [ ] 响应式测试（桌面/平板/手机）
+- [x] Phase 2: AI 沉浸模式样式重构（2026-04-15 完成）
 - [x] Phase 2.5: 左侧边栏样式重构（已完成）
-  - [x] 重构 Sidebar 主容器（移除 CSS，使用 Tailwind）
-  - [x] 重构 ExplorerView 组件（资源管理器）
-  - [x] 重构 StarredView 组件（置顶视图）
-  - [x] 重构 SearchView 组件（搜索视图）
-  - [x] 重构 OutlineView 组件（大纲视图）
-  - [x] 重构 ExtensionsView 组件（插件视图）
-  - [x] 重构 ActivityBar 组件（活动栏）
-  - [x] 重构 StatusBar 组件（状态栏）
-  - [x] 重构 ResizeHandle 组件（调整大小手柄）
-  - [x] 重构 Toast 组件（提示消息）
-  - [x] 重构 MarkdownRenderer 组件（Markdown 渲染器）
-  - [x] 重构 SyncStatusIndicator 组件（同步状态指示器）
-  - [x] TypeScript 类型检查通过
-  - [x] 删除所有旧的 CSS 文件（12 个文件）
-  - [ ] 功能测试（所有功能保持正常）
-  - [ ] 主题适配（Default + Newsprint）
-  - [ ] 响应式测试（桌面/平板/手机）
 - [x] Phase 3: 安装常用 Shadcn UI 组件（已完成，2026-04-16 00:30）
-  - [x] Button（按钮）
-  - [x] Card（卡片）
-  - [x] Dialog（对话框）
-  - [x] Tabs（标签页）
-  - [x] Select（选择器）
-  - [x] Dropdown Menu（下拉菜单）
-  - [x] Input（输入框）
-  - [x] Textarea（文本域）
-  - [x] Popover（弹出层）
-  - [x] Toast（通知）
-  - [x] 修复 components.json UTF-8 BOM 问题
-  - [x] 修复 toaster.tsx 导入路径
-  - [x] 创建组件测试页面（test.html）
-  - [x] TypeScript 类型检查通过
-  - [x] 创建安装文档
 - [ ] Phase 3.5: 自定义主题 CSS 变量（可选）
-  - [ ] 定义品牌色（primary、secondary）
-  - [ ] 定义语义色（success、warning、error、info）
-  - [ ] 定义中性色（gray 色阶）
-  - [ ] 定义圆角（radius）
-  - [ ] 定义阴影（shadow）
-  - [ ] 定义字体（font-family、font-size）
-  - [ ] 定义间距（spacing）
-  - [ ] 暗色模式适配
-- [x] Phase 4: 中风险组件迁移（使用 Shadcn UI 组件，预计 3-4 小时）- 🔄 进行中（37.5% 完成）
+- [x] Phase 4: 中风险组件迁移（使用 Shadcn UI 组件）- 🔄 进行中（37.5% 完成）
   - [x] 重构 TabBar（使用 Shadcn Button + DropdownMenu）- ✅ 完成（2026-04-16 16:30）
   - [x] 重构 RightPanel（使用 Shadcn Button + Textarea）- ✅ 完成（2026-04-16 17:30）
+  - [x] 重构 PreviewPanel（使用 Shadcn Button）- ✅ 完成（2026-04-16 18:00）
+  - [x] 增强 BubbleMenu 工具栏（两行布局：Markdown 格式 + AI 操作）- ✅ 完成（2026-04-16 18:20）
+  - [ ] 安装额外组件：Badge、ScrollArea、Separator
+  - [ ] 重构 BlockSpacePanel（使用 Shadcn Card + Input + Badge）
+  - [ ] 重构 DocumentBlocksPanel（使用 Shadcn Card + ScrollArea）
+  - [ ] 重构 SessionHistoryPanel（使用 Shadcn Card + ScrollArea + Separator）
+  - [ ] 重构 BlockDetailPanel（使用 Shadcn Dialog + Card）
+  - [ ] 重构 BlockDerivativeSelector（使用 Shadcn Select + Dialog）
+- [ ] Phase 5: 右侧边栏重构（混合模式）- 🔄 进行中（40% 完成）- [需求文档](./spec/features/styles/right-panel-refactor.md)
+  - [x] 第一阶段：设计变量提取与样式系统升级（30分钟）- ✅ 完成（2026-04-16 19:00）
+  - [x] 第二阶段：公共组件模式抽取（45分钟）- ✅ 完成（2026-04-16 19:10）
+  - [ ] 第三阶段：组件命名清洗与结构优化（60分钟）
+  - [ ] 第四阶段：生产级功能增强（45分钟）
+  - [ ] 第五阶段：集成测试与文档（30分钟）
   - [x] 重构 PreviewPanel（使用 Shadcn Button）- ✅ 完成（2026-04-16 18:00）
   - [x] 增强 BubbleMenu 工具栏（两行布局：Markdown 格式 + AI 操作）- ✅ 完成（2026-04-16 18:20）
   - [ ] 安装额外组件：Badge、ScrollArea、Separator

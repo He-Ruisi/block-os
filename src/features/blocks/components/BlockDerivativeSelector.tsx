@@ -3,6 +3,7 @@ import type { Block } from '@/types/models/block'
 import { blockStore } from '@/storage/blockStore'
 import { formatDateTime } from '@/utils/date'
 import '@/styles/modules/blocks.css'
+import '@/styles/modules/common-patterns.css'
 
 interface BlockDerivativeSelectorProps {
   sourceBlockId: string
@@ -60,11 +61,11 @@ export function BlockDerivativeSelector({
           <button className="block-derivative-selector__close-button" onClick={onCancel}>×</button>
         </div>
 
-        <div className="block-derivative-selector__body">
+        <div className="block-derivative-selector__body scroll-area">
           {isLoading ? (
-            <div className="block-derivative-selector__loading-state">
-              <div className="block-derivative-selector__loading-icon">⏳</div>
-              <div className="block-derivative-selector__loading-text">加载中...</div>
+            <div className="empty-state">
+              <div className="empty-state__icon">⏳</div>
+              <div className="empty-state__text">加载中...</div>
             </div>
           ) : (
             <>
@@ -75,7 +76,7 @@ export function BlockDerivativeSelector({
                     源 Block
                   </div>
                   <div
-                    className={`block-derivative-selector__option ${selectedBlockId === sourceBlock.id ? 'block-derivative-selector__option--selected' : ''}`}
+                    className={`card-interactive block-derivative-selector__option ${selectedBlockId === sourceBlock.id ? 'card-highlighted' : ''}`}
                     onClick={() => setSelectedBlockId(sourceBlock.id)}
                   >
                     <div className="block-derivative-selector__option-header">
@@ -108,7 +109,7 @@ export function BlockDerivativeSelector({
                   {derivatives.map(derivative => (
                     <div
                       key={derivative.id}
-                      className={`block-derivative-selector__option ${selectedBlockId === derivative.id ? 'block-derivative-selector__option--selected' : ''}`}
+                      className={`card-interactive block-derivative-selector__option ${selectedBlockId === derivative.id ? 'card-highlighted' : ''}`}
                       onClick={() => setSelectedBlockId(derivative.id)}
                     >
                       <div className="block-derivative-selector__option-header">
@@ -139,10 +140,10 @@ export function BlockDerivativeSelector({
               )}
 
               {derivatives.length === 0 && sourceBlock && (
-                <div className="block-derivative-selector__empty-state">
-                  <div className="block-derivative-selector__empty-icon">📝</div>
-                  <div className="block-derivative-selector__empty-text">暂无派生版本</div>
-                  <div className="block-derivative-selector__empty-hint">
+                <div className="empty-state">
+                  <div className="empty-state__icon">📝</div>
+                  <div className="empty-state__text">暂无派生版本</div>
+                  <div className="empty-state__hint">
                     引用此 Block 并修改后会自动创建派生版本
                   </div>
                 </div>
@@ -152,11 +153,11 @@ export function BlockDerivativeSelector({
         </div>
 
         <div className="block-derivative-selector__footer">
-          <button className="block-derivative-selector__button block-derivative-selector__button--secondary" onClick={onCancel}>
+          <button className="btn-secondary" onClick={onCancel}>
             取消
           </button>
           <button
-            className="block-derivative-selector__button block-derivative-selector__button--primary"
+            className="btn-primary"
             onClick={handleSelect}
             disabled={!selectedBlockId}
           >
