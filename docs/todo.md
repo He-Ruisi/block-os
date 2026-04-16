@@ -52,16 +52,21 @@
   - [ ] 功能测试（所有功能保持正常）
   - [ ] 主题适配（Default + Newsprint）
   - [ ] 响应式测试（桌面/平板/手机）
-- [ ] Phase 2.5: 左侧边栏样式重构（进行中）
+- [x] Phase 2.5: 左侧边栏样式重构（已完成）
   - [x] 重构 Sidebar 主容器（移除 CSS，使用 Tailwind）
   - [x] 重构 ExplorerView 组件（资源管理器）
-  - [ ] 重构 StarredView 组件（置顶视图）
-  - [ ] 重构 SearchView 组件（搜索视图）
-  - [ ] 重构 OutlineView 组件（大纲视图）
-  - [ ] 重构 ExtensionsView 组件（插件视图）
-  - [ ] TypeScript 类型检查通过
-  - [ ] 功能测试（项目管理、文档管理、置顶、搜索等）
-  - [x] 删除旧的 CSS 文件（5 个文件）
+  - [x] 重构 StarredView 组件（置顶视图）
+  - [x] 重构 SearchView 组件（搜索视图）
+  - [x] 重构 OutlineView 组件（大纲视图）
+  - [x] 重构 ExtensionsView 组件（插件视图）
+  - [x] 重构 ActivityBar 组件（活动栏）
+  - [x] 重构 StatusBar 组件（状态栏）
+  - [x] 重构 ResizeHandle 组件（调整大小手柄）
+  - [x] 重构 Toast 组件（提示消息）
+  - [x] 重构 MarkdownRenderer 组件（Markdown 渲染器）
+  - [x] 重构 SyncStatusIndicator 组件（同步状态指示器）
+  - [x] TypeScript 类型检查通过
+  - [x] 删除所有旧的 CSS 文件（12 个文件）
   - [ ] 功能测试（所有功能保持正常）
   - [ ] 主题适配（Default + Newsprint）
   - [ ] 响应式测试（桌面/平板/手机）

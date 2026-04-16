@@ -1,5 +1,37 @@
 # BlockOS 更新日志
 
+## [v1.16.4] - 2026-04-15 🎨 完成所有低风险组件 Tailwind 样式重构
+
+**重要里程碑**：完成 6 个低风险组件的 Tailwind CSS 迁移，累计完成 12 个组件（43%）。
+
+- **今日完成组件**（6 个）：
+  - **ActivityBar**（活动栏）：左侧图标栏，使用 flex、h-12、w-12，激活状态紫色左边框
+  - **StatusBar**（状态栏）：底部状态显示，三栏布局（同步/保存/统计），状态颜色标记
+  - **ResizeHandle**（调整大小手柄）：拖拽调整宽度，group-hover 悬停效果，双击恢复默认
+  - **Toast**（提示消息）：固定定位，三种类型（success/error/info），淡入淡出动画
+  - **MarkdownRenderer**（Markdown 渲染器）：最复杂组件，20+ 子元素样式，代码高亮、表格、引用
+  - **SyncStatusIndicator**（同步状态指示器）：紧凑布局，不同状态不同背景色，旋转动画
+- **技术实现**：
+  - 移除所有 CSS 文件导入，完全使用 Tailwind 工具类
+  - 删除 6 个 CSS 文件，代码更简洁
+  - 保持功能逻辑不变，只更新样式
+  - TypeScript 类型检查通过 ✅
+- **Tailwind 类名规范**：
+  - 尺寸：h-6/h-12/h-14、w-12、max-w-[760px]
+  - 间距：px-2/px-3/px-4、gap-1/gap-2/gap-3
+  - 圆角：rounded-md/rounded-lg/rounded-2xl/rounded-full
+  - 颜色：bg-background/bg-muted、text-foreground/text-muted-foreground
+  - 状态：hover:bg-muted、disabled:opacity-50
+  - 动画：animate-spin（旋转）
+- **进度统计**：
+  - 总进度：12/28 完成（43%）
+  - 今日新增：6 个组件
+  - 剩余：16 个组件（8 个中风险 + 8 个低优先级/高风险）
+
+**下一步**：明日开始中风险组件迁移（TabBar、RightPanel、7 个右侧面板子组件），预计 3-4 小时。
+
+---
+
 ## [v1.16.3] - 2026-04-15 🎨 AI 沉浸模式 Tailwind 样式重构完成（Phase 2）
 
 **重要里程碑**：完成 AI 沉浸模式从 CSS 到 Tailwind 的完整样式重构，采用 Notion/Roam 风格设计。
