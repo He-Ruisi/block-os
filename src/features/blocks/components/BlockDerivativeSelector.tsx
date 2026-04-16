@@ -92,8 +92,8 @@ export function BlockDerivativeSelector({
                       {truncateContent(sourceBlock.content)}
                     </div>
                     <div className="block-derivative-selector__option-meta">
-                      <span className="block-derivative-selector__meta-item">📅 {formatDate(sourceBlock.metadata.createdAt)}</span>
-                      <span className="block-derivative-selector__meta-item">🏷️ {sourceBlock.metadata.tags.join(', ')}</span>
+                      <span className="block-derivative-selector__meta-item">{formatDate(sourceBlock.metadata.createdAt)}</span>
+                      <span className="block-derivative-selector__meta-item">{sourceBlock.metadata.tags.join(', ')}</span>
                     </div>
                   </div>
                 </div>
@@ -125,12 +125,12 @@ export function BlockDerivativeSelector({
                         {truncateContent(derivative.content)}
                       </div>
                       <div className="block-derivative-selector__option-meta">
-                        <span className="block-derivative-selector__meta-item">📄 {derivative.derivation?.contextTitle}</span>
-                        <span className="block-derivative-selector__meta-item">📅 {formatDate(derivative.metadata.createdAt)}</span>
+                        <span className="block-derivative-selector__meta-item">{derivative.derivation?.contextTitle}</span>
+                        <span className="block-derivative-selector__meta-item">{formatDate(derivative.metadata.createdAt)}</span>
                       </div>
                       {derivative.derivation?.modifications && (
                         <div className="block-derivative-selector__option-modifications">
-                          ✏️ {derivative.derivation.modifications}
+                          {derivative.derivation.modifications}
                         </div>
                       )}
                     </div>

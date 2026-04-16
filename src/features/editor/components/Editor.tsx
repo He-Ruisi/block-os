@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, useCallback } from 'react'
+﻿import { useEffect, useState, useRef, useCallback } from 'react'
 import StarterKit from '@tiptap/starter-kit'
 import Underline from '@tiptap/extension-underline'
 import { SuggestionMenu } from './SuggestionMenu'
@@ -30,7 +30,7 @@ type AIToolbarMode = 'continue' | 'rewrite' | 'shorten' | 'expand' | 'translate'
 
 const MIMO_API_KEY = import.meta.env.VITE_MIMO_API_KEY || ''
 
-/** 判断拖拽事件是否来自 BlockOS（AI 回复或 Block 空间） */
+/** 鍒ゆ柇鎷栨嫿浜嬩欢鏄惁鏉ヨ嚜 BlockOS锛圓I 鍥炲鎴?Block 绌洪棿锛?*/
 function isBlockOSDrag(e: DragEvent | React.DragEvent): boolean {
   return (
     e.dataTransfer?.types.includes('application/blockos-ai-content') ||
@@ -58,28 +58,28 @@ export function Editor({ onEditorReady, onTextSelected, documentId }: EditorProp
   const editor = useEditor({
     extensions: [StarterKit, Underline, BlockLink, BlockReference, SourceBlock, inlineAIPluginRef.current],
     content: `
-      <h1>欢迎使用 BlockOS</h1>
-      <p>这是一个写作优先的知识操作系统。</p>
-      <h2>开始写作</h2>
-      <p>支持 Markdown 语法：</p>
+      <h1>娆㈣繋浣跨敤 BlockOS</h1>
+      <p>杩欐槸涓€涓啓浣滀紭鍏堢殑鐭ヨ瘑鎿嶄綔绯荤粺銆?/p>
+      <h2>寮€濮嬪啓浣?/h2>
+      <p>鏀寔 Markdown 璇硶锛?/p>
       <ul>
-        <li>使用 # 创建标题</li>
-        <li>使用 ** 加粗文字</li>
-        <li>使用 * 创建斜体</li>
+        <li>浣跨敤 # 鍒涘缓鏍囬</li>
+        <li>浣跨敤 ** 鍔犵矖鏂囧瓧</li>
+        <li>浣跨敤 * 鍒涘缓鏂滀綋</li>
       </ul>
-      <h2>Block 系统</h2>
-      <p>使用 <code>[[</code> 创建双向链接，使用 <code>((</code> 引用其他 Block。</p>
-      <p>现在就开始写作吧...</p>
-      <h2>选中文字发送给 AI</h2>
-      <p>选中任意文字，然后按 Cmd/Ctrl + Shift + A 发送给 AI，或者右键选择"发送给 AI"。</p>
+      <h2>Block 绯荤粺</h2>
+      <p>浣跨敤 <code>[[</code> 鍒涘缓鍙屽悜閾炬帴锛屼娇鐢?<code>((</code> 寮曠敤鍏朵粬 Block銆?/p>
+      <p>鐜板湪灏卞紑濮嬪啓浣滃惂...</p>
+      <h2>閫変腑鏂囧瓧鍙戦€佺粰 AI</h2>
+      <p>閫変腑浠绘剰鏂囧瓧锛岀劧鍚庢寜 Cmd/Ctrl + Shift + A 鍙戦€佺粰 AI锛屾垨鑰呭彸閿€夋嫨"鍙戦€佺粰 AI"銆?/p>
     `,
     editorProps: {
       attributes: { class: 'editor-content' },
-      // 拦截 ProseMirror 的 drop，阻止它用 text/plain 插入（导致重复）
+      // 鎷︽埅 ProseMirror 鐨?drop锛岄樆姝㈠畠鐢?text/plain 鎻掑叆锛堝鑷撮噸澶嶏級
       handleDrop: (_view, event) => {
         if (isBlockOSDrag(event as DragEvent)) {
-          // 返回 true = 告诉 ProseMirror "我已处理，别再插入了"
-          // 实际插入由外层 React onDrop 完成
+          // 杩斿洖 true = 鍛婅瘔 ProseMirror "鎴戝凡澶勭悊锛屽埆鍐嶆彃鍏ヤ簡"
+          // 瀹為檯鎻掑叆鐢卞灞?React onDrop 瀹屾垚
           return true
         }
         return false
@@ -124,7 +124,7 @@ export function Editor({ onEditorReady, onTextSelected, documentId }: EditorProp
     },
   })
 
-  // ---- 拖拽处理（React 层，在 ProseMirror 之上） ----
+  // ---- 鎷栨嫿澶勭悊锛圧eact 灞傦紝鍦?ProseMirror 涔嬩笂锛?----
 
   const handleDrop = useCallback((e: React.DragEvent) => {
     if (!editor || !isBlockOSDrag(e)) return
@@ -137,14 +137,13 @@ export function Editor({ onEditorReady, onTextSelected, documentId }: EditorProp
     let insertData: Record<string, unknown> | null = null
 
     if (blockData) {
-      // Block 空间拖入 → 灵感块
       try {
         const parsed = JSON.parse(blockData)
         const title = parsed.title || 'Block'
         const text = parsed.content || blockData
         insertData = {
           type: 'sourceBlock',
-          attrs: { source: 'inspiration', sourceLabel: `💡 灵感 · ${title}`, blockId: parsed.id || null },
+          attrs: { source: 'inspiration', sourceLabel: `馃挕 鐏垫劅 路 ${title}`, blockId: parsed.id || null },
           content: text.split('\n').filter((l: string) => l.trim()).map((line: string) => ({
             type: 'paragraph',
             content: [{ type: 'text', text: line }],
@@ -153,16 +152,15 @@ export function Editor({ onEditorReady, onTextSelected, documentId }: EditorProp
       } catch {
         insertData = {
           type: 'sourceBlock',
-          attrs: { source: 'inspiration', sourceLabel: '💡 灵感' },
+          attrs: { source: 'inspiration', sourceLabel: '馃挕 鐏垫劅' },
           content: [{ type: 'paragraph', content: [{ type: 'text', text: blockData }] }],
         }
       }
     } else if (aiContent) {
-      // AI 回复拖入 → AI 块
       const lines = aiContent.split('\n').filter((l: string) => l.trim())
       insertData = {
         type: 'sourceBlock',
-        attrs: { source: 'ai', sourceLabel: '◆ AI 生成' },
+        attrs: { source: 'ai', sourceLabel: 'AI 生成' },
         content: lines.map((line: string) => ({
           type: 'paragraph',
           content: [{ type: 'text', text: line }],
@@ -172,7 +170,6 @@ export function Editor({ onEditorReady, onTextSelected, documentId }: EditorProp
 
     if (!insertData) return
 
-    // 将光标移到拖拽位置
     const pos = editor.view.posAtCoords({ left: e.clientX, top: e.clientY })
     if (pos) {
       editor.chain().focus().setTextSelection(pos.pos).insertContent(insertData).run()
@@ -188,8 +185,6 @@ export function Editor({ onEditorReady, onTextSelected, documentId }: EditorProp
     }
   }, [])
 
-  // ---- Inline AI Decoration 事件处理 ----
-  // 监听 Decoration widget 内的 confirm/discard 自定义事件
   useEffect(() => {
     if (!editor) return
     const el = editor.view.dom
@@ -203,7 +198,7 @@ export function Editor({ onEditorReady, onTextSelected, documentId }: EditorProp
     }
   }, [editor])
 
-  // ---- 搜索 / 建议 ----
+  // ---- 鎼滅储 / 寤鸿 ----
 
   const handleSearch = async (query: string) => {
     try {
@@ -251,15 +246,14 @@ export function Editor({ onEditorReady, onTextSelected, documentId }: EditorProp
     setShowSuggestion(false)
   }
 
-  // ---- 文档加载 ----
+  // ---- 鏂囨。鍔犺浇 ----
 
   useEffect(() => {
     const loadDocument = async () => {
       if (!editor) return
       if (loadedDocumentIdRef.current === documentId) return
 
-      // 切换文档前，先保存当前文档
-      const prevDocId = currentDocIdRef.current
+      // 鍒囨崲鏂囨。鍓嶏紝鍏堜繚瀛樺綋鍓嶆枃妗?      const prevDocId = currentDocIdRef.current
       if (prevDocId && prevDocId !== documentId) {
         try {
           await documentStore.updateDocumentBlocks(prevDocId, editor.getJSON())
@@ -273,7 +267,7 @@ export function Editor({ onEditorReady, onTextSelected, documentId }: EditorProp
         if (documentId) {
           const doc = await documentStore.getDocument(documentId)
           if (!doc) { 
-            editor.commands.setContent('<p>文档不存在</p>')
+            editor.commands.setContent('<p>鏂囨。涓嶅瓨鍦?/p>')
             setCurrentDocId('')
             return 
           }
@@ -286,20 +280,20 @@ export function Editor({ onEditorReady, onTextSelected, documentId }: EditorProp
           setCurrentDocId(doc.id)
           documentStore.setCurrentDocument(doc.id)
         } else {
-          // 没有 documentId 时，显示欢迎页面，不自动加载任何文档
+          // 娌℃湁 documentId 鏃讹紝鏄剧ず娆㈣繋椤甸潰锛屼笉鑷姩鍔犺浇浠讳綍鏂囨。
           editor.commands.setContent(`
-            <h1>欢迎使用 BlockOS</h1>
-            <p>这是一个写作优先的知识操作系统。</p>
-            <h2>开始写作</h2>
-            <p>支持 Markdown 语法：</p>
+            <h1>娆㈣繋浣跨敤 BlockOS</h1>
+            <p>杩欐槸涓€涓啓浣滀紭鍏堢殑鐭ヨ瘑鎿嶄綔绯荤粺銆?/p>
+            <h2>寮€濮嬪啓浣?/h2>
+            <p>鏀寔 Markdown 璇硶锛?/p>
             <ul>
-              <li>使用 # 创建标题</li>
-              <li>使用 ** 加粗文字</li>
-              <li>使用 * 创建斜体</li>
+              <li>浣跨敤 # 鍒涘缓鏍囬</li>
+              <li>浣跨敤 ** 鍔犵矖鏂囧瓧</li>
+              <li>浣跨敤 * 鍒涘缓鏂滀綋</li>
             </ul>
-            <h2>Block 系统</h2>
-            <p>使用 <code>[[</code> 创建双向链接，使用 <code>((</code> 引用其他 Block。</p>
-            <p>现在就开始写作吧...</p>
+            <h2>Block 绯荤粺</h2>
+            <p>浣跨敤 <code>[[</code> 鍒涘缓鍙屽悜閾炬帴锛屼娇鐢?<code>((</code> 寮曠敤鍏朵粬 Block銆?/p>
+            <p>鐜板湪灏卞紑濮嬪啓浣滃惂...</p>
           `)
           setCurrentDocId('')
           documentStore.setCurrentDocument('')
@@ -315,7 +309,6 @@ export function Editor({ onEditorReady, onTextSelected, documentId }: EditorProp
     if (editor && onEditorReady) onEditorReady(editor)
   }, [editor, onEditorReady])
 
-  // 快捷键
   useEffect(() => {
     if (!editor) return
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -371,7 +364,6 @@ export function Editor({ onEditorReady, onTextSelected, documentId }: EditorProp
     return () => window.removeEventListener('navigateToHeading', handler)
   }, [editor])
 
-  // 监听从 Block 详情面板插入 release 的事件
   useEffect(() => {
     if (!editor) return
     const handler = (e: Event) => {
@@ -382,7 +374,7 @@ export function Editor({ onEditorReady, onTextSelected, documentId }: EditorProp
         type: 'sourceBlock',
         attrs: {
           source: 'inspiration',
-          sourceLabel: `📦 v${releaseVersion} · ${title}`,
+          sourceLabel: `馃摝 v${releaseVersion} 路 ${title}`,
           blockId: blockId || null,
           releaseVersion: releaseVersion,
         },
@@ -403,7 +395,6 @@ export function Editor({ onEditorReady, onTextSelected, documentId }: EditorProp
     return () => { if (updateTimeoutRef.current) clearTimeout(updateTimeoutRef.current) }
   }, [])
 
-  // 页面关闭/刷新前立即保存
   useEffect(() => {
     if (!editor) return
     const handleBeforeUnload = () => {
@@ -411,7 +402,6 @@ export function Editor({ onEditorReady, onTextSelected, documentId }: EditorProp
       if (!docId) return
       try {
         const json = editor.getJSON()
-        // 用同步方式尽力保存（beforeunload 中异步不可靠）
         documentStore.updateDocumentBlocks(docId, json).catch(() => {})
       } catch { /* ignore */ }
     }
@@ -421,15 +411,15 @@ export function Editor({ onEditorReady, onTextSelected, documentId }: EditorProp
 
   return (
     <div className="editor-container" ref={editorRef}>
-      {/* Toolbar — 两行布局，对标 reactjs-tiptap-editor 风格 */}
+      {/* Toolbar 鈥?涓よ甯冨眬锛屽鏍?reactjs-tiptap-editor 椋庢牸 */}
       <div className="editor-toolbar">
-        {/* 第一行：撤销/重做 | 清除 | 标题 | 文字格式 | 列表 */}
+        {/* 绗竴琛岋細鎾ら攢/閲嶅仛 | 娓呴櫎 | 鏍囬 | 鏂囧瓧鏍煎紡 | 鍒楄〃 */}
         <div className="editor-toolbar__row">
           <div className="editor-toolbar__group">
             <button className="editor-toolbar__button" onClick={() => editor?.chain().focus().undo().run()}
-              disabled={!editor?.can().undo()} title="撤销 ⌘Z">↩</button>
+              disabled={!editor?.can().undo()} title="撤销">↶</button>
             <button className="editor-toolbar__button" onClick={() => editor?.chain().focus().redo().run()}
-              disabled={!editor?.can().redo()} title="重做 ⌘⇧Z">↪</button>
+              disabled={!editor?.can().redo()} title="重做">↷</button>
           </div>
           <div className="editor-toolbar__separator" />
           <div className="editor-toolbar__group">
@@ -450,43 +440,43 @@ export function Editor({ onEditorReady, onTextSelected, documentId }: EditorProp
           <div className="editor-toolbar__separator" />
           <div className="editor-toolbar__group">
             <button className={`editor-toolbar__button ${editor?.isActive('bold') ? 'editor-toolbar__button--active' : ''}`}
-              onClick={() => editor?.chain().focus().toggleBold().run()} title="粗体 ⌘B"><strong>B</strong></button>
+              onClick={() => editor?.chain().focus().toggleBold().run()} title="加粗"><strong>B</strong></button>
             <button className={`editor-toolbar__button ${editor?.isActive('italic') ? 'editor-toolbar__button--active' : ''}`}
-              onClick={() => editor?.chain().focus().toggleItalic().run()} title="斜体 ⌘I"><em>I</em></button>
+              onClick={() => editor?.chain().focus().toggleItalic().run()} title="斜体"><em>I</em></button>
             <button className={`editor-toolbar__button editor-toolbar__button--underline ${editor?.isActive('strike') ? 'editor-toolbar__button--active' : ''}`}
               onClick={() => editor?.chain().focus().toggleStrike().run()} title="删除线"><s>S</s></button>
             <button className={`editor-toolbar__button ${editor?.isActive('code') ? 'editor-toolbar__button--active' : ''}`}
-              onClick={() => editor?.chain().focus().toggleCode().run()} title="行内代码 ⌘E">{'</>'}</button>
+              onClick={() => editor?.chain().focus().toggleCode().run()} title="行内代码">{'</>'}</button>
           </div>
-          <div className="toolbar-sep" />
-          <div className="toolbar-group">
-            <button className={`toolbar-btn ${editor?.isActive('bulletList') ? 'active' : ''}`}
-              onClick={() => editor?.chain().focus().toggleBulletList().run()} title="无序列表">☰</button>
-            <button className={`toolbar-btn ${editor?.isActive('orderedList') ? 'active' : ''}`}
-              onClick={() => editor?.chain().focus().toggleOrderedList().run()} title="有序列表">☷</button>
+          <div className="editor-toolbar__separator" />
+          <div className="editor-toolbar__group">
+            <button className={`editor-toolbar__button ${editor?.isActive('bulletList') ? 'editor-toolbar__button--active' : ''}`}
+              onClick={() => editor?.chain().focus().toggleBulletList().run()} title="无序列表">•</button>
+            <button className={`editor-toolbar__button ${editor?.isActive('orderedList') ? 'editor-toolbar__button--active' : ''}`}
+              onClick={() => editor?.chain().focus().toggleOrderedList().run()} title="有序列表">1.</button>
           </div>
         </div>
-        {/* 第二行：引用 | 分隔线 | 代码块 | 快捷键提示 */}
-        <div className="toolbar-row">
-          <div className="toolbar-group">
-            <button className={`toolbar-btn ${editor?.isActive('blockquote') ? 'active' : ''}`}
+        {/* 绗簩琛岋細寮曠敤 | 鍒嗛殧绾?| 浠ｇ爜鍧?| 蹇嵎閿彁绀?*/}
+        <div className="editor-toolbar__row">
+          <div className="editor-toolbar__group">
+            <button className={`editor-toolbar__button ${editor?.isActive('blockquote') ? 'editor-toolbar__button--active' : ''}`}
               onClick={() => editor?.chain().focus().toggleBlockquote().run()} title="引用">❝</button>
-            <button className="toolbar-btn"
-              onClick={() => editor?.chain().focus().setHorizontalRule().run()} title="分隔线">―</button>
-            <button className={`toolbar-btn ${editor?.isActive('codeBlock') ? 'active' : ''}`}
+            <button className="editor-toolbar__button"
+              onClick={() => editor?.chain().focus().setHorizontalRule().run()} title="分隔线">—</button>
+            <button className={`editor-toolbar__button ${editor?.isActive('codeBlock') ? 'editor-toolbar__button--active' : ''}`}
               onClick={() => editor?.chain().focus().toggleCodeBlock().run()} title="代码块">{'{ }'}</button>
           </div>
-          <div className="toolbar-spacer" />
-          <span className="toolbar-hint">⌘⇧A 发送选区给 AI</span>
+          <div className="editor-toolbar__spacer" />
+          <span className="editor-toolbar__hint">Ctrl/Cmd + Shift + A 发送选区给 AI</span>
         </div>
       </div>
 
-      {/* 编辑区域 */}
+      {/* 缂栬緫鍖哄煙 */}
       <div className="editor-scroll" onDrop={handleDrop} onDragOver={handleDragOver}>
         <EditorContent editor={editor} />
       </div>
 
-     {/* BubbleMenu — 两行工具栏：格式 + AI 操作 */}
+     {/* BubbleMenu 鈥?涓よ宸ュ叿鏍忥細鏍煎紡 + AI 鎿嶄綔 */}
       {editor && (
         <EditorBubbleMenu
           editor={editor}
@@ -497,11 +487,11 @@ export function Editor({ onEditorReady, onTextSelected, documentId }: EditorProp
         />
       )}
 
-      {/* 翻译/解释 行内预览 */}
+      {/* 缈昏瘧/瑙ｉ噴 琛屽唴棰勮 */}
       {annotationPreview && (
         <div className="annotation-preview">
           <span className="annotation-preview-label">
-            {annotationPreview.mode === 'explain' ? '💡 解释' : '🌐 翻译'}
+            {annotationPreview.mode === 'explain' ? '馃挕 瑙ｉ噴' : '馃寪 缈昏瘧'}
           </span>
           <span className="annotation-preview-text">{annotationPreview.text}</span>
           <button
@@ -522,3 +512,4 @@ export function Editor({ onEditorReady, onTextSelected, documentId }: EditorProp
     </div>
   )
 }
+

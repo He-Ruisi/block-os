@@ -1,8 +1,8 @@
-/* ============================================================
+﻿/* ============================================================
    BlockOS Responsive Design - iPad & Mobile Adaptation
    ============================================================ */
 
-/* 响应式断点 */
+/* 鍝嶅簲寮忔柇鐐?*/
 :root {
   --breakpoint-mobile: 768px;
   --breakpoint-tablet: 1024px;
@@ -14,7 +14,7 @@
    ============================================================ */
 
 @media (max-width: 1024px) {
-  /* ActivityBar - 增加宽度便于触摸 */
+  /* ActivityBar - 澧炲姞瀹藉害渚夸簬瑙︽懜 */
   .activity-bar {
     width: 56px;
   }
@@ -25,7 +25,7 @@
     font-size: 22px;
   }
   
-  /* Sidebar - 改为浮层模式 */
+  /* Sidebar - 鏀逛负娴眰妯″紡 */
   .sidebar-panel {
     width: 280px;
     position: fixed;
@@ -42,7 +42,7 @@
     transform: translateX(0);
   }
   
-  /* 侧边栏遮罩层 */
+  /* 渚ц竟鏍忛伄缃╁眰 */
   .sidebar-overlay {
     display: block;
     position: fixed;
@@ -59,14 +59,14 @@
     pointer-events: auto;
   }
   
-  /* Editor Area - 全宽 */
+  /* Editor Area - 鍏ㄥ */
   .editor-area {
     width: 100% !important;
     min-width: 100%;
     flex: 1;
   }
   
-  /* Editor Content - 优化阅读宽度 */
+  /* Editor Content - 浼樺寲闃呰瀹藉害 */
   .editor-content {
     max-width: 680px;
     font-size: 16px;
@@ -77,28 +77,28 @@
     padding: 24px 32px 80px;
   }
   
-  /* Toolbar - 触摸友好按钮 */
-  .toolbar-btn {
+  /* Toolbar - 瑙︽懜鍙嬪ソ鎸夐挳 */
+  .editor-toolbar__button {
     width: 40px;
     height: 40px;
     font-size: 16px;
   }
   
-  .toolbar-btn svg {
+  .editor-toolbar__button svg {
     width: 18px;
     height: 18px;
   }
   
-  .toolbar-sep {
+  .editor-toolbar__separator {
     margin: 0 6px;
   }
   
-  .toolbar-row {
+  .editor-toolbar__row {
     padding: 6px 16px;
     min-height: 44px;
   }
   
-  /* TabBar - 增加标签高度 */
+  /* TabBar - 澧炲姞鏍囩楂樺害 */
   .tab {
     min-width: 140px;
     height: 44px;
@@ -116,7 +116,7 @@
     height: 40px;
   }
   
-  /* RightPanel - 浮层模式 */
+  /* RightPanel - 娴眰妯″紡 */
   .right-panel {
     position: fixed;
     right: 0;
@@ -133,7 +133,7 @@
     transform: translateX(0);
   }
   
-  /* 右侧面板关闭按钮 */
+  /* 鍙充晶闈㈡澘鍏抽棴鎸夐挳 */
   .right-panel-close {
     display: flex;
     align-items: center;
@@ -155,12 +155,12 @@
     background: var(--color-bg-hover);
   }
   
-  /* ResizeHandle - iPad 上隐藏 */
+  /* ResizeHandle - iPad 涓婇殣钘?*/
   .resize-handle {
     display: none;
   }
   
-  /* StatusBar - 增加高度 */
+  /* StatusBar - 澧炲姞楂樺害 */
   .status-bar {
     height: 36px;
     padding: 0 16px;
@@ -177,7 +177,7 @@
    ============================================================ */
 
 @media (max-width: 768px) {
-  /* ActivityBar - 底部导航栏 */
+  /* ActivityBar - 搴曢儴瀵艰埅鏍?*/
   .activity-bar {
     width: 100%;
     height: 60px;
@@ -215,14 +215,14 @@
     height: 2px;
   }
   
-  /* Sidebar - 全宽浮层 */
+  /* Sidebar - 鍏ㄥ娴眰 */
   .sidebar-panel {
     left: 0;
     width: 85vw;
     max-width: 320px;
   }
   
-  /* Editor Content - 移动端优化 */
+  /* Editor Content - 绉诲姩绔紭鍖?*/
   .editor-content {
     max-width: 100%;
     font-size: 17px;
@@ -233,25 +233,25 @@
     padding: 16px 20px 80px;
   }
   
-  /* Toolbar - 单行滚动 */
-  .toolbar-row:first-child {
+  /* Toolbar - 鍗曡婊氬姩 */
+  .editor-toolbar__row:first-child {
     border-bottom: none;
   }
   
-  .toolbar-row {
+  .editor-toolbar__row {
     overflow-x: auto;
     scrollbar-width: none;
   }
   
-  .toolbar-row::-webkit-scrollbar {
+  .editor-toolbar__row::-webkit-scrollbar {
     display: none;
   }
   
-  .toolbar-hint {
+  .editor-toolbar__hint {
     display: none;
   }
   
-  /* TabBar - 紧凑布局 */
+  /* TabBar - 绱у噾甯冨眬 */
   .tab {
     min-width: 120px;
     padding: 0 12px;
@@ -261,12 +261,12 @@
     gap: 8px;
   }
   
-  /* RightPanel - 全屏 */
+  /* RightPanel - 鍏ㄥ睆 */
   .right-panel {
     width: 100vw;
   }
   
-  /* StatusBar - 固定在底部导航栏上方 */
+  /* StatusBar - 鍥哄畾鍦ㄥ簳閮ㄥ鑸爮涓婃柟 */
   .status-bar {
     position: fixed;
     bottom: 60px;
@@ -285,7 +285,7 @@
     font-size: 12px;
   }
   
-  /* App 布局调整 */
+  /* App 甯冨眬璋冩暣 */
   .app {
     padding-bottom: 60px;
   }
@@ -297,12 +297,12 @@
 
 @media (max-width: 1024px) {
   .theme-newsprint {
-    /* 保持硬阴影风格 */
+    /* 淇濇寔纭槾褰遍鏍?*/
     --shadow-sm: 3px 3px 0px 0px #111111;
     --shadow-md: 5px 5px 0px 0px #111111;
     --shadow-lg: 6px 6px 0px 0px #111111;
 
-    /* 字号调整 */
+    /* 瀛楀彿璋冩暣 */
     --editor-font-size: 17px;
     --editor-line-height: 1.7;
   }
@@ -334,9 +334,9 @@
    ============================================================ */
 
 @media (hover: none) and (pointer: coarse) {
-  /* 触摸设备：增加所有可点击元素的触摸目标 */
+  /* 瑙︽懜璁惧锛氬鍔犳墍鏈夊彲鐐瑰嚮鍏冪礌鐨勮Е鎽哥洰鏍?*/
   button,
-  .toolbar-btn,
+  .editor-toolbar__button,
   .tab,
   .activity-icon,
   .explorer-item,
@@ -345,20 +345,20 @@
     min-width: 44px;
   }
   
-  /* 触摸反馈 */
+  /* 瑙︽懜鍙嶉 */
   button:active,
-  .toolbar-btn:active,
+  .editor-toolbar__button:active,
   .tab:active {
     transform: scale(0.95);
     transition: transform 0.1s;
   }
   
-  /* 移除 hover 效果，使用 active 替代 */
-  .toolbar-btn:hover {
+  /* 绉婚櫎 hover 鏁堟灉锛屼娇鐢?active 鏇夸唬 */
+  .editor-toolbar__button:hover {
     background: transparent;
   }
   
-  .toolbar-btn:active {
+  .editor-toolbar__button:active {
     background: var(--color-bg-hover);
   }
 }
@@ -368,13 +368,13 @@
    ============================================================ */
 
 @media (max-width: 1024px) and (orientation: landscape) {
-  /* 横屏模式：减少垂直间距 */
+  /* 妯睆妯″紡锛氬噺灏戝瀭鐩撮棿璺?*/
   .editor-scroll {
     padding-top: 16px;
     padding-bottom: 60px;
   }
   
-  .toolbar-row {
+  .editor-toolbar__row {
     min-height: 40px;
     padding: 4px 12px;
   }
@@ -404,3 +404,4 @@
     }
   }
 }
+

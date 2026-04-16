@@ -202,10 +202,10 @@ export function BlockSpacePanel() {
                   </div>
                   <div className="block-space-panel__info">
                     <span className="block-space-panel__type">
-                      {block.type === 'ai-generated' ? '🤖 AI' : '✍️ 编辑器'}
+                      {block.type === 'ai-generated' ? 'AI' : '编辑器'}
                     </span>
                     {(block.releases?.length ?? 0) > 0 && (
-                      <span className="block-space-panel__versions">📚 {block.releases!.length} 版本</span>
+                      <span className="block-space-panel__versions">版本 {block.releases!.length}</span>
                     )}
                     <span className="block-space-panel__time">
                       {formatDate(block.metadata.createdAt)}

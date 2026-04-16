@@ -110,10 +110,16 @@ export function BlockDetailPanel({ blockId, onClose, onInsertRelease }: BlockDet
             {block.content.length > 200 ? '...' : ''}
           </div>
           <div className="block-detail-panel__meta-row">
-            <span className="block-detail-panel__meta-chip">{block.type === 'ai-generated' ? '🤖 AI' : '✍️ 编辑器'}</span>
-            <span className="block-detail-panel__meta-chip">📅 {formatRelativeTime(block.metadata.createdAt)}</span>
+            <span className="block-detail-panel__meta-chip">
+              {block.type === 'ai-generated' ? 'AI' : '编辑器'}
+            </span>
+            <span className="block-detail-panel__meta-chip">
+              {formatRelativeTime(block.metadata.createdAt)}
+            </span>
             {block.metadata.tags.map(tag => (
-              <span key={tag} className="block-detail-panel__meta-chip block-detail-panel__meta-chip--tag">#{tag}</span>
+              <span key={tag} className="block-detail-panel__meta-chip block-detail-panel__meta-chip--tag">
+                #{tag}
+              </span>
             ))}
           </div>
         </section>
@@ -186,7 +192,7 @@ export function BlockDetailPanel({ blockId, onClose, onInsertRelease }: BlockDet
             <div className="block-detail-panel__usage-list">
               {usages.map(usage => (
                 <div key={usage.id} className="block-detail-panel__usage-item">
-                  <span className="block-detail-panel__usage-doc">📄 {usage.documentTitle}</span>
+                  <span className="block-detail-panel__usage-doc">{usage.documentTitle}</span>
                   <span className="block-detail-panel__usage-version">v{usage.releaseVersion}</span>
                   <span className="block-detail-panel__usage-time">{formatRelativeTime(usage.insertedAt)}</span>
                 </div>

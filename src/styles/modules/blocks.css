@@ -1,6 +1,6 @@
-/**
- * Block 模块样式
- * 包含：BlockDetailPanel, BlockDerivativeSelector, BlockSpacePanel, DocumentBlocksPanel
+﻿/**
+ * Block 妯″潡鏍峰紡
+ * 鍖呭惈锛欱lockDetailPanel, BlockDerivativeSelector, BlockSpacePanel, DocumentBlocksPanel
  */
 
 .block-detail-panel {
@@ -609,183 +609,20 @@
   gap: 16px;
 }
 
-/* Compatibility during class migration */
-.detail-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
-  border-bottom: 1px solid var(--color-border-primary);
-  background: var(--color-bg-secondary);
-}
-
-.detail-back {
-  background: none;
-  border: none;
-  color: var(--color-purple);
-  font-size: 13px;
-  cursor: pointer;
-  padding: 4px 8px;
-  border-radius: 4px;
-}
-
-.detail-title,
-.section-label,
-.release-title-text,
-.block-option-title {
-  color: var(--color-text-primary);
-}
-
-.detail-loading,
-.loading-text,
-.empty-text,
-.usage-time,
-.release-time,
-.meta-item,
-.panel-subtitle,
-.filter-label,
-.empty-hint {
+.block-space-panel__versions {
+  font-size: 10px;
   color: var(--color-text-tertiary);
 }
-
-.detail-body,
-.derivative-selector-body,
-.block-space-body,
-.panel-body {
-  flex: 1;
-  overflow-y: auto;
-}
-
-.detail-section,
-.block-section {
-  margin-bottom: 20px;
-}
-
-.section-label-row,
-.release-card-header,
-.block-option-header,
-.block-meta,
-.panel-footer,
-.stats {
+.document-blocks-panel__stat-item {
   display: flex;
   align-items: center;
+  gap: 6px;
+  font-size: 11px;
 }
-
-.detail-content-box,
-.new-release-form,
-.block-option-modifications,
-.usage-item,
-.block-node,
-.block-card {
-  background: var(--color-bg-secondary);
+.document-blocks-panel__stat-label {
+  color: var(--color-text-tertiary);
 }
-
-.detail-meta-row,
-.block-option-meta,
-.block-tags,
-.block-node-links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-}
-
-.meta-chip,
-.tag-chip,
-.release-version,
-.usage-version,
-.block-tag,
-.block-links-count {
-  font-size: 10px;
-  padding: 2px 6px;
-  border-radius: 3px;
-}
-
-.new-release-btn,
-.btn-primary-sm,
-.btn-primary {
-  background: var(--color-purple);
-  color: #fff;
-}
-
-.btn-secondary-sm,
-.btn-secondary {
-  background: var(--color-bg-primary);
-  border: 1px solid var(--color-border-primary);
-}
-
-.release-list,
-.usage-list,
-.blocks-list,
-.blocks-tree {
-  display: flex;
-  flex-direction: column;
-}
-
-.release-card.selected,
-.block-option.selected,
-.block-card.highlighted {
-  border-color: var(--color-purple);
-  background: var(--color-purple-light);
-}
-
-.derivative-selector-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
-.derivative-selector-content {
-  background: var(--color-bg-primary);
-  border-radius: 8px;
-  width: 90%;
-  max-width: 700px;
-  max-height: 80vh;
-  display: flex;
-  flex-direction: column;
-}
-
-.derivative-selector-header,
-.derivative-selector-footer,
-.panel-header {
-  padding: 16px;
-}
-
-.search-box {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  background: var(--color-bg-secondary);
-  border: 1px solid var(--color-border-primary);
-  border-radius: 6px;
-  margin-bottom: 12px;
-}
-
-.search-input,
-.release-title-input,
-.tag-filter {
-  width: 100%;
-}
-
-.block-space-empty,
-.panel-empty,
-.loading-state,
-.empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-}
-
-.block-card,
-.release-card,
-.block-option,
-.block-node {
-  border: 1px solid var(--color-border-primary);
-  border-radius: 6px;
+.document-blocks-panel__stat-value {
+  color: var(--color-text-primary);
+  font-weight: 600;
 }

@@ -1,16 +1,16 @@
-/* ============================================================
+﻿/* ============================================================
    Touch Interaction Enhancements
-   触摸交互增强样式
+   瑙︽懜浜や簰澧炲己鏍峰紡
    ============================================================ */
 
 /* ============================================================
-   触摸反馈动画
+   瑙︽懜鍙嶉鍔ㄧ敾
    ============================================================ */
 
 @media (hover: none) and (pointer: coarse) {
-  /* 所有可交互元素的触摸反馈 */
+  /* 鎵€鏈夊彲浜や簰鍏冪礌鐨勮Е鎽稿弽棣?*/
   button:active,
-  .toolbar-btn:active,
+  .editor-toolbar__button:active,
   .tab:active,
   .activity-icon:active,
   .explorer-item:active,
@@ -23,8 +23,8 @@
     transition: transform 0.1s ease-out;
   }
 
-  /* 移除 hover 效果，避免触摸后残留 */
-  .toolbar-btn:hover,
+  /* 绉婚櫎 hover 鏁堟灉锛岄伩鍏嶈Е鎽稿悗娈嬬暀 */
+  .editor-toolbar__button:hover,
   .tab:hover,
   .activity-icon:hover,
   .explorer-item:hover,
@@ -33,8 +33,8 @@
     color: inherit;
   }
 
-  /* 使用 active 状态替代 hover */
-  .toolbar-btn:active {
+  /* 浣跨敤 active 鐘舵€佹浛浠?hover */
+  .editor-toolbar__button:active {
     background: var(--color-bg-hover);
     color: var(--color-text-primary);
   }
@@ -43,13 +43,13 @@
     color: var(--color-text-primary);
   }
 
-  /* 链接和文本选择优化 */
+  /* 閾炬帴鍜屾枃鏈€夋嫨浼樺寲 */
   a:active,
   .block-link:active {
     opacity: 0.7;
   }
 
-  /* 输入框触摸优化 */
+  /* 杈撳叆妗嗚Е鎽镐紭鍖?*/
   input:focus,
   textarea:focus {
     outline: 2px solid var(--color-border-focus);
@@ -58,13 +58,13 @@
 }
 
 /* ============================================================
-   触摸目标尺寸优化
+   瑙︽懜鐩爣灏哄浼樺寲
    ============================================================ */
 
 @media (max-width: 1024px) {
-  /* 确保所有可点击元素至少 44x44px */
+  /* 纭繚鎵€鏈夊彲鐐瑰嚮鍏冪礌鑷冲皯 44x44px */
   button,
-  .toolbar-btn,
+  .editor-toolbar__button,
   .tab-close,
   .activity-icon,
   .panel-tab,
@@ -74,29 +74,29 @@
     min-width: 44px;
   }
 
-  /* 小图标按钮增加内边距 */
+  /* 灏忓浘鏍囨寜閽鍔犲唴杈硅窛 */
   .tab-close,
   .explorer-action-btn {
     padding: 10px;
   }
 
-  /* 输入框增加高度 */
+  /* 杈撳叆妗嗗鍔犻珮搴?*/
   input[type="text"],
   input[type="password"],
   textarea {
     min-height: 44px;
     padding: 10px 12px;
-    font-size: 16px; /* 防止 iOS 自动缩放 */
+    font-size: 16px; /* 闃叉 iOS 鑷姩缂╂斁 */
   }
 
-  /* 下拉选择框 */
+  /* 涓嬫媺閫夋嫨妗?*/
   select {
     min-height: 44px;
     padding: 10px 12px;
     font-size: 16px;
   }
 
-  /* 复选框和单选框 */
+  /* 澶嶉€夋鍜屽崟閫夋 */
   input[type="checkbox"],
   input[type="radio"] {
     min-width: 24px;
@@ -106,11 +106,11 @@
 }
 
 /* ============================================================
-   长按反馈效果
+   闀挎寜鍙嶉鏁堟灉
    ============================================================ */
 
 @media (hover: none) and (pointer: coarse) {
-  /* 长按时的视觉反馈 */
+  /* 闀挎寜鏃剁殑瑙嗚鍙嶉 */
   .explorer-doc-item,
   .explorer-project-item,
   .tab {
@@ -145,11 +145,11 @@
 }
 
 /* ============================================================
-   滑动手势视觉提示
+   婊戝姩鎵嬪娍瑙嗚鎻愮ず
    ============================================================ */
 
 @media (max-width: 1024px) {
-  /* 侧边栏滑动提示 */
+  /* 渚ц竟鏍忔粦鍔ㄦ彁绀?*/
   .sidebar-panel::before {
     content: '';
     position: absolute;
@@ -168,7 +168,7 @@
     opacity: 0.6;
   }
 
-  /* 右侧面板滑动提示 */
+  /* 鍙充晶闈㈡澘婊戝姩鎻愮ず */
   .right-panel::before {
     content: '';
     position: absolute;
@@ -189,12 +189,12 @@
 }
 
 /* ============================================================
-   Newsprint 主题触摸优化
+   Newsprint 涓婚瑙︽懜浼樺寲
    ============================================================ */
 
 @media (hover: none) and (pointer: coarse) {
   .theme-newsprint button:active,
-  .theme-newsprint .toolbar-btn:active {
+  .theme-newsprint .editor-toolbar__button:active {
     transform: scale(0.95) translate(1px, 1px);
     box-shadow: 1px 1px 0px 0px #111111;
   }
@@ -214,7 +214,7 @@
 }
 
 /* ============================================================
-   防止文本选择（触摸拖动时）
+   闃叉鏂囨湰閫夋嫨锛堣Е鎽告嫋鍔ㄦ椂锛?
    ============================================================ */
 
 @media (hover: none) and (pointer: coarse) {
@@ -227,7 +227,7 @@
     -webkit-touch-callout: none;
   }
 
-  /* 编辑器内容保持可选择 */
+  /* 缂栬緫鍣ㄥ唴瀹逛繚鎸佸彲閫夋嫨 */
   .editor-content,
   .chat-input,
   input,
@@ -238,47 +238,47 @@
 }
 
 /* ============================================================
-   滚动条优化（触摸设备）
+   婊氬姩鏉′紭鍖栵紙瑙︽懜璁惧锛?
    ============================================================ */
 
 @media (max-width: 1024px) {
-  /* 隐藏滚动条，但保持滚动功能 */
+  /* 闅愯棌婊氬姩鏉★紝浣嗕繚鎸佹粴鍔ㄥ姛鑳?*/
   .sidebar-panel-content,
-  .panel-body,
+  .block-detail-panel__body,
   .editor-scroll,
-  .toolbar-row {
+  .editor-toolbar__row {
     scrollbar-width: none;
     -ms-overflow-style: none;
   }
 
   .sidebar-panel-content::-webkit-scrollbar,
-  .panel-body::-webkit-scrollbar,
+  .block-detail-panel__body::-webkit-scrollbar,
   .editor-scroll::-webkit-scrollbar,
-  .toolbar-row::-webkit-scrollbar {
+  .editor-toolbar__row::-webkit-scrollbar {
     display: none;
   }
 
-  /* iOS 弹性滚动 */
+  /* iOS 寮规€ф粴鍔?*/
   .sidebar-panel-content,
-  .panel-body,
+  .block-detail-panel__body,
   .editor-scroll {
     -webkit-overflow-scrolling: touch;
   }
 }
 
 /* ============================================================
-   键盘弹出时的布局调整（iOS）
+   閿洏寮瑰嚭鏃剁殑甯冨眬璋冩暣锛坕OS锛?
    ============================================================ */
 
 @media (max-width: 768px) {
-  /* 输入框获得焦点时，确保可见 */
+  /* 杈撳叆妗嗚幏寰楃劍鐐规椂锛岀‘淇濆彲瑙?*/
   input:focus,
   textarea:focus {
     scroll-margin-bottom: 100px;
   }
 
-  /* 聊天输入区固定在底部 */
-  .panel-footer {
+  /* 鑱婂ぉ杈撳叆鍖哄浐瀹氬湪搴曢儴 */
+  .document-blocks-panel__footer {
     position: sticky;
     bottom: 0;
     background: var(--color-bg-primary);
@@ -287,18 +287,18 @@
 }
 
 /* ============================================================
-   加载和过渡动画优化
+   鍔犺浇鍜岃繃娓″姩鐢讳紭鍖?
    ============================================================ */
 
 @media (hover: none) and (pointer: coarse) {
-  /* 减少动画时长，提升响应速度 */
+  /* 鍑忓皯鍔ㄧ敾鏃堕暱锛屾彁鍗囧搷搴旈€熷害 */
   .sidebar-panel,
   .right-panel,
   .sidebar-overlay {
     transition-duration: 0.25s;
   }
 
-  /* 使用硬件加速 */
+  /* 浣跨敤纭欢鍔犻€?*/
   .sidebar-panel,
   .right-panel,
   .tab,
@@ -308,11 +308,11 @@
 }
 
 /* ============================================================
-   可访问性增强
+   鍙闂€у寮?
    ============================================================ */
 
 @media (max-width: 1024px) {
-  /* 焦点指示器更明显 */
+  /* 鐒︾偣鎸囩ず鍣ㄦ洿鏄庢樉 */
   button:focus-visible,
   input:focus-visible,
   textarea:focus-visible,
@@ -321,7 +321,7 @@
     outline-offset: 2px;
   }
 
-  /* 跳过链接（键盘导航） */
+  /* 璺宠繃閾炬帴锛堥敭鐩樺鑸級 */
   .skip-to-content {
     position: absolute;
     top: -40px;
@@ -339,21 +339,24 @@
 }
 
 /* ============================================================
-   性能优化
+   鎬ц兘浼樺寲
    ============================================================ */
 
 @media (max-width: 1024px) {
-  /* 使用 transform 而非 left/right 提升性能 */
+  /* 浣跨敤 transform 鑰岄潪 left/right 鎻愬崌鎬ц兘 */
   .sidebar-panel,
   .right-panel {
     transform: translateX(0);
     will-change: transform;
   }
 
-  /* 减少重绘 */
+  /* 鍑忓皯閲嶇粯 */
   .activity-icon,
-  .toolbar-btn,
+  .editor-toolbar__button,
   .tab {
     contain: layout style paint;
   }
 }
+
+
+
