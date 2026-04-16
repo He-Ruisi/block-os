@@ -1,0 +1,6 @@
+{
+  "featureName": "css-modules-migration",
+  "specType": "feature",
+  "workflowType": "requirements-first",
+  "generationMode": "requirements"
+}
