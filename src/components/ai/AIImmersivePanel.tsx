@@ -12,7 +12,6 @@ import {
   getProviderApiKey,
   type AIProvider,
 } from '../../services/aiService'
-import '../panel/RightPanel.css'
 
 interface AIImmersivePanelProps {
   onClose?: () => void
