@@ -39,7 +39,7 @@
   - [ ] 重构 SessionHistoryPanel（使用 Shadcn Card + ScrollArea + Separator）
   - [ ] 重构 BlockDetailPanel（使用 Shadcn Dialog + Card）
   - [ ] 重构 BlockDerivativeSelector（使用 Shadcn Select + Dialog）
-- [ ] Phase 5: 右侧边栏重构（混合模式）- 🔄 进行中（80% 完成）- [需求文档](./spec/features/styles/right-panel-refactor.md)
+- [x] Phase 5: 右侧边栏重构（混合模式）- ✅ 完成（100%）- [需求文档](./spec/features/styles/right-panel-refactor.md)
   - [x] 第一阶段：设计变量提取与样式系统升级（30分钟）- ✅ 完成（2026-04-16 19:00）
   - [x] 第二阶段：公共组件模式抽取（45分钟）- ✅ 完成（2026-04-16 19:10）
   - [x] 第三阶段：组件命名清洗与结构优化（60分钟）- ✅ 完成（2026-04-16 19:05）
@@ -54,12 +54,12 @@
     - [x] 键盘导航支持（Enter/Space/Escape/Tab，焦点管理）
     - [x] 可访问性改进（ARIA 标签、role 属性、焦点陷阱、WCAG 2.1 AA 级）
     - [x] 加载状态样式（spinner 旋转器、skeleton 骨架屏）
-  - [ ] 第五阶段：集成测试与文档（30分钟）
-    - [ ] 功能测试（所有功能保持正常）
-    - [ ] 视觉回归测试（主题适配验证）
-    - [ ] 性能测试（渲染性能/内存占用）
-    - [ ] 更新组件文档
-    - [ ] 创建使用示例
+  - [x] 第五阶段：集成测试与文档（30分钟）- ✅ 完成（2026-04-16 19:45）
+    - [x] 功能测试（所有功能保持正常）
+    - [x] 视觉回归测试（主题适配验证）
+    - [x] 性能测试（渲染性能/内存占用）
+    - [x] 更新组件文档
+    - [x] 创建使用示例
 
 ### OCR 插件系统 🔌 - [技术设计](../.kiro/specs/ocr-plugin-system/design.md)
 - [x] Phase 1: 插件系统核心（Week 1）
