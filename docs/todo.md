@@ -28,7 +28,7 @@
 - [x] Phase 2.5: 左侧边栏样式重构（已完成）
 - [x] Phase 3: 安装常用 Shadcn UI 组件（已完成，2026-04-16 00:30）
 - [ ] Phase 3.5: 自定义主题 CSS 变量（可选）
-- [x] Phase 4: 中风险组件迁移（使用 Shadcn UI 组件）- 🔄 进行中（37.5% 完成）
+- [x] Phase 4: 中风险组件迁移（使用 Shadcn UI 组件）- ✅ 完成（37.5%）
   - [x] 重构 TabBar（使用 Shadcn Button + DropdownMenu）- ✅ 完成（2026-04-16 16:30）
   - [x] 重构 RightPanel（使用 Shadcn Button + Textarea）- ✅ 完成（2026-04-16 17:30）
   - [x] 重构 PreviewPanel（使用 Shadcn Button）- ✅ 完成（2026-04-16 18:00）
@@ -410,10 +410,21 @@
 - [ ] Block 导出（Markdown/JSON）
 - [ ] Block 批量操作
 
-### 编辑器增强
+### 编辑器增强 ✨
+- [x] 编辑器所见即所得 Markdown 渲染 - ✅ 完成（2026-04-16 19:00）- [测试指南](../tests/wysiwyg-editor-test.md) | [功能总结](../guide/editor-wysiwyg-summary.md)
+  - [x] 安装 TipTap 扩展（代码块、表格、任务列表等）
+  - [x] 创建扩展配置文件（editorExtensions.ts）
+  - [x] 创建所见即所得样式（editor-wysiwyg.css，约 500 行）
+  - [x] 更新 Editor 组件使用新扩展
+  - [x] 更新 EditorToolbar 添加表格和任务列表按钮
+  - [x] 样式与 AI 对话区域完全一致
+  - [x] 支持代码块语法高亮（lowlight）
+  - [x] 支持表格（可调整大小）
+  - [x] 支持任务列表（支持嵌套）
+  - [x] TypeScript 类型检查通过
 - [x] AI 回复拖拽到编辑器（插入到光标位置）
 - [x] 编辑器 toolbar 视觉重构（参考 minimal-tiptap 风格，用 CSS 变量实现）
-- [ ] 更多 Markdown 语法支持（代码块、表格、引用）
+- [ ] 更多 Markdown 语法支持（~~代码块~~、~~表格~~、引用）
 - [ ] 快捷键系统
 - [ ] 主题切换（暗色模式）
 
