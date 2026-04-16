@@ -8,11 +8,8 @@ import { TaskList } from '@tiptap/extension-task-list'
 import { TaskItem } from '@tiptap/extension-task-item'
 import { Typography } from '@tiptap/extension-typography'
 import { Placeholder } from '@tiptap/extension-placeholder'
-import { CodeBlockLowlight } from '@tiptap/extension-code-block-lowlight'
-import { common, createLowlight } from 'lowlight'
-
-// 创建 lowlight 实例用于代码高亮
-const lowlight = createLowlight(common)
+import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight'
+import { lowlight } from 'lowlight'
 
 /**
  * 获取编辑器扩展配置
