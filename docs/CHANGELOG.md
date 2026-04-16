@@ -1,5 +1,43 @@
 # BlockOS 更新日志
 
+## [v1.22.0] - 2026-04-16 🏗️ Phase 5 代码重组启动：第 1 步完成（高优先级改进）
+
+**重要里程碑**：启动 Phase 5 代码重组计划，完成第 1 步高优先级改进，项目结构更加清晰规范。
+
+- **Phase 5 第 1 步完成**（3/3 任务）：
+  1. **合并重复文件**：
+     - 删除 `useToast.ts` 和 `Toast.tsx` 重复文件
+     - 统一使用 shadcn/ui toast 系统
+     - 更新所有相关引用
+  2. **统一样式管理**：
+     - 创建 `src/styles/` 目录结构（global/components/themes）
+     - 移动 15 个组件 CSS 文件到 `src/styles/components/`
+     - 将 design tokens 移到 `src/styles/global/design-tokens.css`
+     - 更新 13 个组件中的 CSS 导入路径
+  3. **添加 Constants 目录**：
+     - 创建 `src/constants/` 目录（ui/storage/api/editor）
+     - 提取魔法值为命名常量（数据库名、UI 尺寸、localStorage 键名等）
+     - 更新代码使用常量引用
+- **技术成果**：
+  - ✅ 43 个文件变更，净增加 920 行代码
+  - ✅ TypeScript 类型检查通过（0 错误、0 警告）
+  - ✅ 使用 smartRelocate 自动更新 import 路径
+  - ✅ 项目保持可运行状态
+- **Spec 文档**：
+  - 创建完整的需求文档（12 个详细需求）
+  - 创建技术设计文档（3 步执行计划）
+  - 定义最终目录结构和验证清单
+- **下一步计划**：
+  - Phase 5 第 2 步：引入 features 架构、完善类型定义、优化 Service 层（预计 4-6 小时）
+  - 或继续 Phase 4 组件迁移（剩余 5 个面板组件）
+
+**当前进度**：
+- ✅ Phase 5 第 1 步：完成（3/3 任务）
+- ⏸️ Phase 5 第 2 步：待开始
+- ⏸️ Phase 5 第 3 步：待开始
+
+---
+
 ## [v1.21.0] - 2026-04-16 ✨ BubbleMenu 工具栏增强：两行布局 + 完整 Markdown 格式支持
 
 **重要功能增强**：成功将编辑器 BubbleMenu 工具栏扩展为两行布局，大幅提升用户体验。
