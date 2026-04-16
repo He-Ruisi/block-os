@@ -95,9 +95,16 @@
   - [ ] 定义字体（font-family、font-size）
   - [ ] 定义间距（spacing）
   - [ ] 暗色模式适配
-- [ ] Phase 4: 中风险组件迁移（使用 Shadcn UI 组件，预计 3-4 小时）
-  - [ ] 重构 TabBar（使用 Shadcn Tabs 组件）
-  - [ ] 重构 RightPanel（使用 Shadcn Card 组件）
+- [x] Phase 4: 中风险组件迁移（使用 Shadcn UI 组件，预计 3-4 小时）- 🔄 进行中（25% 完成）
+  - [x] 重构 TabBar（使用 Shadcn Button + DropdownMenu）- ✅ 完成（2026-04-16 16:30）
+  - [x] 重构 RightPanel（使用 Shadcn Button + Textarea）- ✅ 完成（2026-04-16 17:30）
+  - [ ] 重构 PreviewPanel（使用 Shadcn Card + Select）
+  - [ ] 安装额外组件：Badge、ScrollArea、Separator
+  - [ ] 重构 BlockSpacePanel（使用 Shadcn Card + Input + Badge）
+  - [ ] 重构 DocumentBlocksPanel（使用 Shadcn Card + ScrollArea）
+  - [ ] 重构 SessionHistoryPanel（使用 Shadcn Card + ScrollArea + Separator）
+  - [ ] 重构 BlockDetailPanel（使用 Shadcn Dialog + Card）
+  - [ ] 重构 BlockDerivativeSelector（使用 Shadcn Select + Dialog）
   - [ ] 重构 BlockSpacePanel（使用 Shadcn 组件）
   - [ ] 重构 BlockDetailPanel（使用 Shadcn Dialog）
   - [ ] 重构 BlockDerivativeSelector（使用 Shadcn Select）

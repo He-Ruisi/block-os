@@ -16,7 +16,11 @@ function loadPrefs(): LayoutPrefs {
     const raw = localStorage.getItem(STORAGE_KEY)
     if (raw) return JSON.parse(raw) as LayoutPrefs
   } catch { /* ignore */ }
-  return { sidebarCollapsed: false, editorWidthRatio: 0.6, sidebarView: 'explorer' }
+  return {
+    sidebarCollapsed: false,
+    editorWidthRatio: 0.6,
+    sidebarView: 'explorer',
+  }
 }
 
 function savePrefs(prefs: LayoutPrefs): void {

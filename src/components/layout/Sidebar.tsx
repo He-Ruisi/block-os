@@ -12,6 +12,8 @@ import { useViewport } from '../../hooks/useViewport'
 interface SidebarProps {
   activeView: SidebarView
   collapsed: boolean
+  onOpenPlugin: (pluginId: string) => void
+  onOpenPluginSettings: (pluginId: string) => void
   onSelectToday: () => void
   onSelectProject: (projectId: string) => void
   onOpenDocument: (doc: Document) => void
@@ -31,6 +33,8 @@ const VIEW_TITLES: Record<SidebarView, string> = {
 export function Sidebar({
   activeView,
   collapsed,
+  onOpenPlugin,
+  onOpenPluginSettings,
   onSelectToday,
   onSelectProject,
   onOpenDocument,
@@ -99,7 +103,10 @@ export function Sidebar({
             <OutlineView documentId={documentId} />
           )}
           {activeView === 'extensions' && (
-            <ExtensionsView />
+            <ExtensionsView
+              onOpenPlugin={onOpenPlugin}
+              onOpenPluginSettings={onOpenPluginSettings}
+            />
           )}
         </div>
 

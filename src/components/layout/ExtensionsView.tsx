@@ -1,12 +1,15 @@
-import { useState, useEffect } from 'react'
-import { Puzzle, Settings, Trash2, X } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { Puzzle, Settings, Trash2 } from 'lucide-react'
 import { pluginRegistry } from '../../services/pluginRegistry'
 import type { PluginRegistryEntry } from '../../types/plugin'
 
-export function ExtensionsView() {
+interface ExtensionsViewProps {
+  onOpenPlugin: (pluginId: string) => void
+  onOpenPluginSettings: (pluginId: string) => void
+}
+
+export function ExtensionsView({ onOpenPlugin, onOpenPluginSettings }: ExtensionsViewProps) {
   const [plugins, setPlugins] = useState<PluginRegistryEntry[]>([])
-  const [activePluginId, setActivePluginId] = useState<string | null>(null)
-  const [showSettings, setShowSettings] = useState(false)
   
   useEffect(() => {
     // 加载已安装的插件列表
@@ -19,46 +22,8 @@ export function ExtensionsView() {
     try {
       await pluginRegistry.uninstallPlugin(pluginId)
       setPlugins(pluginRegistry.getAllPlugins())
-      if (activePluginId === pluginId) {
-        setActivePluginId(null)
-      }
     } catch (err) {
       alert('卸载失败：' + (err as Error).message)
-    }
-  }
-  
-  const handleOpenPlugin = (pluginId: string) => {
-    setActivePluginId(pluginId)
-    setShowSettings(false)
-  }
-  
-  const handleOpenSettings = (pluginId: string) => {
-    setActivePluginId(pluginId)
-    setShowSettings(true)
-  }
-  
-  const handleClose = () => {
-    setActivePluginId(null)
-    setShowSettings(false)
-  }
-  
-  // 如果有活动插件，渲染插件 UI
-  if (activePluginId) {
-    const plugin = pluginRegistry.getPlugin(activePluginId)
-    if (plugin) {
-      return (
-        <div className="flex-1 flex flex-col overflow-hidden">
-          <div className="flex items-center justify-between px-4 py-4 border-b border-border">
-            <h3 className="text-sm font-medium m-0">{plugin.metadata.name}</h3>
-            <button className="p-1 border-none bg-transparent text-muted-foreground cursor-pointer rounded flex items-center justify-center transition-colors hover:bg-muted" onClick={handleClose}>
-              <X size={16} />
-            </button>
-          </div>
-          <div className="flex-1 overflow-y-auto">
-            {showSettings && plugin.renderSettings ? plugin.renderSettings() : plugin.render()}
-          </div>
-        </div>
-      )
     }
   }
   
@@ -102,7 +67,7 @@ export function ExtensionsView() {
               <div className="flex items-center gap-2 flex-wrap w-full justify-end">
                 <button
                   className="px-3 py-1.5 rounded-lg border border-border bg-background text-foreground text-xs cursor-pointer transition-colors flex items-center justify-center hover:bg-muted"
-                  onClick={() => handleOpenPlugin(entry.metadata.id)}
+                  onClick={() => onOpenPlugin(entry.metadata.id)}
                   title="打开插件"
                 >
                   打开
@@ -110,7 +75,7 @@ export function ExtensionsView() {
                 {entry.instance?.renderSettings && (
                   <button
                     className="px-3 py-1.5 rounded-lg border border-border bg-background text-foreground text-xs cursor-pointer transition-colors flex items-center justify-center hover:bg-muted"
-                    onClick={() => handleOpenSettings(entry.metadata.id)}
+                    onClick={() => onOpenPluginSettings(entry.metadata.id)}
                     title="设置"
                   >
                     <Settings size={16} />

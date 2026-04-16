@@ -11,6 +11,7 @@ import type { AIMode } from './components/ai/AIFloatPanel'
 import { AuthPage } from './components/auth/AuthPage'
 import { SettingsPanel } from './components/panel/SettingsPanel'
 import { StatusBar } from './components/layout/StatusBar'
+import { PluginWorkspaceView } from './components/layout/PluginWorkspaceView'
 import { Toast } from './components/shared/Toast'
 import { ProjectOverview } from './components/project/ProjectOverview'
 import { initStorage } from './storage'
@@ -35,6 +36,7 @@ function App() {
   const [showProjectOverview, setShowProjectOverview] = useState(false)
   const [storageReady, setStorageReady] = useState(false)
   const [pendingAIInsert, setPendingAIInsert] = useState<{ documentId: string; content: string } | null>(null)
+  const [activePluginWorkspace, setActivePluginWorkspace] = useState<{ pluginId: string; showSettings: boolean } | null>(null)
   const previousViewModeRef = useRef<'ai-focus' | 'hybrid' | null>(null)
   
   // 视图模式：AI 沉浸式 or 混合模式
@@ -93,6 +95,7 @@ function App() {
 
   const handleSelectProject = useCallback((projectId: string) => {
     // 显示项目概览页面
+    setActivePluginWorkspace(null)
     setShowProjectOverview(true)
     selectProject(projectId)
   }, [selectProject])
@@ -100,13 +103,21 @@ function App() {
   const handleOpenProjectFromOverview = useCallback((projectId: string) => {
     // 从项目概览打开项目（关闭概览，切换到项目）
     setShowProjectOverview(false)
+    setActivePluginWorkspace(null)
     selectProject(projectId)
   }, [selectProject])
 
   const handleOpenDocument = useCallback((doc: Parameters<typeof openDocument>[0]) => {
     setShowProjectOverview(false)
+    setActivePluginWorkspace(null)
     openDocument(doc)
   }, [openDocument])
+
+  const handleOpenPluginWorkspace = useCallback((pluginId: string, showSettings: boolean) => {
+    setShowProjectOverview(false)
+    setActivePluginWorkspace({ pluginId, showSettings })
+    setSidebarCollapsed(true)
+  }, [setSidebarCollapsed])
 
   const handleCreateProject = useCallback(() => {
     // TODO: 实现新建项目对话框
@@ -405,6 +416,8 @@ function App() {
               <Sidebar
                 activeView={sidebarView}
                 collapsed={sidebarCollapsed}
+                onOpenPlugin={(pluginId) => handleOpenPluginWorkspace(pluginId, false)}
+                onOpenPluginSettings={(pluginId) => handleOpenPluginWorkspace(pluginId, true)}
                 onSelectToday={selectToday}
                 onSelectProject={handleSelectProject}
                 onOpenDocument={handleOpenDocument}
@@ -421,6 +434,24 @@ function App() {
               <ProjectOverview
                 onSelectProject={handleOpenProjectFromOverview}
                 onCreateProject={handleCreateProject}
+              />
+            ) : activePluginWorkspace ? (
+              <PluginWorkspaceView
+                pluginId={activePluginWorkspace.pluginId}
+                showSettings={activePluginWorkspace.showSettings}
+                onClose={() => setActivePluginWorkspace(null)}
+                onToggleSettings={() => {
+                  setActivePluginWorkspace((prev) => {
+                    if (!prev) {
+                      return prev
+                    }
+
+                    return {
+                      ...prev,
+                      showSettings: !prev.showSettings,
+                    }
+                  })
+                }}
               />
             ) : (
               /* 编辑器视图 */

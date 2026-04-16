@@ -402,30 +402,54 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI, onCl
       {/* 对话标签页 */}
       {activeTab === 'chat' && (
         showSettings ? (
-          <div className="settings-panel">
-            <div className="settings-header">
-              <h3 className="settings-title">运行设置</h3>
-              <button className="settings-close-btn" onClick={() => setShowSettings(false)} title="关闭">
-                ✕
-              </button>
+          <div className="flex h-full flex-col bg-background">
+            <div className="flex flex-shrink-0 items-center justify-between border-b border-border bg-background px-4 py-3.5">
+              <h3 className="m-0 text-base font-semibold text-foreground">运行设置</h3>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 text-muted-foreground transition-all hover:bg-muted hover:text-foreground"
+                onClick={() => setShowSettings(false)}
+                title="关闭"
+              >
+                <span className="text-lg">✕</span>
+              </Button>
             </div>
             
-            <div className="settings-body">
-              <div
-                className={`settings-card ${expandedSettingsSection === 'model' ? 'expanded' : ''}`}
+            <div className="flex flex-1 flex-col gap-3 overflow-y-auto px-3.5 py-3.5">
+              <button
+                className={cn(
+                  "w-full rounded-[18px] border border-border/80 bg-gradient-to-b from-background/96 to-background p-0 text-left shadow-[0_10px_30px_rgba(15,23,42,0.04)] transition-all hover:border-border hover:shadow-[0_12px_34px_rgba(15,23,42,0.08)]",
+                  expandedSettingsSection === 'model' && "border-purple-600/55 shadow-[0_14px_36px_rgba(15,23,42,0.1)]"
+                )}
+                onClick={() => setExpandedSettingsSection('model')}
+                type="button"
               >
-                <button className="settings-card-summary" onClick={() => setExpandedSettingsSection('model')} type="button">
-                  <div className="settings-card-copy">
-                    <span className="settings-card-title">Model</span>
-                    <span className="settings-card-description">{getProviderConfig(aiProvider).name} · {getModelLabel(aiModel)}</span>
+                <div className="flex items-center justify-between gap-3 px-4 py-4">
+                  <div className="flex min-w-0 flex-col gap-2">
+                    <span className="text-[15px] font-semibold text-foreground">Model</span>
+                    <span className="text-[13px] leading-relaxed text-muted-foreground">
+                      {getProviderConfig(aiProvider).name} · {getModelLabel(aiModel)}
+                    </span>
                   </div>
-                  <ChevronDown size={16} className="settings-card-chevron" />
-                </button>
+                  <ChevronDown 
+                    size={16} 
+                    className={cn(
+                      "flex-shrink-0 text-muted-foreground transition-all",
+                      expandedSettingsSection === 'model' && "rotate-180 text-foreground"
+                    )}
+                  />
+                </div>
                 {expandedSettingsSection === 'model' && (
-                  <div className="settings-card-detail" onClick={e => e.stopPropagation()}>
-                    <label className="settings-label">Select model</label>
+                  <div 
+                    className="animate-in fade-in-0 slide-in-from-top-1 border-t border-border/80 px-4 pb-4"
+                    onClick={e => e.stopPropagation()}
+                  >
+                    <label className="mb-2 mt-3.5 block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                      Select model
+                    </label>
                     <select
-                      className="settings-select settings-select-large"
+                      className="min-h-[48px] w-full rounded-xl border border-border bg-background px-3 py-2.5 text-[15px] font-medium text-foreground outline-none transition-all focus:border-purple-600 focus:ring-2 focus:ring-purple-600/20"
                       value={aiModel}
                       onChange={e => {
                         setAIModel(e.target.value)
@@ -440,25 +464,41 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI, onCl
                     </select>
                   </div>
                 )}
-              </div>
+              </button>
 
-              <div
-                className={`settings-card ${expandedSettingsSection === 'prompt' ? 'expanded' : ''}`}
+              <button
+                className={cn(
+                  "w-full rounded-[18px] border border-border/80 bg-gradient-to-b from-background/96 to-background p-0 text-left shadow-[0_10px_30px_rgba(15,23,42,0.04)] transition-all hover:border-border hover:shadow-[0_12px_34px_rgba(15,23,42,0.08)]",
+                  expandedSettingsSection === 'prompt' && "border-purple-600/55 shadow-[0_14px_36px_rgba(15,23,42,0.1)]"
+                )}
+                onClick={() => setExpandedSettingsSection('prompt')}
+                type="button"
               >
-                <button className="settings-card-summary" onClick={() => setExpandedSettingsSection('prompt')} type="button">
-                  <div className="settings-card-copy">
-                    <span className="settings-card-title">System instructions</span>
-                    <span className="settings-card-description">
+                <div className="flex items-center justify-between gap-3 px-4 py-4">
+                  <div className="flex min-w-0 flex-col gap-2">
+                    <span className="text-[15px] font-semibold text-foreground">System instructions</span>
+                    <span className="break-words text-[13px] leading-relaxed text-muted-foreground">
                       {tempSystemPrompt.trim() ? `${tempSystemPrompt.trim().slice(0, 40)}${tempSystemPrompt.trim().length > 40 ? '...' : ''}` : 'Optional tone and style instructions for the model'}
                     </span>
                   </div>
-                  <ChevronDown size={16} className="settings-card-chevron" />
-                </button>
+                  <ChevronDown 
+                    size={16} 
+                    className={cn(
+                      "flex-shrink-0 text-muted-foreground transition-all",
+                      expandedSettingsSection === 'prompt' && "rotate-180 text-foreground"
+                    )}
+                  />
+                </div>
                 {expandedSettingsSection === 'prompt' && (
-                  <div className="settings-card-detail" onClick={e => e.stopPropagation()}>
-                    <label className="settings-label">System instructions</label>
-                    <textarea
-                      className="system-prompt-textarea"
+                  <div 
+                    className="animate-in fade-in-0 slide-in-from-top-1 border-t border-border/80 px-4 pb-4"
+                    onClick={e => e.stopPropagation()}
+                  >
+                    <label className="mb-2 mt-3.5 block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                      System instructions
+                    </label>
+                    <Textarea
+                      className="min-h-[132px] w-full resize-vertical rounded-xl border border-border bg-background px-3.5 py-3 text-sm leading-relaxed text-foreground outline-none transition-all focus:border-purple-600 focus:ring-2 focus:ring-purple-600/20"
                       value={tempSystemPrompt}
                       onChange={e => setTempSystemPrompt(e.target.value)}
                       rows={6}
@@ -466,31 +506,46 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI, onCl
                     />
                   </div>
                 )}
-              </div>
+              </button>
 
               {aiProvider === 'deepseek' && (
-                <div
-                  className={`settings-card ${expandedSettingsSection === 'reasoning' ? 'expanded' : ''}`}
+                <button
+                  className={cn(
+                    "w-full rounded-[18px] border border-border/80 bg-gradient-to-b from-background/96 to-background p-0 text-left shadow-[0_10px_30px_rgba(15,23,42,0.04)] transition-all hover:border-border hover:shadow-[0_12px_34px_rgba(15,23,42,0.08)]",
+                    expandedSettingsSection === 'reasoning' && "border-purple-600/55 shadow-[0_14px_36px_rgba(15,23,42,0.1)]"
+                  )}
+                  onClick={() => setExpandedSettingsSection('reasoning')}
+                  type="button"
                 >
-                  <button className="settings-card-summary" onClick={() => setExpandedSettingsSection('reasoning')} type="button">
-                    <div className="settings-card-copy">
-                      <span className="settings-card-title">Reasoning</span>
-                      <span className="settings-card-description">
+                  <div className="flex items-center justify-between gap-3 px-4 py-4">
+                    <div className="flex min-w-0 flex-col gap-2">
+                      <span className="text-[15px] font-semibold text-foreground">Reasoning</span>
+                      <span className="text-[13px] leading-relaxed text-muted-foreground">
                         {aiModel === 'deepseek-reasoner' ? 'Deeper reasoning for complex tasks' : 'Faster responses for daily chat'}
                       </span>
                     </div>
-                    <ChevronDown size={16} className="settings-card-chevron" />
-                  </button>
+                    <ChevronDown 
+                      size={16} 
+                      className={cn(
+                        "flex-shrink-0 text-muted-foreground transition-all",
+                        expandedSettingsSection === 'reasoning' && "rotate-180 text-foreground"
+                      )}
+                    />
+                  </div>
                   {expandedSettingsSection === 'reasoning' && (
-                    <div className="settings-card-detail" onClick={e => e.stopPropagation()}>
-                      <div className="settings-toggle-item">
-                        <div className="toggle-item-info">
-                          <span className="toggle-item-label">Use reasoning model</span>
-                          <span className="toggle-item-hint">Switch between `deepseek-chat` and `deepseek-reasoner`</span>
+                    <div 
+                      className="animate-in fade-in-0 slide-in-from-top-1 border-t border-border/80 px-4 pb-4"
+                      onClick={e => e.stopPropagation()}
+                    >
+                      <div className="flex items-center justify-between gap-4 pt-3.5">
+                        <div className="flex flex-1 flex-col gap-1">
+                          <span className="text-sm font-medium text-foreground">Use reasoning model</span>
+                          <span className="text-xs text-muted-foreground">Switch between `deepseek-chat` and `deepseek-reasoner`</span>
                         </div>
-                        <label className="toggle-switch">
+                        <label className="relative inline-block h-7 w-12 flex-shrink-0 cursor-pointer">
                           <input
                             type="checkbox"
+                            className="peer h-0 w-0 opacity-0"
                             checked={aiModel === 'deepseek-reasoner'}
                             onChange={e => {
                               const newModel = e.target.checked ? 'deepseek-reasoner' : 'deepseek-chat'
@@ -498,31 +553,47 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI, onCl
                               setCurrentModel(newModel)
                             }}
                           />
-                          <span className="toggle-slider"></span>
+                          <span className="absolute inset-0 cursor-pointer rounded-full bg-muted transition-all before:absolute before:bottom-1 before:left-1 before:h-5 before:w-5 before:rounded-full before:bg-white before:shadow-sm before:transition-all before:content-[''] peer-checked:bg-purple-600 peer-checked:before:translate-x-5 peer-disabled:cursor-not-allowed peer-disabled:opacity-50"></span>
                         </label>
                       </div>
                     </div>
                   )}
-                </div>
+                </button>
               )}
 
-              <div
-                className={`settings-card ${expandedSettingsSection === 'provider' ? 'expanded' : ''}`}
+              <button
+                className={cn(
+                  "w-full rounded-[18px] border border-border/80 bg-gradient-to-b from-background/96 to-background p-0 text-left shadow-[0_10px_30px_rgba(15,23,42,0.04)] transition-all hover:border-border hover:shadow-[0_12px_34px_rgba(15,23,42,0.08)]",
+                  expandedSettingsSection === 'provider' && "border-purple-600/55 shadow-[0_14px_36px_rgba(15,23,42,0.1)]"
+                )}
+                onClick={() => setExpandedSettingsSection('provider')}
+                type="button"
               >
-                <button className="settings-card-summary" onClick={() => setExpandedSettingsSection('provider')} type="button">
-                  <div className="settings-card-copy">
-                    <span className="settings-card-title">{hasApiKey ? 'AI Provider' : 'No API Key'}</span>
-                    <span className="settings-card-description">
+                <div className="flex items-center justify-between gap-3 px-4 py-4">
+                  <div className="flex min-w-0 flex-col gap-2">
+                    <span className="text-[15px] font-semibold text-foreground">{hasApiKey ? 'AI Provider' : 'No API Key'}</span>
+                    <span className="text-[13px] leading-relaxed text-muted-foreground">
                       {hasApiKey ? `${getProviderConfig(aiProvider).name} connected` : 'Switch to a provider with a configured API key'}
                     </span>
                   </div>
-                  <ChevronDown size={16} className="settings-card-chevron" />
-                </button>
+                  <ChevronDown 
+                    size={16} 
+                    className={cn(
+                      "flex-shrink-0 text-muted-foreground transition-all",
+                      expandedSettingsSection === 'provider' && "rotate-180 text-foreground"
+                    )}
+                  />
+                </div>
                 {expandedSettingsSection === 'provider' && (
-                  <div className="settings-card-detail" onClick={e => e.stopPropagation()}>
-                    <label className="settings-label">AI Provider</label>
+                  <div 
+                    className="animate-in fade-in-0 slide-in-from-top-1 border-t border-border/80 px-4 pb-4"
+                    onClick={e => e.stopPropagation()}
+                  >
+                    <label className="mb-2 mt-3.5 block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                      AI Provider
+                    </label>
                     <select
-                      className="settings-select"
+                      className="min-h-[44px] w-full rounded-xl border border-border bg-background px-3 py-2.5 text-sm text-foreground outline-none transition-all focus:border-purple-600 focus:ring-2 focus:ring-purple-600/20"
                       value={aiProvider}
                       onChange={e => {
                         const provider = e.target.value as AIProvider
@@ -534,37 +605,62 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI, onCl
                       <option value="mimo">Xiaomi MiMo</option>
                       <option value="deepseek">DeepSeek V3.2</option>
                     </select>
-                    <div className="settings-inline-hint">
+                    <div className="mt-2.5 text-xs leading-relaxed text-muted-foreground">
                       {hasApiKey ? 'API key detected for the current provider.' : 'No API key detected for the current provider yet.'}
                     </div>
                   </div>
                 )}
-              </div>
+              </button>
 
-              <div
-                className={`settings-card ${expandedSettingsSection === 'context' ? 'expanded' : ''}`}
+              <button
+                className={cn(
+                  "w-full rounded-[18px] border border-border/80 bg-gradient-to-b from-background/96 to-background p-0 text-left shadow-[0_10px_30px_rgba(15,23,42,0.04)] transition-all hover:border-border hover:shadow-[0_12px_34px_rgba(15,23,42,0.08)]",
+                  expandedSettingsSection === 'context' && "border-purple-600/55 shadow-[0_14px_36px_rgba(15,23,42,0.1)]"
+                )}
+                onClick={() => setExpandedSettingsSection('context')}
+                type="button"
               >
-                <button className="settings-card-summary" onClick={() => setExpandedSettingsSection('context')} type="button">
-                  <div className="settings-card-copy">
-                    <span className="settings-card-title">Context</span>
-                    <span className="settings-card-description">Token count · 0 / 128,000</span>
+                <div className="flex items-center justify-between gap-3 px-4 py-4">
+                  <div className="flex min-w-0 flex-col gap-2">
+                    <span className="text-[15px] font-semibold text-foreground">Context</span>
+                    <span className="text-[13px] leading-relaxed text-muted-foreground">Token count · 0 / 128,000</span>
                   </div>
-                  <ChevronDown size={16} className="settings-card-chevron" />
-                </button>
+                  <ChevronDown 
+                    size={16} 
+                    className={cn(
+                      "flex-shrink-0 text-muted-foreground transition-all",
+                      expandedSettingsSection === 'context' && "rotate-180 text-foreground"
+                    )}
+                  />
+                </div>
                 {expandedSettingsSection === 'context' && (
-                  <div className="settings-card-detail" onClick={e => e.stopPropagation()}>
-                    <div className="token-count-display">
-                      <span className="token-count-label">Token count</span>
-                      <span className="token-count-value">0 / 128,000</span>
+                  <div 
+                    className="animate-in fade-in-0 slide-in-from-top-1 border-t border-border/80 px-4 pb-4"
+                    onClick={e => e.stopPropagation()}
+                  >
+                    <div className="mt-3.5 flex items-center justify-between rounded-[14px] border border-border/80 bg-secondary px-4 py-3.5">
+                      <span className="text-[13px] text-muted-foreground">Token count</span>
+                      <span className="font-mono text-sm font-medium text-foreground">0 / 128,000</span>
                     </div>
                   </div>
                 )}
-              </div>
+              </button>
             </div>
 
-            <div className="settings-footer">
-              <button className="btn-secondary" onClick={() => { setTempSystemPrompt(systemPrompt); setShowSettings(false) }}>Cancel</button>
-              <button className="btn-primary" onClick={() => { setSystemPrompt(tempSystemPrompt); setShowSettings(false) }}>Save</button>
+            <div className="flex flex-shrink-0 gap-3 border-t border-border bg-background px-4 py-3.5">
+              <Button
+                variant="outline"
+                className="flex-1"
+                onClick={() => { setTempSystemPrompt(systemPrompt); setShowSettings(false) }}
+              >
+                Cancel
+              </Button>
+              <Button
+                className="flex-1 bg-purple-600 hover:bg-purple-700"
+                onClick={() => { setSystemPrompt(tempSystemPrompt); setShowSettings(false) }}
+              >
+                Save
+              </Button>
             </div>
           </div>
         ) : showHistory ? (
@@ -579,62 +675,78 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI, onCl
           <>
             {/* Session 标题栏 */}
             {messages.length > 0 && (
-              <div className="session-title-bar">
-                <span className="session-title">{currentSession.title}</span>
+              <div className="flex-shrink-0 border-b border-border bg-secondary px-3.5 py-1">
+                <span className="block overflow-hidden text-ellipsis whitespace-nowrap text-[11px] text-muted-foreground">
+                  {currentSession.title}
+                </span>
               </div>
             )}
 
-            <div className="panel-body">
-              <div className="messages-container">
+            <div className="flex flex-1 flex-col overflow-y-auto">
+              <div className="flex flex-1 flex-col gap-4 p-4">
                 {messages.length === 0 ? (
-                  <div className="panel-placeholder">
-                    <div className="placeholder-icon">🤖</div>
-                    <div className="placeholder-text">开始与 AI 对话</div>
-                    <div className="placeholder-hint">AI 回复可直接写入编辑器或捕获为 Block</div>
+                  <div className="flex flex-1 flex-col items-center justify-center text-center">
+                    <div className="mb-3 text-5xl opacity-50">🤖</div>
+                    <div className="mb-1.5 text-sm text-muted-foreground">开始与 AI 对话</div>
+                    <div className="text-xs text-muted-foreground/70">AI 回复可直接写入编辑器或捕获为 Block</div>
                   </div>
                 ) : (
                   messages.map(msg => (
-                    <div key={msg.id} className={`message message-${msg.role}`}>
-                      <div className="message-avatar">{msg.role === 'user' ? '👤' : '🤖'}</div>
-                      <div className="message-wrapper">
+                    <div key={msg.id} className="flex gap-2.5 animate-in fade-in-0 slide-in-from-bottom-2">
+                      <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center text-2xl">
+                        {msg.role === 'user' ? '👤' : '🤖'}
+                      </div>
+                      <div className="flex min-w-0 flex-1 flex-col gap-1.5">
                         {/* AI 对话回复（如果存在） */}
                         {msg.role === 'assistant' && msg.content && (
-                          <div className="message-content">
+                          <div className="min-w-0 flex-1">
                             <MarkdownRenderer content={msg.content} />
                           </div>
                         )}
                         
                         {/* 用户消息（纯文本） */}
                         {msg.role === 'user' && (
-                          <div className="message-content">
+                          <div className="break-words whitespace-pre-wrap rounded-md bg-secondary px-3 py-2.5 text-sm leading-relaxed text-foreground">
                             {msg.content}
                           </div>
                         )}
                         
                         {/* 编辑器内容（Markdown 渲染，重点展示） */}
                         {msg.role === 'assistant' && msg.editorContent && (
-                          <div className="editor-content-preview">
-                            <div className="preview-label">📝 编辑器内容</div>
-                            <div className="preview-markdown">
+                          <div className="mt-3 rounded-lg border border-border bg-secondary p-4">
+                            <div className="mb-3 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                              📝 编辑器内容
+                            </div>
+                            <div>
                               <MarkdownRenderer content={msg.editorContent} />
                             </div>
                           </div>
                         )}
                         
                         {msg.role === 'assistant' && (msg.content || msg.editorContent) && (
-                          <div className="message-actions">
-                            <button
-                              className={`insert-button ${msg.insertedToEditor ? 'inserted' : ''}`}
+                          <div className="mt-1.5 flex gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className={cn(
+                                "h-7 gap-1 px-2.5 text-[11px] transition-all",
+                                msg.insertedToEditor && "bg-emerald-600/10 text-emerald-600 hover:bg-emerald-600/20"
+                              )}
                               onClick={() => insertToEditor(msg.id)}
                               disabled={msg.insertedToEditor}
                             >
                               {msg.insertedToEditor ? '✓ 已写入编辑器' : '↗ 写入编辑器'}
-                            </button>
-                            <button className="capture-button" onClick={() => handleCaptureBlock(msg.id)}>
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="h-7 gap-1 border-purple-600 px-2.5 text-[11px] text-purple-600 hover:bg-purple-600/10"
+                              onClick={() => handleCaptureBlock(msg.id)}
+                            >
                               ◆ 捕获为Block
-                            </button>
+                            </Button>
                             <span
-                              className="drag-handle"
+                              className="flex h-7 w-7 cursor-grab select-none items-center justify-center rounded text-base leading-none tracking-tighter text-muted-foreground transition-all hover:bg-secondary hover:text-foreground active:cursor-grabbing"
                               draggable
                               onDragStart={e => handleDragStart(e, msg.id)}
                               title="拖拽到编辑器"
@@ -651,9 +763,9 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI, onCl
               </div>
             </div>
 
-            <div className="panel-footer">
-              <textarea
-                className="chat-input"
+            <div className="flex flex-shrink-0 flex-col gap-2 border-t border-border bg-secondary p-3">
+              <Textarea
+                className="w-full resize-none rounded-md border border-border bg-background px-2.5 py-2.5 text-[13px] text-foreground outline-none transition-colors focus:border-purple-600 disabled:cursor-not-allowed disabled:opacity-50"
                 placeholder="输入消息... (Enter 发送，Shift+Enter 换行)"
                 value={input}
                 onChange={e => setInput(e.target.value)}
@@ -661,9 +773,13 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI, onCl
                 disabled={isLoading}
                 rows={3}
               />
-              <button className="send-button" onClick={handleSendMessage} disabled={!input.trim() || isLoading}>
+              <Button
+                className="self-end bg-purple-600 px-4 py-2 text-[13px] font-medium hover:bg-purple-700 disabled:cursor-not-allowed disabled:opacity-50"
+                onClick={handleSendMessage}
+                disabled={!input.trim() || isLoading}
+              >
                 {isLoading ? '发送中...' : '发送'}
-              </button>
+              </Button>
             </div>
           </>
         )
