@@ -1,5 +1,29 @@
 # BlockOS 更新日志
 
+## [v1.27.0] - 2026-04-16 🎨 PreviewPanel V0 像素级重构完成
+
+**重要里程碑**：完成 PreviewPanel 组件的 V0 设计像素级还原，安装 Badge 和 ScrollArea 组件，右侧边栏 UI 统一性进一步提升。
+
+- **PreviewPanel V0 重构**：
+  - ✅ 模式选择：预览/审阅按钮（Eye 和 FileCheck 图标）
+  - ✅ 模板选择：Shadcn Select 下拉框（小说/博客/大纲）
+  - ✅ 格式选择：带图标下拉框（PDF/Markdown/纯文本/Word/HTML）+ 导出按钮
+  - ✅ 预览区域：顶部信息栏（模式 · 模板 + 格式 Badge）+ ScrollArea
+  - ✅ V0 主题色应用：accent-green (#35AB67)
+  - ✅ 保留所有功能：预览生成、导出文件、定期刷新
+
+- **新增 Shadcn UI 组件**（2个）：
+  - Badge 组件：4 种变体（default/secondary/destructive/outline）
+  - ScrollArea 组件：自定义滚动条样式
+
+- **技术成果**：
+  - 完全使用 Tailwind CSS 工具类
+  - lucide-react 图标（Eye/FileCheck/FileText/FileCode/Download）
+  - TypeScript 类型检查通过（0 错误）
+  - 像素级还原 V0 设计
+
+---
+
 ## [v1.26.0] - 2026-04-16 🎉 右侧边栏重构 Phase 5 全部完成
 
 **重大里程碑**：Phase 5 右侧边栏重构全部 5 个阶段完成！建立了完整的设计系统和公共样式模式，达到生产级质量标准。

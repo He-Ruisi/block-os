@@ -60,13 +60,20 @@
     - [x] 性能测试（渲染性能/内存占用）
     - [x] 更新组件文档
     - [x] 创建使用示例
-- [ ] Phase 6: V0 右侧边栏像素级重构 - 🔄 进行中（12.5% 完成）- [参考设计](../references/V0 右侧边栏/)
+- [ ] Phase 6: V0 右侧边栏像素级重构 - 🔄 进行中（25% 完成）- [参考设计](../references/V0 右侧边栏/)
   - [x] BlockSpacePanel 重构 - ✅ 完成（2026-04-16 20:35）
     - [x] 搜索框：lucide-react Search 图标 + 焦点环效果
     - [x] 标签过滤：Badge 按钮组（显示前 5 个 + "更多"）
     - [x] Bento Grid 卡片布局（响应式 2 列）
     - [x] V0 主题色应用（accent-green #35AB67）
     - [x] 保留所有功能和逻辑
+  - [x] PreviewPanel 重构 - ✅ 完成（2026-04-16 21:00）
+    - [x] 模式选择按钮（预览/审阅，Eye/FileCheck 图标）
+    - [x] 模板选择下拉框（小说/博客/大纲）
+    - [x] 格式选择 + 导出按钮（PDF/Markdown/纯文本/Word/HTML）
+    - [x] 预览区域：顶部信息栏 + ScrollArea
+    - [x] 安装 Badge 和 ScrollArea 组件
+    - [x] V0 主题色应用（accent-green）
   - [ ] BlockDetailPanel 重构
     - [ ] 返回按钮 + 标题区域
     - [ ] 版本历史列表（Clock 图标 + 折叠卡片）
@@ -82,7 +89,6 @@
   - [ ] SessionHistoryPanel 重构
     - [ ] 按日期分组的会话列表
     - [ ] 会话卡片（标题 + 时间 + 消息数）
-  - [ ] PreviewPanel 重构（已在 Phase 4 完成，需验证是否符合 V0 设计）
   - [ ] SettingsPanel 重构
     - [ ] 折叠卡片（Model、System Instructions、Reasoning、Provider、Context）
     - [ ] 表单输入和切换开关
