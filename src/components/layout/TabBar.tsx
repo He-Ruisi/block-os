@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import type { Tab } from '../../types/project'
-import './TabBar.css'
+import { Button } from '@/components/ui/button'
 
 interface TabBarProps {
   tabs: Tab[]
@@ -68,7 +68,6 @@ export function TabBar({
   const handleDragStart = useCallback((e: React.DragEvent, index: number) => {
     setDragIndex(index)
     e.dataTransfer.effectAllowed = 'move'
-    // 设置一个透明的拖拽图像（用 CSS 控制视觉）
     const el = e.currentTarget as HTMLElement
     e.dataTransfer.setDragImage(el, el.offsetWidth / 2, el.offsetHeight / 2)
   }, [])
@@ -92,17 +91,21 @@ export function TabBar({
   }, [])
 
   return (
-    <div className="tab-bar">
-      <div className="tab-list">
+    <div className="flex h-11 flex-shrink-0 items-center justify-between border-b border-border bg-secondary px-2">
+      {/* 标签页列表 */}
+      <div className="flex flex-1 items-center gap-1 overflow-x-auto overflow-y-hidden scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent">
         {tabs.map((tab, index) => (
           <div
             key={tab.id}
-            className={[
-              'tab',
-              tab.id === activeTabId ? 'active' : '',
-              dragIndex === index ? 'dragging' : '',
-              dropIndex === index && dragIndex !== index ? 'drop-target' : '',
-            ].filter(Boolean).join(' ')}
+            className={`
+              relative flex max-w-[200px] cursor-pointer items-center gap-2 whitespace-nowrap rounded-t-md px-3 py-2 transition-colors select-none
+              ${tab.id === activeTabId 
+                ? 'bg-background shadow-sm' 
+                : 'bg-transparent hover:bg-muted'
+              }
+              ${dragIndex === index ? 'opacity-40' : ''}
+              ${dropIndex === index && dragIndex !== index ? 'border-l-2 border-purple-600' : ''}
+            `}
             onClick={() => onSelectTab(tab.id)}
             onContextMenu={e => handleContextMenu(e, tab.id, index)}
             draggable
@@ -111,67 +114,77 @@ export function TabBar({
             onDragEnd={handleDragEnd}
             onDragLeave={handleDragLeave}
           >
-            <span className="tab-title">
-              {tab.isDirty && <span className="tab-dirty-indicator">●</span>}
-              {tab.type === 'today' && <span className="tab-type-icon">📅</span>}
-              {tab.type === 'project' && <span className="tab-type-icon">📁</span>}
-              {tab.type === 'document' && <span className="tab-type-icon">📄</span>}
+            <span className="flex items-center gap-1.5 overflow-hidden text-ellipsis text-sm text-foreground">
+              {tab.isDirty && <span className="text-xs text-blue-500">●</span>}
+              {tab.type === 'today' && <span className="text-xs flex-shrink-0">📅</span>}
+              {tab.type === 'project' && <span className="text-xs flex-shrink-0">📁</span>}
+              {tab.type === 'document' && <span className="text-xs flex-shrink-0">📄</span>}
               {tab.title}
             </span>
             <button
-              className="tab-close"
+              className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded opacity-0 transition-all hover:bg-muted-foreground/20 group-hover:opacity-100"
               onClick={e => { e.stopPropagation(); onCloseTab(tab.id) }}
               title="关闭"
             >
-              ×
+              <span className="text-lg text-muted-foreground hover:text-foreground">×</span>
             </button>
           </div>
         ))}
 
-        <button className="tab-new" onClick={onNewTab} title="新建标签页 (⌘T)">
-          +
-        </button>
+        {/* 新建标签按钮 */}
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8 flex-shrink-0"
+          onClick={onNewTab}
+          title="新建标签页 (⌘T)"
+        >
+          <span className="text-lg">+</span>
+        </Button>
       </div>
 
-      <div className="tab-actions">
-        <button
-          className="tab-action-button"
+      {/* 操作按钮 */}
+      <div className="ml-2 flex items-center gap-1">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8"
           onClick={onToggleFullscreen}
           title={isFullscreen ? '退出全屏' : '全屏'}
         >
-          {isFullscreen ? '⊡' : '⛶'}
-        </button>
+          <span className="text-lg">{isFullscreen ? '⊡' : '⛶'}</span>
+        </Button>
       </div>
 
       {/* 右键菜单 */}
       {ctxMenu.visible && (
         <div
           ref={ctxMenuRef}
-          className="tab-context-menu"
+          className="fixed z-[1000] min-w-[140px] animate-in fade-in-0 zoom-in-95 rounded-md border border-border bg-background p-1 shadow-lg"
           style={{ top: ctxMenu.y, left: ctxMenu.x }}
         >
           <button
-            className="ctx-menu-item"
+            className="flex w-full items-center rounded-sm px-4 py-2 text-left text-sm text-foreground transition-colors hover:bg-muted disabled:pointer-events-none disabled:opacity-50"
             onClick={() => { onSaveTab(ctxMenu.tabId); setCtxMenu(p => ({ ...p, visible: false })) }}
           >
             💾 保存
           </button>
-          <div className="ctx-menu-separator" />
+          <div className="my-1 h-px bg-border" />
           <button
-            className="ctx-menu-item"
+            className="flex w-full items-center rounded-sm px-4 py-2 text-left text-sm text-foreground transition-colors hover:bg-muted disabled:pointer-events-none disabled:opacity-50"
             onClick={() => { onCloseTab(ctxMenu.tabId); setCtxMenu(p => ({ ...p, visible: false })) }}
           >
             关闭
           </button>
           <button
-            className="ctx-menu-item"
+            className="flex w-full items-center rounded-sm px-4 py-2 text-left text-sm text-foreground transition-colors hover:bg-muted disabled:pointer-events-none disabled:opacity-50"
             onClick={() => { onCloseOtherTabs(ctxMenu.tabId); setCtxMenu(p => ({ ...p, visible: false })) }}
             disabled={tabs.length <= 1}
           >
             关闭其他
           </button>
           <button
-            className="ctx-menu-item"
+            className="flex w-full items-center rounded-sm px-4 py-2 text-left text-sm text-foreground transition-colors hover:bg-muted disabled:pointer-events-none disabled:opacity-50"
             onClick={() => { onCloseTabsToRight(ctxMenu.tabId); setCtxMenu(p => ({ ...p, visible: false })) }}
             disabled={ctxMenu.tabIndex >= tabs.length - 1}
           >

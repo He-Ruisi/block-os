@@ -71,20 +71,16 @@
 ## 🟡 明日完成（8个）- 中风险
 
 ### 右侧面板组件（7个）
-| 文件 | 组件 | 风险 | 说明 |
-|------|------|------|------|
-| src/components/panel/RightPanel.css | RightPanel | 🟡 中 | 主面板容器 |
-| src/components/panel/BlockSpacePanel.css | BlockSpacePanel | 🟡 中 | Block 空间面板 |
-| src/components/panel/BlockDetailPanel.css | BlockDetailPanel | 🟡 中 | Block 详情面板 |
-| src/components/panel/BlockDerivativeSelector.css | BlockDerivativeSelector | 🟡 中 | Block 派生选择器 |
-| src/components/panel/DocumentBlocksPanel.css | DocumentBlocksPanel | 🟡 中 | 文档 Block 面板 |
-| src/components/panel/PreviewPanel.css | PreviewPanel | 🟡 中 | 预览面板 |
-| src/components/panel/SessionHistoryPanel.css | SessionHistoryPanel | 🟡 中 | 会话历史面板 |
-
-### 其他组件（1个）
-| 文件 | 组件 | 风险 | 说明 |
-|------|------|------|------|
-| src/components/layout/TabBar.css | TabBar | 🟡 中 | 标签页栏 |
+| 文件 | 组件 | 风险 | 状态 | 说明 |
+|------|------|------|------|------|
+| src/components/layout/TabBar.css | TabBar | 🟡 中 | ✅ 完成 | 标签页栏 |
+| src/components/panel/RightPanel.css | RightPanel | 🟡 中 | 🔄 进行中 | 主面板容器（部分完成） |
+| src/components/panel/BlockSpacePanel.css | BlockSpacePanel | 🟡 中 | ⏸️ 待开始 | Block 空间面板 |
+| src/components/panel/BlockDetailPanel.css | BlockDetailPanel | 🟡 中 | ⏸️ 待开始 | Block 详情面板 |
+| src/components/panel/BlockDerivativeSelector.css | BlockDerivativeSelector | 🟡 中 | ⏸️ 待开始 | Block 派生选择器 |
+| src/components/panel/DocumentBlocksPanel.css | DocumentBlocksPanel | 🟡 中 | ⏸️ 待开始 | 文档 Block 面板 |
+| src/components/panel/PreviewPanel.css | PreviewPanel | 🟡 中 | ⏸️ 待开始 | 预览面板 |
+| src/components/panel/SessionHistoryPanel.css | SessionHistoryPanel | 🟡 中 | ⏸️ 待开始 | 会话历史面板 |
 
 **明日总计**：约 3-4小时
 

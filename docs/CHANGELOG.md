@@ -1,5 +1,41 @@
 # BlockOS 更新日志
 
+## [v1.18.0] - 2026-04-16 🎨 Phase 4 开始：TabBar 组件迁移完成
+
+**重要里程碑**：开始 Phase 4 中风险组件迁移，成功完成 TabBar 组件的完整 Tailwind CSS 迁移。
+
+- **已完成迁移**（1/8）：
+  1. **TabBar**（标签页栏）- 完全迁移到 Tailwind CSS
+     - ✅ 删除 TabBar.css 文件
+     - ✅ 使用 Shadcn Button 和 DropdownMenu 组件
+     - ✅ 保留所有功能：拖拽重排序、右键菜单、脏标记、类型图标
+     - ✅ TypeScript 类型检查通过
+- **部分迁移**（1/8）：
+  2. **RightPanel**（右侧面板容器）- 约 30% 完成
+     - ✅ AI 欢迎界面（沉浸式模式初始状态）
+     - ✅ 面板头部（标签页切换、操作按钮）
+     - ⏸️ 设置面板、消息列表、输入框区域等待迁移
+- **技术改进**：
+  - 使用 `cn()` 工具函数动态组合 Tailwind 类名
+  - 保留所有原有功能和交互逻辑
+  - 响应式设计保持不变
+- **验证通过**：
+  - ✅ TypeScript 类型检查通过（0 错误）
+  - ✅ 所有功能正常工作
+
+**当前进度**：
+- ✅ TabBar 完成（1/8）
+- 🔄 RightPanel 进行中（约 30% 完成）
+- ⏸️ 其他 6 个组件待开始（PreviewPanel、BlockSpacePanel、DocumentBlocksPanel、SessionHistoryPanel、BlockDetailPanel、BlockDerivativeSelector）
+
+**下一步**：
+1. 继续完成 RightPanel 迁移（剩余 70%）
+2. 迁移 PreviewPanel（预计 20 分钟）
+3. 安装 Badge, ScrollArea, Separator 组件
+4. 迁移 BlockSpacePanel, DocumentBlocksPanel, SessionHistoryPanel
+
+---
+
 ## [v1.17.0] - 2026-04-16 🎨 Phase 3 完成：安装 10 个 Shadcn UI 组件
 
 **重要里程碑**：成功安装并配置 Shadcn UI 组件库，为后续中风险组件迁移奠定基础。

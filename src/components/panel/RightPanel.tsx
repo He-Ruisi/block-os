@@ -23,7 +23,9 @@ import { useSession } from '../../hooks/useSession'
 import { useViewport } from '../../hooks/useViewport'
 import { useSwipeGesture } from '../../hooks/useSwipeGesture'
 import type { PanelTab } from '../../types/chat'
-import './RightPanel.css'
+import { Button } from '@/components/ui/button'
+import { Textarea } from '@/components/ui/textarea'
+import { cn } from '@/lib/utils'
 
 interface RightPanelProps {
   onInsertContent?: (content: string) => void
@@ -245,28 +247,38 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI, onCl
 
   return (
     <div 
-      className={`right-panel ${viewport.isTablet || viewport.isMobile ? 'expanded' : ''} ${isAIFocusMode ? 'ai-focus-mode' : ''}`}
+      className={cn(
+        "flex flex-col border-l border-border bg-background h-screen overflow-hidden flex-1 min-w-[280px] max-w-[480px]",
+        (viewport.isTablet || viewport.isMobile) && "expanded",
+        isAIFocusMode && "border-l-0 max-w-none w-full"
+      )}
       {...((viewport.isTablet || viewport.isMobile) ? swipeHandlers : {})}
     >
       {/* 响应式关闭按钮 - 仅在平板/手机模式显示 */}
       {(viewport.isTablet || viewport.isMobile) && onClose && (
-        <button className="right-panel-close" onClick={onClose} title="关闭">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="absolute top-2 right-2 z-10 h-8 w-8"
+          onClick={onClose}
+          title="关闭"
+        >
           <X size={18} />
-        </button>
+        </Button>
       )}
       
       {/* AI 沉浸式模式 - 初始状态 */}
       {isAIFocusMode && !hasMessages && (
-        <div className="ai-welcome-container">
-          <div className="ai-welcome-content">
-            <div className="ai-welcome-greeting">
-              <span className="ai-welcome-icon">🤖</span>
-              <h1 className="ai-welcome-title">下午好</h1>
+        <div className="flex flex-1 items-center justify-center p-10 bg-background">
+          <div className="flex w-full max-w-[800px] flex-col items-center gap-12">
+            <div className="flex flex-col items-center gap-4">
+              <span className="text-6xl leading-none">🤖</span>
+              <h1 className="m-0 text-4xl font-semibold tracking-tight text-foreground">下午好</h1>
             </div>
             
-            <div className="ai-input-large-wrapper">
-              <textarea
-                className="ai-input-large"
+            <div className="flex w-full flex-col gap-3">
+              <Textarea
+                className="w-full resize-none rounded-lg border-2 border-border bg-background px-6 py-5 text-lg leading-relaxed text-foreground shadow-sm outline-none transition-all focus:border-purple-600 focus:shadow-md disabled:cursor-not-allowed disabled:opacity-50"
                 placeholder="How can I help you today?"
                 value={input}
                 onChange={e => setInput(e.target.value)}
@@ -274,17 +286,17 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI, onCl
                 disabled={isLoading}
                 rows={4}
               />
-              <div className="ai-input-footer">
-                <div className="ai-model-indicator">
-                  {getProviderConfig(aiProvider).name} ? {aiModel}
+              <div className="flex items-center justify-between px-1">
+                <div className="text-sm font-medium text-muted-foreground">
+                  {getProviderConfig(aiProvider).name} · {aiModel}
                 </div>
-                <button 
-                  className="ai-send-button-large" 
-                  onClick={handleSendMessage} 
+                <Button
+                  className="rounded-md bg-purple-600 px-8 py-3 text-base font-medium text-white transition-all hover:bg-purple-700 hover:-translate-y-0.5 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-50"
+                  onClick={handleSendMessage}
                   disabled={!input.trim() || isLoading}
                 >
                   {isLoading ? '发送中...' : '发送'}
-                </button>
+                </Button>
               </div>
             </div>
           </div>
@@ -319,45 +331,61 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI, onCl
       {/* 混合模式 */}
       {!isAIFocusMode && (
         <>
-          <div className="panel-header">
-        <div className="panel-tabs">
+          <div className="flex flex-shrink-0 items-center gap-2 border-b border-border bg-secondary px-3.5 py-2.5">
+        <div className="flex flex-1 gap-1">
           {(['chat', 'blocks', 'preview'] as PanelTab[]).map(tab => (
-            <button
+            <Button
               key={tab}
-              className={`panel-tab ${activeTab === tab && !showHistory ? 'active' : ''}`}
+              variant="ghost"
+              size="sm"
+              className={cn(
+                "rounded px-3 py-1.5 text-xs font-medium text-muted-foreground transition-all hover:bg-background hover:text-foreground",
+                activeTab === tab && !showHistory && "bg-background text-foreground"
+              )}
               onClick={() => { setActiveTab(tab); setShowHistory(false) }}
             >
               {tab === 'chat' ? '对话' : tab === 'blocks' ? 'Block空间' : '预览导出'}
-            </button>
+            </Button>
           ))}
         </div>
 
         {/* 对话标签页的操作按钮 */}
         {activeTab === 'chat' && (
-          <div className="chat-header-actions">
-            <button
-              className="icon-button"
+          <div className="ml-auto flex items-center gap-0.5">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7 text-muted-foreground transition-all hover:bg-background hover:text-foreground"
               onClick={onSwitchToAIFocus}
               title="全屏模式"
             >
               <Maximize2 size={14} />
-            </button>
-            <button
-              className="icon-button"
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7 text-muted-foreground transition-all hover:bg-background hover:text-foreground"
               onClick={handleNewSession}
               title="新建对话"
             >
-              +
-            </button>
-            <button
-              className={`icon-button ${showHistory ? 'active' : ''}`}
+              <span className="text-base leading-none">+</span>
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className={cn(
+                "h-7 w-7 text-muted-foreground transition-all hover:bg-background hover:text-foreground",
+                showHistory && "bg-background text-purple-600"
+              )}
               onClick={() => setShowHistory(v => !v)}
               title="历史对话"
             >
-              ☰
-            </button>
-            <button
-              className="icon-button"
+              <span className="text-base leading-none">☰</span>
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7 text-muted-foreground transition-all hover:bg-background hover:text-foreground"
               onClick={() => {
                 setTempSystemPrompt(systemPrompt)
                 setExpandedSettingsSection('model')
@@ -365,8 +393,8 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI, onCl
               }}
               title="设置"
             >
-              ⚙
-            </button>
+              <span className="text-base leading-none">⚙</span>
+            </Button>
           </div>
         )}
       </div>

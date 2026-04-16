@@ -1,6 +1,6 @@
 // 统一 IndexedDB 初始化 — 单例，所有 Store 共享同一个连接
 const DB_NAME = 'blockos-db'
-const DB_VERSION = 5  // 升级到 5，添加 usages store
+const DB_VERSION = 6  // 升级到 6，添加 OCR 历史记录 store
 
 let db: IDBDatabase | null = null
 let initPromise: Promise<IDBDatabase> | null = null
@@ -51,6 +51,14 @@ export async function initDatabase(): Promise<IDBDatabase> {
         const usageStore = database.createObjectStore('usages', { keyPath: 'id' })
         usageStore.createIndex('blockId', 'blockId', { unique: false })
         usageStore.createIndex('documentId', 'documentId', { unique: false })
+      }
+
+      // v6: ocrPhotoRecords store（OCR 历史记录）
+      if (!database.objectStoreNames.contains('ocrPhotoRecords')) {
+        const ocrStore = database.createObjectStore('ocrPhotoRecords', { keyPath: 'id' })
+        ocrStore.createIndex('createdAt', 'createdAt', { unique: false })
+        ocrStore.createIndex('updatedAt', 'updatedAt', { unique: false })
+        ocrStore.createIndex('isFavorite', 'isFavorite', { unique: false })
       }
     }
   })
