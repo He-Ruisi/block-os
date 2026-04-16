@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback } from 'react'
+import { Search, Tag, ChevronDown } from 'lucide-react'
 import type { Block, BlockRelease } from '@/types/models/block'
 import { blockStore } from '@/storage/blockStore'
-import { formatRelativeTime } from '@/utils/date'
 import { BlockDetailPanel } from './BlockDetailPanel'
+import { cn } from '@/lib/utils'
 import '@/styles/modules/blocks.css'
 import '@/styles/modules/common-patterns.css'
 
@@ -10,7 +11,7 @@ export function BlockSpacePanel() {
   const [blocks, setBlocks] = useState<Block[]>([])
   const [filteredBlocks, setFilteredBlocks] = useState<Block[]>([])
   const [searchQuery, setSearchQuery] = useState('')
-  const [selectedTag, setSelectedTag] = useState<string>('all')
+  const [selectedTag, setSelectedTag] = useState<string>('全部')
   const [allTags, setAllTags] = useState<string[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [highlightedBlockId, setHighlightedBlockId] = useState<string | null>(null)
@@ -77,7 +78,7 @@ export function BlockSpacePanel() {
   useEffect(() => {
     let result = blocks
 
-    if (selectedTag !== 'all') {
+    if (selectedTag !== '全部') {
       result = result.filter(block => block.metadata.tags.includes(selectedTag))
     }
 
@@ -92,8 +93,6 @@ export function BlockSpacePanel() {
 
     setFilteredBlocks(result)
   }, [blocks, selectedTag, searchQuery])
-
-  const formatDate = (date: Date) => formatRelativeTime(date)
 
   const truncateContent = (content: string, maxLength = 100) =>
     (content.length <= maxLength ? content : `${content.substring(0, maxLength)}...`)
@@ -133,37 +132,47 @@ export function BlockSpacePanel() {
   }
 
   return (
-    <div className="block-space-panel">
-      <div className="block-space-panel__header">
-        <div className="input-search">
-          <span className="input-search__icon" aria-hidden="true">🔍</span>
-          <input
-            type="text"
-            className="input-search__field"
-            placeholder="搜索 Block..."
-            value={searchQuery}
-            onChange={e => setSearchQuery(e.target.value)}
-            aria-label="搜索 Block"
-          />
-        </div>
-
-        <div className="block-space-panel__filter-bar">
-          <span className="block-space-panel__filter-label">标签:</span>
-          <select
-            className="block-space-panel__tag-filter"
-            value={selectedTag}
-            onChange={e => setSelectedTag(e.target.value)}
-            aria-label="按标签过滤 Block"
-          >
-            <option value="all">全部</option>
-            {allTags.map(tag => (
-              <option key={tag} value={tag}>#{tag}</option>
-            ))}
-          </select>
-        </div>
+    <div className="flex flex-col h-full">
+      {/* Search */}
+      <div className="relative mb-4 shrink-0">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <input
+          type="text"
+          placeholder="搜索 Block..."
+          value={searchQuery}
+          onChange={e => setSearchQuery(e.target.value)}
+          className="w-full pl-10 pr-4 py-2 text-sm bg-input border border-border rounded-md focus:outline-none focus:border-border-focus focus:ring-3 focus:ring-focus-ring transition-all"
+          aria-label="搜索 Block"
+        />
       </div>
 
-      <div className="block-space-panel__body scroll-area">
+      {/* Tag Filter */}
+      <div className="flex flex-wrap gap-2 mb-4 shrink-0">
+        {['全部', ...allTags.slice(0, 5)].map((tag) => (
+          <button
+            key={tag}
+            onClick={() => setSelectedTag(tag)}
+            className={cn(
+              "inline-flex items-center px-2.5 py-1 text-xs font-medium rounded-md transition-colors cursor-pointer",
+              selectedTag === tag
+                ? "bg-accent-green text-white hover:bg-accent-green/90"
+                : "bg-secondary text-muted-foreground hover:bg-accent hover:text-foreground"
+            )}
+          >
+            {tag}
+          </button>
+        ))}
+        {allTags.length > 5 && (
+          <button
+            className="inline-flex items-center px-2.5 py-1 text-xs font-medium rounded-md bg-secondary text-muted-foreground hover:bg-accent cursor-pointer"
+          >
+            更多 <ChevronDown className="h-3 w-3 ml-1" />
+          </button>
+        )}
+      </div>
+
+      {/* Block Cards (Bento Grid) */}
+      <div className="flex-1 overflow-y-auto scroll-area">
         {isLoading ? (
           <div className="empty-state">
             <div className="empty-state__icon">⏳</div>
@@ -180,48 +189,44 @@ export function BlockSpacePanel() {
             </div>
           </div>
         ) : (
-          <div className="block-space-panel__list">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {filteredBlocks.map(block => (
               <div
                 key={block.id}
-                className={`card-interactive block-space-panel__card ${highlightedBlockId === block.id ? 'card-highlighted' : ''}`}
                 data-block-id={block.id}
                 draggable
                 onDragStart={event => handleBlockDragStart(event, block)}
                 onClick={() => setDetailBlockId(block.id)}
-                role="button"
-                tabIndex={0}
-                aria-label={`查看 Block: ${block.metadata.title || block.content.substring(0, 30)}`}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault()
                     setDetailBlockId(block.id)
                   }
                 }}
-              >
-                {block.metadata.title && (
-                  <div className="block-space-panel__title">{block.metadata.title}</div>
+                role="button"
+                tabIndex={0}
+                aria-label={`查看 Block: ${block.metadata.title || block.content.substring(0, 30)}`}
+                className={cn(
+                  "p-4 rounded-lg bg-secondary hover:bg-accent border border-border hover:border-accent-green/50 transition-all cursor-pointer group",
+                  highlightedBlockId === block.id && "border-accent-green bg-accent-green/10 animate-pulse"
                 )}
-                <div className="block-space-panel__content">
+              >
+                <h4 className="text-sm font-medium text-foreground mb-2 line-clamp-1 group-hover:text-accent-green transition-colors">
+                  {block.metadata.title || block.content.substring(0, 30)}
+                </h4>
+                <p className="text-xs text-muted-foreground mb-3 line-clamp-3 leading-relaxed">
                   {truncateContent(block.content)}
-                </div>
-                <div className="block-space-panel__meta">
-                  <div className="block-space-panel__tags">
-                    {block.metadata.tags.map(tag => (
-                      <span key={tag} className="badge-tag">#{tag}</span>
-                    ))}
-                  </div>
-                  <div className="block-space-panel__info">
-                    <span className="block-space-panel__type">
-                      {block.type === 'ai-generated' ? 'AI' : '编辑器'}
+                </p>
+                <div className="flex flex-wrap gap-1">
+                  {block.metadata.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="inline-flex items-center text-[10px] px-1.5 py-0 border border-accent-green/30 text-accent-green rounded-sm"
+                    >
+                      <Tag className="h-2.5 w-2.5 mr-1" />
+                      {tag}
                     </span>
-                    {(block.releases?.length ?? 0) > 0 && (
-                      <span className="block-space-panel__versions">版本 {block.releases!.length}</span>
-                    )}
-                    <span className="block-space-panel__time">
-                      {formatDate(block.metadata.createdAt)}
-                    </span>
-                  </div>
+                  ))}
                 </div>
               </div>
             ))}
