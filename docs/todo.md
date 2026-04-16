@@ -70,18 +70,20 @@
   - [ ] 功能测试（所有功能保持正常）
   - [ ] 主题适配（Default + Newsprint）
   - [ ] 响应式测试（桌面/平板/手机）
-- [ ] Phase 3: 安装常用 Shadcn UI 组件
+- [ ] Phase 3: 安装常用 Shadcn UI 组件（下一步，预计 30-45 分钟）
   - [ ] Button（按钮）
   - [ ] Card（卡片）
   - [ ] Dialog（对话框）
+  - [ ] Tabs（标签页）
+  - [ ] Select（选择器）
+  - [ ] Dropdown Menu（下拉菜单）
   - [ ] Input（输入框）
   - [ ] Textarea（文本域）
-  - [ ] Select（选择器）
-  - [ ] Tabs（标签页）
-  - [ ] Toast（通知）
-  - [ ] Dropdown Menu（下拉菜单）
   - [ ] Popover（弹出层）
-- [ ] Phase 3: 自定义主题 CSS 变量
+  - [ ] Toast（通知）- 确认是否已有
+  - [ ] 测试所有组件是否正常工作
+  - [ ] 熟悉组件 API 和使用方式
+- [ ] Phase 3.5: 自定义主题 CSS 变量（可选）
   - [ ] 定义品牌色（primary、secondary）
   - [ ] 定义语义色（success、warning、error、info）
   - [ ] 定义中性色（gray 色阶）
@@ -90,14 +92,19 @@
   - [ ] 定义字体（font-family、font-size）
   - [ ] 定义间距（spacing）
   - [ ] 暗色模式适配
-- [ ] Phase 4: 重构现有组件
-  - [ ] 重构 Sidebar（使用 Tailwind 工具类）
-  - [ ] 重构 TabBar（使用 Shadcn Tabs）
-  - [ ] 重构 Editor（使用 Tailwind 样式）
-  - [ ] 重构 AIFloatPanel（使用 Shadcn Card）
-  - [ ] 重构 RightPanel（使用 Tailwind 布局）
-  - [ ] 重构 Toast（使用 Shadcn Toast）
-  - [ ] 重构 AuthPage（使用 Shadcn Form 组件）
+- [ ] Phase 4: 中风险组件迁移（使用 Shadcn UI 组件，预计 3-4 小时）
+  - [ ] 重构 TabBar（使用 Shadcn Tabs 组件）
+  - [ ] 重构 RightPanel（使用 Shadcn Card 组件）
+  - [ ] 重构 BlockSpacePanel（使用 Shadcn 组件）
+  - [ ] 重构 BlockDetailPanel（使用 Shadcn Dialog）
+  - [ ] 重构 BlockDerivativeSelector（使用 Shadcn Select）
+  - [ ] 重构 DocumentBlocksPanel（使用 Shadcn 组件）
+  - [ ] 重构 PreviewPanel（使用 Shadcn 组件）
+  - [ ] 重构 SessionHistoryPanel（使用 Shadcn 组件）
+  - [ ] TypeScript 类型检查通过
+  - [ ] 功能测试（所有功能保持正常）
+  - [ ] 主题适配（Default + Newsprint）
+  - [ ] 响应式测试（桌面/平板/手机）
 
 ### OCR 插件系统 🔌 - [技术设计](../.kiro/specs/ocr-plugin-system/design.md)
 - [x] Phase 1: 插件系统核心（Week 1）
