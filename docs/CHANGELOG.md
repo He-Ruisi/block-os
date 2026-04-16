@@ -1,5 +1,54 @@
 # BlockOS 更新日志
 
+## [v1.17.0] - 2026-04-16 🎨 Phase 3 完成：安装 10 个 Shadcn UI 组件
+
+**重要里程碑**：成功安装并配置 Shadcn UI 组件库，为后续中风险组件迁移奠定基础。
+
+- **已安装组件**（10 个）：
+  1. **Button**（按钮）- 6 种变体（default/secondary/destructive/outline/ghost/link），3 种尺寸
+  2. **Card**（卡片）- 包含 Header、Title、Description、Content、Footer 子组件
+  3. **Dialog**（对话框）- 模态对话框，包含 Trigger、Content、Header、Footer
+  4. **Tabs**（标签页）- 标签页切换，包含 List、Trigger、Content
+  5. **Select**（选择器）- 下拉选择框，包含 Trigger、Value、Content、Item
+  6. **Dropdown Menu**（下拉菜单）- 右键菜单，包含 Trigger、Content、Item、Label、Separator
+  7. **Input**（输入框）- 单行文本输入，支持各种 type
+  8. **Textarea**（文本域）- 多行文本输入
+  9. **Popover**（弹出层）- 轻量级弹出层，包含 Trigger、Content
+  10. **Toast**（通知）- 全局通知提示，包含 Toaster 和 useToast Hook
+- **问题修复**：
+  - 修复 components.json UTF-8 BOM 问题（导致 Shadcn CLI 无法解析）
+  - 修复 toaster.tsx 导入路径错误（`@/components/hooks/use-toast` → `@/hooks/use-toast`）
+- **依赖安装**：
+  - class-variance-authority@0.7.1 - CVA 样式变体管理
+  - clsx@2.1.1 - 类名合并工具
+  - tailwind-merge@3.5.0 - Tailwind 类名冲突解决
+  - lucide-react@1.8.0 - 图标库
+  - @radix-ui/* - Radix UI 无头组件（自动安装）
+- **测试页面**：
+  - 创建完整的组件测试页面（test.html）
+  - 测试所有 10 个组件的基本功能、变体、尺寸、状态
+  - 访问地址：`http://localhost:5173/test.html`
+- **文档完善**：
+  - 创建安装文档（docs/guide/shadcn-components-installed.md）
+  - 包含每个组件的用途、示例代码、API 说明
+  - 提供常见问题解答和参考资源
+- **验证通过**：
+  - ✅ TypeScript 类型检查通过（0 错误）
+  - ✅ 所有组件文件完整
+  - ✅ 依赖安装完整
+  - ✅ 路径别名配置正确
+
+**技术亮点**：
+1. 源代码级别的组件（可直接修改）
+2. 完整的可访问性支持（ARIA 标签、键盘导航）
+3. 基于 Radix UI 无头组件（高质量、经过充分测试）
+4. 使用 CVA 管理样式变体（类型安全、易扩展）
+5. 完全兼容 Tailwind CSS（无冲突）
+
+**下一步**：Phase 4 - 使用 Shadcn UI 组件重构中风险组件（TabBar、RightPanel、7 个右侧面板子组件），预计 3-4 小时。
+
+---
+
 ## [v1.16.4] - 2026-04-15 🎨 完成所有低风险组件 Tailwind 样式重构
 
 **重要里程碑**：完成 6 个低风险组件的 Tailwind CSS 迁移，累计完成 12 个组件（43%）。
