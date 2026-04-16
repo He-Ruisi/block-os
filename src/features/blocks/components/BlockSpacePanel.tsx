@@ -4,6 +4,10 @@ import type { Block, BlockRelease } from '@/types/models/block'
 import { blockStore } from '@/storage/blockStore'
 import { BlockDetailPanel } from './BlockDetailPanel'
 import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Card } from '@/components/ui/card'
+import { ScrollArea } from '@/components/ui/scroll-area'
 import { cn } from '@/lib/utils'
 import '@/styles/modules/blocks.css'
 import '@/styles/modules/common-patterns.css'
@@ -150,30 +154,32 @@ export function BlockSpacePanel() {
       {/* Tag Filter */}
       <div className="flex flex-wrap gap-2 mb-4 shrink-0">
         {['全部', ...allTags.slice(0, 5)].map((tag) => (
-          <button
+          <Button
             key={tag}
+            variant={selectedTag === tag ? "default" : "secondary"}
+            size="sm"
             onClick={() => setSelectedTag(tag)}
             className={cn(
-              "inline-flex items-center px-2.5 py-1 text-xs font-medium rounded-md transition-colors cursor-pointer",
-              selectedTag === tag
-                ? "bg-accent-green text-white hover:bg-accent-green/90"
-                : "bg-secondary text-muted-foreground hover:bg-accent hover:text-foreground"
+              "h-7 px-2.5 text-xs",
+              selectedTag === tag && "bg-accent-green hover:bg-accent-green/90"
             )}
           >
             {tag}
-          </button>
+          </Button>
         ))}
         {allTags.length > 5 && (
-          <button
-            className="inline-flex items-center px-2.5 py-1 text-xs font-medium rounded-md bg-secondary text-muted-foreground hover:bg-accent cursor-pointer"
+          <Button
+            variant="secondary"
+            size="sm"
+            className="h-7 px-2.5 text-xs"
           >
             更多 <ChevronDown className="h-3 w-3 ml-1" />
-          </button>
+          </Button>
         )}
       </div>
 
       {/* Block Cards (Bento Grid) */}
-      <div className="flex-1 overflow-y-auto scroll-area">
+      <ScrollArea className="flex-1">
         {isLoading ? (
           <div className="empty-state">
             <div className="empty-state__icon">⏳</div>
@@ -190,9 +196,9 @@ export function BlockSpacePanel() {
             </div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-1">
             {filteredBlocks.map(block => (
-              <div
+              <Card
                 key={block.id}
                 data-block-id={block.id}
                 draggable
@@ -208,11 +214,11 @@ export function BlockSpacePanel() {
                 tabIndex={0}
                 aria-label={`查看 Block: ${block.metadata.title || block.content.substring(0, 30)}`}
                 className={cn(
-                  "p-4 rounded-lg bg-secondary hover:bg-accent border border-border hover:border-accent-green/50 transition-all cursor-pointer group",
+                  "p-4 hover:bg-accent hover:border-accent-green/50 transition-all cursor-pointer group",
                   highlightedBlockId === block.id && "border-accent-green bg-accent-green/10 animate-pulse"
                 )}
               >
-                <h4 className="text-sm font-medium text-foreground mb-2 line-clamp-1 group-hover:text-accent-green transition-colors">
+                <h4 className="text-sm font-medium mb-2 line-clamp-1 group-hover:text-accent-green transition-colors">
                   {block.metadata.title || block.content.substring(0, 30)}
                 </h4>
                 <p className="text-xs text-muted-foreground mb-3 line-clamp-3 leading-relaxed">
@@ -220,20 +226,21 @@ export function BlockSpacePanel() {
                 </p>
                 <div className="flex flex-wrap gap-1">
                   {block.metadata.tags.map((tag) => (
-                    <span
+                    <Badge
                       key={tag}
-                      className="inline-flex items-center text-[10px] px-1.5 py-0 border border-accent-green/30 text-accent-green rounded-sm"
+                      variant="outline"
+                      className="h-4 px-1.5 text-[10px] border-accent-green/30 text-accent-green"
                     >
                       <Tag className="h-2.5 w-2.5 mr-1" />
                       {tag}
-                    </span>
+                    </Badge>
                   ))}
                 </div>
-              </div>
+              </Card>
             ))}
           </div>
         )}
-      </div>
+      </ScrollArea>
     </div>
   )
 }
