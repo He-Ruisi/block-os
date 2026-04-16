@@ -145,60 +145,8 @@ export function EditorContentArea({
           onDrop={handleDrop}
           onDragOver={handleDragOver}
           className={cn(
-            // 基础 prose 样式
-            "prose prose-neutral dark:prose-invert max-w-none",
-            "text-[15px] leading-relaxed",
-            
-            // 标题样式 - 参考 MarkdownRenderer
-            "prose-headings:font-semibold prose-headings:text-foreground",
-            "prose-h1:mb-4 prose-h1:mt-6 prose-h1:border-b-2 prose-h1:border-border prose-h1:pb-2 prose-h1:text-[28px]",
-            "prose-h2:mb-3 prose-h2:mt-5 prose-h2:text-2xl",
-            "prose-h3:mb-2.5 prose-h3:mt-4 prose-h3:text-xl",
-            "prose-h4:mb-2 prose-h4:mt-3.5 prose-h4:text-lg",
-            
-            // 段落样式
-            "prose-p:my-3 prose-p:leading-relaxed prose-p:first:mt-0 prose-p:last:mb-0",
-            
-            // 引用样式 - 参考 MarkdownRenderer
-            "prose-blockquote:my-4 prose-blockquote:border-l-4 prose-blockquote:border-primary",
-            "prose-blockquote:bg-primary/5 prose-blockquote:px-4 prose-blockquote:py-3",
-            "prose-blockquote:not-italic prose-blockquote:text-foreground",
-            
-            // 列表样式
-            "prose-ul:my-3 prose-ul:list-disc prose-ul:pl-6",
-            "prose-ol:my-3 prose-ol:list-decimal prose-ol:pl-6",
-            "prose-li:my-1.5 prose-li:leading-relaxed",
-            
-            // 代码样式 - 参考 MarkdownRenderer
-            "prose-code:text-primary prose-code:bg-accent prose-code:border prose-code:border-border",
-            "prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:font-mono prose-code:text-[0.9em]",
-            "prose-code:before:content-none prose-code:after:content-none",
-            
-            // 代码块样式
-            "prose-pre:my-4 prose-pre:overflow-hidden prose-pre:rounded-lg prose-pre:border prose-pre:border-border",
-            "prose-pre:bg-muted prose-pre:p-0",
-            
-            // 链接样式
-            "prose-a:text-primary prose-a:no-underline prose-a:border-b prose-a:border-transparent",
-            "hover:prose-a:border-primary",
-            
-            // 表格样式
-            "prose-table:my-4 prose-table:overflow-x-auto prose-table:rounded-lg prose-table:border prose-table:border-border",
-            "prose-thead:bg-muted",
-            "prose-th:border-b-2 prose-th:border-border prose-th:px-3 prose-th:py-2.5 prose-th:text-left prose-th:font-semibold",
-            "prose-td:border-b prose-td:border-border prose-td:px-3 prose-td:py-2.5",
-            "prose-tr:hover:bg-muted",
-            
-            // 强调样式
-            "prose-strong:font-bold prose-strong:text-foreground",
-            "prose-em:italic",
-            "prose-del:text-muted-foreground prose-del:line-through",
-            
-            // 分隔线
-            "prose-hr:my-6 prose-hr:border-0 prose-hr:border-t-2 prose-hr:border-border",
-            
-            // 选中文本
-            "selection:bg-primary/20 selection:text-foreground"
+            "text-[15px] leading-relaxed text-foreground",
+            "min-h-[200px]"
           )}
         >
           {editor && <EditorContent editor={editor} />}

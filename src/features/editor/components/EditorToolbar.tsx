@@ -12,6 +12,8 @@ import {
   Quote,
   Minus,
   Code2,
+  Table,
+  CheckSquare,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -224,7 +226,7 @@ export function EditorToolbar({ editor, className }: EditorToolbarProps) {
         </div>
       </div>
 
-      {/* 第二行：引用 | 分隔线 | 代码块 | 快捷键提示 */}
+      {/* 第二行：引用 | 分隔线 | 代码块 | 表格 | 任务列表 | 快捷键提示 */}
       <div className="flex items-center gap-1 px-3 py-1.5 min-h-9 overflow-x-auto">
         <div className="flex items-center gap-0.5">
           <Button
@@ -263,6 +265,40 @@ export function EditorToolbar({ editor, className }: EditorToolbarProps) {
             title="代码块"
           >
             <Code2 className="h-4 w-4" />
+          </Button>
+        </div>
+
+        <div className="w-px h-4 bg-border mx-1" />
+
+        {/* 表格和任务列表 */}
+        <div className="flex items-center gap-0.5">
+          <Button
+            variant="ghost"
+            size="sm"
+            className={cn(
+              "h-7 w-7 p-0",
+              editor.isActive('table')
+                ? "bg-primary/10 text-primary"
+                : "text-muted-foreground"
+            )}
+            onClick={() => editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()}
+            title="插入表格"
+          >
+            <Table className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            className={cn(
+              "h-7 w-7 p-0",
+              editor.isActive('taskList')
+                ? "bg-primary/10 text-primary"
+                : "text-muted-foreground"
+            )}
+            onClick={() => editor.chain().focus().toggleTaskList().run()}
+            title="任务列表"
+          >
+            <CheckSquare className="h-4 w-4" />
           </Button>
         </div>
 

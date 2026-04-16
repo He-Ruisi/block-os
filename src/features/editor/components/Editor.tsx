@@ -1,18 +1,20 @@
 ﻿import { useEffect, useState, useRef } from 'react'
-import StarterKit from '@tiptap/starter-kit'
-import Underline from '@tiptap/extension-underline'
 import { useEditor, Editor as TiptapEditor } from '@tiptap/react'
 import {
   BlockLink, BlockReference, SourceBlock,
   createInlineAIPlugin,
   confirmInlineAIReplace, discardInlineAIReplace,
 } from '../extensions'
+import { getEditorExtensions } from '../config/editorExtensions'
 
 import { EditorBreadcrumb } from './EditorBreadcrumb'
 import { EditorToolbar } from './EditorToolbar'
 import { EditorContentArea } from './EditorContentArea'
 import { EditorBubbleMenu } from './EditorBubbleMenu'
 import { documentStore } from '@/storage/documentStore'
+
+// 导入所见即所得样式
+import '../styles/editor-wysiwyg.css'
 
 interface EditorProps {
   onEditorReady?: (editor: TiptapEditor) => void
@@ -40,23 +42,37 @@ export function Editor({ onEditorReady, onTextSelected, documentId }: EditorProp
   const inlineAIPluginRef = useRef(createInlineAIPlugin())
 
   const editor = useEditor({
-    extensions: [StarterKit, Underline, BlockLink, BlockReference, SourceBlock, inlineAIPluginRef.current],
+    extensions: [
+      ...getEditorExtensions(),
+      BlockLink,
+      BlockReference,
+      SourceBlock,
+      inlineAIPluginRef.current,
+    ],
     content: `
       <h1>欢迎使用 BlockOS</h1>
       <p>这是一个以写作为优先的知识操作系统。</p>
       <h2>开始写作</h2>
       <p>支持 Markdown 语法：</p>
       <ul>
-        <li>使用 # 创建标题</li>
-        <li>使用 ** 加粗文字</li>
-        <li>使用 * 创建斜体</li>
+        <li>使用 <strong>#</strong> 创建标题</li>
+        <li>使用 <strong>**</strong> 加粗文字</li>
+        <li>使用 <strong>*</strong> 创建斜体</li>
+        <li>使用 <code>\`\`\`</code> 创建代码块</li>
+        <li>使用 <strong>- [ ]</strong> 创建任务列表</li>
       </ul>
       <h2>Block 系统</h2>
       <p>使用 <code>[[</code> 创建双向链接，使用 <code>((</code> 引用其他 Block。</p>
+      <blockquote>
+        <p>💡 提示：所有 Markdown 语法都会实时渲染为所见即所得的效果。</p>
+      </blockquote>
       <p>现在就开始写作吧...</p>
     `,
     editorProps: {
-      attributes: { class: 'editor-content' },
+      attributes: { 
+        class: 'editor-content',
+        'data-placeholder': '开始写作...',
+      },
     },
     onSelectionUpdate: ({ editor: ed }) => {
       const { from, to } = ed.state.selection
@@ -139,12 +155,17 @@ export function Editor({ onEditorReady, onTextSelected, documentId }: EditorProp
             <h2>开始写作</h2>
             <p>支持 Markdown 语法：</p>
             <ul>
-              <li>使用 # 创建标题</li>
-              <li>使用 ** 加粗文字</li>
-              <li>使用 * 创建斜体</li>
+              <li>使用 <strong>#</strong> 创建标题</li>
+              <li>使用 <strong>**</strong> 加粗文字</li>
+              <li>使用 <strong>*</strong> 创建斜体</li>
+              <li>使用 <code>\`\`\`</code> 创建代码块</li>
+              <li>使用 <strong>- [ ]</strong> 创建任务列表</li>
             </ul>
             <h2>Block 系统</h2>
             <p>使用 <code>[[</code> 创建双向链接，使用 <code>((</code> 引用其他 Block。</p>
+            <blockquote>
+              <p>💡 提示：所有 Markdown 语法都会实时渲染为所见即所得的效果。</p>
+            </blockquote>
             <p>现在就开始写作吧...</p>
           `)
           setDocumentTitle('欢迎使用 BlockOS')
