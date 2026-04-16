@@ -1,6 +1,10 @@
 import { useState, useEffect } from 'react'
+import { FileText, Hash, Link2 } from 'lucide-react'
 import type { DocumentBlock } from '@/types/models/document'
 import { documentStore } from '@/storage/documentStore'
+import { Badge } from '@/components/ui/badge'
+import { Card } from '@/components/ui/card'
+import { ScrollArea } from '@/components/ui/scroll-area'
 import '@/styles/modules/blocks.css'
 import '@/styles/modules/common-patterns.css'
 
@@ -43,81 +47,84 @@ export function DocumentBlocksPanel() {
   const getNodeIcon = (nodeType: string) => {
     switch (nodeType) {
       case 'heading':
-        return '📰'
+        return <Hash className="h-3 w-3" />
       case 'paragraph':
-        return '📝'
+        return <FileText className="h-3 w-3" />
       case 'listItem':
-        return '•'
+        return <span className="text-xs">•</span>
       default:
-        return '○'
+        return <span className="text-xs">○</span>
     }
   }
 
-  const truncateContent = (content: string, maxLength = 60) =>
-    (content.length <= maxLength ? content : `${content.substring(0, maxLength)}...`)
-
   return (
-    <div className="document-blocks-panel">
-      <div className="document-blocks-panel__header">
-        <h3 className="document-blocks-panel__title">📄 {documentTitle}</h3>
-        <div className="document-blocks-panel__subtitle">隐式 Block 结构</div>
+    <div className="flex flex-col h-full">
+      {/* Header */}
+      <div className="p-4 border-b shrink-0">
+        <div className="flex items-center gap-2 mb-1">
+          <FileText className="h-4 w-4 text-muted-foreground" />
+          <h3 className="text-sm font-medium">{documentTitle}</h3>
+        </div>
+        <p className="text-xs text-muted-foreground">隐式 Block 结构</p>
       </div>
 
-      <div className="document-blocks-panel__body scroll-area">
+      {/* Body */}
+      <ScrollArea className="flex-1">
         {isLoading ? (
-          <div className="empty-state">
-            <span className="empty-state__icon">⏳</span>
-            <p className="empty-state__text">加载中...</p>
+          <div className="flex flex-col items-center justify-center py-12">
+            <div className="text-4xl mb-3">⏳</div>
+            <div className="text-sm text-muted-foreground">加载中...</div>
           </div>
         ) : blocks.length === 0 ? (
-          <div className="empty-state">
-            <span className="empty-state__icon">📝</span>
-            <p className="empty-state__text">开始写作</p>
-            <p className="empty-state__hint">每个段落都会自动成为一个 Block</p>
+          <div className="flex flex-col items-center justify-center py-12">
+            <div className="text-4xl mb-3">📝</div>
+            <div className="text-sm text-muted-foreground mb-1">开始写作</div>
+            <div className="text-xs text-muted-foreground">每个段落都会自动成为一个 Block</div>
           </div>
         ) : (
-          <div className="document-blocks-panel__tree">
+          <div className="p-4 space-y-2">
             {blocks.map((block, index) => (
-              <div key={block.id} className="card-base document-blocks-panel__node">
-                <div className="document-blocks-panel__node-header">
-                  <span className="document-blocks-panel__icon">{getNodeIcon(block.nodeType)}</span>
-                  <span className="document-blocks-panel__index">#{index + 1}</span>
+              <Card key={block.id} className="p-3">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-muted-foreground">{getNodeIcon(block.nodeType)}</span>
+                  <Badge variant="outline" className="text-[10px]">#{index + 1}</Badge>
                   {block.links.length > 0 && (
-                    <span className="badge-primary document-blocks-panel__links-count" title={`${block.links.length} 个链接`}>
-                      🔗 {block.links.length}
-                    </span>
+                    <Badge className="bg-accent-green text-white text-[10px]" title={`${block.links.length} 个链接`}>
+                      <Link2 className="h-2.5 w-2.5 mr-1" />
+                      {block.links.length}
+                    </Badge>
                   )}
                 </div>
-                <div className="document-blocks-panel__node-content">
-                  {truncateContent(block.content)}
-                </div>
+                <p className="text-xs text-foreground leading-relaxed line-clamp-2 mb-2">
+                  {block.content}
+                </p>
                 {block.links.length > 0 && (
-                  <div className="document-blocks-panel__node-links">
+                  <div className="flex flex-wrap gap-1">
                     {block.links.map((linkId, i) => (
-                      <span key={i} className="badge-outline document-blocks-panel__link-badge" title={linkId}>
+                      <Badge key={i} variant="outline" className="text-[10px]" title={linkId}>
                         → {linkId.substring(0, 8)}
-                      </span>
+                      </Badge>
                     ))}
                   </div>
                 )}
-              </div>
+              </Card>
             ))}
           </div>
         )}
-      </div>
+      </ScrollArea>
 
-      <div className="document-blocks-panel__footer">
-        <div className="document-blocks-panel__stats">
-          <span className="document-blocks-panel__stat-item">
-            <span className="document-blocks-panel__stat-label">段落:</span>
-            <span className="document-blocks-panel__stat-value">{blocks.length}</span>
-          </span>
-          <span className="document-blocks-panel__stat-item">
-            <span className="document-blocks-panel__stat-label">链接:</span>
-            <span className="document-blocks-panel__stat-value">
-              {blocks.reduce((sum, block) => sum + block.links.length, 0)}
-            </span>
-          </span>
+      {/* Footer */}
+      <div className="flex items-center justify-around p-4 border-t shrink-0">
+        <div className="text-center">
+          <div className="text-xs text-muted-foreground mb-1">段落</div>
+          <div className="text-lg font-semibold">{blocks.length}</div>
+        </div>
+        <div className="h-8 w-px bg-border" />
+        <div className="text-center">
+          <div className="text-xs text-muted-foreground mb-1">链接</div>
+          <div className="text-lg font-semibold">
+            {blocks.reduce((sum, block) => sum + block.links.length, 0)}
+          </div>
         </div>
       </div>
     </div>

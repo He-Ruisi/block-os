@@ -60,13 +60,14 @@
     - [x] 性能测试（渲染性能/内存占用）
     - [x] 更新组件文档
     - [x] 创建使用示例
-- [ ] Phase 6: V0 右侧边栏像素级重构 - 🔄 进行中（25% 完成）- [参考设计](../references/V0 右侧边栏/)
+- [ ] Phase 6: V0 右侧边栏像素级重构 - 🔄 进行中（50% 完成）- [参考设计](../references/V0 右侧边栏/)
   - [x] BlockSpacePanel 重构 - ✅ 完成（2026-04-16 20:35）
     - [x] 搜索框：lucide-react Search 图标 + 焦点环效果
     - [x] 标签过滤：Badge 按钮组（显示前 5 个 + "更多"）
     - [x] Bento Grid 卡片布局（响应式 2 列）
     - [x] V0 主题色应用（accent-green #35AB67）
     - [x] 保留所有功能和逻辑
+    - [x] 使用 Shadcn UI 组件优化（Input、Button、Badge、Card、ScrollArea）
   - [x] PreviewPanel 重构 - ✅ 完成（2026-04-16 21:00）
     - [x] 模式选择按钮（预览/审阅，Eye/FileCheck 图标）
     - [x] 模板选择下拉框（小说/博客/大纲）
@@ -74,18 +75,21 @@
     - [x] 预览区域：顶部信息栏 + ScrollArea
     - [x] 安装 Badge 和 ScrollArea 组件
     - [x] V0 主题色应用（accent-green）
-  - [ ] BlockDetailPanel 重构
-    - [ ] 返回按钮 + 标题区域
-    - [ ] 版本历史列表（Clock 图标 + 折叠卡片）
-    - [ ] 引用记录列表（Link2 图标）
-    - [ ] 操作按钮（插入编辑器、发布新版本）
-  - [ ] DocumentBlocksPanel 重构
-    - [ ] Block 结构树状显示
-    - [ ] 统计信息（段落数、链接数）
-  - [ ] BlockDerivativeSelector 重构
-    - [ ] 模态框样式（role="dialog"）
-    - [ ] 源 Block 和派生版本显示
-    - [ ] 单选选项（role="radio"）
+  - [x] BlockDetailPanel 重构 - ✅ 完成（2026-04-16 21:25）
+    - [x] 返回按钮 + 标题区域（ArrowLeft 图标）
+    - [x] 版本历史列表（Clock 图标 + 折叠卡片）
+    - [x] 引用记录列表（Link2 图标）
+    - [x] 操作按钮（插入编辑器、发布新版本）
+    - [x] 当前内容显示完整（ScrollArea 可滚动）
+    - [x] 版本卡片悬停显示完整内容（Popover 自动显示）
+    - [x] 使用 Shadcn UI 组件（Button、Input、Badge、Card、ScrollArea、Popover）
+  - [x] BlockDerivativeSelector 重构 - ✅ 完成（2026-04-16 21:40）
+    - [x] 模态框样式（role="dialog"，Card + Flexbox 布局）
+    - [x] 源 Block 和派生版本显示（Star、Sprout 图标）
+    - [x] 单选选项（role="radio"）
+    - [x] 增大边距（p-6，24px）
+    - [x] 滚动区域支持滚动到底部
+    - [x] 使用 Shadcn UI 组件（Card、Button、Badge、ScrollArea）
   - [ ] SessionHistoryPanel 重构
     - [ ] 按日期分组的会话列表
     - [ ] 会话卡片（标题 + 时间 + 消息数）
