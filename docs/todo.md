@@ -375,6 +375,25 @@
 
 ## P2 - 增强功能
 
+### 代码重组与架构优化 🏗️ - [需求文档](../.kiro/specs/code-reorganization-phase5/requirements.md)
+- [ ] Phase 5: 代码重组（分 3 步执行，预计 9-13 小时）
+  - [ ] 第 1 步：高优先级改进（2-3 小时）
+    - [ ] 合并重复文件（useToast.ts / use-toast.ts）
+    - [ ] 统一样式管理（集中到 src/styles/）
+    - [ ] 添加 constants 目录（消除魔法值）
+  - [ ] 第 2 步：中优先级改进（4-6 小时）
+    - [ ] 引入 features 架构（ai/editor/auth/blocks）
+    - [ ] 完善类型定义（models/api/common）
+    - [ ] 优化 Service 层（api/business/integration/core）
+  - [ ] 第 3 步：低优先级改进（3-4 小时）
+    - [ ] 添加 contexts 目录（React Context）
+    - [ ] 完善 plugin 系统结构
+    - [ ] 添加测试目录结构
+  - [ ] 贯穿所有步骤
+    - [ ] 保持项目可运行状态（每步完成后验证）
+    - [ ] 更新文档和配置（CLAUDE.md, ARCHITECTURE.md, structure.md）
+    - [ ] 依赖层级验证（无循环依赖）
+
 ### 代码重构与优化 🔧
 - [x] EditorBubbleMenu 组件分离（2026-04-16 完成）
   - [x] 创建独立的 EditorBubbleMenu 组件文件
