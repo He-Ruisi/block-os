@@ -14,11 +14,12 @@ React 18 + TypeScript 5 + Vite 6 + TipTap 2 + IndexedDB + Bun
 
 ## 关键约束
 
-1. **禁止循环依赖** — 依赖方向只能向下：types → utils → storage → services → editor → hooks → components → App
+1. **禁止循环依赖** — 依赖方向只能向下：types → utils → storage → services → hooks → features → components → App
 2. **类型安全** — 所有函数参数和返回值必须有明确类型，修改后运行 `bun run type-check`
 3. **单一职责** — 每个文件只做一件事
 4. **不引入新框架** — 除非明确讨论
 5. **内容/样式/模板分离** — Block 的来源信息、视觉表现、导出规则三层独立。详见 [ADR](./docs/spec/architecture/content-style-template.md)
+6. **Features 架构** — 复杂功能按功能域组织（ai/editor/auth/blocks），每个 feature 包含相关的 components/hooks/services
 
 ## 核心概念
 

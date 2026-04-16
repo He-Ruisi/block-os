@@ -252,8 +252,8 @@ This plan focuses on:
 
 ### Cross-cutting Tasks (Apply to All Steps)
 
-- [-] 12. Update documentation
-  - [ ] 12.1 Update CLAUDE.md
+- [x] 12. Update documentation
+  - [x] 12.1 Update CLAUDE.md
     - Update project structure section with new directory layout
     - _Requirements: 11.1_
 
@@ -277,7 +277,7 @@ This plan focuses on:
     - Add resolve aliases for new directories
     - _Requirements: 11.5_
 
-  - [ ] 12.6 Create reorganization summary
+  - [-] 12.6 Create reorganization summary
     - Create docs/guide/phase5-reorganization-summary.md
     - Document all changes made
     - Provide migration guide for developers
