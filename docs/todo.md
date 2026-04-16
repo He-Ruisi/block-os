@@ -60,6 +60,36 @@
     - [x] 性能测试（渲染性能/内存占用）
     - [x] 更新组件文档
     - [x] 创建使用示例
+- [ ] Phase 6: V0 右侧边栏像素级重构 - 🔄 进行中（12.5% 完成）- [参考设计](../references/V0 右侧边栏/)
+  - [x] BlockSpacePanel 重构 - ✅ 完成（2026-04-16 20:35）
+    - [x] 搜索框：lucide-react Search 图标 + 焦点环效果
+    - [x] 标签过滤：Badge 按钮组（显示前 5 个 + "更多"）
+    - [x] Bento Grid 卡片布局（响应式 2 列）
+    - [x] V0 主题色应用（accent-green #35AB67）
+    - [x] 保留所有功能和逻辑
+  - [ ] BlockDetailPanel 重构
+    - [ ] 返回按钮 + 标题区域
+    - [ ] 版本历史列表（Clock 图标 + 折叠卡片）
+    - [ ] 引用记录列表（Link2 图标）
+    - [ ] 操作按钮（插入编辑器、发布新版本）
+  - [ ] DocumentBlocksPanel 重构
+    - [ ] Block 结构树状显示
+    - [ ] 统计信息（段落数、链接数）
+  - [ ] BlockDerivativeSelector 重构
+    - [ ] 模态框样式（role="dialog"）
+    - [ ] 源 Block 和派生版本显示
+    - [ ] 单选选项（role="radio"）
+  - [ ] SessionHistoryPanel 重构
+    - [ ] 按日期分组的会话列表
+    - [ ] 会话卡片（标题 + 时间 + 消息数）
+  - [ ] PreviewPanel 重构（已在 Phase 4 完成，需验证是否符合 V0 设计）
+  - [ ] SettingsPanel 重构
+    - [ ] 折叠卡片（Model、System Instructions、Reasoning、Provider、Context）
+    - [ ] 表单输入和切换开关
+  - [ ] RightPanel 主容器重构
+    - [ ] 标签页切换（AI 对话、Block、预览导出）
+    - [ ] 面板头部（标题 + 关闭按钮）
+    - [ ] 响应式宽度（sm:w-96 md:w-[420px] lg:w-[480px]）
 
 ### OCR 插件系统 🔌 - [技术设计](../.kiro/specs/ocr-plugin-system/design.md)
 - [x] Phase 1: 插件系统核心（Week 1）

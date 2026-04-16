@@ -3,7 +3,7 @@
 ## 安装时间
 2026-04-16 00:30
 
-## 已安装组件（10个）
+## 已安装组件（12个）
 
 ### 1. Button（按钮）
 - **文件**: `src/components/ui/button.tsx`
@@ -145,6 +145,31 @@
   }
   ```
 
+### 11. Badge（徽章）
+- **文件**: `src/components/ui/badge.tsx`
+- **用途**: 显示状态、标签、计数等小型信息
+- **变体**: default、secondary、destructive、outline
+- **示例**:
+  ```tsx
+  import { Badge } from "@/components/ui/badge"
+  <Badge>默认</Badge>
+  <Badge variant="secondary">次要</Badge>
+  <Badge variant="destructive">危险</Badge>
+  <Badge variant="outline">轮廓</Badge>
+  ```
+
+### 12. ScrollArea（滚动区域）
+- **文件**: `src/components/ui/scroll-area.tsx`
+- **组件**: ScrollArea、ScrollBar
+- **用途**: 自定义滚动条样式的滚动容器
+- **示例**:
+  ```tsx
+  import { ScrollArea } from "@/components/ui/scroll-area"
+  <ScrollArea className="h-[200px]">
+    <div>长内容...</div>
+  </ScrollArea>
+  ```
+
 ## 依赖包
 
 已安装的核心依赖：
@@ -153,6 +178,7 @@
 - `tailwind-merge` - Tailwind 类名冲突解决
 - `lucide-react` - 图标库
 - `@radix-ui/*` - Radix UI 无头组件（自动安装）
+- `@radix-ui/react-scroll-area` - ScrollArea 组件依赖
 
 ## 测试页面
 

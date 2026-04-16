@@ -1,22 +1,30 @@
 import { useState, useEffect, useCallback } from 'react'
+import { Eye, FileCheck, FileText, FileCode, Download } from 'lucide-react'
 import type { Block } from '@/types/models/block'
-import { DEFAULT_STYLE_THEMES, DEFAULT_DOCUMENT_TEMPLATES } from '@/types/models/block'
+import { DEFAULT_DOCUMENT_TEMPLATES } from '@/types/models/block'
 import { blockStore } from '@/storage/blockStore'
 import { documentStore } from '@/storage/documentStore'
 import { exportBlocks } from '@/features/blocks'
 import { Button } from '@/components/ui/button'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Badge } from '@/components/ui/badge'
+import { ScrollArea } from '@/components/ui/scroll-area'
 import { cn } from '@/lib/utils'
 
 export function PreviewPanel() {
   const [blocks, setBlocks] = useState<Block[]>([])
-  const [selectedThemeId, setSelectedThemeId] = useState('editing')
-  const [selectedTemplateId, setSelectedTemplateId] = useState('novel')
+  const [selectedThemeId, setSelectedThemeId] = useState('preview')
+  const [selectedTemplateId, setSelectedTemplateId] = useState('blog')
   const [previewContent, setPreviewContent] = useState('')
-  const [previewFormat, setPreviewFormat] = useState<'markdown' | 'html' | 'plain-text'>('plain-text')
+  const [exportFormat, setExportFormat] = useState('md')
   const [isLoading, setIsLoading] = useState(true)
-  const [copySuccess, setCopySuccess] = useState(false)
 
-  const selectedTheme = DEFAULT_STYLE_THEMES.find(t => t.id === selectedThemeId) ?? DEFAULT_STYLE_THEMES[0]
   const selectedTemplate = DEFAULT_DOCUMENT_TEMPLATES.find(t => t.id === selectedTemplateId) ?? DEFAULT_DOCUMENT_TEMPLATES[0]
 
   // 加载当前文档的 Block
@@ -69,23 +77,11 @@ export function PreviewPanel() {
     }
     const result = exportBlocks(blocks, selectedTemplateId, selectedThemeId)
     setPreviewContent(result.content)
-    setPreviewFormat(result.format)
   }, [blocks, selectedTemplateId, selectedThemeId])
-
-  const handleCopy = async () => {
-    if (!previewContent) return
-    try {
-      await navigator.clipboard.writeText(previewContent)
-      setCopySuccess(true)
-      setTimeout(() => setCopySuccess(false), 2000)
-    } catch {
-      console.error('Failed to copy')
-    }
-  }
 
   const handleDownload = () => {
     if (!previewContent) return
-    const ext = previewFormat === 'markdown' ? 'md' : previewFormat === 'html' ? 'html' : 'txt'
+    const ext = exportFormat
     const blob = new Blob([previewContent], { type: 'text/plain;charset=utf-8' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
@@ -95,135 +91,159 @@ export function PreviewPanel() {
     URL.revokeObjectURL(url)
   }
 
+  const getTemplateName = (id: string) => {
+    const names: Record<string, string> = {
+      'novel': '小说',
+      'blog': '博客',
+      'outline': '大纲',
+    }
+    return names[id] || id
+  }
+
+  const getModeName = (id: string) => {
+    const names: Record<string, string> = {
+      'preview': '预览模式',
+      'review': '审阅模式',
+      'editing': '编辑模式',
+    }
+    return names[id] || id
+  }
+
   return (
-    <div className="flex h-full flex-col overflow-hidden">
-      {/* 控制区域 */}
-      <div className="flex flex-shrink-0 flex-col gap-2.5 border-b border-border p-3">
-        <div className="flex flex-col gap-1.5">
-          <label className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
-            样式主题
-          </label>
-          <div className="flex flex-wrap gap-1.5">
-            {DEFAULT_STYLE_THEMES.map(theme => (
-              <button
-                key={theme.id}
-                className={cn(
-                  "whitespace-nowrap rounded-2xl border border-border bg-background px-2.5 py-1.5 text-xs text-muted-foreground transition-all hover:border-border hover:text-foreground",
-                  selectedThemeId === theme.id && "border-purple-600 bg-purple-600/10 font-medium text-purple-600"
-                )}
-                onClick={() => setSelectedThemeId(theme.id)}
-              >
-                {theme.id === 'editing' ? '✏️' : theme.id === 'preview' ? '👁' : '📝'}
-                {' '}{theme.name}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="flex flex-col gap-1.5">
-          <label className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
-            导出模板
-          </label>
-          <div className="flex flex-wrap gap-1.5">
-            {DEFAULT_DOCUMENT_TEMPLATES.map(tmpl => (
-              <button
-                key={tmpl.id}
-                className={cn(
-                  "whitespace-nowrap rounded-2xl border border-border bg-background px-2.5 py-1.5 text-xs text-muted-foreground transition-all hover:border-border hover:text-foreground",
-                  selectedTemplateId === tmpl.id && "border-purple-600 bg-purple-600/10 font-medium text-purple-600"
-                )}
-                onClick={() => setSelectedTemplateId(tmpl.id)}
-              >
-                {tmpl.id === 'novel' ? '📖' : tmpl.id === 'blog' ? '📰' : '📋'}
-                {' '}{tmpl.name}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* 当前配置摘要 */}
-        <div className="flex flex-wrap items-center gap-1.5 rounded bg-secondary px-2.5 py-1.5">
-          <span className="text-[11px] text-muted-foreground">
-            AI块: {selectedTemplate.exportRules.aiBlocks === 'merge-as-paragraph' ? '融入正文' : selectedTemplate.exportRules.aiBlocks === 'keep-as-quote' ? '保留引用' : '移除'}
-          </span>
-          <span className="text-[11px] text-border">·</span>
-          <span className="text-[11px] text-muted-foreground">
-            格式: {selectedTemplate.exportRules.format === 'markdown' ? 'Markdown' : selectedTemplate.exportRules.format === 'html' ? 'HTML' : '纯文本'}
-          </span>
-          <span className="text-[11px] text-border">·</span>
-          <span className="text-[11px] text-muted-foreground">
-            来源标签: {selectedTheme.showSourceLabels ? '显示' : '隐藏'}
-          </span>
-        </div>
-      </div>
-
-      {/* 预览区域 */}
-      <div className={cn(
-        "min-h-0 flex-1 overflow-y-auto px-4 py-5",
-        selectedThemeId === 'editing' && "text-foreground",
-        selectedThemeId === 'preview' && "font-serif text-muted-foreground leading-8",
-        selectedThemeId === 'review' && "text-foreground"
-      )}>
-        {isLoading ? (
-          <div className="flex h-full flex-col items-center justify-center px-5 py-10 text-center">
-            <div className="mb-3 text-5xl opacity-50">⏳</div>
-            <div className="mb-1.5 text-sm text-muted-foreground">加载中...</div>
-          </div>
-        ) : blocks.length === 0 ? (
-          <div className="flex h-full flex-col items-center justify-center px-5 py-10 text-center">
-            <div className="mb-3 text-5xl opacity-50">📄</div>
-            <div className="mb-1.5 text-sm text-muted-foreground">当前文档为空</div>
-            <div className="text-xs text-muted-foreground">在编辑器中写入内容后，这里会显示预览</div>
-          </div>
-        ) : previewFormat === 'html' ? (
-          <div
-            className={cn(
-              "break-words text-sm leading-relaxed text-foreground",
-              "[&_h1]:mb-4 [&_h1]:text-2xl [&_h1]:font-semibold",
-              "[&_h2]:mb-3 [&_h2]:mt-5 [&_h2]:text-lg [&_h2]:font-semibold",
-              "[&_p]:mb-3",
-              "[&_blockquote]:my-3 [&_blockquote]:rounded-r [&_blockquote]:border-l-[3px] [&_blockquote]:border-border [&_blockquote]:bg-secondary [&_blockquote]:px-4 [&_blockquote]:py-2 [&_blockquote]:text-muted-foreground",
-              "[&_pre]:my-3 [&_pre]:overflow-x-auto [&_pre]:rounded-md [&_pre]:bg-secondary [&_pre]:p-3",
-              "[&_hr]:my-5 [&_hr]:border-0 [&_hr]:border-t [&_hr]:border-border",
-              selectedThemeId === 'review' && "rounded-md border border-[#f0e6c0] bg-[#fffef5] p-4"
-            )}
-            dangerouslySetInnerHTML={{ __html: previewContent }}
-          />
-        ) : (
-          <pre className={cn(
-            "m-0 whitespace-pre-wrap break-words bg-transparent text-sm leading-relaxed text-foreground",
-            selectedThemeId === 'review' && "rounded-md border border-[#f0e6c0] bg-[#fffef5] p-4"
-          )}>
-            {previewContent}
-          </pre>
-        )}
-      </div>
-
-      {/* 底部操作栏 */}
-      {blocks.length > 0 && (
-        <div className="flex flex-shrink-0 items-center justify-between border-t border-border bg-secondary px-3 py-2.5">
-          <span className="text-[11px] text-muted-foreground">{blocks.length} 个段落</span>
+    <div className="flex flex-col h-full min-h-0">
+      {/* Settings */}
+      <div className="space-y-4 mb-4 shrink-0">
+        {/* Mode Selection */}
+        <div className="flex items-center gap-4">
+          <span className="text-sm text-muted-foreground shrink-0">模式:</span>
           <div className="flex gap-2">
             <Button
-              variant="outline"
+              variant={selectedThemeId === 'preview' ? 'default' : 'secondary'}
               size="sm"
-              className="h-7 px-3 text-xs"
-              onClick={handleCopy}
-              disabled={!previewContent}
+              onClick={() => setSelectedThemeId('preview')}
+              className={cn(
+                selectedThemeId === 'preview' && 'bg-accent-green hover:bg-accent-green/90 text-white'
+              )}
             >
-              {copySuccess ? '✓ 已复制' : '📋 复制'}
+              <Eye className="h-4 w-4 mr-1" />
+              预览
             </Button>
             <Button
+              variant={selectedThemeId === 'review' ? 'default' : 'secondary'}
               size="sm"
-              className="h-7 bg-purple-600 px-3 text-xs hover:bg-purple-700"
-              onClick={handleDownload}
-              disabled={!previewContent}
+              onClick={() => setSelectedThemeId('review')}
+              className={cn(
+                selectedThemeId === 'review' && 'bg-accent-green hover:bg-accent-green/90 text-white'
+              )}
             >
-              ⬇ 导出文件
+              <FileCheck className="h-4 w-4 mr-1" />
+              审阅
             </Button>
           </div>
         </div>
-      )}
+
+        {/* Template Selection */}
+        <div className="flex items-center gap-4">
+          <span className="text-sm text-muted-foreground shrink-0">模板:</span>
+          <Select value={selectedTemplateId} onValueChange={setSelectedTemplateId}>
+            <SelectTrigger className="flex-1 bg-input border-border">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="novel">小说</SelectItem>
+              <SelectItem value="blog">博客</SelectItem>
+              <SelectItem value="outline">大纲</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Format Selection */}
+        <div className="flex items-center gap-4">
+          <span className="text-sm text-muted-foreground shrink-0">格式:</span>
+          <Select value={exportFormat} onValueChange={setExportFormat}>
+            <SelectTrigger className="flex-1 bg-input border-border">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="pdf">
+                <div className="flex items-center">
+                  <FileText className="h-4 w-4 mr-2 text-red-500" />
+                  PDF
+                </div>
+              </SelectItem>
+              <SelectItem value="md">
+                <div className="flex items-center">
+                  <FileCode className="h-4 w-4 mr-2 text-accent-green" />
+                  Markdown
+                </div>
+              </SelectItem>
+              <SelectItem value="txt">
+                <div className="flex items-center">
+                  <FileText className="h-4 w-4 mr-2 text-muted-foreground" />
+                  纯文本
+                </div>
+              </SelectItem>
+              <SelectItem value="docx">
+                <div className="flex items-center">
+                  <FileText className="h-4 w-4 mr-2 text-blue-500" />
+                  Word
+                </div>
+              </SelectItem>
+              <SelectItem value="html">
+                <div className="flex items-center">
+                  <FileCode className="h-4 w-4 mr-2 text-orange-500" />
+                  HTML
+                </div>
+              </SelectItem>
+            </SelectContent>
+          </Select>
+          <Button 
+            size="icon" 
+            className="bg-accent-green hover:bg-accent-green/90 text-white shrink-0"
+            onClick={handleDownload}
+            disabled={!previewContent}
+          >
+            <Download className="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
+
+      {/* Preview Area */}
+      <div className="flex-1 rounded-lg border border-border bg-secondary/50 overflow-hidden min-h-0">
+        <div className="h-full flex flex-col">
+          <div className="px-4 py-2 border-b border-border bg-secondary flex items-center justify-between shrink-0">
+            <span className="text-xs text-muted-foreground">
+              {getModeName(selectedThemeId)} · {getTemplateName(selectedTemplateId)}
+            </span>
+            <Badge variant="outline" className="text-[10px] border-accent-green/30 text-accent-green">
+              .{exportFormat}
+            </Badge>
+          </div>
+          <ScrollArea className="flex-1 p-4">
+            {isLoading ? (
+              <div className="flex h-full flex-col items-center justify-center px-5 py-10 text-center">
+                <div className="mb-3 text-5xl opacity-50">⏳</div>
+                <div className="mb-1.5 text-sm text-muted-foreground">加载中...</div>
+              </div>
+            ) : blocks.length === 0 ? (
+              <div className="flex h-full flex-col items-center justify-center px-5 py-10 text-center">
+                <div className="mb-3 text-5xl opacity-50">📄</div>
+                <div className="mb-1.5 text-sm text-muted-foreground">当前文档为空</div>
+                <div className="text-xs text-muted-foreground">在编辑器中写入内容后，这里会显示预览</div>
+              </div>
+            ) : (
+              <div className={cn(
+                'prose prose-invert prose-sm max-w-none',
+                selectedThemeId === 'review' && 'bg-yellow-500/5 rounded p-2'
+              )}>
+                <pre className="text-xs text-muted-foreground whitespace-pre-wrap font-sans leading-relaxed">
+                  {previewContent}
+                </pre>
+              </div>
+            )}
+          </ScrollArea>
+        </div>
+      </div>
     </div>
   )
 }
