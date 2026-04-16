@@ -1,5 +1,5 @@
-import type { OCRPhotoRecord } from '../../types/common/ocr'
-import { generateUUID } from '../../utils/uuid'
+import type { OCRPhotoRecord } from '@/types/common/ocr'
+import { generateUUID } from '@/utils/uuid'
 
 const MAX_IMAGE_SIZE_BYTES = 5 * 1024 * 1024
 

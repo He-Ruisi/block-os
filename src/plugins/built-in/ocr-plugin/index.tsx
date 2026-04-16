@@ -1,8 +1,8 @@
-// src/plugins/ocr-plugin/index.tsx
+// src/plugins/built-in/ocr-plugin/index.tsx
 
 import React, { useState } from 'react'
-import type { IPlugin, PluginMetadata } from '../../types/common/plugin'
-import type { IPluginAPI } from '../../services/core/pluginAPI'
+import type { IPlugin, PluginMetadata } from '@/types/common/plugin'
+import type { IPluginAPI } from '@/services/core/pluginAPI'
 import { OCRPanel } from './OCRPanel'
 
 export class OCRPlugin implements IPlugin {

@@ -14,14 +14,14 @@ import {
   ZoomIn,
   ZoomOut,
 } from 'lucide-react'
-import { Button } from '../../components/ui/button'
-import { Input } from '../../components/ui/input'
-import { Tabs, TabsList, TabsTrigger } from '../../components/ui/tabs'
-import { Textarea } from '../../components/ui/textarea'
-import type { IPluginAPI } from '../../services/core/pluginAPI'
-import { captureOCRRecordAsExplicitBlock, upsertImplicitBlockFromOCR } from '../../services/integration/ocrBlockService'
-import { ocrPhotoStore } from '../../storage/ocrPhotoStore'
-import type { OCRPhotoRecord } from '../../types/common/ocr'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Textarea } from '@/components/ui/textarea'
+import type { IPluginAPI } from '@/services/core/pluginAPI'
+import { captureOCRRecordAsExplicitBlock, upsertImplicitBlockFromOCR } from '@/services/integration/ocrBlockService'
+import { ocrPhotoStore } from '@/storage/ocrPhotoStore'
+import type { OCRPhotoRecord } from '@/types/common/ocr'
 import { recognizeText } from './ocrService'
 import {
   createCapturedFileName,
@@ -432,7 +432,7 @@ export function OCRPanel({ api }: OCRPanelProps) {
   return (
     <div className="ocr-workspace">
       <div className="ocr-mobile-nav">
-        <Tabs value={mobileTab} onValueChange={(value) => setMobileTab(value as MobileTab)}>
+        <Tabs value={mobileTab} onValueChange={(value: string) => setMobileTab(value as MobileTab)}>
           <TabsList className="ocr-mobile-tabs">
             <TabsTrigger value="history">历史</TabsTrigger>
             <TabsTrigger value="preview">预览</TabsTrigger>
@@ -452,7 +452,7 @@ export function OCRPanel({ api }: OCRPanelProps) {
           </Button>
         </div>
 
-        <Tabs value={historyTab} onValueChange={(value) => setHistoryTab(value as HistoryTab)}>
+        <Tabs value={historyTab} onValueChange={(value: string) => setHistoryTab(value as HistoryTab)}>
           <TabsList className="ocr-history-tabs">
             <TabsTrigger value="recent">最近上传</TabsTrigger>
             <TabsTrigger value="favorite">我的收藏</TabsTrigger>
@@ -463,7 +463,7 @@ export function OCRPanel({ api }: OCRPanelProps) {
           <Search size={16} className="ocr-search-icon" />
           <Input
             value={searchQuery}
-            onChange={(event) => setSearchQuery(event.target.value)}
+            onChange={(event: ChangeEvent<HTMLInputElement>) => setSearchQuery(event.target.value)}
             placeholder="搜索文件名"
             aria-label="搜索 OCR 历史"
           />
@@ -502,7 +502,7 @@ export function OCRPanel({ api }: OCRPanelProps) {
                     variant="ghost"
                     size="icon"
                     className={record.isFavorite ? 'ocr-favorite-active' : ''}
-                    onClick={(event) => {
+                    onClick={(event: React.MouseEvent) => {
                       event.stopPropagation()
                       void handleToggleFavorite(record.id)
                     }}
@@ -514,7 +514,7 @@ export function OCRPanel({ api }: OCRPanelProps) {
                     type="button"
                     variant="ghost"
                     size="icon"
-                    onClick={(event) => {
+                    onClick={(event: React.MouseEvent) => {
                       event.stopPropagation()
                       void handleDeleteRecord(record.id)
                     }}
@@ -642,7 +642,7 @@ export function OCRPanel({ api }: OCRPanelProps) {
         </div>
 
         <div className="ocr-result-view-tabs">
-          <Tabs value={resultView} onValueChange={(value) => setResultView(value as ResultView)}>
+          <Tabs value={resultView} onValueChange={(value: string) => setResultView(value as ResultView)}>
             <TabsList className="ocr-result-tabs-list">
               <TabsTrigger value="text">文本视图</TabsTrigger>
               <TabsTrigger value="raw" disabled={!hasRawResult}>
@@ -656,7 +656,7 @@ export function OCRPanel({ api }: OCRPanelProps) {
           {resultView === 'text' ? (
             <Textarea
               value={draftText}
-              onChange={(event) => setDraftText(event.target.value)}
+              onChange={(event: ChangeEvent<HTMLTextAreaElement>) => setDraftText(event.target.value)}
               onBlur={() => void handleSaveDraft()}
               placeholder={selectedRecord ? '点击“识别文字”开始识别，或在这里编辑结果。' : '请选择图片后开始识别'}
               disabled={!selectedRecord}
@@ -685,7 +685,7 @@ export function OCRPanel({ api }: OCRPanelProps) {
         ref={fileInputRef}
         type="file"
         accept="image/*"
-        onChange={(event) => {
+        onChange={(event: ChangeEvent<HTMLInputElement>) => {
           void handleFileChange(event)
         }}
         className="ocr-hidden-input"

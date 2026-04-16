@@ -115,7 +115,7 @@ This plan focuses on:
     - Run `bun run type-check` (must pass with 0 errors)
     - _Requirements: 5.5, 5.6, 10.1-10.6_
 
-- [x] 6. Optimize Service layer
+- [ ] 6. Optimize Service layer
   - [x] 6.1 Create service subdirectories
     - Create src/services/api/
     - Create src/services/business/
@@ -167,61 +167,61 @@ This plan focuses on:
 
 ### Step 3: Low Priority Improvements (Long-term Optimization)
 
-- [ ] 8. Add Contexts directory
-  - [ ] 8.1 Create contexts directory
+- [x] 8. Add Contexts directory
+  - [x] 8.1 Create contexts directory
     - Create src/contexts/
     - _Requirements: 7.1_
 
-  - [ ] 8.2 Identify extractable contexts (optional)
+  - [x] 8.2 Identify extractable contexts (optional)
     - Review codebase for global state that could be Context
     - Consider AuthContext, ThemeContext for future use
     - _Requirements: 7.2_
 
-  - [ ] 8.3 Create Context files (optional)
+  - [x] 8.3 Create Context files (optional)
     - Create src/contexts/AuthContext.tsx (if needed)
     - Create src/contexts/ThemeContext.tsx (if needed)
     - Follow naming convention: <Name>Context.tsx
     - _Requirements: 7.3_
 
-  - [ ] 8.4 Create contexts index.ts
+  - [x] 8.4 Create contexts index.ts
     - Create src/contexts/index.ts with exports
     - _Requirements: 7.4_
 
-  - [ ] 8.5 Update components to use new Contexts (if created)
+  - [x] 8.5 Update components to use new Contexts (if created)
     - Update relevant components to use Context providers
     - _Requirements: 7.5_
 
-  - [ ] 8.6 Run type check and functional tests
+  - [x] 8.6 Run type check and functional tests
     - Run `bun run type-check` (must pass with 0 errors)
     - Test Context functionality in browser
     - _Requirements: 7.6, 7.7, 10.1-10.6_
 
-- [ ] 9. Improve Plugin system structure
-  - [ ] 9.1 Create plugin subdirectories
+- [x] 9. Improve Plugin system structure
+  - [x] 9.1 Create plugin subdirectories
     - Create src/plugins/core/
     - Create src/plugins/built-in/
     - _Requirements: 8.1_
 
-  - [ ] 9.2 Move OCR plugin to built-in
+  - [x] 9.2 Move OCR plugin to built-in
     - Move src/plugins/ocr-plugin/ to src/plugins/built-in/ocr-plugin/
     - _Requirements: 8.2_
 
-  - [ ] 9.3 Create plugin core files
+  - [x] 9.3 Create plugin core files
     - Create src/plugins/core/types.ts (re-export from @/types/common/plugin)
     - Create src/plugins/core/base.ts (optional base class)
     - _Requirements: 8.3_
 
-  - [ ] 9.4 Create plugins index.ts
+  - [x] 9.4 Create plugins index.ts
     - Create src/plugins/index.ts to export core and built-in plugins
     - _Requirements: 8.1, 8.2_
 
-  - [ ] 9.5 Run type check and functional tests
+  - [x] 9.5 Run type check and functional tests
     - Run `bun run type-check` (must pass with 0 errors)
     - Test plugin functionality (OCR) in browser
     - _Requirements: 8.4, 8.5, 10.1-10.6_
 
-- [ ] 10. Add test directory structure
-  - [ ] 10.1 Create test directories
+- [x] 10. Add test directory structure
+  - [x] 10.1 Create test directories
     - Create src/__tests__/unit/
     - Create src/__tests__/integration/
     - Create src/__tests__/e2e/
@@ -229,24 +229,24 @@ This plan focuses on:
     - Create src/__tests__/utils/
     - _Requirements: 9.1, 9.2_
 
-  - [ ] 10.2 Create test README
+  - [x] 10.2 Create test README
     - Create src/__tests__/README.md with testing guidelines
     - Document test structure, naming conventions, and commands
     - _Requirements: 9.3_
 
-  - [ ] 10.3 Move existing test files (if any)
+  - [x] 10.3 Move existing test files (if any)
     - Move any existing test files to appropriate test directories
     - _Requirements: 9.4_
 
-  - [ ] 10.4 Create example test file (optional)
+  - [x] 10.4 Create example test file (optional)
     - Create src/__tests__/unit/utils/uuid.test.ts as example
     - _Requirements: 9.5_
 
-  - [ ] 10.5 Run type check
+  - [x] 10.5 Run type check
     - Run `bun run type-check` (must pass with 0 errors)
     - _Requirements: 9.6, 10.1-10.6_
 
-- [ ] 11. Checkpoint - Step 3 complete
+- [x] 11. Checkpoint - Step 3 complete
   - Ensure all tests pass, ask the user if questions arise.
   - _Requirements: 10.1-10.6_
 

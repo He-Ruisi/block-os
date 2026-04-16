@@ -23,7 +23,7 @@ import { toast } from './hooks/use-toast'
 import { useViewport } from './hooks/useViewport'
 import { pluginRegistry } from './services/core/pluginRegistry'
 import { PluginAPI } from './services/core/pluginAPI'
-import { OCRPlugin } from './plugins/ocr-plugin'
+import { OCRPlugin } from './plugins/built-in/ocr-plugin'
 import { LOCAL_STORAGE_KEYS } from './constants/storage'
 import './styles/components/App.css'
 
