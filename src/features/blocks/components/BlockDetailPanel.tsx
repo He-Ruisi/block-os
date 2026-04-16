@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { cn } from '@/lib/utils'
 import '@/styles/modules/blocks.css'
 import '@/styles/modules/common-patterns.css'
@@ -73,12 +74,6 @@ export function BlockDetailPanel({ blockId, onClose, onInsertRelease }: BlockDet
     }
   }
 
-  const truncate = (text: string, lines = 2) => {
-    const rows = text.split('\n').filter(line => line.trim())
-    const preview = rows.slice(0, lines).join('\n')
-    return rows.length > lines ? `${preview}...` : preview
-  }
-
   if (isLoading) {
     return (
       <div className="flex flex-col h-full">
@@ -131,10 +126,11 @@ export function BlockDetailPanel({ blockId, onClose, onInsertRelease }: BlockDet
           <section className="space-y-3">
             <h3 className="text-xs font-medium text-muted-foreground">当前内容</h3>
             <Card className="p-3">
-              <p className="text-xs text-foreground leading-relaxed">
-                {block.content.substring(0, 200)}
-                {block.content.length > 200 ? '...' : ''}
-              </p>
+              <ScrollArea className="h-[200px]">
+                <p className="text-xs text-foreground leading-relaxed whitespace-pre-wrap pr-4">
+                  {block.content}
+                </p>
+              </ScrollArea>
             </Card>
             <div className="flex flex-wrap gap-2">
               <Badge variant="outline">
@@ -204,35 +200,58 @@ export function BlockDetailPanel({ blockId, onClose, onInsertRelease }: BlockDet
             ) : (
               <div className="space-y-2">
                 {[...releases].reverse().map(release => (
-                  <Card
-                    key={release.version}
-                    className={cn(
-                      "p-3 cursor-pointer transition-all hover:border-accent-green/50",
-                      selectedVersion === release.version && "border-accent-green bg-accent-green/5"
-                    )}
-                    onClick={() => setSelectedVersion(selectedVersion === release.version ? null : release.version)}
-                    role="button"
-                    tabIndex={0}
-                    aria-label={`版本 ${release.version}: ${release.title}`}
-                    aria-pressed={selectedVersion === release.version}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault()
-                        setSelectedVersion(selectedVersion === release.version ? null : release.version)
-                      }
-                    }}
-                  >
-                    <div className="flex items-center gap-2 mb-2">
-                      <Badge className="bg-accent-green text-white">v{release.version}</Badge>
-                      <span className="text-xs font-medium flex-1">{release.title}</span>
-                      <span className="text-[10px] text-muted-foreground">
-                        {formatRelativeTime(release.releasedAt)}
-                      </span>
-                    </div>
-                    <p className="text-xs text-muted-foreground leading-relaxed">
-                      {truncate(release.content)}
-                    </p>
-                  </Card>
+                  <Popover key={release.version}>
+                    <PopoverTrigger asChild>
+                      <Card
+                        className={cn(
+                          "p-3 cursor-pointer transition-all hover:border-accent-green/50",
+                          selectedVersion === release.version && "border-accent-green bg-accent-green/5"
+                        )}
+                        onClick={() => setSelectedVersion(selectedVersion === release.version ? null : release.version)}
+                        role="button"
+                        tabIndex={0}
+                        aria-label={`版本 ${release.version}: ${release.title}`}
+                        aria-pressed={selectedVersion === release.version}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault()
+                            setSelectedVersion(selectedVersion === release.version ? null : release.version)
+                          }
+                        }}
+                      >
+                        <div className="flex items-center gap-2 mb-2">
+                          <Badge className="bg-accent-green text-white">v{release.version}</Badge>
+                          <span className="text-xs font-medium flex-1">{release.title}</span>
+                          <span className="text-[10px] text-muted-foreground">
+                            {formatRelativeTime(release.releasedAt)}
+                          </span>
+                        </div>
+                        <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
+                          {release.content}
+                        </p>
+                      </Card>
+                    </PopoverTrigger>
+                    <PopoverContent 
+                      className="w-96 max-h-[400px] overflow-hidden p-0"
+                      side="left"
+                      align="start"
+                      onOpenAutoFocus={(e) => e.preventDefault()}
+                    >
+                      <div className="p-3 border-b bg-secondary">
+                        <div className="flex items-center gap-2">
+                          <Badge className="bg-accent-green text-white">v{release.version}</Badge>
+                          <span className="text-xs font-medium">{release.title}</span>
+                        </div>
+                      </div>
+                      <ScrollArea className="h-[350px]">
+                        <div className="p-4">
+                          <p className="text-xs text-foreground leading-relaxed whitespace-pre-wrap">
+                            {release.content}
+                          </p>
+                        </div>
+                      </ScrollArea>
+                    </PopoverContent>
+                  </Popover>
                 ))}
               </div>
             )}
