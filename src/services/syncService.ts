@@ -1,5 +1,6 @@
 import { supabase, isSupabaseEnabled } from '../lib/supabase'
 import type { Block } from '../types/block'
+import type { OCRPhotoRecord } from '../types/ocr'
 import type { Project } from '../types/project'
 import type { Document } from '../types/document'
 
@@ -256,6 +257,86 @@ export async function deleteBlockFromSupabase(blockId: string): Promise<void> {
   const { error } = await supabase.from('blocks').delete().eq('id', blockId)
   if (error) {
     console.error('[Sync] Failed to delete block:', error)
+    throw error
+  }
+}
+
+// ============ OCR Photo Records ============
+
+export async function syncOCRPhotoRecordToSupabase(record: OCRPhotoRecord, userId: string): Promise<void> {
+  if (!isSupabaseEnabled) {
+    console.warn('[Sync] Supabase 未启用，跳过同步')
+    return
+  }
+
+  const { error } = await supabase
+    .from('ocr_photo_records')
+    .upsert({
+      id: record.id,
+      user_id: userId,
+      file_name: record.fileName,
+      file_size: record.fileSize,
+      mime_type: record.mimeType,
+      image_data_url: record.imageDataUrl,
+      thumbnail_data_url: record.thumbnailDataUrl || null,
+      is_favorite: record.isFavorite,
+      ocr_status: record.ocrStatus,
+      ocr_text: record.ocrText || null,
+      ocr_raw_text: record.ocrRawText || null,
+      ocr_error: record.ocrError || null,
+      implicit_block_id: record.implicitBlockId || null,
+      implicit_block_version: record.implicitBlockVersion || null,
+      created_at: record.createdAt,
+      updated_at: record.updatedAt,
+    })
+
+  if (error) {
+    console.error('[Sync] Failed to sync OCR photo record:', error)
+    throw error
+  }
+}
+
+export async function fetchOCRPhotoRecordsFromSupabase(userId: string): Promise<OCRPhotoRecord[]> {
+  if (!isSupabaseEnabled) {
+    return []
+  }
+
+  const { data, error } = await supabase
+    .from('ocr_photo_records')
+    .select('*')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false })
+
+  if (error) {
+    console.error('[Sync] Failed to fetch OCR photo records:', error)
+    throw error
+  }
+
+  return (data || []).map((row) => ({
+    id: row.id,
+    fileName: row.file_name,
+    fileSize: row.file_size,
+    mimeType: row.mime_type,
+    imageDataUrl: row.image_data_url,
+    thumbnailDataUrl: row.thumbnail_data_url || undefined,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+    isFavorite: row.is_favorite,
+    ocrStatus: row.ocr_status,
+    ocrText: row.ocr_text || undefined,
+    ocrRawText: row.ocr_raw_text || undefined,
+    ocrError: row.ocr_error || undefined,
+    implicitBlockId: row.implicit_block_id || undefined,
+    implicitBlockVersion: row.implicit_block_version || undefined,
+  }))
+}
+
+export async function deleteOCRPhotoRecordFromSupabase(recordId: string): Promise<void> {
+  if (!isSupabaseEnabled) return
+
+  const { error } = await supabase.from('ocr_photo_records').delete().eq('id', recordId)
+  if (error) {
+    console.error('[Sync] Failed to delete OCR photo record:', error)
     throw error
   }
 }

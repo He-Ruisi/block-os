@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef, useCallback } from 'react'
 import { useEditor, EditorContent, BubbleMenu, Editor as TiptapEditor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
+import Underline from '@tiptap/extension-underline'
 import {
   BlockLink, BlockReference, SourceBlock, searchBlocks,
   createInlineAIPlugin,
@@ -15,6 +16,7 @@ import { recordBlockUsage } from '../../services/blockReleaseService'
 import { sendInlineAIRequest } from '../../services/aiService'
 import { captureSelectionAsBlock } from '../../services/blockCaptureService'
 import { generateUUID } from '../../utils/uuid'
+import { cn } from '../../lib/utils'
 import './Editor.css'
 
 interface EditorProps {
@@ -59,7 +61,7 @@ export function Editor({ onEditorReady, onTextSelected, documentId }: EditorProp
   const inlineAIPluginRef = useRef(createInlineAIPlugin())
 
   const editor = useEditor({
-    extensions: [StarterKit, BlockLink, BlockReference, SourceBlock, inlineAIPluginRef.current],
+    extensions: [StarterKit, Underline, BlockLink, BlockReference, SourceBlock, inlineAIPluginRef.current],
     content: `
       <h1>欢迎使用 BlockOS</h1>
       <p>这是一个写作优先的知识操作系统。</p>
@@ -728,7 +730,7 @@ export function Editor({ onEditorReady, onTextSelected, documentId }: EditorProp
         <EditorContent editor={editor} />
       </div>
 
-      {/* BubbleMenu — AI 操作工具栏 */}
+      {/* BubbleMenu — 两行工具栏：格式 + AI 操作 */}
       {editor && (
         <BubbleMenu
           editor={editor}
@@ -739,72 +741,248 @@ export function Editor({ onEditorReady, onTextSelected, documentId }: EditorProp
             return from !== to && !hasActiveInlineAI(state) && !ed.isActive('sourceBlock', { pending: true })
           }}
         >
-          <div className="bubble-menu bubble-menu--ai">
-            {/* 格式组 */}
-            <button className={`toolbar-btn ${editor.isActive('bold') ? 'active' : ''}`}
-              onClick={() => editor.chain().focus().toggleBold().run()} title="粗体"><strong>B</strong></button>
-            <button className={`toolbar-btn ${editor.isActive('italic') ? 'active' : ''}`}
-              onClick={() => editor.chain().focus().toggleItalic().run()} title="斜体"><em>I</em></button>
-            <div className="toolbar-sep" />
-            {/* AI 对话入口 */}
-            <button
-              className="toolbar-btn toolbar-btn--ai-chat"
-              onClick={handleOpenAIChat}
-              title="AI 对话">
-              ✦ AI
-            </button>
-            <div className="toolbar-sep" />
-            {/* AI 操作组 */}
-            <button
-              className={`toolbar-btn toolbar-btn-wide${aiLoading === 'continue' ? ' ai-btn--loading' : ''}`}
-              onClick={handleContinue}
-              disabled={aiLoading !== null}
-              title="续写：在选中段落下方插入 AI 续写内容">
-              {aiLoading === 'continue' ? '...' : '续写'}
-            </button>
-            <button
-              className={`toolbar-btn toolbar-btn-wide${aiLoading === 'rewrite' ? ' ai-btn--loading' : ''}`}
-              onClick={() => handleReplace('rewrite')}
-              disabled={aiLoading !== null}
-              title="改写：替换选中内容">
-              {aiLoading === 'rewrite' ? '...' : '改写'}
-            </button>
-            <button
-              className={`toolbar-btn toolbar-btn-wide${aiLoading === 'shorten' ? ' ai-btn--loading' : ''}`}
-              onClick={() => handleReplace('shorten')}
-              disabled={aiLoading !== null}
-              title="缩写">
-              {aiLoading === 'shorten' ? '...' : '缩写'}
-            </button>
-            <button
-              className={`toolbar-btn toolbar-btn-wide${aiLoading === 'expand' ? ' ai-btn--loading' : ''}`}
-              onClick={() => handleReplace('expand')}
-              disabled={aiLoading !== null}
-              title="扩写">
-              {aiLoading === 'expand' ? '...' : '扩写'}
-            </button>
-            <button
-              className={`toolbar-btn toolbar-btn-wide${aiLoading === 'translate' ? ' ai-btn--loading' : ''}`}
-              onClick={handleTranslate}
-              disabled={aiLoading !== null}
-              title="翻译：写入附属层，不替换原文">
-              {aiLoading === 'translate' ? '...' : '翻译'}
-            </button>
-            <button
-              className={`toolbar-btn toolbar-btn-wide${aiLoading === 'explain' ? ' ai-btn--loading' : ''}`}
-              onClick={handleExplain}
-              disabled={aiLoading !== null}
-              title="解释：写入附属层批注">
-              {aiLoading === 'explain' ? '...' : '解释'}
-            </button>
-            <div className="toolbar-sep" />
-            <button
-              className="toolbar-btn toolbar-btn-wide"
-              onClick={handleCapture}
-              disabled={aiLoading !== null}
-              title="存为块">
-              捕获
-            </button>
+          <div className="flex flex-col gap-1 p-1 bg-white border border-gray-200 rounded-lg shadow-md">
+            {/* 第一行：Markdown 格式工具 */}
+            <div className="flex items-center gap-0.5">
+              {/* 文本类型 */}
+              <button
+                className={cn(
+                  "flex items-center justify-center h-7 px-2 text-xs font-medium rounded transition-all",
+                  !editor.isActive('heading') && !editor.isActive('paragraph')
+                    ? "text-gray-600 hover:bg-gray-100"
+                    : "text-gray-600 hover:bg-gray-100"
+                )}
+                onClick={() => editor.chain().focus().setParagraph().run()}
+                title="正文">
+                正文
+              </button>
+              <button
+                className={cn(
+                  "flex items-center justify-center h-7 px-2 text-xs font-semibold rounded transition-all",
+                  editor.isActive('heading', { level: 1 })
+                    ? "bg-purple-100 text-purple-600"
+                    : "text-gray-600 hover:bg-gray-100"
+                )}
+                onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
+                title="一级标题">
+                H1
+              </button>
+              <button
+                className={cn(
+                  "flex items-center justify-center h-7 px-2 text-xs font-semibold rounded transition-all",
+                  editor.isActive('heading', { level: 2 })
+                    ? "bg-purple-100 text-purple-600"
+                    : "text-gray-600 hover:bg-gray-100"
+                )}
+                onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
+                title="二级标题">
+                H2
+              </button>
+              <button
+                className={cn(
+                  "flex items-center justify-center h-7 px-2 text-xs font-semibold rounded transition-all",
+                  editor.isActive('heading', { level: 3 })
+                    ? "bg-purple-100 text-purple-600"
+                    : "text-gray-600 hover:bg-gray-100"
+                )}
+                onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
+                title="三级标题">
+                H3
+              </button>
+              
+              <div className="w-px h-4 bg-gray-200 mx-1" />
+              
+              {/* 文本格式 */}
+              <button
+                className={cn(
+                  "flex items-center justify-center w-7 h-7 text-sm font-bold rounded transition-all",
+                  editor.isActive('bold')
+                    ? "bg-purple-100 text-purple-600"
+                    : "text-gray-600 hover:bg-gray-100"
+                )}
+                onClick={() => editor.chain().focus().toggleBold().run()}
+                title="粗体">
+                B
+              </button>
+              <button
+                className={cn(
+                  "flex items-center justify-center w-7 h-7 text-sm italic rounded transition-all",
+                  editor.isActive('italic')
+                    ? "bg-purple-100 text-purple-600"
+                    : "text-gray-600 hover:bg-gray-100"
+                )}
+                onClick={() => editor.chain().focus().toggleItalic().run()}
+                title="斜体">
+                I
+              </button>
+              <button
+                className={cn(
+                  "flex items-center justify-center w-7 h-7 text-sm underline rounded transition-all",
+                  editor.isActive('underline')
+                    ? "bg-purple-100 text-purple-600"
+                    : "text-gray-600 hover:bg-gray-100"
+                )}
+                onClick={() => editor.chain().focus().toggleUnderline().run()}
+                title="下划线">
+                U
+              </button>
+              <button
+                className={cn(
+                  "flex items-center justify-center w-7 h-7 text-sm line-through rounded transition-all",
+                  editor.isActive('strike')
+                    ? "bg-purple-100 text-purple-600"
+                    : "text-gray-600 hover:bg-gray-100"
+                )}
+                onClick={() => editor.chain().focus().toggleStrike().run()}
+                title="删除线">
+                S
+              </button>
+              <button
+                className={cn(
+                  "flex items-center justify-center w-7 h-7 text-xs font-mono rounded transition-all",
+                  editor.isActive('code')
+                    ? "bg-purple-100 text-purple-600"
+                    : "text-gray-600 hover:bg-gray-100"
+                )}
+                onClick={() => editor.chain().focus().toggleCode().run()}
+                title="行内代码">
+                {'<>'}
+              </button>
+              
+              <div className="w-px h-4 bg-gray-200 mx-1" />
+              
+              {/* 列表 */}
+              <button
+                className={cn(
+                  "flex items-center justify-center w-7 h-7 text-xs rounded transition-all",
+                  editor.isActive('bulletList')
+                    ? "bg-purple-100 text-purple-600"
+                    : "text-gray-600 hover:bg-gray-100"
+                )}
+                onClick={() => editor.chain().focus().toggleBulletList().run()}
+                title="无序列表">
+                •
+              </button>
+              <button
+                className={cn(
+                  "flex items-center justify-center w-7 h-7 text-xs rounded transition-all",
+                  editor.isActive('orderedList')
+                    ? "bg-purple-100 text-purple-600"
+                    : "text-gray-600 hover:bg-gray-100"
+                )}
+                onClick={() => editor.chain().focus().toggleOrderedList().run()}
+                title="有序列表">
+                1.
+              </button>
+              <button
+                className={cn(
+                  "flex items-center justify-center w-7 h-7 text-xs rounded transition-all",
+                  editor.isActive('blockquote')
+                    ? "bg-purple-100 text-purple-600"
+                    : "text-gray-600 hover:bg-gray-100"
+                )}
+                onClick={() => editor.chain().focus().toggleBlockquote().run()}
+                title="引用">
+                "
+              </button>
+            </div>
+
+            {/* 第二行：AI 操作工具 */}
+            <div className="flex items-center gap-0.5">
+              {/* AI 对话入口 */}
+              <button
+                className="flex items-center justify-center h-7 px-2 text-xs font-semibold text-purple-600 rounded transition-all hover:bg-purple-50"
+                onClick={handleOpenAIChat}
+                title="AI 对话">
+                ✦ AI
+              </button>
+              
+              <div className="w-px h-4 bg-gray-200 mx-1" />
+              
+              {/* AI 操作组 */}
+              <button
+                className={cn(
+                  "flex items-center justify-center h-7 px-2 text-xs rounded transition-all",
+                  aiLoading === 'continue'
+                    ? "opacity-50 cursor-wait text-gray-600"
+                    : "text-gray-600 hover:bg-gray-100"
+                )}
+                onClick={handleContinue}
+                disabled={aiLoading !== null}
+                title="续写：在选中段落下方插入 AI 续写内容">
+                {aiLoading === 'continue' ? '...' : '续写'}
+              </button>
+              <button
+                className={cn(
+                  "flex items-center justify-center h-7 px-2 text-xs rounded transition-all",
+                  aiLoading === 'rewrite'
+                    ? "opacity-50 cursor-wait text-gray-600"
+                    : "text-gray-600 hover:bg-gray-100"
+                )}
+                onClick={() => handleReplace('rewrite')}
+                disabled={aiLoading !== null}
+                title="改写：替换选中内容">
+                {aiLoading === 'rewrite' ? '...' : '改写'}
+              </button>
+              <button
+                className={cn(
+                  "flex items-center justify-center h-7 px-2 text-xs rounded transition-all",
+                  aiLoading === 'shorten'
+                    ? "opacity-50 cursor-wait text-gray-600"
+                    : "text-gray-600 hover:bg-gray-100"
+                )}
+                onClick={() => handleReplace('shorten')}
+                disabled={aiLoading !== null}
+                title="缩写">
+                {aiLoading === 'shorten' ? '...' : '缩写'}
+              </button>
+              <button
+                className={cn(
+                  "flex items-center justify-center h-7 px-2 text-xs rounded transition-all",
+                  aiLoading === 'expand'
+                    ? "opacity-50 cursor-wait text-gray-600"
+                    : "text-gray-600 hover:bg-gray-100"
+                )}
+                onClick={() => handleReplace('expand')}
+                disabled={aiLoading !== null}
+                title="扩写">
+                {aiLoading === 'expand' ? '...' : '扩写'}
+              </button>
+              <button
+                className={cn(
+                  "flex items-center justify-center h-7 px-2 text-xs rounded transition-all",
+                  aiLoading === 'translate'
+                    ? "opacity-50 cursor-wait text-gray-600"
+                    : "text-gray-600 hover:bg-gray-100"
+                )}
+                onClick={handleTranslate}
+                disabled={aiLoading !== null}
+                title="翻译：写入附属层，不替换原文">
+                {aiLoading === 'translate' ? '...' : '翻译'}
+              </button>
+              <button
+                className={cn(
+                  "flex items-center justify-center h-7 px-2 text-xs rounded transition-all",
+                  aiLoading === 'explain'
+                    ? "opacity-50 cursor-wait text-gray-600"
+                    : "text-gray-600 hover:bg-gray-100"
+                )}
+                onClick={handleExplain}
+                disabled={aiLoading !== null}
+                title="解释：写入附属层批注">
+                {aiLoading === 'explain' ? '...' : '解释'}
+              </button>
+              
+              <div className="w-px h-4 bg-gray-200 mx-1" />
+              
+              <button
+                className="flex items-center justify-center h-7 px-2 text-xs rounded transition-all text-gray-600 hover:bg-gray-100"
+                onClick={handleCapture}
+                disabled={aiLoading !== null}
+                title="存为块">
+                捕获
+              </button>
+            </div>
           </div>
         </BubbleMenu>
       )}

@@ -331,31 +331,12 @@
   border-radius: 3px;
 }
 
-/* ---- BubbleMenu 悬浮菜单 ---- */
-.bubble-menu {
-  display: flex;
-  align-items: center;
-  gap: 1px;
-  padding: 4px;
-  background: var(--color-bg-primary);
-  border: 1px solid var(--color-border-primary);
-  border-radius: var(--border-radius-lg);
-  box-shadow: var(--shadow-md);
-}
+/* ---- AI BubbleMenu (migrated to Tailwind, keeping only legacy styles if needed) ---- */
 
-.bubble-menu .toolbar-btn {
-  width: 28px;
-  height: 28px;
-  font-size: 13px;
-  border-radius: 4px;
+.ai-btn--loading {
+  opacity: 0.5;
+  cursor: wait;
 }
-
-.bubble-menu .toolbar-sep {
-  height: 16px;
-  margin: 0 4px;
-}
-
-/* ---- SourceBlock 样式（内容与形式分离） ---- */
 
 .source-block {
   position: relative;
@@ -508,40 +489,6 @@
 @keyframes blockSlideIn {
   from { opacity: 0; transform: translateX(-6px); }
   to { opacity: 1; transform: translateX(0); }
-}
-
-/* ---- AI BubbleMenu ---- */
-
-.bubble-menu--ai {
-  flex-wrap: nowrap;
-  gap: 2px;
-  max-width: 520px;
-}
-
-.bubble-menu--ai .toolbar-btn-wide {
-  font-size: 11px;
-  padding: 0 7px;
-  height: 26px;
-  min-width: 36px;
-}
-
-.ai-btn--loading {
-  opacity: 0.5;
-  cursor: wait;
-}
-
-.toolbar-btn--ai-chat {
-  font-size: 11px;
-  font-weight: 600;
-  padding: 0 8px;
-  height: 26px;
-  color: var(--color-purple);
-  white-space: nowrap;
-}
-
-.toolbar-btn--ai-chat:hover {
-  background: var(--color-purple-light);
-  color: var(--color-purple-hover);
 }
 
 /* ---- SourceBlock pending 临时态 ---- */

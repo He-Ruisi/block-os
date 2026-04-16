@@ -3,19 +3,24 @@ import {
   syncProjectToSupabase,
   syncDocumentToSupabase,
   syncBlockToSupabase,
+  syncOCRPhotoRecordToSupabase,
   deleteProjectFromSupabase,
   deleteDocumentFromSupabase,
   deleteBlockFromSupabase,
+  deleteOCRPhotoRecordFromSupabase,
   fetchProjectsFromSupabase,
   fetchDocumentsFromSupabase,
   fetchBlocksFromSupabase,
+  fetchOCRPhotoRecordsFromSupabase,
 } from './syncService'
 import { projectStore } from '../storage/projectStore'
 import { documentStore } from '../storage/documentStore'
 import { blockStore } from '../storage/blockStore'
+import { ocrPhotoStore } from '../storage/ocrPhotoStore'
 import type { Project } from '../types/project'
 import type { Document } from '../types/document'
 import type { Block } from '../types/block'
+import type { OCRPhotoRecord } from '../types/ocr'
 
 // 同步状态管理
 interface SyncState {
@@ -25,9 +30,11 @@ interface SyncState {
     projects: Set<string>
     documents: Set<string>
     blocks: Set<string>
+    ocrPhotoRecords: Set<string>
     deletedProjects: Set<string>
     deletedDocuments: Set<string>
     deletedBlocks: Set<string>
+    deletedOCRPhotoRecords: Set<string>
   }
   isOnline: boolean
 }
@@ -36,9 +43,11 @@ interface PersistedSyncQueue {
   projects: string[]
   documents: string[]
   blocks: string[]
+  ocrPhotoRecords: string[]
   deletedProjects: string[]
   deletedDocuments: string[]
   deletedBlocks: string[]
+  deletedOCRPhotoRecords: string[]
 }
 
 const SYNC_QUEUE_STORAGE_KEY = 'blockos-sync-queue'
@@ -51,9 +60,11 @@ class AutoSyncService {
       projects: new Set(),
       documents: new Set(),
       blocks: new Set(),
+      ocrPhotoRecords: new Set(),
       deletedProjects: new Set(),
       deletedDocuments: new Set(),
       deletedBlocks: new Set(),
+      deletedOCRPhotoRecords: new Set(),
     },
     isOnline: navigator.onLine,
   }
@@ -91,9 +102,11 @@ class AutoSyncService {
       projects: Array.from(this.state.pendingChanges.projects),
       documents: Array.from(this.state.pendingChanges.documents),
       blocks: Array.from(this.state.pendingChanges.blocks),
+      ocrPhotoRecords: Array.from(this.state.pendingChanges.ocrPhotoRecords),
       deletedProjects: Array.from(this.state.pendingChanges.deletedProjects),
       deletedDocuments: Array.from(this.state.pendingChanges.deletedDocuments),
       deletedBlocks: Array.from(this.state.pendingChanges.deletedBlocks),
+      deletedOCRPhotoRecords: Array.from(this.state.pendingChanges.deletedOCRPhotoRecords),
     }
     localStorage.setItem(SYNC_QUEUE_STORAGE_KEY, JSON.stringify(payload))
   }
@@ -106,9 +119,11 @@ class AutoSyncService {
       this.state.pendingChanges.projects = new Set(persisted.projects || [])
       this.state.pendingChanges.documents = new Set(persisted.documents || [])
       this.state.pendingChanges.blocks = new Set(persisted.blocks || [])
+      this.state.pendingChanges.ocrPhotoRecords = new Set(persisted.ocrPhotoRecords || [])
       this.state.pendingChanges.deletedProjects = new Set(persisted.deletedProjects || [])
       this.state.pendingChanges.deletedDocuments = new Set(persisted.deletedDocuments || [])
       this.state.pendingChanges.deletedBlocks = new Set(persisted.deletedBlocks || [])
+      this.state.pendingChanges.deletedOCRPhotoRecords = new Set(persisted.deletedOCRPhotoRecords || [])
     } catch (error) {
       console.error('[AutoSync] 加载待同步队列失败:', error)
     }
@@ -149,6 +164,13 @@ class AutoSyncService {
     this.notifyListeners()
   }
 
+  markOCRPhotoRecordChanged(recordId: string): void {
+    this.state.pendingChanges.deletedOCRPhotoRecords.delete(recordId)
+    this.state.pendingChanges.ocrPhotoRecords.add(recordId)
+    this.persistPendingChanges()
+    this.notifyListeners()
+  }
+
   markProjectDeleted(projectId: string): void {
     this.state.pendingChanges.projects.delete(projectId)
     this.state.pendingChanges.deletedProjects.add(projectId)
@@ -170,14 +192,23 @@ class AutoSyncService {
     this.notifyListeners()
   }
 
+  markOCRPhotoRecordDeleted(recordId: string): void {
+    this.state.pendingChanges.ocrPhotoRecords.delete(recordId)
+    this.state.pendingChanges.deletedOCRPhotoRecords.add(recordId)
+    this.persistPendingChanges()
+    this.notifyListeners()
+  }
+
   hasPendingChanges(): boolean {
     return (
       this.state.pendingChanges.projects.size > 0 ||
       this.state.pendingChanges.documents.size > 0 ||
       this.state.pendingChanges.blocks.size > 0 ||
+      this.state.pendingChanges.ocrPhotoRecords.size > 0 ||
       this.state.pendingChanges.deletedProjects.size > 0 ||
       this.state.pendingChanges.deletedDocuments.size > 0 ||
-      this.state.pendingChanges.deletedBlocks.size > 0
+      this.state.pendingChanges.deletedBlocks.size > 0 ||
+      this.state.pendingChanges.deletedOCRPhotoRecords.size > 0
     )
   }
 
@@ -255,6 +286,15 @@ class AutoSyncService {
         }
       }
 
+      for (const recordId of Array.from(this.state.pendingChanges.deletedOCRPhotoRecords)) {
+        try {
+          await deleteOCRPhotoRecordFromSupabase(recordId)
+          this.state.pendingChanges.deletedOCRPhotoRecords.delete(recordId)
+        } catch (error) {
+          console.error(`[AutoSync] 删除 OCR 记录失败 ${recordId}:`, error)
+        }
+      }
+
       for (const documentId of Array.from(this.state.pendingChanges.deletedDocuments)) {
         try {
           await deleteDocumentFromSupabase(documentId)
@@ -318,6 +358,20 @@ class AutoSyncService {
         }
       }
 
+      for (const recordId of Array.from(this.state.pendingChanges.ocrPhotoRecords)) {
+        try {
+          const record = await ocrPhotoStore.getRecord(recordId)
+          if (record) {
+            await syncOCRPhotoRecordToSupabase(record, userId)
+            this.state.pendingChanges.ocrPhotoRecords.delete(recordId)
+          } else {
+            this.state.pendingChanges.ocrPhotoRecords.delete(recordId)
+          }
+        } catch (error) {
+          console.error(`[AutoSync] 同步 OCR 记录失败 ${recordId}:`, error)
+        }
+      }
+
       this.state.lastSyncTime = new Date()
       this.persistPendingChanges()
       console.log('[AutoSync] 同步完成')
@@ -341,10 +395,11 @@ class AutoSyncService {
     projects: number
     documents: number
     blocks: number
+    ocrPhotoRecords: number
   }> {
     if (!isSupabaseEnabled) {
       console.log('[AutoSync] Supabase 未启用，跳过云端拉取')
-      return { projects: 0, documents: 0, blocks: 0 }
+      return { projects: 0, documents: 0, blocks: 0, ocrPhotoRecords: 0 }
     }
 
     if (!this.state.isOnline) {
@@ -381,16 +436,23 @@ class AutoSyncService {
         await blockStore.saveBlock(block, { skipSyncMark: true })
       }
 
+      const cloudOCRPhotoRecords = await fetchOCRPhotoRecordsFromSupabase(userId)
+      for (const record of cloudOCRPhotoRecords) {
+        await ocrPhotoStore.saveRecord(record, { skipSyncMark: true })
+      }
+
       console.log('[AutoSync] 云端数据拉取完成', {
         projects: cloudProjects.length,
         documents: cloudDocuments.length,
         blocks: cloudBlocks.length,
+        ocrPhotoRecords: cloudOCRPhotoRecords.length,
       })
 
       return {
         projects: cloudProjects.length,
         documents: cloudDocuments.length,
         blocks: cloudBlocks.length,
+        ocrPhotoRecords: cloudOCRPhotoRecords.length,
       }
     } catch (error) {
       console.error('[AutoSync] 云端数据拉取失败:', error)
@@ -411,9 +473,11 @@ class AutoSyncService {
       this.state.pendingChanges.projects.size +
       this.state.pendingChanges.documents.size +
       this.state.pendingChanges.blocks.size +
+      this.state.pendingChanges.ocrPhotoRecords.size +
       this.state.pendingChanges.deletedProjects.size +
       this.state.pendingChanges.deletedDocuments.size +
-      this.state.pendingChanges.deletedBlocks.size
+      this.state.pendingChanges.deletedBlocks.size +
+      this.state.pendingChanges.deletedOCRPhotoRecords.size
     )
   }
 }
@@ -444,4 +508,9 @@ export async function saveDocumentWithSync(document: Document): Promise<void> {
 export async function saveBlockWithSync(block: Block): Promise<void> {
   await blockStore.saveBlock(block)
   autoSyncService.markBlockChanged(block.id)
+}
+
+export async function saveOCRPhotoRecordWithSync(record: OCRPhotoRecord): Promise<void> {
+  await ocrPhotoStore.saveRecord(record)
+  autoSyncService.markOCRPhotoRecordChanged(record.id)
 }

@@ -94,7 +94,7 @@
 ### 编辑器组件（2个）- 高风险
 | 文件 | 组件 | 风险 | 说明 |
 |------|------|------|------|
-| src/components/editor/Editor.css | Editor | 🔴 高 | TipTap 编辑器核心 |
+| src/components/editor/Editor.css | Editor | 🔴 高 | TipTap 编辑器核心（BubbleMenu 已迁移 ✅） |
 | src/components/editor/SuggestionMenu.css | SuggestionMenu | 🟡 中 | 建议菜单 |
 
 ### 其他组件（2个）
@@ -178,7 +178,9 @@
 
 ---
 
-**更新时间**：2026-04-16 18:00
-**当前进度**：15/28 完成（54%）
-**今日成果**：完成 TabBar、RightPanel、PreviewPanel 组件迁移（Phase 4 进度：3/8 完成）
+**更新时间**：2026-04-16 18:20
+**当前进度**：15/28 完成（54%）+ BubbleMenu 工具栏增强 ✅
+**今日成果**：
+- 完成 TabBar、RightPanel、PreviewPanel 组件迁移（Phase 4 进度：3/8 完成）
+- 完成 BubbleMenu 工具栏增强（两行布局：Markdown 格式 + AI 操作）
 **下一步**：安装 Badge、ScrollArea、Separator 组件，继续迁移剩余 5 个组件

@@ -150,6 +150,47 @@ create policy "Users can delete own block usages"
   on block_usages for delete using (auth.uid() = user_id);
 
 -- ============================================================
+-- OCR Photo Records
+-- ============================================================
+create table if not exists ocr_photo_records (
+  id text primary key,
+  user_id uuid not null references auth.users(id) on delete cascade,
+  file_name text not null,
+  file_size bigint not null default 0,
+  mime_type text not null,
+  image_data_url text not null,
+  thumbnail_data_url text,
+  is_favorite boolean not null default false,
+  ocr_status text not null default 'idle',
+  ocr_text text,
+  ocr_raw_text text,
+  ocr_error text,
+  implicit_block_id text,
+  implicit_block_version integer,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+alter table ocr_photo_records enable row level security;
+
+drop policy if exists "Users can view own ocr photo records" on ocr_photo_records;
+drop policy if exists "Users can insert own ocr photo records" on ocr_photo_records;
+drop policy if exists "Users can update own ocr photo records" on ocr_photo_records;
+drop policy if exists "Users can delete own ocr photo records" on ocr_photo_records;
+
+create policy "Users can view own ocr photo records"
+  on ocr_photo_records for select using (auth.uid() = user_id);
+
+create policy "Users can insert own ocr photo records"
+  on ocr_photo_records for insert with check (auth.uid() = user_id);
+
+create policy "Users can update own ocr photo records"
+  on ocr_photo_records for update using (auth.uid() = user_id);
+
+create policy "Users can delete own ocr photo records"
+  on ocr_photo_records for delete using (auth.uid() = user_id);
+
+-- ============================================================
 -- Sessions
 -- ============================================================
 create table if not exists sessions (
@@ -232,6 +273,9 @@ create index if not exists idx_sessions_date on sessions(date);
 create index if not exists idx_sessions_updated_at on sessions(updated_at);
 create index if not exists idx_git_commits_user_id on git_commits(user_id);
 create index if not exists idx_git_commits_created_at on git_commits(created_at);
+create index if not exists idx_ocr_photo_records_user_id on ocr_photo_records(user_id);
+create index if not exists idx_ocr_photo_records_created_at on ocr_photo_records(created_at);
+create index if not exists idx_ocr_photo_records_implicit_block_id on ocr_photo_records(implicit_block_id);
 
 drop index if exists idx_blocks_source_type;
 drop index if exists idx_blocks_releases;
@@ -260,6 +304,7 @@ drop trigger if exists update_projects_updated_at on projects;
 drop trigger if exists update_documents_updated_at on documents;
 drop trigger if exists update_blocks_updated_at on blocks;
 drop trigger if exists update_sessions_updated_at on sessions;
+drop trigger if exists update_ocr_photo_records_updated_at on ocr_photo_records;
 
 create trigger update_projects_updated_at before update on projects
   for each row execute function update_updated_at_column();
@@ -271,6 +316,9 @@ create trigger update_blocks_updated_at before update on blocks
   for each row execute function update_updated_at_column();
 
 create trigger update_sessions_updated_at before update on sessions
+  for each row execute function update_updated_at_column();
+
+create trigger update_ocr_photo_records_updated_at before update on ocr_photo_records
   for each row execute function update_updated_at_column();
 
 do $$

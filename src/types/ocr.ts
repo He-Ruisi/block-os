@@ -14,4 +14,6 @@ export interface OCRPhotoRecord {
   ocrText?: string
   ocrRawText?: string
   ocrError?: string
+  implicitBlockId?: string
+  implicitBlockVersion?: number
 }

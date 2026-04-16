@@ -19,6 +19,7 @@ import { Input } from '../../components/ui/input'
 import { Tabs, TabsList, TabsTrigger } from '../../components/ui/tabs'
 import { Textarea } from '../../components/ui/textarea'
 import type { IPluginAPI } from '../../services/pluginAPI'
+import { captureOCRRecordAsExplicitBlock, upsertImplicitBlockFromOCR } from '../../services/ocrBlockService'
 import { ocrPhotoStore } from '../../storage/ocrPhotoStore'
 import type { OCRPhotoRecord } from '../../types/ocr'
 import { recognizeText } from './ocrService'
@@ -280,7 +281,7 @@ export function OCRPanel({ api }: OCRPanelProps) {
       return
     }
 
-    const nextRecord: OCRPhotoRecord = {
+    const draftRecord: OCRPhotoRecord = {
       ...selectedRecord,
       ocrText: draftText,
       updatedAt: new Date().toISOString(),
@@ -288,6 +289,16 @@ export function OCRPanel({ api }: OCRPanelProps) {
     }
 
     try {
+      let nextRecord = draftRecord
+      if (draftRecord.ocrText?.trim()) {
+        const implicitBlock = await upsertImplicitBlockFromOCR(draftRecord)
+        nextRecord = {
+          ...draftRecord,
+          implicitBlockId: implicitBlock.blockId,
+          implicitBlockVersion: implicitBlock.version,
+        }
+      }
+
       await persistRecord(nextRecord)
     } catch (error) {
       const message = getErrorMessage(error, '保存识别结果失败')
@@ -323,12 +334,19 @@ export function OCRPanel({ api }: OCRPanelProps) {
 
     try {
       const result = await recognizeText(dataUrlToBase64(selectedRecord.imageDataUrl), apiUrl, apiToken)
-      const nextRecord: OCRPhotoRecord = {
+      const recognizedRecord: OCRPhotoRecord = {
         ...processingRecord,
         ocrStatus: 'done',
         ocrText: result.text,
         ocrRawText: result.rawText,
         updatedAt: new Date().toISOString(),
+      }
+
+      const implicitBlock = await upsertImplicitBlockFromOCR(recognizedRecord)
+      const nextRecord: OCRPhotoRecord = {
+        ...recognizedRecord,
+        implicitBlockId: implicitBlock.blockId,
+        implicitBlockVersion: implicitBlock.version,
       }
 
       setDraftText(result.text)
@@ -386,16 +404,15 @@ export function OCRPanel({ api }: OCRPanelProps) {
   }, [api, draftText])
 
   const handleSaveAsBlock = useCallback(async (): Promise<void> => {
-    const text = draftText.trim()
-    if (!text) {
+    if (!selectedRecord?.ocrText?.trim()) {
       return
     }
 
     try {
-      await api.saveAsBlock(text, {
-        title: selectedRecord ? `${selectedRecord.fileName} OCR 结果` : 'OCR 识别结果',
-        tags: ['OCR', '图片识别'],
-        source: { type: 'import' },
+      await captureOCRRecordAsExplicitBlock({
+        ...selectedRecord,
+        ocrText: draftText.trim(),
+        updatedAt: new Date().toISOString(),
       })
       api.showSuccess('已保存为 Block')
     } catch (error) {
