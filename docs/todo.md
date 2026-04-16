@@ -375,6 +375,14 @@
 
 ## P2 - 增强功能
 
+### 代码重构与优化 🔧
+- [x] EditorBubbleMenu 组件分离（2026-04-16 完成）
+  - [x] 创建独立的 EditorBubbleMenu 组件文件
+  - [x] 将 BubbleMenu UI 和 AI 操作逻辑分离
+  - [x] 创建重构指南文档
+  - [ ] 手动完成 Editor.tsx 重构（按照指南，预计 10-15 分钟）
+  - [ ] 验证所有 BubbleMenu 功能正常工作
+
 ### Block 增强
 - [x] 隐式/显式 Block 区分（AI 自动创建为隐式，捕获后变显式）
 - [x] Block 空间只显示显式 Block
