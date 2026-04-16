@@ -5,7 +5,7 @@ import { SuggestionMenu } from './SuggestionMenu'
 import { documentStore } from '@/storage/documentStore'
 import { blockStore } from '@/storage/blockStore'
 import { recordBlockUsage } from '@/features/blocks/services/blockReleaseService'
-import '@/styles/components/Editor.css'
+import '@/styles/modules/editor.css'
 import { useEditor, EditorContent, Editor as TiptapEditor } from '@tiptap/react'
 import {
   BlockLink, BlockReference, SourceBlock, searchBlocks,
@@ -424,38 +424,38 @@ export function Editor({ onEditorReady, onTextSelected, documentId }: EditorProp
       {/* Toolbar — 两行布局，对标 reactjs-tiptap-editor 风格 */}
       <div className="editor-toolbar">
         {/* 第一行：撤销/重做 | 清除 | 标题 | 文字格式 | 列表 */}
-        <div className="toolbar-row">
-          <div className="toolbar-group">
-            <button className="toolbar-btn" onClick={() => editor?.chain().focus().undo().run()}
+        <div className="editor-toolbar__row">
+          <div className="editor-toolbar__group">
+            <button className="editor-toolbar__button" onClick={() => editor?.chain().focus().undo().run()}
               disabled={!editor?.can().undo()} title="撤销 ⌘Z">↩</button>
-            <button className="toolbar-btn" onClick={() => editor?.chain().focus().redo().run()}
+            <button className="editor-toolbar__button" onClick={() => editor?.chain().focus().redo().run()}
               disabled={!editor?.can().redo()} title="重做 ⌘⇧Z">↪</button>
           </div>
-          <div className="toolbar-sep" />
-          <div className="toolbar-group">
-            <button className="toolbar-btn" onClick={() => editor?.chain().focus().unsetAllMarks().run()}
+          <div className="editor-toolbar__separator" />
+          <div className="editor-toolbar__group">
+            <button className="editor-toolbar__button" onClick={() => editor?.chain().focus().unsetAllMarks().run()}
               title="清除格式">✕</button>
           </div>
-          <div className="toolbar-sep" />
-          <div className="toolbar-group">
-            <button className={`toolbar-btn toolbar-btn-wide ${!editor?.isActive('heading') && !editor?.isActive('codeBlock') ? 'active' : ''}`}
+          <div className="editor-toolbar__separator" />
+          <div className="editor-toolbar__group">
+            <button className={`editor-toolbar__button editor-toolbar__button--wide ${!editor?.isActive('heading') && !editor?.isActive('codeBlock') ? 'editor-toolbar__button--active' : ''}`}
               onClick={() => editor?.chain().focus().setParagraph().run()} title="正文">正文</button>
-            <button className={`toolbar-btn toolbar-btn-wide ${editor?.isActive('heading', { level: 1 }) ? 'active' : ''}`}
+            <button className={`editor-toolbar__button editor-toolbar__button--wide ${editor?.isActive('heading', { level: 1 }) ? 'editor-toolbar__button--active' : ''}`}
               onClick={() => editor?.chain().focus().toggleHeading({ level: 1 }).run()} title="标题 1">标题 1</button>
-            <button className={`toolbar-btn toolbar-btn-wide ${editor?.isActive('heading', { level: 2 }) ? 'active' : ''}`}
+            <button className={`editor-toolbar__button editor-toolbar__button--wide ${editor?.isActive('heading', { level: 2 }) ? 'editor-toolbar__button--active' : ''}`}
               onClick={() => editor?.chain().focus().toggleHeading({ level: 2 }).run()} title="标题 2">标题 2</button>
-            <button className={`toolbar-btn toolbar-btn-wide ${editor?.isActive('heading', { level: 3 }) ? 'active' : ''}`}
+            <button className={`editor-toolbar__button editor-toolbar__button--wide ${editor?.isActive('heading', { level: 3 }) ? 'editor-toolbar__button--active' : ''}`}
               onClick={() => editor?.chain().focus().toggleHeading({ level: 3 }).run()} title="标题 3">标题 3</button>
           </div>
-          <div className="toolbar-sep" />
-          <div className="toolbar-group">
-            <button className={`toolbar-btn ${editor?.isActive('bold') ? 'active' : ''}`}
+          <div className="editor-toolbar__separator" />
+          <div className="editor-toolbar__group">
+            <button className={`editor-toolbar__button ${editor?.isActive('bold') ? 'editor-toolbar__button--active' : ''}`}
               onClick={() => editor?.chain().focus().toggleBold().run()} title="粗体 ⌘B"><strong>B</strong></button>
-            <button className={`toolbar-btn ${editor?.isActive('italic') ? 'active' : ''}`}
+            <button className={`editor-toolbar__button ${editor?.isActive('italic') ? 'editor-toolbar__button--active' : ''}`}
               onClick={() => editor?.chain().focus().toggleItalic().run()} title="斜体 ⌘I"><em>I</em></button>
-            <button className={`toolbar-btn toolbar-btn-underline ${editor?.isActive('strike') ? 'active' : ''}`}
+            <button className={`editor-toolbar__button editor-toolbar__button--underline ${editor?.isActive('strike') ? 'editor-toolbar__button--active' : ''}`}
               onClick={() => editor?.chain().focus().toggleStrike().run()} title="删除线"><s>S</s></button>
-            <button className={`toolbar-btn ${editor?.isActive('code') ? 'active' : ''}`}
+            <button className={`editor-toolbar__button ${editor?.isActive('code') ? 'editor-toolbar__button--active' : ''}`}
               onClick={() => editor?.chain().focus().toggleCode().run()} title="行内代码 ⌘E">{'</>'}</button>
           </div>
           <div className="toolbar-sep" />

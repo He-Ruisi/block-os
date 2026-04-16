@@ -4,7 +4,7 @@ import { blockStore } from '@/storage/blockStore'
 import { usageStore } from '@/storage/usageStore'
 import { publishBlockVersion } from '../services/blockReleaseService'
 import { formatRelativeTime } from '@/utils/date'
-import '@/styles/components/BlockDetailPanel.css'
+import '@/styles/modules/blocks.css'
 
 interface BlockDetailPanelProps {
   blockId: string
@@ -23,12 +23,12 @@ export function BlockDetailPanel({ blockId, onClose, onInsertRelease }: BlockDet
   const loadData = useCallback(async () => {
     try {
       setIsLoading(true)
-      const [b, u] = await Promise.all([
+      const [loadedBlock, loadedUsages] = await Promise.all([
         blockStore.getBlock(blockId),
         usageStore.getUsagesByBlock(blockId),
       ])
-      setBlock(b)
-      setUsages(u)
+      setBlock(loadedBlock)
+      setUsages(loadedUsages)
     } catch (error) {
       console.error('Failed to load block detail:', error)
     } finally {
@@ -36,10 +36,13 @@ export function BlockDetailPanel({ blockId, onClose, onInsertRelease }: BlockDet
     }
   }, [blockId])
 
-  useEffect(() => { loadData() }, [loadData])
+  useEffect(() => {
+    void loadData()
+  }, [loadData])
 
   const handleCreateRelease = async () => {
     if (!block) return
+
     try {
       await publishBlockVersion({
         blockId,
@@ -56,23 +59,25 @@ export function BlockDetailPanel({ blockId, onClose, onInsertRelease }: BlockDet
 
   const handleInsert = () => {
     if (!block || selectedVersion === null) return
-    const release = block.releases?.find(r => r.version === selectedVersion)
-    if (release) onInsertRelease(block, release)
+    const release = block.releases?.find(item => item.version === selectedVersion)
+    if (release) {
+      onInsertRelease(block, release)
+    }
   }
 
   const truncate = (text: string, lines = 2) => {
-    const arr = text.split('\n').filter(l => l.trim())
-    const preview = arr.slice(0, lines).join('\n')
-    return arr.length > lines ? preview + '…' : preview
+    const rows = text.split('\n').filter(line => line.trim())
+    const preview = rows.slice(0, lines).join('\n')
+    return rows.length > lines ? `${preview}...` : preview
   }
 
   if (isLoading) {
     return (
       <div className="block-detail-panel">
-        <div className="detail-header">
-          <button className="detail-back" onClick={onClose}>← 返回</button>
+        <div className="block-detail-panel__header">
+          <button className="block-detail-panel__back" onClick={onClose}>← 返回</button>
         </div>
-        <div className="detail-loading">加载中...</div>
+        <div className="block-detail-panel__loading">加载中...</div>
       </div>
     )
   }
@@ -80,10 +85,10 @@ export function BlockDetailPanel({ blockId, onClose, onInsertRelease }: BlockDet
   if (!block) {
     return (
       <div className="block-detail-panel">
-        <div className="detail-header">
-          <button className="detail-back" onClick={onClose}>← 返回</button>
+        <div className="block-detail-panel__header">
+          <button className="block-detail-panel__back" onClick={onClose}>← 返回</button>
         </div>
-        <div className="detail-loading">Block 不存在</div>
+        <div className="block-detail-panel__loading">Block 不存在</div>
       </div>
     )
   }
@@ -92,56 +97,58 @@ export function BlockDetailPanel({ blockId, onClose, onInsertRelease }: BlockDet
 
   return (
     <div className="block-detail-panel">
-      {/* 头部 */}
-      <div className="detail-header">
-        <button className="detail-back" onClick={onClose}>← 返回</button>
-        <span className="detail-title">{block.metadata.title || 'Block 详情'}</span>
+      <div className="block-detail-panel__header">
+        <button className="block-detail-panel__back" onClick={onClose}>← 返回</button>
+        <span className="block-detail-panel__title">{block.metadata.title || 'Block 详情'}</span>
       </div>
 
-      <div className="detail-body">
-        {/* 当前内容 */}
-        <section className="detail-section">
-          <div className="section-label">当前内容</div>
-          <div className="detail-content-box">
-            {block.content.substring(0, 200)}{block.content.length > 200 ? '…' : ''}
+      <div className="block-detail-panel__body">
+        <section className="block-detail-panel__section">
+          <div className="block-detail-panel__section-label">当前内容</div>
+          <div className="block-detail-panel__content-box">
+            {block.content.substring(0, 200)}
+            {block.content.length > 200 ? '...' : ''}
           </div>
-          <div className="detail-meta-row">
-            <span className="meta-chip">{block.type === 'ai-generated' ? '🤖 AI' : '✍️ 编辑器'}</span>
-            <span className="meta-chip">📅 {formatRelativeTime(block.metadata.createdAt)}</span>
-            {block.metadata.tags.map(t => (
-              <span key={t} className="meta-chip tag-chip">#{t}</span>
+          <div className="block-detail-panel__meta-row">
+            <span className="block-detail-panel__meta-chip">{block.type === 'ai-generated' ? '🤖 AI' : '✍️ 编辑器'}</span>
+            <span className="block-detail-panel__meta-chip">📅 {formatRelativeTime(block.metadata.createdAt)}</span>
+            {block.metadata.tags.map(tag => (
+              <span key={tag} className="block-detail-panel__meta-chip block-detail-panel__meta-chip--tag">#{tag}</span>
             ))}
           </div>
         </section>
 
-        {/* Release 版本列表 */}
-        <section className="detail-section">
-          <div className="section-label-row">
-            <span className="section-label">版本 ({releases.length})</span>
+        <section className="block-detail-panel__section">
+          <div className="block-detail-panel__section-label-row">
+            <span className="block-detail-panel__section-label">版本 ({releases.length})</span>
             <button
-              className="new-release-btn"
-              onClick={handleCreateRelease}
+              className="block-detail-panel__new-release-btn"
+              onClick={() => setShowNewRelease(true)}
             >
               + 发布新版本
             </button>
           </div>
 
-          {/* 新建 release 表单 */}
           {showNewRelease && (
-            <div className="new-release-form">
+            <div className="block-detail-panel__new-release-form">
               <input
-                className="release-title-input"
-                placeholder="版本标题（如：偏历史叙述语气）"
+                className="block-detail-panel__release-title-input"
+                placeholder="版本标题，例如：偏历史叙述语气"
                 value={newReleaseTitle}
                 onChange={e => setNewReleaseTitle(e.target.value)}
-                onKeyDown={e => e.key === 'Enter' && handleCreateRelease()}
+                onKeyDown={e => e.key === 'Enter' && void handleCreateRelease()}
                 autoFocus
               />
-              <div className="release-form-actions">
-                <button className="btn-sm btn-secondary-sm" onClick={() => setShowNewRelease(false)}>取消</button>
+              <div className="block-detail-panel__release-form-actions">
                 <button
-                  className="btn-sm btn-primary-sm"
-                  onClick={handleCreateRelease}
+                  className="block-detail-panel__button block-detail-panel__button--secondary"
+                  onClick={() => setShowNewRelease(false)}
+                >
+                  取消
+                </button>
+                <button
+                  className="block-detail-panel__button block-detail-panel__button--primary"
+                  onClick={() => void handleCreateRelease()}
                 >
                   发布
                 </button>
@@ -149,43 +156,39 @@ export function BlockDetailPanel({ blockId, onClose, onInsertRelease }: BlockDet
             </div>
           )}
 
-          {/* 版本列表 */}
           {releases.length === 0 ? (
-            <div className="empty-hint-sm">暂无发布版本，点击上方按钮发布</div>
+            <div className="block-detail-panel__empty-hint">暂无发布版本，点击上方按钮发布</div>
           ) : (
-            <div className="release-list">
+            <div className="block-detail-panel__release-list">
               {[...releases].reverse().map(release => (
                 <div
                   key={release.version}
-                  className={`release-card ${selectedVersion === release.version ? 'selected' : ''}`}
-                  onClick={() => setSelectedVersion(
-                    selectedVersion === release.version ? null : release.version
-                  )}
+                  className={`block-detail-panel__release-card ${selectedVersion === release.version ? 'block-detail-panel__release-card--selected' : ''}`}
+                  onClick={() => setSelectedVersion(selectedVersion === release.version ? null : release.version)}
                 >
-                  <div className="release-card-header">
-                    <span className="release-version">v{release.version}</span>
-                    <span className="release-title-text">{release.title}</span>
-                    <span className="release-time">{formatRelativeTime(release.releasedAt)}</span>
+                  <div className="block-detail-panel__release-card-header">
+                    <span className="block-detail-panel__release-version">v{release.version}</span>
+                    <span className="block-detail-panel__release-title-text">{release.title}</span>
+                    <span className="block-detail-panel__release-time">{formatRelativeTime(release.releasedAt)}</span>
                   </div>
-                  <div className="release-preview">{truncate(release.content)}</div>
+                  <div className="block-detail-panel__release-preview">{truncate(release.content)}</div>
                 </div>
               ))}
             </div>
           )}
         </section>
 
-        {/* 使用记录 */}
-        <section className="detail-section">
-          <div className="section-label">引用记录 ({usages.length})</div>
+        <section className="block-detail-panel__section">
+          <div className="block-detail-panel__section-label">引用记录 ({usages.length})</div>
           {usages.length === 0 ? (
-            <div className="empty-hint-sm">暂无引用记录</div>
+            <div className="block-detail-panel__empty-hint">暂无引用记录</div>
           ) : (
-            <div className="usage-list">
+            <div className="block-detail-panel__usage-list">
               {usages.map(usage => (
-                <div key={usage.id} className="usage-item">
-                  <span className="usage-doc">📄 {usage.documentTitle}</span>
-                  <span className="usage-version">v{usage.releaseVersion}</span>
-                  <span className="usage-time">{formatRelativeTime(usage.insertedAt)}</span>
+                <div key={usage.id} className="block-detail-panel__usage-item">
+                  <span className="block-detail-panel__usage-doc">📄 {usage.documentTitle}</span>
+                  <span className="block-detail-panel__usage-version">v{usage.releaseVersion}</span>
+                  <span className="block-detail-panel__usage-time">{formatRelativeTime(usage.insertedAt)}</span>
                 </div>
               ))}
             </div>
@@ -193,11 +196,10 @@ export function BlockDetailPanel({ blockId, onClose, onInsertRelease }: BlockDet
         </section>
       </div>
 
-      {/* 底部操作 */}
       {selectedVersion !== null && (
-        <div className="detail-footer">
-          <span className="footer-hint">已选择 v{selectedVersion}</span>
-          <button className="btn-primary-sm" onClick={handleInsert}>
+        <div className="block-detail-panel__footer">
+          <span className="block-detail-panel__footer-hint">已选择 v{selectedVersion}</span>
+          <button className="block-detail-panel__button block-detail-panel__button--primary" onClick={handleInsert}>
             插入到编辑器
           </button>
         </div>

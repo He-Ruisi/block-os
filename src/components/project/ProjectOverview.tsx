@@ -4,7 +4,7 @@ import type { Project } from '../../types/models/project'
 import { projectStore } from '../../storage/projectStore'
 import { documentStore } from '../../storage/documentStore'
 import { formatDistanceToNow } from '../../utils/date'
-import '../../styles/components/ProjectOverview.css'
+import '../../styles/modules/panels.css'
 
 interface ProjectOverviewProps {
   onSelectProject: (projectId: string) => void
@@ -165,7 +165,7 @@ export function ProjectOverview({ onSelectProject, onCreateProject }: ProjectOve
                   {menuOpenId === project.id && (
                     <div className="project-card-menu-dropdown">
                       <button
-                        className="project-menu-item"
+                        className="project-overview__menu-item"
                         onClick={e => {
                           e.stopPropagation()
                           onSelectProject(project.id)
@@ -175,7 +175,7 @@ export function ProjectOverview({ onSelectProject, onCreateProject }: ProjectOve
                         打开项目
                       </button>
                       <button
-                        className="project-menu-item danger"
+                        className="project-overview__menu-item project-overview__menu-item--danger"
                         onClick={e => {
                           e.stopPropagation()
                           handleDeleteProject(project.id)

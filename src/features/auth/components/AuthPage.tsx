@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
-import '../../../styles/components/AuthPage.css'
+import '../../../styles/modules/panels.css'
 
 interface AuthPageProps {
   onSignIn: (username: string, password: string) => Promise<void>
@@ -64,13 +64,13 @@ export function AuthPage({ onSignIn, onSignUp, loading, error, isPullingData }: 
 
         <div className="auth-tabs">
           <button
-            className={`auth-tab ${isLogin ? 'active' : ''}`}
+            className={`auth-tab ${isLogin ? 'auth-tab--active' : ''}`}
             onClick={() => { setIsLogin(true); setLocalError(null) }}
           >
             登录
           </button>
           <button
-            className={`auth-tab ${!isLogin ? 'active' : ''}`}
+            className={`auth-tab ${!isLogin ? 'auth-tab--active' : ''}`}
             onClick={() => { setIsLogin(false); setLocalError(null) }}
           >
             注册

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import '../../../styles/components/SuggestionMenu.css'
+import '../../../styles/modules/ai.css'
 
 interface SuggestionItem {
   id: string
@@ -52,7 +52,7 @@ export function SuggestionMenu({ items, onSelect, onClose, position }: Suggestio
   return (
     <div
       ref={menuRef}
-      className="suggestion-menu"
+      className="editor-suggestion-menu"
       style={{
         top: `${position.top}px`,
         left: `${position.left}px`,
@@ -61,12 +61,12 @@ export function SuggestionMenu({ items, onSelect, onClose, position }: Suggestio
       {items.map((item, index) => (
         <div
           key={item.id}
-          className={`suggestion-item ${index === selectedIndex ? 'selected' : ''}`}
+          className={`editor-suggestion-menu__item ${index === selectedIndex ? 'editor-suggestion-menu__item--selected' : ''}`}
           onClick={() => onSelect(item)}
           onMouseEnter={() => setSelectedIndex(index)}
         >
-          <div className="suggestion-title">{item.title}</div>
-          <div className="suggestion-content">
+          <div className="editor-suggestion-menu__title">{item.title}</div>
+          <div className="editor-suggestion-menu__content">
             {item.content.substring(0, 60)}
             {item.content.length > 60 ? '...' : ''}
           </div>

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import type { Block } from '@/types/models/block'
 import { blockStore } from '@/storage/blockStore'
 import { formatDateTime } from '@/utils/date'
-import '@/styles/components/BlockDerivativeSelector.css'
+import '@/styles/modules/blocks.css'
 
 interface BlockDerivativeSelectorProps {
   sourceBlockId: string
@@ -10,10 +10,10 @@ interface BlockDerivativeSelectorProps {
   onCancel: () => void
 }
 
-export function BlockDerivativeSelector({ 
-  sourceBlockId, 
-  onSelect, 
-  onCancel 
+export function BlockDerivativeSelector({
+  sourceBlockId,
+  onSelect,
+  onCancel,
 }: BlockDerivativeSelectorProps) {
   const [sourceBlock, setSourceBlock] = useState<Block | null>(null)
   const [derivatives, setDerivatives] = useState<Block[]>([])
@@ -21,7 +21,7 @@ export function BlockDerivativeSelector({
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    loadDerivativeTree()
+    void loadDerivativeTree()
   }, [sourceBlockId])
 
   const loadDerivativeTree = async () => {
@@ -38,111 +38,99 @@ export function BlockDerivativeSelector({
   }
 
   const handleSelect = () => {
-    const selectedBlock = selectedBlockId === sourceBlockId 
-      ? sourceBlock 
-      : derivatives.find(d => d.id === selectedBlockId)
-    
+    const selectedBlock = selectedBlockId === sourceBlockId
+      ? sourceBlock
+      : derivatives.find(item => item.id === selectedBlockId)
+
     if (selectedBlock) {
       onSelect(selectedBlock)
     }
   }
 
-  const truncateContent = (content: string, maxLength: number = 100) => {
-    if (content.length <= maxLength) return content
-    return content.substring(0, maxLength) + '...'
-  }
+  const truncateContent = (content: string, maxLength = 100) =>
+    (content.length <= maxLength ? content : `${content.substring(0, maxLength)}...`)
 
   const formatDate = (date: Date) => formatDateTime(date)
 
   return (
-    <div className="derivative-selector-overlay" onClick={onCancel}>
-      <div className="derivative-selector-content" onClick={(e) => e.stopPropagation()}>
-        <div className="derivative-selector-header">
-          <h3>选择 Block 版本</h3>
-          <button className="close-button" onClick={onCancel}>×</button>
+    <div className="block-derivative-selector__overlay" onClick={onCancel}>
+      <div className="block-derivative-selector__content" onClick={e => e.stopPropagation()}>
+        <div className="block-derivative-selector__header">
+          <h3 className="block-derivative-selector__title">选择 Block 版本</h3>
+          <button className="block-derivative-selector__close-button" onClick={onCancel}>×</button>
         </div>
 
-        <div className="derivative-selector-body">
+        <div className="block-derivative-selector__body">
           {isLoading ? (
-            <div className="loading-state">
-              <div className="loading-icon">⏳</div>
-              <div className="loading-text">加载中...</div>
+            <div className="block-derivative-selector__loading-state">
+              <div className="block-derivative-selector__loading-icon">⏳</div>
+              <div className="block-derivative-selector__loading-text">加载中...</div>
             </div>
           ) : (
             <>
-              {/* 源 Block */}
               {sourceBlock && (
-                <div className="block-section">
-                  <div className="section-title">
-                    <span className="section-icon">🌟</span>
+                <div className="block-derivative-selector__section">
+                  <div className="block-derivative-selector__section-title">
+                    <span className="block-derivative-selector__section-icon">🌟</span>
                     源 Block
                   </div>
-                  <div 
-                    className={`block-option ${selectedBlockId === sourceBlock.id ? 'selected' : ''}`}
+                  <div
+                    className={`block-derivative-selector__option ${selectedBlockId === sourceBlock.id ? 'block-derivative-selector__option--selected' : ''}`}
                     onClick={() => setSelectedBlockId(sourceBlock.id)}
                   >
-                    <div className="block-option-header">
+                    <div className="block-derivative-selector__option-header">
                       <input
                         type="radio"
                         checked={selectedBlockId === sourceBlock.id}
                         onChange={() => setSelectedBlockId(sourceBlock.id)}
                       />
-                      <div className="block-option-title">
+                      <div className="block-derivative-selector__option-title">
                         {sourceBlock.metadata.title || '无标题'}
                       </div>
                     </div>
-                    <div className="block-option-content">
+                    <div className="block-derivative-selector__option-content">
                       {truncateContent(sourceBlock.content)}
                     </div>
-                    <div className="block-option-meta">
-                      <span className="meta-item">
-                        📅 {formatDate(sourceBlock.metadata.createdAt)}
-                      </span>
-                      <span className="meta-item">
-                        🏷️ {sourceBlock.metadata.tags.join(', ')}
-                      </span>
+                    <div className="block-derivative-selector__option-meta">
+                      <span className="block-derivative-selector__meta-item">📅 {formatDate(sourceBlock.metadata.createdAt)}</span>
+                      <span className="block-derivative-selector__meta-item">🏷️ {sourceBlock.metadata.tags.join(', ')}</span>
                     </div>
                   </div>
                 </div>
               )}
 
-              {/* 派生版本 */}
               {derivatives.length > 0 && (
-                <div className="block-section">
-                  <div className="section-title">
-                    <span className="section-icon">🌿</span>
+                <div className="block-derivative-selector__section">
+                  <div className="block-derivative-selector__section-title">
+                    <span className="block-derivative-selector__section-icon">🌿</span>
                     派生版本 ({derivatives.length})
                   </div>
-                  {derivatives.map((derivative) => (
-                    <div 
+                  {derivatives.map(derivative => (
+                    <div
                       key={derivative.id}
-                      className={`block-option ${selectedBlockId === derivative.id ? 'selected' : ''}`}
+                      className={`block-derivative-selector__option ${selectedBlockId === derivative.id ? 'block-derivative-selector__option--selected' : ''}`}
                       onClick={() => setSelectedBlockId(derivative.id)}
                     >
-                      <div className="block-option-header">
+                      <div className="block-derivative-selector__option-header">
                         <input
                           type="radio"
                           checked={selectedBlockId === derivative.id}
                           onChange={() => setSelectedBlockId(derivative.id)}
                         />
-                        <div className="block-option-title">
+                        <div className="block-derivative-selector__option-title">
                           {derivative.metadata.title || '无标题'}
                         </div>
                       </div>
-                      <div className="block-option-content">
+                      <div className="block-derivative-selector__option-content">
                         {truncateContent(derivative.content)}
                       </div>
-                      <div className="block-option-meta">
-                        <span className="meta-item">
-                          📄 {derivative.derivation?.contextTitle}
-                        </span>
-                        <span className="meta-item">
-                          📅 {formatDate(derivative.metadata.createdAt)}
-                        </span>
+                      <div className="block-derivative-selector__option-meta">
+                        <span className="block-derivative-selector__meta-item">📄 {derivative.derivation?.contextTitle}</span>
+                        <span className="block-derivative-selector__meta-item">📅 {formatDate(derivative.metadata.createdAt)}</span>
                       </div>
                       {derivative.derivation?.modifications && (
-                        <div className="block-option-modifications">
-                          💬 {derivative.derivation.modifications}
+                        <div className="block-derivative-selector__option-modifications">
+                          ✏️ {derivative.derivation.modifications}
                         </div>
                       )}
                     </div>
@@ -151,10 +139,10 @@ export function BlockDerivativeSelector({
               )}
 
               {derivatives.length === 0 && sourceBlock && (
-                <div className="empty-state">
-                  <div className="empty-icon">📝</div>
-                  <div className="empty-text">暂无派生版本</div>
-                  <div className="empty-hint">
+                <div className="block-derivative-selector__empty-state">
+                  <div className="block-derivative-selector__empty-icon">📝</div>
+                  <div className="block-derivative-selector__empty-text">暂无派生版本</div>
+                  <div className="block-derivative-selector__empty-hint">
                     引用此 Block 并修改后会自动创建派生版本
                   </div>
                 </div>
@@ -163,12 +151,12 @@ export function BlockDerivativeSelector({
           )}
         </div>
 
-        <div className="derivative-selector-footer">
-          <button className="btn-secondary" onClick={onCancel}>
+        <div className="block-derivative-selector__footer">
+          <button className="block-derivative-selector__button block-derivative-selector__button--secondary" onClick={onCancel}>
             取消
           </button>
-          <button 
-            className="btn-primary" 
+          <button
+            className="block-derivative-selector__button block-derivative-selector__button--primary"
             onClick={handleSelect}
             disabled={!selectedBlockId}
           >

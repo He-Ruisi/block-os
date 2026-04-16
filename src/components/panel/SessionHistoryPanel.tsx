@@ -2,7 +2,7 @@ import { useState } from 'react'
 import type { Session } from '@/types/models/chat'
 import { groupSessionsByDate, exportSessionAsJSON } from '@/features/ai'
 import { sessionStore } from '@/storage/sessionStore'
-import '@/styles/components/SessionHistoryPanel.css'
+import '@/styles/modules/panels.css'
 
 interface SessionHistoryPanelProps {
   sessions: Session[]
@@ -35,16 +35,15 @@ export function SessionHistoryPanel({
     setContextMenu(null)
   }
 
-  const formatTime = (date: Date) => {
-    return new Date(date).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
-  }
+  const formatTime = (date: Date) =>
+    new Date(date).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
 
   if (sessions.length === 0) {
     return (
-      <div className="session-history-empty">
-        <div className="empty-icon">💬</div>
-        <div className="empty-text">还没有历史对话</div>
-        <div className="empty-hint">开始对话后会自动保存</div>
+      <div className="session-history-panel__empty">
+        <div className="session-history-panel__empty-icon">💬</div>
+        <div className="session-history-panel__empty-text">还没有历史对话</div>
+        <div className="session-history-panel__empty-hint">开始对话后会自动保存</div>
       </div>
     )
   }
@@ -52,17 +51,17 @@ export function SessionHistoryPanel({
   return (
     <div className="session-history-panel" onClick={() => setContextMenu(null)}>
       {groups.map(group => (
-        <div key={group.date} className="session-group">
-          <div className="session-group-label">{group.label}</div>
+        <div key={group.date} className="session-history-panel__group">
+          <div className="session-history-panel__group-label">{group.label}</div>
           {group.sessions.map(session => (
             <div
               key={session.id}
-              className={`session-item ${session.id === currentSessionId ? 'active' : ''}`}
+              className={`session-history-panel__item ${session.id === currentSessionId ? 'session-history-panel__item--active' : ''}`}
               onClick={() => onSelect(session)}
               onContextMenu={e => handleContextMenu(e, session)}
             >
-              <div className="session-item-title">{session.title}</div>
-              <div className="session-item-meta">
+              <div className="session-history-panel__item-title">{session.title}</div>
+              <div className="session-history-panel__item-meta">
                 <span>{session.messages.length} 条消息</span>
                 <span>{formatTime(session.updatedAt)}</span>
               </div>
@@ -73,18 +72,24 @@ export function SessionHistoryPanel({
 
       {contextMenu && (
         <div
-          className="session-context-menu"
+          className="session-history-panel__context-menu"
           style={{ top: contextMenu.y, left: contextMenu.x }}
           onClick={e => e.stopPropagation()}
         >
-          <button onClick={() => { exportSessionAsJSON(contextMenu.session); setContextMenu(null) }}>
-            📥 导出 JSON
+          <button
+            className="session-history-panel__context-menu-button"
+            onClick={() => {
+              exportSessionAsJSON(contextMenu.session)
+              setContextMenu(null)
+            }}
+          >
+            导出 JSON
           </button>
           <button
-            className="danger"
+            className="session-history-panel__context-menu-button session-history-panel__context-menu-button--danger"
             onClick={() => handleDelete(contextMenu.session.id)}
           >
-            🗑 删除
+            删除
           </button>
         </div>
       )}

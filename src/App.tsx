@@ -25,7 +25,7 @@ import { pluginRegistry } from './services/core/pluginRegistry'
 import { PluginAPI } from './services/core/pluginAPI'
 import { OCRPlugin } from './plugins/built-in/ocr-plugin'
 import { LOCAL_STORAGE_KEYS } from './constants/storage'
-import './styles/components/App.css'
+import './styles/modules/panels.css'
 
 function App() {
   const editorAreaRef = useRef<HTMLDivElement>(null)
@@ -370,8 +370,8 @@ function App() {
   // 加载中
   if ((auth.loading && !auth.user) || !storageReady) {
     return (
-      <div className="app-loading">
-        <div className="loading-spinner">BlockOS</div>
+      <div className="app__loading">
+        <div className="app__loading-spinner">BlockOS</div>
       </div>
     )
   }
@@ -390,7 +390,7 @@ function App() {
   }
 
   return (
-    <div className={`app ${isFullscreen ? 'fullscreen' : ''} ${theme === 'newsprint' ? 'theme-newsprint' : ''} ${viewMode === 'ai-focus' ? 'app-ai-focus' : ''}`}>
+    <div className={`app ${isFullscreen ? 'app--fullscreen' : ''} ${theme === 'newsprint' ? 'theme-newsprint' : ''} ${viewMode === 'ai-focus' ? 'app--ai-focus' : ''}`}>
       {/* AI 沉浸式模式 */}
       {viewMode === 'ai-focus' && (
         <RightPanel

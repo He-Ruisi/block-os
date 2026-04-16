@@ -3,7 +3,7 @@ import type { Block, BlockRelease } from '@/types/models/block'
 import { blockStore } from '@/storage/blockStore'
 import { formatRelativeTime } from '@/utils/date'
 import { BlockDetailPanel } from './BlockDetailPanel'
-import '@/styles/components/BlockSpacePanel.css'
+import '@/styles/modules/blocks.css'
 
 export function BlockSpacePanel() {
   const [blocks, setBlocks] = useState<Block[]>([])
@@ -15,14 +15,12 @@ export function BlockSpacePanel() {
   const [highlightedBlockId, setHighlightedBlockId] = useState<string | null>(null)
   const [detailBlockId, setDetailBlockId] = useState<string | null>(null)
 
-  // 加载 Blocks（只加载显式 Block）
   const loadBlocks = async () => {
     try {
       setIsLoading(true)
-      const allBlocks = await blockStore.getAllBlocks()
-      // 过滤掉隐式 Block
-      const explicitBlocks = allBlocks.filter(b => !b.implicit)
-      const tags = Array.from(new Set(explicitBlocks.flatMap(b => b.metadata.tags))).sort()
+      const allLoadedBlocks = await blockStore.getAllBlocks()
+      const explicitBlocks = allLoadedBlocks.filter(block => !block.implicit)
+      const tags = Array.from(new Set(explicitBlocks.flatMap(block => block.metadata.tags))).sort()
       setBlocks(explicitBlocks)
       setFilteredBlocks(explicitBlocks)
       setAllTags(tags)
@@ -33,103 +31,96 @@ export function BlockSpacePanel() {
     }
   }
 
-  // 初始化
   useEffect(() => {
-    loadBlocks()
+    void loadBlocks()
   }, [])
 
-  // 监听 Block 更新事件
   useEffect(() => {
     const handleBlockUpdate = () => {
-      console.log('[BlockSpacePanel] Reloading blocks...')
-      loadBlocks()
+      void loadBlocks()
     }
 
     window.addEventListener('blockUpdated', handleBlockUpdate)
     return () => window.removeEventListener('blockUpdated', handleBlockUpdate)
   }, [])
 
-  // 监听显示 Block 事件
   useEffect(() => {
-    const handleShowBlock = (e: Event) => {
-      const blockId = (e as CustomEvent<string>).detail
+    const handleShowBlock = (event: Event) => {
+      const blockId = (event as CustomEvent<string>).detail
       setHighlightedBlockId(blockId)
       setTimeout(() => setHighlightedBlockId(null), 3000)
       setTimeout(() => {
         const element = document.querySelector(`[data-block-id="${blockId}"]`)
-        if (element) element.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        }
       }, 100)
     }
+
     window.addEventListener('showBlockInSpace', handleShowBlock)
     return () => window.removeEventListener('showBlockInSpace', handleShowBlock)
   }, [])
 
-  // 监听 openBlockDetail 事件 → 直接打开详情面板
   useEffect(() => {
-    const handler = (e: Event) => {
-      const blockId = (e as CustomEvent<string>).detail
-      if (blockId) setDetailBlockId(blockId)
+    const handler = (event: Event) => {
+      const blockId = (event as CustomEvent<string>).detail
+      if (blockId) {
+        setDetailBlockId(blockId)
+      }
     }
+
     window.addEventListener('openBlockDetail', handler)
     return () => window.removeEventListener('openBlockDetail', handler)
   }, [])
 
-  // 搜索和过滤
   useEffect(() => {
     let result = blocks
 
-    // 标签过滤
     if (selectedTag !== 'all') {
-      result = result.filter(block => 
-        block.metadata.tags.includes(selectedTag)
-      )
+      result = result.filter(block => block.metadata.tags.includes(selectedTag))
     }
 
-    // 搜索过滤
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase()
       result = result.filter(block =>
-        block.content.toLowerCase().includes(query) ||
-        block.metadata.title?.toLowerCase().includes(query) ||
-        block.metadata.tags.some(tag => tag.toLowerCase().includes(query))
+        block.content.toLowerCase().includes(query)
+        || block.metadata.title?.toLowerCase().includes(query)
+        || block.metadata.tags.some(tag => tag.toLowerCase().includes(query)),
       )
     }
 
     setFilteredBlocks(result)
   }, [blocks, selectedTag, searchQuery])
 
-  // 格式化日期
   const formatDate = (date: Date) => formatRelativeTime(date)
 
-  // 截断内容
-  const truncateContent = (content: string, maxLength: number = 100) => {
-    if (content.length <= maxLength) return content
-    return content.substring(0, maxLength) + '...'
-  }
+  const truncateContent = (content: string, maxLength = 100) =>
+    (content.length <= maxLength ? content : `${content.substring(0, maxLength)}...`)
 
-  // 拖拽 Block 到编辑器
-  const handleBlockDragStart = useCallback((e: React.DragEvent, block: Block) => {
+  const handleBlockDragStart = useCallback((event: React.DragEvent, block: Block) => {
     const data = JSON.stringify({
       id: block.id,
       title: block.metadata.title || block.content.substring(0, 30),
       content: block.content,
       type: block.type,
     })
-    e.dataTransfer.setData('application/blockos-block', data)
-    e.dataTransfer.setData('text/plain', block.content)
-    e.dataTransfer.effectAllowed = 'copy'
+    event.dataTransfer.setData('application/blockos-block', data)
+    event.dataTransfer.setData('text/plain', block.content)
+    event.dataTransfer.effectAllowed = 'copy'
   }, [])
 
-  // 从详情面板插入 release 到编辑器
-  const handleInsertRelease = useCallback((_block: Block, release: BlockRelease) => {
-    // 通过全局事件通知编辑器插入 release 内容
+  const handleInsertRelease = useCallback((block: Block, release: BlockRelease) => {
     window.dispatchEvent(new CustomEvent('insertBlockRelease', {
-      detail: { blockId: _block.id, releaseVersion: release.version, content: release.content, title: release.title },
+      detail: {
+        blockId: block.id,
+        releaseVersion: release.version,
+        content: release.content,
+        title: release.title,
+      },
     }))
     setDetailBlockId(null)
   }, [])
 
-  // 如果正在查看详情，显示详情面板
   if (detailBlockId) {
     return (
       <BlockDetailPanel
@@ -142,24 +133,24 @@ export function BlockSpacePanel() {
 
   return (
     <div className="block-space-panel">
-      <div className="block-space-header">
-        <div className="search-box">
-          <span className="search-icon">🔍</span>
+      <div className="block-space-panel__header">
+        <div className="block-space-panel__search-box">
+          <span className="block-space-panel__search-icon">🔍</span>
           <input
             type="text"
-            className="search-input"
+            className="block-space-panel__search-input"
             placeholder="搜索 Block..."
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={e => setSearchQuery(e.target.value)}
           />
         </div>
 
-        <div className="filter-bar">
-          <span className="filter-label">标签:</span>
-          <select 
-            className="tag-filter"
+        <div className="block-space-panel__filter-bar">
+          <span className="block-space-panel__filter-label">标签:</span>
+          <select
+            className="block-space-panel__tag-filter"
             value={selectedTag}
-            onChange={(e) => setSelectedTag(e.target.value)}
+            onChange={e => setSelectedTag(e.target.value)}
             aria-label="按标签过滤 Block"
           >
             <option value="all">全部</option>
@@ -170,55 +161,53 @@ export function BlockSpacePanel() {
         </div>
       </div>
 
-      <div className="block-space-body">
+      <div className="block-space-panel__body">
         {isLoading ? (
-          <div className="block-space-empty">
-            <div className="empty-icon">⏳</div>
-            <div className="empty-text">加载中...</div>
+          <div className="block-space-panel__empty">
+            <div className="block-space-panel__empty-icon">⏳</div>
+            <div className="block-space-panel__empty-text">加载中...</div>
           </div>
         ) : filteredBlocks.length === 0 ? (
-          <div className="block-space-empty">
-            <div className="empty-icon">📦</div>
-            <div className="empty-text">
+          <div className="block-space-panel__empty">
+            <div className="block-space-panel__empty-icon">📦</div>
+            <div className="block-space-panel__empty-text">
               {blocks.length === 0 ? '还没有 Block' : '没有找到匹配的 Block'}
             </div>
-            <div className="empty-hint">
+            <div className="block-space-panel__empty-hint">
               {blocks.length === 0 ? '捕获 AI 回复或选中文字来创建 Block' : '尝试其他搜索条件'}
             </div>
           </div>
         ) : (
-          <div className="blocks-list">
+          <div className="block-space-panel__list">
             {filteredBlocks.map(block => (
-              <div 
-                key={block.id} 
-                className={`block-card ${highlightedBlockId === block.id ? 'highlighted' : ''}`}
+              <div
+                key={block.id}
+                className={`block-space-panel__card ${highlightedBlockId === block.id ? 'block-space-panel__card--highlighted' : ''}`}
                 data-block-id={block.id}
                 draggable
-                onDragStart={e => handleBlockDragStart(e, block)}
+                onDragStart={event => handleBlockDragStart(event, block)}
                 onClick={() => setDetailBlockId(block.id)}
               >
                 {block.metadata.title && (
-                  <div className="block-title">{block.metadata.title}</div>
+                  <div className="block-space-panel__title">{block.metadata.title}</div>
                 )}
-                <div className="block-content">
+                <div className="block-space-panel__content">
                   {truncateContent(block.content)}
                 </div>
-                <div className="block-meta">
-                  <div className="block-tags">
+                <div className="block-space-panel__meta">
+                  <div className="block-space-panel__tags">
                     {block.metadata.tags.map(tag => (
-                      <span key={tag} className="block-tag">#{tag}</span>
+                      <span key={tag} className="block-space-panel__tag">#{tag}</span>
                     ))}
                   </div>
-                  <div className="block-info">
-                    <span className="block-type">
+                  <div className="block-space-panel__info">
+                    <span className="block-space-panel__type">
                       {block.type === 'ai-generated' ? '🤖 AI' : '✍️ 编辑器'}
                     </span>
                     {(block.releases?.length ?? 0) > 0 && (
-                      <span className="block-versions">
-                        📦 {block.releases!.length} 版本
-                      </span>
+                      <span className="block-space-panel__versions">📚 {block.releases!.length} 版本</span>
                     )}
-                    <span className="block-time">
+                    <span className="block-space-panel__time">
                       {formatDate(block.metadata.createdAt)}
                     </span>
                   </div>
