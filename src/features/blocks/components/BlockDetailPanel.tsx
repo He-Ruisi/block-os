@@ -1,9 +1,16 @@
 import { useState, useEffect, useCallback } from 'react'
+import { ArrowLeft, Clock, Link2 } from 'lucide-react'
 import type { Block, BlockRelease, BlockUsage } from '@/types/models/block'
 import { blockStore } from '@/storage/blockStore'
 import { usageStore } from '@/storage/usageStore'
 import { publishBlockVersion } from '../services/blockReleaseService'
 import { formatRelativeTime } from '@/utils/date'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Badge } from '@/components/ui/badge'
+import { Card } from '@/components/ui/card'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { cn } from '@/lib/utils'
 import '@/styles/modules/blocks.css'
 import '@/styles/modules/common-patterns.css'
 
@@ -74,22 +81,32 @@ export function BlockDetailPanel({ blockId, onClose, onInsertRelease }: BlockDet
 
   if (isLoading) {
     return (
-      <div className="block-detail-panel">
-        <div className="block-detail-panel__header">
-          <button className="block-detail-panel__back" onClick={onClose}>← 返回</button>
+      <div className="flex flex-col h-full">
+        <div className="flex items-center gap-2 p-4 border-b shrink-0">
+          <Button variant="ghost" size="sm" onClick={onClose}>
+            <ArrowLeft className="h-4 w-4 mr-1" />
+            返回
+          </Button>
         </div>
-        <div className="block-detail-panel__loading">加载中...</div>
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-sm text-muted-foreground">加载中...</div>
+        </div>
       </div>
     )
   }
 
   if (!block) {
     return (
-      <div className="block-detail-panel">
-        <div className="block-detail-panel__header">
-          <button className="block-detail-panel__back" onClick={onClose}>← 返回</button>
+      <div className="flex flex-col h-full">
+        <div className="flex items-center gap-2 p-4 border-b shrink-0">
+          <Button variant="ghost" size="sm" onClick={onClose}>
+            <ArrowLeft className="h-4 w-4 mr-1" />
+            返回
+          </Button>
         </div>
-        <div className="block-detail-panel__loading">Block 不存在</div>
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-sm text-muted-foreground">Block 不存在</div>
+        </div>
       </div>
     )
   }
@@ -97,131 +114,173 @@ export function BlockDetailPanel({ blockId, onClose, onInsertRelease }: BlockDet
   const releases = block.releases ?? []
 
   return (
-    <div className="block-detail-panel">
-      <div className="block-detail-panel__header">
-        <button className="btn-ghost block-detail-panel__back" onClick={onClose}>
-          <span className="block-detail-panel__back-icon">←</span>
+    <div className="flex flex-col h-full">
+      {/* Header */}
+      <div className="flex items-center gap-2 p-4 border-b shrink-0">
+        <Button variant="ghost" size="sm" onClick={onClose}>
+          <ArrowLeft className="h-4 w-4 mr-1" />
           返回
-        </button>
-        <span className="block-detail-panel__title">{block.metadata.title || 'Block 详情'}</span>
+        </Button>
+        <span className="text-sm font-medium">{block.metadata.title || 'Block 详情'}</span>
       </div>
 
-      <div className="block-detail-panel__body scroll-area">
-        <section className="block-detail-panel__section">
-          <div className="block-detail-panel__section-label">当前内容</div>
-          <div className="block-detail-panel__content-box">
-            {block.content.substring(0, 200)}
-            {block.content.length > 200 ? '...' : ''}
-          </div>
-          <div className="block-detail-panel__meta-row">
-            <span className="badge-outline">
-              {block.type === 'ai-generated' ? 'AI' : '编辑器'}
-            </span>
-            <span className="badge-outline">
-              {formatRelativeTime(block.metadata.createdAt)}
-            </span>
-            {block.metadata.tags.map(tag => (
-              <span key={tag} className="badge-tag">
-                #{tag}
-              </span>
-            ))}
-          </div>
-        </section>
+      {/* Body */}
+      <ScrollArea className="flex-1">
+        <div className="p-4 space-y-6">
+          {/* Current Content Section */}
+          <section className="space-y-3">
+            <h3 className="text-xs font-medium text-muted-foreground">当前内容</h3>
+            <Card className="p-3">
+              <p className="text-xs text-foreground leading-relaxed">
+                {block.content.substring(0, 200)}
+                {block.content.length > 200 ? '...' : ''}
+              </p>
+            </Card>
+            <div className="flex flex-wrap gap-2">
+              <Badge variant="outline">
+                {block.type === 'ai-generated' ? 'AI' : '编辑器'}
+              </Badge>
+              <Badge variant="outline">
+                {formatRelativeTime(block.metadata.createdAt)}
+              </Badge>
+              {block.metadata.tags.map(tag => (
+                <Badge key={tag} variant="outline" className="border-accent-green/30 text-accent-green">
+                  #{tag}
+                </Badge>
+              ))}
+            </div>
+          </section>
 
-        <section className="block-detail-panel__section">
-          <div className="block-detail-panel__section-label-row">
-            <span className="block-detail-panel__section-label">版本 ({releases.length})</span>
-            <button
-              className="btn-primary block-detail-panel__new-release-btn"
-              onClick={() => setShowNewRelease(true)}
-            >
-              + 发布新版本
-            </button>
-          </div>
+          {/* Releases Section */}
+          <section className="space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="text-xs font-medium text-muted-foreground flex items-center gap-1">
+                <Clock className="h-3 w-3" />
+                版本 ({releases.length})
+              </h3>
+              <Button
+                variant="default"
+                size="sm"
+                onClick={() => setShowNewRelease(true)}
+                className="h-7 text-xs bg-accent-green hover:bg-accent-green/90"
+              >
+                + 发布新版本
+              </Button>
+            </div>
 
-          {showNewRelease && (
-            <div className="block-detail-panel__new-release-form">
-              <input
-                className="block-detail-panel__release-title-input"
-                placeholder="版本标题，例如：偏历史叙述语气"
-                value={newReleaseTitle}
-                onChange={e => setNewReleaseTitle(e.target.value)}
-                onKeyDown={e => e.key === 'Enter' && void handleCreateRelease()}
-                autoFocus
-              />
-              <div className="block-detail-panel__release-form-actions">
-                <button
-                  className="btn-secondary"
-                  onClick={() => setShowNewRelease(false)}
-                >
-                  取消
-                </button>
-                <button
-                  className="btn-primary"
-                  onClick={() => void handleCreateRelease()}
-                >
-                  发布
-                </button>
+            {showNewRelease && (
+              <Card className="p-3 space-y-2">
+                <Input
+                  placeholder="版本标题，例如：偏历史叙述语气"
+                  value={newReleaseTitle}
+                  onChange={e => setNewReleaseTitle(e.target.value)}
+                  onKeyDown={e => e.key === 'Enter' && void handleCreateRelease()}
+                  autoFocus
+                />
+                <div className="flex gap-2 justify-end">
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => setShowNewRelease(false)}
+                  >
+                    取消
+                  </Button>
+                  <Button
+                    variant="default"
+                    size="sm"
+                    onClick={() => void handleCreateRelease()}
+                    className="bg-accent-green hover:bg-accent-green/90"
+                  >
+                    发布
+                  </Button>
+                </div>
+              </Card>
+            )}
+
+            {releases.length === 0 ? (
+              <div className="text-xs text-muted-foreground text-center py-4">
+                暂无发布版本，点击上方按钮发布
               </div>
-            </div>
-          )}
+            ) : (
+              <div className="space-y-2">
+                {[...releases].reverse().map(release => (
+                  <Card
+                    key={release.version}
+                    className={cn(
+                      "p-3 cursor-pointer transition-all hover:border-accent-green/50",
+                      selectedVersion === release.version && "border-accent-green bg-accent-green/5"
+                    )}
+                    onClick={() => setSelectedVersion(selectedVersion === release.version ? null : release.version)}
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`版本 ${release.version}: ${release.title}`}
+                    aria-pressed={selectedVersion === release.version}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault()
+                        setSelectedVersion(selectedVersion === release.version ? null : release.version)
+                      }
+                    }}
+                  >
+                    <div className="flex items-center gap-2 mb-2">
+                      <Badge className="bg-accent-green text-white">v{release.version}</Badge>
+                      <span className="text-xs font-medium flex-1">{release.title}</span>
+                      <span className="text-[10px] text-muted-foreground">
+                        {formatRelativeTime(release.releasedAt)}
+                      </span>
+                    </div>
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      {truncate(release.content)}
+                    </p>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </section>
 
-          {releases.length === 0 ? (
-            <div className="block-detail-panel__empty-hint">暂无发布版本，点击上方按钮发布</div>
-          ) : (
-            <div className="block-detail-panel__release-list">
-              {[...releases].reverse().map(release => (
-                <div
-                  key={release.version}
-                  className={`card-interactive block-detail-panel__release-card ${selectedVersion === release.version ? 'card-highlighted' : ''}`}
-                  onClick={() => setSelectedVersion(selectedVersion === release.version ? null : release.version)}
-                  role="button"
-                  tabIndex={0}
-                  aria-label={`版本 ${release.version}: ${release.title}`}
-                  aria-pressed={selectedVersion === release.version}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault()
-                      setSelectedVersion(selectedVersion === release.version ? null : release.version)
-                    }
-                  }}
-                >
-                  <div className="block-detail-panel__release-card-header">
-                    <span className="badge-success">v{release.version}</span>
-                    <span className="block-detail-panel__release-title-text">{release.title}</span>
-                    <span className="block-detail-panel__release-time">{formatRelativeTime(release.releasedAt)}</span>
-                  </div>
-                  <div className="block-detail-panel__release-preview">{truncate(release.content)}</div>
-                </div>
-              ))}
-            </div>
-          )}
-        </section>
+          {/* Usages Section */}
+          <section className="space-y-3">
+            <h3 className="text-xs font-medium text-muted-foreground flex items-center gap-1">
+              <Link2 className="h-3 w-3" />
+              引用记录 ({usages.length})
+            </h3>
+            {usages.length === 0 ? (
+              <div className="text-xs text-muted-foreground text-center py-4">
+                暂无引用记录
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {usages.map(usage => (
+                  <Card key={usage.id} className="p-3">
+                    <div className="flex items-center gap-2 text-xs">
+                      <span className="flex-1 font-medium">{usage.documentTitle}</span>
+                      <Badge className="bg-accent-green text-white text-[10px]">
+                        v{usage.releaseVersion}
+                      </Badge>
+                      <span className="text-[10px] text-muted-foreground">
+                        {formatRelativeTime(usage.insertedAt)}
+                      </span>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </section>
+        </div>
+      </ScrollArea>
 
-        <section className="block-detail-panel__section">
-          <div className="block-detail-panel__section-label">引用记录 ({usages.length})</div>
-          {usages.length === 0 ? (
-            <div className="block-detail-panel__empty-hint">暂无引用记录</div>
-          ) : (
-            <div className="block-detail-panel__usage-list">
-              {usages.map(usage => (
-                <div key={usage.id} className="block-detail-panel__usage-item">
-                  <span className="block-detail-panel__usage-doc">{usage.documentTitle}</span>
-                  <span className="badge-success">v{usage.releaseVersion}</span>
-                  <span className="block-detail-panel__usage-time">{formatRelativeTime(usage.insertedAt)}</span>
-                </div>
-              ))}
-            </div>
-          )}
-        </section>
-      </div>
-
+      {/* Footer */}
       {selectedVersion !== null && (
-        <div className="block-detail-panel__footer">
-          <span className="block-detail-panel__footer-hint">已选择 v{selectedVersion}</span>
-          <button className="btn-primary" onClick={handleInsert}>
+        <div className="flex items-center justify-between p-4 border-t shrink-0">
+          <span className="text-xs text-muted-foreground">已选择 v{selectedVersion}</span>
+          <Button
+            variant="default"
+            size="sm"
+            onClick={handleInsert}
+            className="bg-accent-green hover:bg-accent-green/90"
+          >
             插入到编辑器
-          </button>
+          </Button>
         </div>
       )}
     </div>
