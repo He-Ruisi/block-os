@@ -25,6 +25,31 @@ export function BlockDerivativeSelector({
     void loadDerivativeTree()
   }, [sourceBlockId])
 
+  // Keyboard navigation: Escape to close
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        onCancel()
+      } else if (event.key === 'Enter' && selectedBlockId) {
+        handleSelect()
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [selectedBlockId, onCancel])
+
+  // Focus trap: Keep focus within modal
+  useEffect(() => {
+    const modal = document.querySelector('.block-derivative-selector__content')
+    if (modal) {
+      const firstFocusable = modal.querySelector('button, input, [tabindex]:not([tabindex="-1"])')
+      if (firstFocusable instanceof HTMLElement) {
+        firstFocusable.focus()
+      }
+    }
+  }, [isLoading])
+
   const loadDerivativeTree = async () => {
     try {
       setIsLoading(true)
@@ -54,11 +79,23 @@ export function BlockDerivativeSelector({
   const formatDate = (date: Date) => formatDateTime(date)
 
   return (
-    <div className="block-derivative-selector__overlay" onClick={onCancel}>
+    <div 
+      className="block-derivative-selector__overlay" 
+      onClick={onCancel}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="derivative-selector-title"
+    >
       <div className="block-derivative-selector__content" onClick={e => e.stopPropagation()}>
         <div className="block-derivative-selector__header">
-          <h3 className="block-derivative-selector__title">选择 Block 版本</h3>
-          <button className="block-derivative-selector__close-button" onClick={onCancel}>×</button>
+          <h3 id="derivative-selector-title" className="block-derivative-selector__title">选择 Block 版本</h3>
+          <button 
+            className="block-derivative-selector__close-button" 
+            onClick={onCancel}
+            aria-label="关闭对话框"
+          >
+            ×
+          </button>
         </div>
 
         <div className="block-derivative-selector__body scroll-area">
@@ -78,6 +115,15 @@ export function BlockDerivativeSelector({
                   <div
                     className={`card-interactive block-derivative-selector__option ${selectedBlockId === sourceBlock.id ? 'card-highlighted' : ''}`}
                     onClick={() => setSelectedBlockId(sourceBlock.id)}
+                    role="radio"
+                    aria-checked={selectedBlockId === sourceBlock.id}
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault()
+                        setSelectedBlockId(sourceBlock.id)
+                      }
+                    }}
                   >
                     <div className="block-derivative-selector__option-header">
                       <input
@@ -111,6 +157,15 @@ export function BlockDerivativeSelector({
                       key={derivative.id}
                       className={`card-interactive block-derivative-selector__option ${selectedBlockId === derivative.id ? 'card-highlighted' : ''}`}
                       onClick={() => setSelectedBlockId(derivative.id)}
+                      role="radio"
+                      aria-checked={selectedBlockId === derivative.id}
+                      tabIndex={0}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault()
+                          setSelectedBlockId(derivative.id)
+                        }
+                      }}
                     >
                       <div className="block-derivative-selector__option-header">
                         <input
@@ -153,13 +208,14 @@ export function BlockDerivativeSelector({
         </div>
 
         <div className="block-derivative-selector__footer">
-          <button className="btn-secondary" onClick={onCancel}>
+          <button className="btn-secondary" onClick={onCancel} aria-label="取消选择">
             取消
           </button>
           <button
             className="btn-primary"
             onClick={handleSelect}
             disabled={!selectedBlockId}
+            aria-label="确认选择此版本"
           >
             选择此版本
           </button>

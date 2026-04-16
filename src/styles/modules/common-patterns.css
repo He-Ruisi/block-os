@@ -1,6 +1,7 @@
 /**
  * BlockOS 公共组件模式
  * 从 V0 右侧边栏提取的可复用样式模式
+ * Phase 5 Stage 4: 添加动画、响应式、加载状态、可访问性增强
  */
 
 /* ============================================================
@@ -29,6 +30,16 @@
   background: var(--color-bg-hover);
   border-color: var(--color-purple);
   box-shadow: var(--shadow-card);
+  transform: translateY(-1px);
+}
+
+.card-interactive:active {
+  transform: translateY(0);
+}
+
+.card-interactive:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
 }
 
 /* 高亮卡片 */
@@ -37,6 +48,19 @@
   border: 2px solid var(--color-purple);
   border-radius: var(--border-radius-md);
   padding: var(--spacing-md);
+  animation: highlight-pulse 0.6s ease-out;
+}
+
+@keyframes highlight-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(127, 119, 221, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(127, 119, 221, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(127, 119, 221, 0);
+  }
 }
 
 /* ============================================================
@@ -52,6 +76,7 @@
   font-weight: 500;
   border-radius: var(--border-radius-sm);
   white-space: nowrap;
+  transition: all 0.15s ease;
 }
 
 /* 主色标签 */
@@ -59,6 +84,11 @@
   background: var(--color-purple-light);
   color: var(--color-purple);
   border: 1px solid transparent;
+}
+
+.badge-primary:hover {
+  background: var(--color-purple);
+  color: #ffffff;
 }
 
 /* 轮廓标签 */
@@ -121,6 +151,7 @@
   background: var(--color-bg-secondary);
   border: 1px solid var(--color-border-primary);
   border-radius: var(--border-radius-md);
+  transition: all 0.2s ease;
 }
 
 .input-search input {
@@ -163,6 +194,7 @@
 .scroll-area::-webkit-scrollbar-thumb {
   background: var(--color-border-primary);
   border-radius: var(--border-radius-sm);
+  transition: background 0.2s ease;
 }
 
 .scroll-area::-webkit-scrollbar-thumb:hover {
@@ -181,12 +213,34 @@
   padding: var(--spacing-xl) var(--spacing-lg);
   text-align: center;
   color: var(--color-text-tertiary);
+  animation: fade-in 0.3s ease-out;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .empty-state__icon {
   font-size: 48px;
   margin-bottom: var(--spacing-md);
   opacity: 0.5;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
 .empty-state__text {
@@ -221,13 +275,29 @@
   outline: none;
 }
 
+.btn-base:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+.btn-base:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .btn-primary {
   background: var(--color-purple);
   color: #ffffff;
 }
 
-.btn-primary:hover {
+.btn-primary:hover:not(:disabled) {
   background: var(--color-purple-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(127, 119, 221, 0.3);
+}
+
+.btn-primary:active:not(:disabled) {
+  transform: translateY(0);
 }
 
 .btn-secondary {
@@ -236,7 +306,7 @@
   border: 1px solid var(--color-border-primary);
 }
 
-.btn-secondary:hover {
+.btn-secondary:hover:not(:disabled) {
   background: var(--color-bg-hover);
   border-color: var(--color-border-secondary);
 }
@@ -246,7 +316,7 @@
   color: var(--color-text-secondary);
 }
 
-.btn-ghost:hover {
+.btn-ghost:hover:not(:disabled) {
   background: var(--color-bg-hover);
 }
 
@@ -269,6 +339,74 @@
 }
 
 /* ============================================================
+   加载状态 (Loading State Pattern)
+   ============================================================ */
+
+.loading-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--color-border-primary);
+  border-top-color: var(--color-purple);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--color-bg-secondary) 0%,
+    var(--color-bg-hover) 50%,
+    var(--color-bg-secondary) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s ease-in-out infinite;
+  border-radius: var(--border-radius-md);
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* ============================================================
+   响应式设计 (Responsive Design)
+   ============================================================ */
+
+/* 平板和手机 */
+@media (max-width: 768px) {
+  .card-base,
+  .card-interactive,
+  .card-highlighted {
+    padding: var(--spacing-sm);
+  }
+
+  .empty-state {
+    padding: var(--spacing-lg) var(--spacing-md);
+  }
+
+  .empty-state__icon {
+    font-size: 36px;
+  }
+
+  .btn-base {
+    padding: 8px 16px;
+    font-size: 14px;
+    min-height: 44px; /* 触摸友好 */
+  }
+}
+
+/* ============================================================
    Newsprint 主题适配
    ============================================================ */
 
@@ -284,6 +422,7 @@
 
 .theme-newsprint .card-interactive:hover {
   box-shadow: var(--shadow-card);
+  transform: none; /* 硬边框风格不需要位移 */
 }
 
 .theme-newsprint .card-highlighted {
@@ -324,6 +463,11 @@
 
 .theme-newsprint .btn-primary {
   border-color: var(--color-purple);
+}
+
+.theme-newsprint .btn-primary:hover:not(:disabled) {
+  transform: none;
+  box-shadow: 3px 3px 0px 0px var(--color-purple);
 }
 
 .theme-newsprint .btn-secondary {

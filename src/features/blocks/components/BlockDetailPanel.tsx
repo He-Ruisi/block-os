@@ -175,6 +175,16 @@ export function BlockDetailPanel({ blockId, onClose, onInsertRelease }: BlockDet
                   key={release.version}
                   className={`card-interactive block-detail-panel__release-card ${selectedVersion === release.version ? 'card-highlighted' : ''}`}
                   onClick={() => setSelectedVersion(selectedVersion === release.version ? null : release.version)}
+                  role="button"
+                  tabIndex={0}
+                  aria-label={`版本 ${release.version}: ${release.title}`}
+                  aria-pressed={selectedVersion === release.version}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault()
+                      setSelectedVersion(selectedVersion === release.version ? null : release.version)
+                    }
+                  }}
                 >
                   <div className="block-detail-panel__release-card-header">
                     <span className="badge-success">v{release.version}</span>

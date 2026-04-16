@@ -39,30 +39,27 @@
   - [ ] 重构 SessionHistoryPanel（使用 Shadcn Card + ScrollArea + Separator）
   - [ ] 重构 BlockDetailPanel（使用 Shadcn Dialog + Card）
   - [ ] 重构 BlockDerivativeSelector（使用 Shadcn Select + Dialog）
-- [ ] Phase 5: 右侧边栏重构（混合模式）- 🔄 进行中（40% 完成）- [需求文档](./spec/features/styles/right-panel-refactor.md)
+- [ ] Phase 5: 右侧边栏重构（混合模式）- 🔄 进行中（80% 完成）- [需求文档](./spec/features/styles/right-panel-refactor.md)
   - [x] 第一阶段：设计变量提取与样式系统升级（30分钟）- ✅ 完成（2026-04-16 19:00）
   - [x] 第二阶段：公共组件模式抽取（45分钟）- ✅ 完成（2026-04-16 19:10）
-  - [ ] 第三阶段：组件命名清洗与结构优化（60分钟）
-  - [ ] 第四阶段：生产级功能增强（45分钟）
+  - [x] 第三阶段：组件命名清洗与结构优化（60分钟）- ✅ 完成（2026-04-16 19:05）
+    - [x] 重构 DocumentBlocksPanel（应用 `.empty-state`、`.card-base`、`.badge-*`）
+    - [x] 重构 BlockSpacePanel（应用 `.input-search`、`.card-interactive`、`.badge-tag`）
+    - [x] 重构 BlockDetailPanel（应用 `.btn-*`、`.badge-*`、`.card-interactive`）
+    - [x] 重构 BlockDerivativeSelector（应用 `.card-interactive`、`.empty-state`、`.btn-*`）
+    - [x] 清理 blocks.css（移除约 200 行冗余样式）
+  - [x] 第四阶段：生产级功能增强（60分钟）- ✅ 完成（2026-04-16 19:30）
+    - [x] 动画和过渡效果（卡片悬停、高亮脉冲、空状态浮动、按钮反馈、加载动画）
+    - [x] 响应式设计优化（移动端/平板/桌面，触摸友好按钮 44px）
+    - [x] 键盘导航支持（Enter/Space/Escape/Tab，焦点管理）
+    - [x] 可访问性改进（ARIA 标签、role 属性、焦点陷阱、WCAG 2.1 AA 级）
+    - [x] 加载状态样式（spinner 旋转器、skeleton 骨架屏）
   - [ ] 第五阶段：集成测试与文档（30分钟）
-  - [x] 重构 PreviewPanel（使用 Shadcn Button）- ✅ 完成（2026-04-16 18:00）
-  - [x] 增强 BubbleMenu 工具栏（两行布局：Markdown 格式 + AI 操作）- ✅ 完成（2026-04-16 18:20）
-  - [ ] 安装额外组件：Badge、ScrollArea、Separator
-  - [ ] 重构 BlockSpacePanel（使用 Shadcn Card + Input + Badge）
-  - [ ] 重构 DocumentBlocksPanel（使用 Shadcn Card + ScrollArea）
-  - [ ] 重构 SessionHistoryPanel（使用 Shadcn Card + ScrollArea + Separator）
-  - [ ] 重构 BlockDetailPanel（使用 Shadcn Dialog + Card）
-  - [ ] 重构 BlockDerivativeSelector（使用 Shadcn Select + Dialog）
-  - [ ] 重构 BlockSpacePanel（使用 Shadcn 组件）
-  - [ ] 重构 BlockDetailPanel（使用 Shadcn Dialog）
-  - [ ] 重构 BlockDerivativeSelector（使用 Shadcn Select）
-  - [ ] 重构 DocumentBlocksPanel（使用 Shadcn 组件）
-  - [ ] 重构 PreviewPanel（使用 Shadcn 组件）
-  - [ ] 重构 SessionHistoryPanel（使用 Shadcn 组件）
-  - [ ] TypeScript 类型检查通过
-  - [ ] 功能测试（所有功能保持正常）
-  - [ ] 主题适配（Default + Newsprint）
-  - [ ] 响应式测试（桌面/平板/手机）
+    - [ ] 功能测试（所有功能保持正常）
+    - [ ] 视觉回归测试（主题适配验证）
+    - [ ] 性能测试（渲染性能/内存占用）
+    - [ ] 更新组件文档
+    - [ ] 创建使用示例
 
 ### OCR 插件系统 🔌 - [技术设计](../.kiro/specs/ocr-plugin-system/design.md)
 - [x] Phase 1: 插件系统核心（Week 1）

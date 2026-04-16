@@ -136,13 +136,14 @@ export function BlockSpacePanel() {
     <div className="block-space-panel">
       <div className="block-space-panel__header">
         <div className="input-search">
-          <span className="input-search__icon">🔍</span>
+          <span className="input-search__icon" aria-hidden="true">🔍</span>
           <input
             type="text"
             className="input-search__field"
             placeholder="搜索 Block..."
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
+            aria-label="搜索 Block"
           />
         </div>
 
@@ -188,6 +189,15 @@ export function BlockSpacePanel() {
                 draggable
                 onDragStart={event => handleBlockDragStart(event, block)}
                 onClick={() => setDetailBlockId(block.id)}
+                role="button"
+                tabIndex={0}
+                aria-label={`查看 Block: ${block.metadata.title || block.content.substring(0, 30)}`}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault()
+                    setDetailBlockId(block.id)
+                  }
+                }}
               >
                 {block.metadata.title && (
                   <div className="block-space-panel__title">{block.metadata.title}</div>
