@@ -33,7 +33,7 @@ import {
   readFileAsDataUrl,
   validateImageFile,
 } from './ocrUtils'
-import '../../styles/components/OCRPanel.css'
+import '../../../styles/components/OCRPanel.css'
 
 type HistoryTab = 'recent' | 'favorite'
 type MobileTab = 'history' | 'preview' | 'result'
