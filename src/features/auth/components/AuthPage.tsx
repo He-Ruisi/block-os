@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
-import '../../styles/components/AuthPage.css'
+import '../../../styles/components/AuthPage.css'
 
 interface AuthPageProps {
   onSignIn: (username: string, password: string) => Promise<void>
