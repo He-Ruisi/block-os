@@ -99,6 +99,7 @@
   - [x] 重构 TabBar（使用 Shadcn Button + DropdownMenu）- ✅ 完成（2026-04-16 16:30）
   - [x] 重构 RightPanel（使用 Shadcn Button + Textarea）- ✅ 完成（2026-04-16 17:30）
   - [x] 重构 PreviewPanel（使用 Shadcn Button）- ✅ 完成（2026-04-16 18:00）
+  - [x] 增强 BubbleMenu 工具栏（两行布局：Markdown 格式 + AI 操作）- ✅ 完成（2026-04-16 18:20）
   - [ ] 安装额外组件：Badge、ScrollArea、Separator
   - [ ] 重构 BlockSpacePanel（使用 Shadcn Card + Input + Badge）
   - [ ] 重构 DocumentBlocksPanel（使用 Shadcn Card + ScrollArea）
