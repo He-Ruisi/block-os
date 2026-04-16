@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react'
 import { Search } from 'lucide-react'
-import { searchBlocks } from '../../editor/extensions/suggestion'
-import type { SuggestionItem } from '../../editor/extensions/suggestion'
+import { searchBlocks } from '@/features/editor/extensions/suggestion'
+import type { SuggestionItem } from '@/features/editor/extensions/suggestion'
 
 interface SearchViewProps {
   onOpenBlock: (blockId: string) => void

@@ -1,5 +1,5 @@
 import { ArrowLeft, ChevronRight, PanelTop, Settings, Workflow } from 'lucide-react'
-import { pluginRegistry } from '../../services/pluginRegistry'
+import { pluginRegistry } from '../../services/core/pluginRegistry'
 import { Tabs, TabsList, TabsTrigger } from '../../components/ui/tabs'
 
 interface PluginWorkspaceViewProps {

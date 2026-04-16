@@ -1,5 +1,5 @@
-import type { SidebarView } from '../../types/layout'
-import type { Document } from '../../types/document'
+import type { SidebarView } from '../../types/common/layout'
+import type { Document } from '../../types/models/document'
 import { ExplorerView } from './ExplorerView'
 import { SearchView } from './SearchView'
 import { StarredView } from './StarredView'

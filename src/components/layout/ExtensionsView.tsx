@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Puzzle, Settings, Trash2 } from 'lucide-react'
-import { pluginRegistry } from '../../services/pluginRegistry'
-import type { PluginRegistryEntry } from '../../types/plugin'
+import { pluginRegistry } from '../../services/core/pluginRegistry'
+import type { PluginRegistryEntry } from '../../types/common/plugin'
 
 interface ExtensionsViewProps {
   onOpenPlugin: (pluginId: string) => void

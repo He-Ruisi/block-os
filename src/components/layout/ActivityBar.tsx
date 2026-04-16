@@ -1,6 +1,6 @@
 import { Folder, Search, List, Puzzle, Newspaper, Palette, User, LogOut, Star } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
-import type { SidebarView } from '../../types/layout'
+import type { SidebarView } from '../../types/common/layout'
 
 interface ActivityBarProps {
   activeView: SidebarView

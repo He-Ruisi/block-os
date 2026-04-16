@@ -18,10 +18,10 @@ import { Button } from '../../components/ui/button'
 import { Input } from '../../components/ui/input'
 import { Tabs, TabsList, TabsTrigger } from '../../components/ui/tabs'
 import { Textarea } from '../../components/ui/textarea'
-import type { IPluginAPI } from '../../services/pluginAPI'
-import { captureOCRRecordAsExplicitBlock, upsertImplicitBlockFromOCR } from '../../services/ocrBlockService'
+import type { IPluginAPI } from '../../services/core/pluginAPI'
+import { captureOCRRecordAsExplicitBlock, upsertImplicitBlockFromOCR } from '../../services/integration/ocrBlockService'
 import { ocrPhotoStore } from '../../storage/ocrPhotoStore'
-import type { OCRPhotoRecord } from '../../types/ocr'
+import type { OCRPhotoRecord } from '../../types/common/ocr'
 import { recognizeText } from './ocrService'
 import {
   createCapturedFileName,

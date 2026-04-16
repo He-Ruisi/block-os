@@ -1,8 +1,8 @@
 import { useState } from 'react'
-import type { Session } from '../../types/chat'
-import { groupSessionsByDate, exportSessionAsJSON } from '../../services/sessionService'
-import { sessionStore } from '../../storage/sessionStore'
-import '../../styles/components/SessionHistoryPanel.css'
+import type { Session } from '@/types/models/chat'
+import { groupSessionsByDate, exportSessionAsJSON } from '@/features/ai'
+import { sessionStore } from '@/storage/sessionStore'
+import '@/styles/components/SessionHistoryPanel.css'
 
 interface SessionHistoryPanelProps {
   sessions: Session[]

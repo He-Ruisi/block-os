@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { X, Cloud, HardDrive, User, LogOut, RefreshCw } from 'lucide-react'
 import { useAutoSync } from '../../hooks/useAutoSync'
-import { autoSyncService } from '../../services/autoSyncService'
+import { autoSyncService } from '../../services/integration/autoSyncService'
 import { isSupabaseEnabled } from '../../lib/supabase'
 import '../../styles/components/SettingsPanel.css'
 

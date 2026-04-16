@@ -1,3 +1,4 @@
+// Models
 export type {
   Block,
   BlockDerivative,
@@ -17,8 +18,13 @@ export type {
   DocumentTemplate,
   TemplateStructureRule,
   TemplateExportRules,
-} from './block'
-export { DEFAULT_STYLE_THEMES, DEFAULT_DOCUMENT_TEMPLATES } from './block'
-export type { Document, DocumentBlock } from './document'
-export type { Project, Tab } from './project'
-export type { Message, PanelTab } from './chat'
+} from './models/block'
+export { DEFAULT_STYLE_THEMES, DEFAULT_DOCUMENT_TEMPLATES } from './models/block'
+export type { Document, DocumentBlock } from './models/document'
+export type { Project, Tab } from './models/project'
+export type { Message, Session, PanelTab } from './models/chat'
+
+// Common
+export type { SidebarView, PluginManifest, StarredItem } from './common/layout'
+export type { IPlugin, PluginMetadata, PluginPermission, PluginStatus, PluginRegistryEntry } from './common/plugin'
+export type { OCRPhotoRecord, OCRPhotoStatus } from './common/ocr'

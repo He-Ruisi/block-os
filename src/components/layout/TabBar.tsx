@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
-import type { Tab } from '../../types/project'
+import type { Tab } from '../../types/models/project'
 import { Button } from '@/components/ui/button'
 
 interface TabBarProps {

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Star, Folder, FileText } from 'lucide-react'
-import type { StarredItem } from '../../types/layout'
-import type { Document } from '../../types/document'
+import type { StarredItem } from '../../types/common/layout'
+import type { Document } from '../../types/models/document'
 import { projectStore } from '../../storage/projectStore'
 import { documentStore } from '../../storage/documentStore'
 

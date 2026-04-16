@@ -1,12 +1,12 @@
 import { useState, useRef, useEffect } from 'react'
 import { X, Maximize2, ChevronDown } from 'lucide-react'
-import { BlockSpacePanel } from './BlockSpacePanel'
+import { BlockSpacePanel } from '@/features/blocks'
 import { SessionHistoryPanel } from './SessionHistoryPanel'
 import { PreviewPanel } from './PreviewPanel'
 import { toast } from '@/hooks/use-toast'
 import { MarkdownRenderer } from '../shared/MarkdownRenderer'
-import { AIImmersivePanel } from '../ai/AIImmersivePanel'
-import { generateUUID } from '../../utils/uuid'
+import { AIImmersivePanel } from '@/features/ai'
+import { generateUUID } from '@/utils/uuid'
 import { 
   sendMessage, 
   createImplicitBlockFromAI,
@@ -17,12 +17,12 @@ import {
   getProviderConfig,
   getProviderApiKey,
   type AIProvider,
-} from '../../services/aiService'
-import { captureMessageAsBlock } from '../../services/blockCaptureService'
-import { useSession } from '../../hooks/useSession'
-import { useViewport } from '../../hooks/useViewport'
-import { useSwipeGesture } from '../../hooks/useSwipeGesture'
-import type { PanelTab } from '../../types/chat'
+} from '@/features/ai'
+import { captureMessageAsBlock } from '@/features/blocks'
+import { useSession } from '@/features/ai'
+import { useViewport } from '@/hooks/useViewport'
+import { useSwipeGesture } from '@/hooks/useSwipeGesture'
+import type { PanelTab } from '@/types/models/chat'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { cn } from '@/lib/utils'

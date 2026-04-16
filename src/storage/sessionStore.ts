@@ -1,4 +1,4 @@
-import type { Session } from '../types/chat'
+import type { Session } from '../types/models/chat'
 import { generateUUID } from '../utils/uuid'
 import { initDatabase, getDatabase } from './database'
 

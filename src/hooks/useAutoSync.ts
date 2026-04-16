@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { autoSyncService } from '../services/autoSyncService'
+import { autoSyncService } from '../services/integration/autoSyncService'
 
 export function useAutoSync() {
   const [syncState, setSyncState] = useState(autoSyncService.getState())

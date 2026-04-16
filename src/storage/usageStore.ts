@@ -1,4 +1,4 @@
-import type { BlockUsage } from '../types/block'
+import type { BlockUsage } from '../types/models/block'
 import { generateUUID } from '../utils/uuid'
 import { getDatabase } from './database'
 

@@ -1,4 +1,4 @@
-import type { Project, Tab } from '../types/project'
+import type { Project, Tab } from '../types/models/project'
 import { generateUUID } from '../utils/uuid'
 import { initDatabase, getDatabase, isDatabaseInitialized } from './database'
 
@@ -34,7 +34,7 @@ export class ProjectStore {
       req.onsuccess = () => {
         if (!options.skipSyncMark) {
           // 标记项目已变更，等待同步
-          import('../services/autoSyncService').then(({ autoSyncService }) => {
+          import('../services/integration/autoSyncService').then(({ autoSyncService }) => {
             autoSyncService.markProjectChanged(project.id)
           })
         }
@@ -86,7 +86,7 @@ export class ProjectStore {
       req.onsuccess = () => {
         if (!options.skipSyncMark) {
           // 标记项目已变更，等待同步
-          import('../services/autoSyncService').then(({ autoSyncService }) => {
+          import('../services/integration/autoSyncService').then(({ autoSyncService }) => {
             autoSyncService.markProjectChanged(id)
           })
         }
@@ -103,7 +103,7 @@ export class ProjectStore {
       const req = tx.objectStore(STORE_NAME).delete(id)
       req.onsuccess = () => {
         if (!options.skipSyncMark) {
-          import('../services/autoSyncService').then(({ autoSyncService }) => {
+          import('../services/integration/autoSyncService').then(({ autoSyncService }) => {
             autoSyncService.markProjectDeleted(id)
           })
         }

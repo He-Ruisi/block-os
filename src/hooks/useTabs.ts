@@ -1,8 +1,8 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
-import type { Tab } from '../types/project'
+import type { Tab } from '../types/models/project'
 import { documentStore } from '../storage/documentStore'
 import { projectStore } from '../storage/projectStore'
-import type { Document } from '../types/document'
+import type { Document } from '../types/models/document'
 
 const STORAGE_KEY = 'blockos-workspace-tabs'
 

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Search, Plus, MoreVertical, Folder, FileText, Link as LinkIcon } from 'lucide-react'
-import type { Project } from '../../types/project'
+import type { Project } from '../../types/models/project'
 import { projectStore } from '../../storage/projectStore'
 import { documentStore } from '../../storage/documentStore'
 import { formatDistanceToNow } from '../../utils/date'

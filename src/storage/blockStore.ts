@@ -1,4 +1,4 @@
-import type { Block, BlockStyle, BlockTemplate, BlockRelease, BlockAnnotation, AnnotationType } from '../types/block'
+import type { Block, BlockStyle, BlockTemplate, BlockRelease, BlockAnnotation, AnnotationType } from '../types/models/block'
 import { generateUUID } from '../utils/uuid'
 import { initDatabase, getDatabase, isDatabaseInitialized } from './database'
 
@@ -29,7 +29,7 @@ export class BlockStore {
       req.onsuccess = () => {
         if (!options.skipSyncMark) {
           // 标记 Block 已变更，等待同步
-          import('../services/autoSyncService').then(({ autoSyncService }) => {
+          import('../services/integration/autoSyncService').then(({ autoSyncService }) => {
             autoSyncService.markBlockChanged(block.id)
           })
         }
@@ -105,7 +105,7 @@ export class BlockStore {
       const req = tx.objectStore(STORE_NAME).delete(id)
       req.onsuccess = () => {
         if (!options.skipSyncMark) {
-          import('../services/autoSyncService').then(({ autoSyncService }) => {
+          import('../services/integration/autoSyncService').then(({ autoSyncService }) => {
             autoSyncService.markBlockDeleted(id)
           })
         }

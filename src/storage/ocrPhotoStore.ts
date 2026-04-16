@@ -1,4 +1,4 @@
-import type { OCRPhotoRecord } from '../types/ocr'
+import type { OCRPhotoRecord } from '../types/common/ocr'
 import { getDatabase, initDatabase, isDatabaseInitialized } from './database'
 
 const STORE_NAME = 'ocrPhotoRecords'
@@ -60,7 +60,7 @@ export class OCRPhotoStore {
     })
 
     if (!options.skipSyncMark) {
-      import('../services/autoSyncService').then(({ autoSyncService }) => {
+      import('../services/integration/autoSyncService').then(({ autoSyncService }) => {
         autoSyncService.markOCRPhotoRecordChanged(record.id)
       })
     }
@@ -80,7 +80,7 @@ export class OCRPhotoStore {
     })
 
     if (!options.skipSyncMark) {
-      import('../services/autoSyncService').then(({ autoSyncService }) => {
+      import('../services/integration/autoSyncService').then(({ autoSyncService }) => {
         autoSyncService.markOCRPhotoRecordDeleted(recordId)
       })
     }

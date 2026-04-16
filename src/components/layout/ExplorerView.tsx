@@ -12,8 +12,8 @@ import {
   Trash2,
   X,
 } from 'lucide-react'
-import type { Project } from '../../types/project'
-import type { Document } from '../../types/document'
+import type { Project } from '../../types/models/project'
+import type { Document } from '../../types/models/document'
 import { projectStore } from '../../storage/projectStore'
 import { documentStore } from '../../storage/documentStore'
 import { useLongPress } from '../../hooks/useLongPress'

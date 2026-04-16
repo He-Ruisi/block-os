@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import type { SidebarView } from '../types/layout'
+import type { SidebarView } from '../types/common/layout'
 import { LOCAL_STORAGE_KEYS, UI_SIZES } from '../constants'
 
 const STORAGE_KEY = LOCAL_STORAGE_KEYS.LAYOUT_PREFERENCES

@@ -1,4 +1,4 @@
-import type { Document, DocumentBlock } from '../types/document'
+import type { Document, DocumentBlock } from '../types/models/document'
 import { generateUUID } from '../utils/uuid'
 import { initDatabase, getDatabase } from './database'
 import { blockStore } from './blockStore'
@@ -34,7 +34,7 @@ export class DocumentStore {
       req.onsuccess = () => {
         if (!options.skipSyncMark) {
           // 标记文档已变更，等待同步
-          import('../services/autoSyncService').then(({ autoSyncService }) => {
+          import('../services/integration/autoSyncService').then(({ autoSyncService }) => {
             autoSyncService.markDocumentChanged(doc.id)
           })
         }
@@ -124,7 +124,7 @@ export class DocumentStore {
       const req = tx.objectStore(STORE_NAME).delete(id)
       req.onsuccess = () => {
         if (!options.skipSyncMark) {
-          import('../services/autoSyncService').then(({ autoSyncService }) => {
+          import('../services/integration/autoSyncService').then(({ autoSyncService }) => {
             autoSyncService.markDocumentDeleted(id)
           })
         }

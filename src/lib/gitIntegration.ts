@@ -1,7 +1,7 @@
 // Git 集成模块
 // 注意：浏览器环境无法直接操作 Git，需要通过后端 API 或 Electron 实现
-import type { Block } from '../types/block'
-import type { Document } from '../types/document'
+import type { Block } from '../types/models/block'
+import type { Document } from '../types/models/document'
 
 export interface GitConfig {
   enabled: boolean
