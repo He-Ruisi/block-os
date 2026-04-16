@@ -8,6 +8,10 @@ import { ExtensionsView } from './ExtensionsView'
 import { SyncStatusIndicator } from '../shared/SyncStatusIndicator'
 import { useSwipeGesture } from '../../hooks/useSwipeGesture'
 import { useViewport } from '../../hooks/useViewport'
+import { cn } from '@/lib/utils'
+import { X } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { ScrollArea } from '@/components/ui/scroll-area'
 
 interface SidebarProps {
   activeView: SidebarView
@@ -62,56 +66,79 @@ export function Sidebar({
       {/* 响应式遮罩层 - 仅在平板/手机模式显示 */}
       {(viewport.isTablet || viewport.isMobile) && (
         <div 
-          className="fixed inset-0 bg-black/20 z-40 lg:hidden"
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden animate-in fade-in-0 duration-200"
           onClick={onClose}
         />
       )}
       
+      {/* Sidebar Container */}
       <aside 
-        className="fixed lg:relative inset-y-0 left-0 z-50 lg:z-0 w-60 bg-background border-r border-border flex flex-col transition-transform duration-200 ease-linear"
+        className={cn(
+          "fixed lg:relative inset-y-0 left-0 z-50 lg:z-0",
+          "w-60 bg-background border-r border-border",
+          "flex flex-col",
+          "transition-transform duration-200 ease-linear",
+          "lg:translate-x-0",
+          (viewport.isTablet || viewport.isMobile) && "animate-in slide-in-from-left-full duration-200"
+        )}
         {...((viewport.isTablet || viewport.isMobile) ? swipeHandlers : {})}
       >
         {/* Header */}
-        <div className="h-12 flex items-center px-4 border-b border-border shrink-0">
+        <div className="h-12 flex items-center justify-between px-4 border-b border-border shrink-0">
           <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
             {VIEW_TITLES[activeView]}
           </h2>
+          
+          {/* 移动端关闭按钮 */}
+          {(viewport.isTablet || viewport.isMobile) && onClose && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7 lg:hidden"
+              onClick={onClose}
+            >
+              <X className="h-4 w-4" />
+              <span className="sr-only">关闭侧边栏</span>
+            </Button>
+          )}
         </div>
 
-        {/* Content */}
-        <div className="flex-1 overflow-y-auto">
-          {activeView === 'explorer' && (
-            <ExplorerView
-              onSelectToday={onSelectToday}
-              onSelectProject={onSelectProject}
-              onOpenDocument={onOpenDocument}
-              currentProjectId={currentProjectId}
-            />
-          )}
-          {activeView === 'search' && (
-            <SearchView onOpenBlock={(blockId) => {
-              window.dispatchEvent(new CustomEvent('openBlockDetail', { detail: blockId }))
-            }} />
-          )}
-          {activeView === 'starred' && (
-            <StarredView
-              onSelectProject={onSelectProject}
-              onOpenDocument={onOpenDocument}
-            />
-          )}
-          {activeView === 'outline' && (
-            <OutlineView documentId={documentId} />
-          )}
-          {activeView === 'extensions' && (
-            <ExtensionsView
-              onOpenPlugin={onOpenPlugin}
-              onOpenPluginSettings={onOpenPluginSettings}
-            />
-          )}
-        </div>
+        {/* Content - 使用 ScrollArea */}
+        <ScrollArea className="flex-1">
+          <div className="p-2">
+            {activeView === 'explorer' && (
+              <ExplorerView
+                onSelectToday={onSelectToday}
+                onSelectProject={onSelectProject}
+                onOpenDocument={onOpenDocument}
+                currentProjectId={currentProjectId}
+              />
+            )}
+            {activeView === 'search' && (
+              <SearchView onOpenBlock={(blockId) => {
+                window.dispatchEvent(new CustomEvent('openBlockDetail', { detail: blockId }))
+              }} />
+            )}
+            {activeView === 'starred' && (
+              <StarredView
+                onSelectProject={onSelectProject}
+                onOpenDocument={onOpenDocument}
+              />
+            )}
+            {activeView === 'outline' && (
+              <OutlineView documentId={documentId} />
+            )}
+            {activeView === 'extensions' && (
+              <ExtensionsView
+                onOpenPlugin={onOpenPlugin}
+                onOpenPluginSettings={onOpenPluginSettings}
+              />
+            )}
+          </div>
+        </ScrollArea>
 
         {/* Footer */}
-        <div className="h-10 flex items-center px-3 border-t border-border shrink-0">
+        <div className="h-10 flex items-center px-3 border-t border-border shrink-0 bg-muted/30">
           <SyncStatusIndicator />
         </div>
       </aside>
