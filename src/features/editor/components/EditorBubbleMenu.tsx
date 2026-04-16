@@ -1,5 +1,33 @@
 import { BubbleMenu, Editor } from '@tiptap/react'
+import { useState } from 'react'
+import {
+  Bold,
+  Italic,
+  Underline,
+  Strikethrough,
+  Code,
+  List,
+  ListOrdered,
+  Quote,
+  Sparkles,
+  ArrowRight,
+  PenLine,
+  Languages,
+  Lightbulb,
+  Minimize2,
+  Maximize2,
+  Bookmark,
+  ChevronDown,
+} from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from '@/components/ui/dropdown-menu'
 import {
   hasActiveInlineAI,
   cancelActiveInlineAI,
@@ -22,6 +50,21 @@ interface EditorBubbleMenuProps {
 
 type AIToolbarMode = 'continue' | 'rewrite' | 'shorten' | 'expand' | 'translate' | 'explain' | 'capture'
 
+/** AI 操作配置 */
+const AI_ACTIONS: Array<{
+  mode: AIToolbarMode
+  icon: typeof Sparkles
+  label: string
+  title: string
+}> = [
+  { mode: 'continue', icon: ArrowRight, label: '续写', title: '在选中段落下方插入 AI 续写内容' },
+  { mode: 'rewrite', icon: PenLine, label: '改写', title: '替换选中内容' },
+  { mode: 'shorten', icon: Minimize2, label: '缩写', title: '缩短选中内容' },
+  { mode: 'expand', icon: Maximize2, label: '扩写', title: '扩展选中内容' },
+  { mode: 'translate', icon: Languages, label: '翻译', title: '翻译选中内容' },
+  { mode: 'explain', icon: Lightbulb, label: '解释', title: '解释选中内容' },
+]
+
 export function EditorBubbleMenu({
   editor,
   apiKey,
@@ -29,6 +72,8 @@ export function EditorBubbleMenu({
   setAiLoading,
   setAnnotationPreview,
 }: EditorBubbleMenuProps) {
+  const [customPrompt, setCustomPrompt] = useState('')
+
   /** 获取选中文字及其前后上下文 */
   const getSelectionContext = (): { text: string; context: string; from: number; to: number } | null => {
     const { from, to } = editor.state.selection
@@ -264,6 +309,37 @@ export function EditorBubbleMenu({
     await captureSelectionAsBlock(sel.text, inheritedSource)
   }
 
+  /** 处理 AI 操作 */
+  const handleAIAction = (mode: AIToolbarMode) => {
+    switch (mode) {
+      case 'continue':
+        handleContinue()
+        break
+      case 'rewrite':
+      case 'shorten':
+      case 'expand':
+        handleReplace(mode)
+        break
+      case 'translate':
+        handleTranslate()
+        break
+      case 'explain':
+        handleExplain()
+        break
+      case 'capture':
+        handleCapture()
+        break
+    }
+  }
+
+  /** 处理自定义指令 */
+  const handleCustomPrompt = () => {
+    if (!customPrompt.trim()) return
+    // TODO: 实现自定义指令功能
+    console.log('Custom prompt:', customPrompt)
+    setCustomPrompt('')
+  }
+
   return (
     <BubbleMenu
       editor={editor}
@@ -274,247 +350,343 @@ export function EditorBubbleMenu({
         return from !== to && !hasActiveInlineAI(state) && !ed.isActive('sourceBlock', { pending: true })
       }}
     >
-      <div className="flex flex-col gap-1 p-1 bg-white border border-gray-200 rounded-lg shadow-md">
+      <div className="flex flex-col gap-1 p-1.5 bg-popover border border-border rounded-xl shadow-lg min-w-[320px]">
         {/* 第一行：Markdown 格式工具 */}
         <div className="flex items-center gap-0.5">
           {/* 文本类型 */}
-          <button
+          <Button
+            variant="ghost"
+            size="sm"
             className={cn(
-              "flex items-center justify-center h-7 px-2 text-xs font-medium rounded transition-all",
+              "h-7 px-2 text-xs font-medium",
               !editor.isActive('heading') && !editor.isActive('paragraph')
-                ? "text-gray-600 hover:bg-gray-100"
-                : "text-gray-600 hover:bg-gray-100"
+                ? "text-muted-foreground"
+                : "text-muted-foreground"
             )}
             onClick={() => editor.chain().focus().setParagraph().run()}
-            title="正文">
+            title="正文"
+          >
             正文
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
             className={cn(
-              "flex items-center justify-center h-7 px-2 text-xs font-semibold rounded transition-all",
+              "h-7 px-2 text-xs font-semibold",
               editor.isActive('heading', { level: 1 })
-                ? "bg-purple-100 text-purple-600"
-                : "text-gray-600 hover:bg-gray-100"
+                ? "bg-primary/10 text-primary"
+                : "text-muted-foreground"
             )}
             onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
-            title="一级标题">
+            title="一级标题"
+          >
             H1
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
             className={cn(
-              "flex items-center justify-center h-7 px-2 text-xs font-semibold rounded transition-all",
+              "h-7 px-2 text-xs font-semibold",
               editor.isActive('heading', { level: 2 })
-                ? "bg-purple-100 text-purple-600"
-                : "text-gray-600 hover:bg-gray-100"
+                ? "bg-primary/10 text-primary"
+                : "text-muted-foreground"
             )}
             onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-            title="二级标题">
+            title="二级标题"
+          >
             H2
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
             className={cn(
-              "flex items-center justify-center h-7 px-2 text-xs font-semibold rounded transition-all",
+              "h-7 px-2 text-xs font-semibold",
               editor.isActive('heading', { level: 3 })
-                ? "bg-purple-100 text-purple-600"
-                : "text-gray-600 hover:bg-gray-100"
+                ? "bg-primary/10 text-primary"
+                : "text-muted-foreground"
             )}
             onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
-            title="三级标题">
+            title="三级标题"
+          >
             H3
-          </button>
-          
-          <div className="w-px h-4 bg-gray-200 mx-1" />
-          
+          </Button>
+
+          <div className="w-px h-4 bg-border mx-1" />
+
           {/* 文本格式 */}
-          <button
+          <Button
+            variant="ghost"
+            size="sm"
             className={cn(
-              "flex items-center justify-center w-7 h-7 text-sm font-bold rounded transition-all",
+              "h-7 w-7 text-sm font-bold",
               editor.isActive('bold')
-                ? "bg-purple-100 text-purple-600"
-                : "text-gray-600 hover:bg-gray-100"
+                ? "bg-primary/10 text-primary"
+                : "text-muted-foreground"
             )}
             onClick={() => editor.chain().focus().toggleBold().run()}
-            title="粗体">
-            B
-          </button>
-          <button
+            title="粗体"
+          >
+            <Bold className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
             className={cn(
-              "flex items-center justify-center w-7 h-7 text-sm italic rounded transition-all",
+              "h-7 w-7 text-sm italic",
               editor.isActive('italic')
-                ? "bg-purple-100 text-purple-600"
-                : "text-gray-600 hover:bg-gray-100"
+                ? "bg-primary/10 text-primary"
+                : "text-muted-foreground"
             )}
             onClick={() => editor.chain().focus().toggleItalic().run()}
-            title="斜体">
-            I
-          </button>
-          <button
+            title="斜体"
+          >
+            <Italic className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
             className={cn(
-              "flex items-center justify-center w-7 h-7 text-sm underline rounded transition-all",
+              "h-7 w-7 text-sm underline",
               editor.isActive('underline')
-                ? "bg-purple-100 text-purple-600"
-                : "text-gray-600 hover:bg-gray-100"
+                ? "bg-primary/10 text-primary"
+                : "text-muted-foreground"
             )}
             onClick={() => editor.chain().focus().toggleUnderline().run()}
-            title="下划线">
-            U
-          </button>
-          <button
+            title="下划线"
+          >
+            <Underline className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
             className={cn(
-              "flex items-center justify-center w-7 h-7 text-sm line-through rounded transition-all",
+              "h-7 w-7 text-sm line-through",
               editor.isActive('strike')
-                ? "bg-purple-100 text-purple-600"
-                : "text-gray-600 hover:bg-gray-100"
+                ? "bg-primary/10 text-primary"
+                : "text-muted-foreground"
             )}
             onClick={() => editor.chain().focus().toggleStrike().run()}
-            title="删除线">
-            S
-          </button>
-          <button
+            title="删除线"
+          >
+            <Strikethrough className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
             className={cn(
-              "flex items-center justify-center w-7 h-7 text-xs font-mono rounded transition-all",
+              "h-7 w-7 text-xs font-mono",
               editor.isActive('code')
-                ? "bg-purple-100 text-purple-600"
-                : "text-gray-600 hover:bg-gray-100"
+                ? "bg-primary/10 text-primary"
+                : "text-muted-foreground"
             )}
             onClick={() => editor.chain().focus().toggleCode().run()}
-            title="行内代码">
-            {'<>'}
-          </button>
-          
-          <div className="w-px h-4 bg-gray-200 mx-1" />
-          
+            title="行内代码"
+          >
+            <Code className="h-4 w-4" />
+          </Button>
+
+          <div className="w-px h-4 bg-border mx-1" />
+
           {/* 列表 */}
-          <button
+          <Button
+            variant="ghost"
+            size="sm"
             className={cn(
-              "flex items-center justify-center w-7 h-7 text-xs rounded transition-all",
+              "h-7 w-7 text-xs",
               editor.isActive('bulletList')
-                ? "bg-purple-100 text-purple-600"
-                : "text-gray-600 hover:bg-gray-100"
+                ? "bg-primary/10 text-primary"
+                : "text-muted-foreground"
             )}
             onClick={() => editor.chain().focus().toggleBulletList().run()}
-            title="无序列表">
-            •
-          </button>
-          <button
+            title="无序列表"
+          >
+            <List className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
             className={cn(
-              "flex items-center justify-center w-7 h-7 text-xs rounded transition-all",
+              "h-7 w-7 text-xs",
               editor.isActive('orderedList')
-                ? "bg-purple-100 text-purple-600"
-                : "text-gray-600 hover:bg-gray-100"
+                ? "bg-primary/10 text-primary"
+                : "text-muted-foreground"
             )}
             onClick={() => editor.chain().focus().toggleOrderedList().run()}
-            title="有序列表">
-            1.
-          </button>
-          <button
+            title="有序列表"
+          >
+            <ListOrdered className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
             className={cn(
-              "flex items-center justify-center w-7 h-7 text-xs rounded transition-all",
+              "h-7 w-7 text-xs",
               editor.isActive('blockquote')
-                ? "bg-purple-100 text-purple-600"
-                : "text-gray-600 hover:bg-gray-100"
+                ? "bg-primary/10 text-primary"
+                : "text-muted-foreground"
             )}
             onClick={() => editor.chain().focus().toggleBlockquote().run()}
-            title="引用">
-            "
-          </button>
+            title="引用"
+          >
+            <Quote className="h-4 w-4" />
+          </Button>
         </div>
 
         {/* 第二行：AI 操作工具 */}
         <div className="flex items-center gap-0.5">
           {/* AI 对话入口 */}
-          <button
-            className="flex items-center justify-center h-7 px-2 text-xs font-semibold text-purple-600 rounded transition-all hover:bg-purple-50"
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-7 px-2 text-xs font-semibold text-primary hover:bg-primary/10"
             onClick={handleOpenAIChat}
-            title="AI 对话">
-            ✦ AI
-          </button>
-          
-          <div className="w-px h-4 bg-gray-200 mx-1" />
-          
-          {/* AI 操作组 */}
-          <button
+            title="AI 对话"
+          >
+            <Sparkles className="h-3.5 w-3.5 mr-1" />
+            AI
+          </Button>
+
+          <div className="w-px h-4 bg-border mx-1" />
+
+          {/* AI 操作下拉菜单 */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className={cn(
+                  "h-7 px-2 text-xs font-medium",
+                  aiLoading ? "text-muted-foreground opacity-50" : "text-muted-foreground"
+                )}
+                disabled={aiLoading !== null}
+              >
+                <Sparkles className="h-3.5 w-3.5 mr-1" />
+                AI 功能
+                <ChevronDown className="h-3.5 w-3.5 ml-1" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-48">
+              {AI_ACTIONS.map((action) => (
+                <DropdownMenuItem
+                  key={action.mode}
+                  onClick={() => handleAIAction(action.mode)}
+                  disabled={aiLoading !== null}
+                  className="cursor-pointer"
+                >
+                  <action.icon className="h-4 w-4 mr-2" />
+                  <span>{action.label}</span>
+                </DropdownMenuItem>
+              ))}
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={handleCapture}
+                disabled={aiLoading !== null}
+                className="cursor-pointer"
+              >
+                <Bookmark className="h-4 w-4 mr-2" />
+                <span>捕获为块</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          {/* 快捷 AI 操作按钮 */}
+          <Button
+            variant="ghost"
+            size="sm"
             className={cn(
-              "flex items-center justify-center h-7 px-2 text-xs rounded transition-all",
+              "h-7 px-2 text-xs",
               aiLoading === 'continue'
-                ? "opacity-50 cursor-wait text-gray-600"
-                : "text-gray-600 hover:bg-gray-100"
+                ? "opacity-50 cursor-wait text-muted-foreground"
+                : "text-muted-foreground"
             )}
             onClick={handleContinue}
             disabled={aiLoading !== null}
-            title="续写：在选中段落下方插入 AI 续写内容">
+            title="续写：在选中段落下方插入 AI 续写内容"
+          >
             {aiLoading === 'continue' ? '...' : '续写'}
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
             className={cn(
-              "flex items-center justify-center h-7 px-2 text-xs rounded transition-all",
+              "h-7 px-2 text-xs",
               aiLoading === 'rewrite'
-                ? "opacity-50 cursor-wait text-gray-600"
-                : "text-gray-600 hover:bg-gray-100"
+                ? "opacity-50 cursor-wait text-muted-foreground"
+                : "text-muted-foreground"
             )}
             onClick={() => handleReplace('rewrite')}
             disabled={aiLoading !== null}
-            title="改写：替换选中内容">
+            title="改写：替换选中内容"
+          >
             {aiLoading === 'rewrite' ? '...' : '改写'}
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
             className={cn(
-              "flex items-center justify-center h-7 px-2 text-xs rounded transition-all",
-              aiLoading === 'shorten'
-                ? "opacity-50 cursor-wait text-gray-600"
-                : "text-gray-600 hover:bg-gray-100"
-            )}
-            onClick={() => handleReplace('shorten')}
-            disabled={aiLoading !== null}
-            title="缩写">
-            {aiLoading === 'shorten' ? '...' : '缩写'}
-          </button>
-          <button
-            className={cn(
-              "flex items-center justify-center h-7 px-2 text-xs rounded transition-all",
-              aiLoading === 'expand'
-                ? "opacity-50 cursor-wait text-gray-600"
-                : "text-gray-600 hover:bg-gray-100"
-            )}
-            onClick={() => handleReplace('expand')}
-            disabled={aiLoading !== null}
-            title="扩写">
-            {aiLoading === 'expand' ? '...' : '扩写'}
-          </button>
-          <button
-            className={cn(
-              "flex items-center justify-center h-7 px-2 text-xs rounded transition-all",
+              "h-7 px-2 text-xs",
               aiLoading === 'translate'
-                ? "opacity-50 cursor-wait text-gray-600"
-                : "text-gray-600 hover:bg-gray-100"
+                ? "opacity-50 cursor-wait text-muted-foreground"
+                : "text-muted-foreground"
             )}
             onClick={handleTranslate}
             disabled={aiLoading !== null}
-            title="翻译：写入附属层，不替换原文">
+            title="翻译：写入附属层，不替换原文"
+          >
             {aiLoading === 'translate' ? '...' : '翻译'}
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
             className={cn(
-              "flex items-center justify-center h-7 px-2 text-xs rounded transition-all",
+              "h-7 px-2 text-xs",
               aiLoading === 'explain'
-                ? "opacity-50 cursor-wait text-gray-600"
-                : "text-gray-600 hover:bg-gray-100"
+                ? "opacity-50 cursor-wait text-muted-foreground"
+                : "text-muted-foreground"
             )}
             onClick={handleExplain}
             disabled={aiLoading !== null}
-            title="解释：写入附属层批注">
+            title="解释：写入附属层批注"
+          >
             {aiLoading === 'explain' ? '...' : '解释'}
-          </button>
-          
-          <div className="w-px h-4 bg-gray-200 mx-1" />
-          
-          <button
-            className="flex items-center justify-center h-7 px-2 text-xs rounded transition-all text-gray-600 hover:bg-gray-100"
+          </Button>
+
+          <div className="w-px h-4 bg-border mx-1" />
+
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-7 px-2 text-xs text-muted-foreground"
             onClick={handleCapture}
             disabled={aiLoading !== null}
-            title="存为块">
+            title="存为块"
+          >
             捕获
-          </button>
+          </Button>
+        </div>
+
+        {/* 第三行：自定义指令输入 */}
+        <div className="flex items-center gap-2 px-1 pt-1 border-t border-border">
+          <div className="flex items-center gap-2 flex-1 bg-muted/50 rounded-md px-2 py-1">
+            <Sparkles className="h-3.5 w-3.5 text-primary flex-shrink-0" />
+            <input
+              type="text"
+              value={customPrompt}
+              onChange={(e) => setCustomPrompt(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleCustomPrompt()}
+              placeholder="输入自定义指令..."
+              className="flex-1 bg-transparent text-xs text-foreground placeholder:text-muted-foreground outline-none"
+            />
+            <Button
+              variant="default"
+              size="sm"
+              className="h-5 w-5 p-0"
+              onClick={handleCustomPrompt}
+              disabled={!customPrompt.trim()}
+            >
+              <ArrowRight className="h-3 w-3" />
+            </Button>
+          </div>
         </div>
       </div>
     </BubbleMenu>

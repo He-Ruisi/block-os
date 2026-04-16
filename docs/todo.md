@@ -60,7 +60,7 @@
     - [x] 性能测试（渲染性能/内存占用）
     - [x] 更新组件文档
     - [x] 创建使用示例
-- [ ] Phase 6: V0 右侧边栏像素级重构 - 🔄 进行中（50% 完成）- [参考设计](../references/V0 右侧边栏/)
+- [ ] Phase 6: V0 右侧边栏像素级重构 - 🔄 进行中（75% 完成）- [参考设计](../references/V0 右侧边栏/)
   - [x] BlockSpacePanel 重构 - ✅ 完成（2026-04-16 20:35）
     - [x] 搜索框：lucide-react Search 图标 + 焦点环效果
     - [x] 标签过滤：Badge 按钮组（显示前 5 个 + "更多"）
@@ -90,6 +90,16 @@
     - [x] 增大边距（p-6，24px）
     - [x] 滚动区域支持滚动到底部
     - [x] 使用 Shadcn UI 组件（Card、Button、Badge、ScrollArea）
+  - [x] DocumentBlocksPanel 重构 - ✅ 完成（2026-04-16 21:45）
+    - [x] Block 结构树状显示（Hash、FileText、Link2 图标）
+    - [x] 统计信息（段落数、链接数）
+    - [x] 卡片布局（p-3 内边距，line-clamp-2 预览）
+    - [x] 使用 Shadcn UI 组件（Card、Badge、ScrollArea）
+  - [x] SessionHistoryPanel 重构 - ✅ 完成（2026-04-16 21:45）
+    - [x] 按日期分组的会话列表
+    - [x] 会话卡片（标题 + 时间 + 消息数）
+    - [x] DropdownMenu 右键菜单（导出 JSON、删除）
+    - [x] 使用 Shadcn UI 组件（Card、Badge、ScrollArea、DropdownMenu）
   - [ ] SessionHistoryPanel 重构
     - [ ] 按日期分组的会话列表
     - [ ] 会话卡片（标题 + 时间 + 消息数）

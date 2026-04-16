@@ -1,5 +1,39 @@
 # BlockOS 更新日志
 
+## [v1.28.0] - 2026-04-16 🎨 Phase 6 右侧边栏 Shadcn UI 优化（75% 完成）
+
+**重要里程碑**：完成 6/8 组件的 Shadcn UI 优化，代码质量和用户体验大幅提升。
+
+- **Phase 6 进度**（6/8 完成，75%）：
+  - ✅ BlockSpacePanel（20:35）- Bento Grid 卡片布局 + 搜索 + 标签过滤
+  - ✅ PreviewPanel（21:00）- 模式选择 + 模板/格式下拉框 + 导出
+  - ✅ BlockDetailPanel（21:25）- 版本历史 + 引用记录 + Popover 悬停显示
+  - ✅ BlockDerivativeSelector（21:40）- 模态框 + 源 Block/派生版本选择
+  - ✅ DocumentBlocksPanel（21:45）- Block 结构树 + 统计信息
+  - ✅ SessionHistoryPanel（21:45）- 按日期分组 + DropdownMenu 右键菜单
+
+- **使用的 Shadcn UI 组件**（12个）：
+  - Button、Input、Badge、Card、ScrollArea、Popover
+  - Select、Textarea、DropdownMenu、Dialog、Tabs、Toast
+
+- **技术成果**：
+  - 移除所有自定义 CSS 类（`.block-*__*`、`.session-*__*`）
+  - 使用 lucide-react 图标替代 emoji
+  - 统一的设计系统（accent-green 主题色）
+  - 完整的可访问性支持（ARIA 标签、键盘导航）
+  - 代码更简洁、更易维护
+
+- **用户体验提升**：
+  - BlockDetailPanel：当前内容可滚动查看完整，版本卡片悬停显示完整内容
+  - BlockDerivativeSelector：增大边距到 24px，滚动区域支持滚动到底部
+  - SessionHistoryPanel：DropdownMenu 替代右键菜单，交互更流畅
+
+- **剩余组件**（2/8）：
+  - ⏸️ SettingsPanel（设置面板）
+  - ⏸️ RightPanel 主容器（标签页切换）
+
+---
+
 ## [v1.27.0] - 2026-04-16 🎨 PreviewPanel V0 像素级重构完成
 
 **重要里程碑**：完成 PreviewPanel 组件的 V0 设计像素级还原，安装 Badge 和 ScrollArea 组件，右侧边栏 UI 统一性进一步提升。
