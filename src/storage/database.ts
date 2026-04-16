@@ -1,6 +1,5 @@
 // 统一 IndexedDB 初始化 — 单例，所有 Store 共享同一个连接
-const DB_NAME = 'blockos-db'
-const DB_VERSION = 6  // 升级到 6，添加 OCR 历史记录 store
+import { DB_NAME, DB_VERSION } from '../constants/storage'
 
 let db: IDBDatabase | null = null
 let initPromise: Promise<IDBDatabase> | null = null

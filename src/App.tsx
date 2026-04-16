@@ -12,26 +12,27 @@ import { AuthPage } from './components/auth/AuthPage'
 import { SettingsPanel } from './components/panel/SettingsPanel'
 import { StatusBar } from './components/layout/StatusBar'
 import { PluginWorkspaceView } from './components/layout/PluginWorkspaceView'
-import { Toast } from './components/shared/Toast'
+import { Toaster } from './components/ui/toaster'
 import { ProjectOverview } from './components/project/ProjectOverview'
 import { initStorage } from './storage'
 import { documentStore } from './storage/documentStore'
 import { useAppLayout } from './hooks/useAppLayout'
 import { useTabs } from './hooks/useTabs'
 import { useAuth } from './hooks/useAuth'
-import { useToast } from './hooks/useToast'
+import { toast } from './hooks/use-toast'
 import { useViewport } from './hooks/useViewport'
 import { pluginRegistry } from './services/pluginRegistry'
 import { PluginAPI } from './services/pluginAPI'
 import { OCRPlugin } from './plugins/ocr-plugin'
-import './App.css'
+import { LOCAL_STORAGE_KEYS } from './constants/storage'
+import './styles/components/App.css'
 
 function App() {
   const editorAreaRef = useRef<HTMLDivElement>(null)
   const [editor, setEditor] = useState<TiptapEditor | null>(null)
   const editorRef = useRef<TiptapEditor | null>(null)
   const [selectedText, setSelectedText] = useState('')
-  const [theme, setTheme] = useState<string>(() => localStorage.getItem('blockos-theme') || 'default')
+  const [theme, setTheme] = useState<string>(() => localStorage.getItem(LOCAL_STORAGE_KEYS.THEME) || 'default')
   const [showSettings, setShowSettings] = useState(false)
   const [showProjectOverview, setShowProjectOverview] = useState(false)
   const [storageReady, setStorageReady] = useState(false)
@@ -41,7 +42,7 @@ function App() {
   
   // 视图模式：AI 沉浸式 or 混合模式
   const [viewMode, setViewMode] = useState<'ai-focus' | 'hybrid'>(() => {
-    return (localStorage.getItem('blockos-view-mode') as 'ai-focus' | 'hybrid') || 'ai-focus'
+    return (localStorage.getItem(LOCAL_STORAGE_KEYS.VIEW_MODE) as 'ai-focus' | 'hybrid') || 'ai-focus'
   })
   
   // 文档统计状态
@@ -51,13 +52,12 @@ function App() {
   const [autoSaveStatus, setAutoSaveStatus] = useState<'saved' | 'saving' | 'unsaved'>('saved')
   const [lastSaved, setLastSaved] = useState<Date | null>(null)
   
-  const { toasts, showToast, removeToast } = useToast()
   const viewport = useViewport()
 
   const toggleTheme = useCallback(() => {
     setTheme(prev => {
       const next = prev === 'default' ? 'newsprint' : 'default'
-      localStorage.setItem('blockos-theme', next)
+      localStorage.setItem(LOCAL_STORAGE_KEYS.THEME, next)
       return next
     })
   }, [])
@@ -130,7 +130,7 @@ function App() {
     
     // 切换到混合模式
     setViewMode('hybrid')
-    localStorage.setItem('blockos-view-mode', 'hybrid')
+    localStorage.setItem(LOCAL_STORAGE_KEYS.VIEW_MODE, 'hybrid')
     setSidebarCollapsed(true)
     
     // 打开新文档
@@ -145,13 +145,13 @@ function App() {
   const switchToAIFocus = useCallback(() => {
     // 切换到 AI 沉浸模式
     setViewMode('ai-focus')
-    localStorage.setItem('blockos-view-mode', 'ai-focus')
+    localStorage.setItem(LOCAL_STORAGE_KEYS.VIEW_MODE, 'ai-focus')
   }, [])
 
   // 切换到混合模式时，确保侧边栏默认隐藏
   const exitAIFocus = useCallback(() => {
     setViewMode('hybrid')
-    localStorage.setItem('blockos-view-mode', 'hybrid')
+    localStorage.setItem(LOCAL_STORAGE_KEYS.VIEW_MODE, 'hybrid')
     setSidebarCollapsed(true)
   }, [setSidebarCollapsed])
 
@@ -268,13 +268,18 @@ function App() {
       await documentStore.updateDocumentBlocks(tab.documentId, editor.getJSON())
       setAutoSaveStatus('saved')
       setLastSaved(new Date())
-      showToast('文档已保存', 'success')
+      toast({
+        title: '文档已保存',
+      })
     } catch (error) {
       console.error('保存失败:', error)
-      showToast('保存失败', 'error')
+      toast({
+        title: '保存失败',
+        variant: 'destructive',
+      })
       setAutoSaveStatus('unsaved')
     }
-  }, [editor, tabs, showToast])
+  }, [editor, tabs])
 
   // 监听编辑器内容变化，更新统计信息
   useEffect(() => {
@@ -530,17 +535,7 @@ function App() {
       )}
       
       {/* Toast 通知 */}
-      <div className="toast-container">
-        {toasts.map(toast => (
-          <Toast
-            key={toast.id}
-            message={toast.message}
-            type={toast.type}
-            duration={toast.duration}
-            onClose={() => removeToast(toast.id)}
-          />
-        ))}
-      </div>
+      <Toaster />
     </div>
   )
 }

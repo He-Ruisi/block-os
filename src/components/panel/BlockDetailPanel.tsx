@@ -4,7 +4,7 @@ import { blockStore } from '../../storage/blockStore'
 import { usageStore } from '../../storage/usageStore'
 import { publishBlockVersion } from '../../services/blockReleaseService'
 import { formatRelativeTime } from '../../utils/date'
-import './BlockDetailPanel.css'
+import '../../styles/components/BlockDetailPanel.css'
 
 interface BlockDetailPanelProps {
   blockId: string

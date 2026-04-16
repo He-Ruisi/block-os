@@ -5,7 +5,7 @@ import { SuggestionMenu } from './SuggestionMenu'
 import { documentStore } from '../../storage/documentStore'
 import { blockStore } from '../../storage/blockStore'
 import { recordBlockUsage } from '../../services/blockReleaseService'
-import './Editor.css'
+import '../../styles/components/Editor.css'
 import { useEditor, EditorContent, Editor as TiptapEditor } from '@tiptap/react'
 import {
   BlockLink, BlockReference, SourceBlock, searchBlocks,

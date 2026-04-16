@@ -3,7 +3,7 @@ import { X, Maximize2, ChevronDown } from 'lucide-react'
 import { BlockSpacePanel } from './BlockSpacePanel'
 import { SessionHistoryPanel } from './SessionHistoryPanel'
 import { PreviewPanel } from './PreviewPanel'
-import { Toast } from '../shared/Toast'
+import { toast } from '@/hooks/use-toast'
 import { MarkdownRenderer } from '../shared/MarkdownRenderer'
 import { AIImmersivePanel } from '../ai/AIImmersivePanel'
 import { generateUUID } from '../../utils/uuid'
@@ -45,8 +45,6 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI, onCl
   const [expandedSettingsSection, setExpandedSettingsSection] = useState<'model' | 'prompt' | 'reasoning' | 'provider' | 'context'>('model')
   const [tempSystemPrompt, setTempSystemPrompt] = useState('')
   const [showHistory, setShowHistory] = useState(false)
-  const [toastMessage, setToastMessage] = useState<string | null>(null)
-  const [toastType, setToastType] = useState<'success' | 'error' | 'info'>('success')
   const [aiProvider, setAIProvider] = useState<AIProvider>(getCurrentProvider())
   const [aiModel, setAIModel] = useState<string>(getCurrentModel())
   const messagesEndRef = useRef<HTMLDivElement>(null)
@@ -112,11 +110,6 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI, onCl
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
 
-  const showToast = (msg: string, type: 'success' | 'error' | 'info' = 'success') => {
-    setToastMessage(msg)
-    setToastType(type)
-  }
-
   const insertToEditor = (messageId: string) => {
     const message = messages.find(m => m.id === messageId)
     if (message?.role === 'assistant') {
@@ -149,10 +142,15 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI, onCl
     const content = message.editorContent || message.content
     const result = await captureMessageAsBlock(messageId, content)
     if (result.success) {
-      showToast('Block 捕获成功！', 'success')
+      toast({
+        title: 'Block 捕获成功！',
+      })
       setActiveTab('blocks')
     } else {
-      showToast(`Block 捕获失败: ${result.error}`, 'error')
+      toast({
+        title: `Block 捕获失败: ${result.error}`,
+        variant: 'destructive',
+      })
     }
   }
 
@@ -787,10 +785,6 @@ export function RightPanel({ onInsertContent, selectedText, onTextSentToAI, onCl
 
       {activeTab === 'blocks' && <BlockSpacePanel />}
       {activeTab === 'preview' && <PreviewPanel />}
-
-      {toastMessage && (
-        <Toast message={toastMessage} type={toastType} onClose={() => setToastMessage(null)} />
-      )}
         </>
       )}
     </div>

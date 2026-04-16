@@ -1,9 +1,8 @@
 import { useState, useEffect, useCallback } from 'react'
 import type { SidebarView } from '../types/layout'
+import { LOCAL_STORAGE_KEYS, UI_SIZES } from '../constants'
 
-const STORAGE_KEY = 'blockos-layout'
-const ACTIVITY_BAR_WIDTH = 48
-const SIDEBAR_PANEL_WIDTH = 240
+const STORAGE_KEY = LOCAL_STORAGE_KEYS.LAYOUT_PREFERENCES
 
 interface LayoutPrefs {
   sidebarCollapsed: boolean
@@ -50,7 +49,7 @@ export function useAppLayout(): AppLayoutState {
   const [editorWidth, setEditorWidthState] = useState(0)
 
   // ActivityBar(48px) + SidebarPanel(0|240px)
-  const sidebarWidth = ACTIVITY_BAR_WIDTH + (prefs.sidebarCollapsed ? 0 : SIDEBAR_PANEL_WIDTH)
+  const sidebarWidth = UI_SIZES.ACTIVITY_BAR_WIDTH + (prefs.sidebarCollapsed ? 0 : UI_SIZES.SIDEBAR_WIDTH)
 
   // 根据比例计算实际宽度
   useEffect(() => {
@@ -102,13 +101,13 @@ export function useAppLayout(): AppLayoutState {
     sidebarView: prefs.sidebarView,
     isFullscreen,
     editorWidth,
-    activityBarWidth: ACTIVITY_BAR_WIDTH,
+    activityBarWidth: UI_SIZES.ACTIVITY_BAR_WIDTH,
     toggleSidebar,
     toggleFullscreen,
     setEditorWidth,
     setSidebarView,
     setSidebarCollapsed,
-    minEditorWidth: 400,
+    minEditorWidth: UI_SIZES.SIDEBAR_MIN_WIDTH * 2,
     maxEditorWidth: availableWidth * 0.8,
   }
 }

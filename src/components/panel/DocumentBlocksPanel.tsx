@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import type { DocumentBlock } from '../../types/document'
 import { documentStore } from '../../storage/documentStore'
-import './DocumentBlocksPanel.css'
+import '../../styles/components/DocumentBlocksPanel.css'
 
 export function DocumentBlocksPanel() {
   const [blocks, setBlocks] = useState<DocumentBlock[]>([])

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import type { Block } from '../../types/block'
 import { blockStore } from '../../storage/blockStore'
 import { formatDateTime } from '../../utils/date'
-import './BlockDerivativeSelector.css'
+import '../../styles/components/BlockDerivativeSelector.css'
 
 interface BlockDerivativeSelectorProps {
   sourceBlockId: string

@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { X, Maximize2, Pin, PinOff, Send, Plus, MessageSquare } from 'lucide-react'
 import { useAIChat } from '../../hooks/useAIChat'
-import './AIFloatPanel.css'
+import '../../styles/components/AIFloatPanel.css'
 
 export type AIMode = 'bubble' | 'float' | 'sidebar'
 

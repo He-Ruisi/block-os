@@ -3,7 +3,7 @@ import { X, Cloud, HardDrive, User, LogOut, RefreshCw } from 'lucide-react'
 import { useAutoSync } from '../../hooks/useAutoSync'
 import { autoSyncService } from '../../services/autoSyncService'
 import { isSupabaseEnabled } from '../../lib/supabase'
-import './SettingsPanel.css'
+import '../../styles/components/SettingsPanel.css'
 
 interface SettingsPanelProps {
   username: string

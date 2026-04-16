@@ -4,7 +4,7 @@ import type { Project } from '../../types/project'
 import { projectStore } from '../../storage/projectStore'
 import { documentStore } from '../../storage/documentStore'
 import { formatDistanceToNow } from '../../utils/date'
-import './ProjectOverview.css'
+import '../../styles/components/ProjectOverview.css'
 
 interface ProjectOverviewProps {
   onSelectProject: (projectId: string) => void

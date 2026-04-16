@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import './SuggestionMenu.css'
+import '../../styles/components/SuggestionMenu.css'
 
 interface SuggestionItem {
   id: string

@@ -3,7 +3,7 @@ import type { Block, BlockRelease } from '../../types/block'
 import { blockStore } from '../../storage/blockStore'
 import { formatRelativeTime } from '../../utils/date'
 import { BlockDetailPanel } from './BlockDetailPanel'
-import './BlockSpacePanel.css'
+import '../../styles/components/BlockSpacePanel.css'
 
 export function BlockSpacePanel() {
   const [blocks, setBlocks] = useState<Block[]>([])

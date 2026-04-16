@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Import BlockOS Design Tokens */
+@import './styles/global/design-tokens.css';
+
 @layer base {
   :root {
     --background: 0 0% 100%;
