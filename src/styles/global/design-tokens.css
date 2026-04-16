@@ -2,40 +2,41 @@
    BlockOS Design Tokens
    ============================================================ */
 
-/* Newsprint 瀛椾綋锛堜粎鍦?newsprint 涓婚婵€娲绘椂鍔犺浇锛?*/
+/* Newsprint 字体（仅在 newsprint 主题激活时加载） */
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400&family=Lora:ital,wght@0,400;0,600;1,400&display=swap');
 
 :root {
-  /* 鑳屾櫙 */
+  /* 背景 */
   --color-bg-primary: #ffffff;
   --color-bg-secondary: #f8f9fa;
   --color-bg-tertiary: #f1f3f5;
   --color-bg-hover: #f0f0f0;
   --color-bg-active: #e8e8e8;
 
-  /* 杈规 */
+  /* 边框 */
   --color-border-primary: #e1e4e8;
   --color-border-secondary: #d1d5da;
   --color-border-focus: #7F77DD;
 
-  /* 鏂囧瓧 */
+  /* 文字 */
   --color-text-primary: #1a1a1a;
   --color-text-secondary: #4a4a4a;
   --color-text-tertiary: #6a737d;
   --color-text-muted: #9ca3af;
 
-  /* 鍝佺墝鑹?*/
+  /* 品牌色 */
   --color-purple: #7F77DD;
   --color-purple-light: #EEEDFE;
   --color-purple-hover: #6e65d0;
 
-  /* 鍔熻兘鑹?*/
+  /* 功能色 */
   --color-accent-gold: #d4a053;
   --color-accent-gold-light: #fff9e6;
-  --color-accent-green: #22a06b;
+  --color-accent-green: #35AB67; /* V0: 主绿色 */
+  --color-accent-green-dark: #00362F; /* V0: 深绿色 */
   --color-accent-red: #c9372c;
 
-  /* 缂栬緫鍣?*/
+  /* 编辑器 */
   --editor-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
   --editor-font-serif: Georgia, 'Times New Roman', serif;
   --editor-font-mono: 'SF Mono', 'Monaco', 'Menlo', 'Consolas', monospace;
@@ -43,61 +44,79 @@
   --editor-line-height: 1.75;
   --editor-max-width: 720px;
 
-  /* 浠ｇ爜鍧?*/
+  /* 代码块 */
   --code-bg: #f6f8fa;
   --code-border: #e1e4e8;
   --code-color: #24292e;
   --code-inline-bg: rgba(175, 184, 193, 0.2);
 
-  /* 宸ュ叿鏍?*/
+  /* 工具栏 */
   --toolbar-height: 44px;
   --toolbar-btn-size: 32px;
   --toolbar-btn-radius: 6px;
 
-  /* 鍦嗚 */
+  /* 圆角 */
   --border-radius: 6px;
+  --border-radius-sm: 4px; /* V0: 小圆角 */
+  --border-radius-md: 6px; /* V0: 中圆角 */
   --border-radius-lg: 8px;
+  --border-radius-xl: 12px; /* V0: 大圆角 */
 
-  /* 闃村奖 */
+  /* 阴影 */
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
   --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+  --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.08); /* V0: 卡片阴影 */
+  --shadow-panel: 0 4px 16px rgba(0, 0, 0, 0.12); /* V0: 面板阴影 */
+
+  /* 间距 */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 12px;
+  --spacing-lg: 16px;
+  --spacing-xl: 24px;
+
+  /* 交互状态 */
+  --color-hover: rgba(0, 0, 0, 0.04);
+  --color-active: rgba(0, 0, 0, 0.08);
+  --color-focus-ring: rgba(127, 119, 221, 0.3); /* 基于 --color-purple */
 }
 
 /* ============================================================
-   Newsprint 涓婚 鈥?鎶ョ焊鍗板埛椋庢牸
-   鍦?<body> 鎴?.app 涓婂姞 .theme-newsprint 婵€娲?   ============================================================ */
+   Newsprint 主题 — 报纸印刷风格
+   在 <body> 或 .app 上加 .theme-newsprint 激活
+   ============================================================ */
 
 .theme-newsprint {
-  /* 鑳屾櫙锛氭柊闂荤焊鏆栫櫧 */
+  /* 背景：新闻纸暖白 */
   --color-bg-primary: #F9F9F7;
   --color-bg-secondary: #F5F5F0;
   --color-bg-tertiary: #EDEDEA;
   --color-bg-hover: #E5E5E0;
   --color-bg-active: #D5D5D0;
 
-  /* 杈规锛氬ⅷ榛戯紝缁撴瀯鎰熷己 */
+  /* 边框：墨黑，结构感强 */
   --color-border-primary: #111111;
   --color-border-secondary: #111111;
   --color-border-focus: #111111;
 
-  /* 鏂囧瓧锛氶珮瀵规瘮搴?*/
+  /* 文字：高对比度 */
   --color-text-primary: #111111;
   --color-text-secondary: #404040;
   --color-text-tertiary: #525252;
   --color-text-muted: #737373;
 
-  /* 鍝佺墝鑹?鈫?缂栬緫绾?*/
+  /* 品牌色 → 编辑红 */
   --color-purple: #CC0000;
   --color-purple-light: rgba(204, 0, 0, 0.06);
   --color-purple-hover: #aa0000;
 
-  /* 鍔熻兘鑹?*/
+  /* 功能色 */
   --color-accent-gold: #111111;
   --color-accent-gold-light: #F5F5F0;
   --color-accent-red: #CC0000;
 
-  /* 缂栬緫鍣ㄥ瓧浣?鈫?琛嚎浣?*/
+  /* 编辑器字体 → 衬线体 */
   --editor-font-family: 'Lora', Georgia, serif;
   --editor-font-serif: 'Playfair Display', 'Times New Roman', serif;
   --editor-font-mono: 'JetBrains Mono', 'Courier New', monospace;
@@ -105,29 +124,34 @@
   --editor-line-height: 1.625;
   --editor-max-width: 680px;
 
-  /* 浠ｇ爜鍧?*/
+  /* 代码块 */
   --code-bg: #EDEDEA;
   --code-border: #111111;
   --code-color: #111111;
   --code-inline-bg: rgba(17, 17, 17, 0.06);
 
-  /* 宸ュ叿鏍?*/
+  /* 工具栏 */
   --toolbar-btn-radius: 0px;
 
-  /* 鍦嗚 鈫?鍏ㄩ儴褰掗浂 */
+  /* 圆角 → 全部归零 */
   --border-radius: 0px;
+  --border-radius-sm: 0px;
+  --border-radius-md: 0px;
   --border-radius-lg: 0px;
+  --border-radius-xl: 0px;
 
-  /* 闃村奖 鈫?纭槾褰?*/
+  /* 阴影 → 硬阴影 */
   --shadow-sm: 2px 2px 0px 0px #111111;
   --shadow-md: 4px 4px 0px 0px #111111;
   --shadow-lg: 6px 6px 0px 0px #111111;
+  --shadow-card: 3px 3px 0px 0px #111111;
+  --shadow-panel: 5px 5px 0px 0px #111111;
 
-  /* 绾稿紶绾圭悊鑳屾櫙 */
+  /* 纸张纹理背景 */
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4' viewBox='0 0 4 4'%3E%3Cpath fill='%23111111' fill-opacity='0.03' d='M1 3h1v1H1V3zm2-2h1v1H3V1z'%3E%3C/path%3E%3C/svg%3E");
 }
 
-/* ---- Newsprint 宸ュ叿鏍?---- */
+/* ---- Newsprint 工具栏 ---- */
 .theme-newsprint .editor-toolbar {
   border-bottom: 2px solid #111111;
   background: #F9F9F7;
@@ -164,7 +188,7 @@
   font-size: 10px;
 }
 
-/* ---- Newsprint 缂栬緫鍖哄煙 ---- */
+/* ---- Newsprint 编辑区域 ---- */
 .theme-newsprint .editor-content h1 {
   font-family: var(--editor-font-serif);
   font-size: 2.5rem;
@@ -201,7 +225,7 @@
   hyphens: auto;
 }
 
-/* 棣栨棣栧瓧涓嬫矇 */
+/* 首段首字下沉 */
 .theme-newsprint .editor-content > p:first-of-type::first-letter {
   font-family: var(--editor-font-serif);
   float: left;
@@ -213,7 +237,7 @@
   color: #111111;
 }
 
-/* Blockquote 鈫?绮楀乏杈规 + 鏂滀綋 */
+/* Blockquote → 粗左边栏 + 斜体 */
 .theme-newsprint .editor-content blockquote::before {
   width: 4px;
   background: #111111;
@@ -225,7 +249,7 @@
   color: #404040;
 }
 
-/* Code block 鈫?澧ㄩ粦杈规 */
+/* Code block → 墨黑边框 */
 .theme-newsprint .editor-content pre {
   border: 2px solid #111111;
   background: #F5F5F0;
@@ -237,18 +261,18 @@
   border: 1px solid rgba(17, 17, 17, 0.15);
 }
 
-/* HR 鈫?绮楅粦绾?*/
+/* HR → 粗黑线 */
 .theme-newsprint .editor-content hr {
   height: 2px;
   background: #111111;
 }
 
-/* 鍒楄〃 鈫?绱у噾 */
+/* 列表 → 紧凑 */
 .theme-newsprint .editor-content li {
   line-height: 1.5;
 }
 
-/* BubbleMenu 鈫?纭槾褰?*/
+/* BubbleMenu → 硬阴影 */
 .theme-newsprint .bubble-menu {
   border: 2px solid #111111;
   border-radius: 0;
@@ -260,7 +284,7 @@
   color: #F9F9F7;
 }
 
-/* SourceBlock 鈫?澧ㄩ粦杈规椋庢牸 */
+/* SourceBlock → 墨黑边框风格 */
 .theme-newsprint .source-block--ai {
   border-left: 4px solid #111111;
   background: #F5F5F0;
@@ -287,7 +311,7 @@
   font-size: 10px;
 }
 
-/* Block Link 鈫?绾㈣壊涓嬪垝绾?*/
+/* Block Link → 红色下划线 */
 .theme-newsprint .block-link {
   background: transparent;
   color: #111111;
@@ -302,14 +326,14 @@
   background: rgba(204, 0, 0, 0.06);
 }
 
-/* Block Reference 鈫?澧ㄩ粦宸﹁竟妗?*/
+/* Block Reference → 墨黑左边框 */
 .theme-newsprint .block-reference {
   border-left: 4px solid #111111;
   border-radius: 0;
   background: #F5F5F0;
 }
 
-/* 渚ц竟鏍?newsprint 閫傞厤 */
+/* 侧边栏 newsprint 适配 */
 .theme-newsprint .activity-bar {
   border-right: 2px solid #111111;
   background: #F5F5F0;
@@ -326,7 +350,7 @@
   color: #F9F9F7;
 }
 
-/* 鍙充晶闈㈡澘 newsprint 閫傞厤 */
+/* 右侧面板 newsprint 适配 */
 .theme-newsprint .right-panel {
   border-left: 2px solid #111111;
 }
@@ -336,7 +360,7 @@
   color: #F9F9F7;
 }
 
-/* 鏍囩鏍?newsprint 閫傞厤 */
+/* 标签栏 newsprint 适配 */
 .theme-newsprint .tab-bar {
   border-bottom: 2px solid #111111;
   background: #F9F9F7;
@@ -369,4 +393,3 @@ body {
   height: 100vh;
   overflow: hidden;
 }
-
