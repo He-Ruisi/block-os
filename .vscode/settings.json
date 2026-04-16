@@ -1,4 +1,7 @@
 {
     "kiroAgent.configureMCP": "Disabled",
-    "typescript.autoClosingTags": false
+    "typescript.autoClosingTags": false,
+    "files.exclude": {
+        "**/.vscode": true
+    }
 }

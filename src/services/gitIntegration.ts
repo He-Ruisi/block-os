@@ -1,14 +1,25 @@
-// Git 集成模块
-// 注意：浏览器环境无法直接操作 Git，需要通过后端 API 或 Electron 实现
-import type { Block } from '../types/block'
+import type { Block, BlockRelease } from '../types/block'
 import type { Document } from '../types/document'
+import { blockStore } from '../storage/blockStore'
+
+const GIT_HISTORY_STORAGE_KEY = 'blockos-git-history'
 
 export interface GitConfig {
   enabled: boolean
   autoCommit: boolean
-  commitInterval: number // 自动提交间隔（秒）
+  commitInterval: number
   repoPath?: string
   branch?: string
+}
+
+export interface GitReleaseSnapshot {
+  kind: 'block-release'
+  blockId: string
+  blockTitle: string
+  releaseVersion: number
+  releaseTitle: string
+  content: string
+  releasedAt: Date
 }
 
 export interface GitCommit {
@@ -17,13 +28,28 @@ export interface GitCommit {
   author: string
   date: Date
   files: string[]
+  snapshot?: GitReleaseSnapshot
+}
+
+function normalizeCommit(commit: GitCommit): GitCommit {
+  return {
+    ...commit,
+    date: new Date(commit.date),
+    snapshot: commit.snapshot
+      ? {
+          ...commit.snapshot,
+          releasedAt: new Date(commit.snapshot.releasedAt),
+        }
+      : undefined,
+  }
 }
 
 export class GitIntegration {
   private config: GitConfig = {
-    enabled: false,
+    enabled: true,
     autoCommit: false,
     commitInterval: 300,
+    branch: 'main',
   }
 
   private lastCommitTime: Date | null = null
@@ -40,7 +66,9 @@ export class GitIntegration {
   private startAutoCommit(): void {
     if (this.autoCommitTimer) clearInterval(this.autoCommitTimer)
     this.autoCommitTimer = window.setInterval(() => {
-      if (this.pendingChanges.size > 0) this.commitPendingChanges()
+      if (this.pendingChanges.size > 0) {
+        void this.commitPendingChanges()
+      }
     }, this.config.commitInterval * 1000)
   }
 
@@ -53,6 +81,25 @@ export class GitIntegration {
 
   trackChange(filePath: string): void {
     this.pendingChanges.add(filePath)
+    window.dispatchEvent(new CustomEvent('git:pending-changes', {
+      detail: { files: Array.from(this.pendingChanges) },
+    }))
+  }
+
+  private loadHistoryFromStorage(): GitCommit[] {
+    try {
+      const raw = localStorage.getItem(GIT_HISTORY_STORAGE_KEY)
+      if (!raw) return []
+      const parsed = JSON.parse(raw) as GitCommit[]
+      return parsed.map(normalizeCommit)
+    } catch (error) {
+      console.error('[Git] Failed to load history:', error)
+      return []
+    }
+  }
+
+  private saveHistoryToStorage(history: GitCommit[]): void {
+    localStorage.setItem(GIT_HISTORY_STORAGE_KEY, JSON.stringify(history))
   }
 
   private async commitPendingChanges(): Promise<void> {
@@ -74,24 +121,30 @@ export class GitIntegration {
       : `auto: update ${files.length} files at ${timestamp}`
   }
 
-  async commit(message: string, files?: string[]): Promise<GitCommit> {
-    if (!this.config.enabled) throw new Error('Git integration is not enabled')
+  async commit(message: string, files?: string[], snapshot?: GitReleaseSnapshot): Promise<GitCommit> {
+    if (!this.config.enabled) {
+      throw new Error('Git integration is not enabled')
+    }
 
-    console.log('[Git] Commit:', { message, files })
     const commit: GitCommit = {
       hash: this.generateHash(),
       message,
       author: 'BlockOS User',
       date: new Date(),
       files: files || [],
+      snapshot,
     }
+
+    const history = this.loadHistoryFromStorage()
+    history.unshift(commit)
+    this.saveHistoryToStorage(history)
+
     window.dispatchEvent(new CustomEvent('git:commit', { detail: commit }))
     return commit
   }
 
   async commitNow(message?: string): Promise<GitCommit | null> {
     if (this.pendingChanges.size === 0) {
-      console.log('[Git] No changes to commit')
       return null
     }
     const files = Array.from(this.pendingChanges)
@@ -101,9 +154,36 @@ export class GitIntegration {
     return commit
   }
 
+  async commitBlockRelease(blockId: string, release: BlockRelease): Promise<GitCommit> {
+    const block = await blockStore.getBlock(blockId)
+    if (!block) {
+      throw new Error('Block not found')
+    }
+
+    const filePath = `blocks/${blockId}.md`
+    const snapshot: GitReleaseSnapshot = {
+      kind: 'block-release',
+      blockId,
+      blockTitle: block.metadata.title || block.content.slice(0, 30) || 'Untitled Block',
+      releaseVersion: release.version,
+      releaseTitle: release.title,
+      content: release.content,
+      releasedAt: new Date(release.releasedAt),
+    }
+
+    const commit = await this.commit(
+      `release(block): ${snapshot.blockTitle} v${release.version} - ${release.title}`,
+      [filePath],
+      snapshot
+    )
+
+    this.pendingChanges.delete(filePath)
+    this.lastCommitTime = new Date()
+    return commit
+  }
+
   async getHistory(limit = 10): Promise<GitCommit[]> {
-    console.log('[Git] Get history, limit:', limit)
-    return []
+    return this.loadHistoryFromStorage().slice(0, limit)
   }
 
   getStatus(): { enabled: boolean; autoCommit: boolean; pendingChanges: number; lastCommit: Date | null } {
@@ -132,7 +212,6 @@ export class GitIntegration {
 
 export const gitIntegration = new GitIntegration()
 
-// Block 导出为 Markdown
 export function blockToMarkdown(block: Block): string {
   let markdown = ''
   if (block.metadata?.title) markdown += `# ${block.metadata.title}\n\n`
@@ -143,7 +222,7 @@ export function blockToMarkdown(block: Block): string {
   markdown += `Created: ${new Date(block.metadata.createdAt).toISOString()}\n`
   if (block.metadata.tags?.length > 0) markdown += `Tags: ${block.metadata.tags.join(', ')}\n`
   if (block.derivation?.isDerivative) {
-    markdown += `\n## Derivation Info\n`
+    markdown += '\n## Derivation Info\n'
     markdown += `Source Block: ${block.derivation.sourceBlockId}\n`
     markdown += `Context: ${block.derivation.contextTitle}\n`
     markdown += `Modifications: ${block.derivation.modifications}\n`
@@ -151,7 +230,6 @@ export function blockToMarkdown(block: Block): string {
   return markdown
 }
 
-// Document 导出为 Markdown
 export function documentToMarkdown(document: Document): string {
   let markdown = `# ${document.title}\n\n`
   if (document.content) {

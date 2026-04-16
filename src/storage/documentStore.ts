@@ -7,6 +7,10 @@ export type { Document, DocumentBlock }
 
 const STORE_NAME = 'documents'
 
+interface DocumentStoreOptions {
+  skipSyncMark?: boolean
+}
+
 export class DocumentStore {
   private currentDocumentId: string | null = null
 
@@ -22,16 +26,18 @@ export class DocumentStore {
     return this.currentDocumentId
   }
 
-  async saveDocument(doc: Document): Promise<string> {
+  async saveDocument(doc: Document, options: DocumentStoreOptions = {}): Promise<string> {
     const db = getDatabase()
     return new Promise((resolve, reject) => {
       const tx = db.transaction([STORE_NAME], 'readwrite')
       const req = tx.objectStore(STORE_NAME).put(doc)
       req.onsuccess = () => {
-        // 标记文档已变更，等待同步
-        import('../services/autoSyncService').then(({ autoSyncService }) => {
-          autoSyncService.markDocumentChanged(doc.id)
-        })
+        if (!options.skipSyncMark) {
+          // 标记文档已变更，等待同步
+          import('../services/autoSyncService').then(({ autoSyncService }) => {
+            autoSyncService.markDocumentChanged(doc.id)
+          })
+        }
         resolve(doc.id)
       }
       req.onerror = () => reject(req.error)
@@ -109,6 +115,23 @@ export class DocumentStore {
   async getDocumentsByProject(projectId: string): Promise<Document[]> {
     const allDocs = await this.getAllDocuments()
     return allDocs.filter(doc => doc.projectId === projectId)
+  }
+
+  async deleteDocument(id: string, options: DocumentStoreOptions = {}): Promise<void> {
+    const db = getDatabase()
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction([STORE_NAME], 'readwrite')
+      const req = tx.objectStore(STORE_NAME).delete(id)
+      req.onsuccess = () => {
+        if (!options.skipSyncMark) {
+          import('../services/autoSyncService').then(({ autoSyncService }) => {
+            autoSyncService.markDocumentDeleted(id)
+          })
+        }
+        resolve()
+      }
+      req.onerror = () => reject(req.error)
+    })
   }
 
   async getTodayDocuments(): Promise<Document[]> {

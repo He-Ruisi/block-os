@@ -11,6 +11,7 @@ import {
 import { SuggestionMenu } from './SuggestionMenu'
 import { documentStore } from '../../storage/documentStore'
 import { blockStore } from '../../storage/blockStore'
+import { recordBlockUsage } from '../../services/blockReleaseService'
 import { sendInlineAIRequest } from '../../services/aiService'
 import { captureSelectionAsBlock } from '../../services/blockCaptureService'
 import { generateUUID } from '../../utils/uuid'
@@ -584,11 +585,39 @@ export function Editor({ onEditorReady, onTextSelected, documentId }: EditorProp
     return () => window.removeEventListener('navigateToBlock', handler)
   }, [])
 
+  useEffect(() => {
+    if (!editor) return
+
+    const handler = (e: Event) => {
+      const { text, level } = (e as CustomEvent<{ text: string; level: number }>).detail
+      if (!text) return
+
+      let targetPos: number | null = null
+      editor.state.doc.descendants((node, pos) => {
+        if (node.type.name !== 'heading') return true
+        const headingLevel = (node.attrs.level as number) || 1
+        const headingText = node.textContent.trim()
+        if (headingLevel === level && headingText === text.trim()) {
+          targetPos = pos
+          return false
+        }
+        return true
+      })
+
+      if (targetPos !== null) {
+        editor.chain().focus().setTextSelection(targetPos).scrollIntoView().run()
+      }
+    }
+
+    window.addEventListener('navigateToHeading', handler)
+    return () => window.removeEventListener('navigateToHeading', handler)
+  }, [editor])
+
   // 监听从 Block 详情面板插入 release 的事件
   useEffect(() => {
     if (!editor) return
     const handler = (e: Event) => {
-      const { content, title, releaseVersion } = (e as CustomEvent).detail
+      const { content, title, releaseVersion, blockId } = (e as CustomEvent).detail
       if (!content) return
       const lines = content.split('\n').filter((l: string) => l.trim())
       editor.chain().focus().insertContent({
@@ -596,7 +625,7 @@ export function Editor({ onEditorReady, onTextSelected, documentId }: EditorProp
         attrs: {
           source: 'inspiration',
           sourceLabel: `📦 v${releaseVersion} · ${title}`,
-          blockId: (e as CustomEvent).detail.blockId || null,
+          blockId: blockId || null,
           releaseVersion: releaseVersion,
         },
         content: lines.map((line: string) => ({
@@ -604,6 +633,9 @@ export function Editor({ onEditorReady, onTextSelected, documentId }: EditorProp
           content: [{ type: 'text', text: line }],
         })),
       }).run()
+      if (blockId && releaseVersion) {
+        void recordBlockUsage(blockId, releaseVersion)
+      }
     }
     window.addEventListener('insertBlockRelease', handler)
     return () => window.removeEventListener('insertBlockRelease', handler)

@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import './Toast.css'
 
 interface ToastProps {
   message: string
@@ -26,10 +25,22 @@ export function Toast({ message, type = 'success', duration = 3000, onClose }: T
     info: 'ℹ'
   }
 
+  const typeStyles = {
+    success: 'bg-green-500 text-white',
+    error: 'bg-red-500 text-white',
+    info: 'bg-blue-500 text-white'
+  }
+
   return (
-    <div className={`toast toast-${type} ${isVisible ? 'toast-visible' : 'toast-hidden'}`}>
-      <span className="toast-icon">{icons[type]}</span>
-      <span className="toast-message">{message}</span>
+    <div 
+      className={`fixed top-5 right-5 z-[10000] flex min-w-[200px] max-w-[400px] items-center gap-2.5 rounded-lg px-5 py-3 text-sm font-medium shadow-lg transition-all duration-300 ${
+        typeStyles[type]
+      } ${
+        isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-5'
+      }`}
+    >
+      <span className="text-lg font-bold">{icons[type]}</span>
+      <span className="flex-1">{message}</span>
     </div>
   )
 }

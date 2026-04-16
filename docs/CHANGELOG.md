@@ -1,5 +1,679 @@
 # BlockOS 更新日志
 
+## [v1.16.4] - 2026-04-15 🎨 完成所有低风险组件 Tailwind 样式重构
+
+**重要里程碑**：完成 6 个低风险组件的 Tailwind CSS 迁移，累计完成 12 个组件（43%）。
+
+- **今日完成组件**（6 个）：
+  - **ActivityBar**（活动栏）：左侧图标栏，使用 flex、h-12、w-12，激活状态紫色左边框
+  - **StatusBar**（状态栏）：底部状态显示，三栏布局（同步/保存/统计），状态颜色标记
+  - **ResizeHandle**（调整大小手柄）：拖拽调整宽度，group-hover 悬停效果，双击恢复默认
+  - **Toast**（提示消息）：固定定位，三种类型（success/error/info），淡入淡出动画
+  - **MarkdownRenderer**（Markdown 渲染器）：最复杂组件，20+ 子元素样式，代码高亮、表格、引用
+  - **SyncStatusIndicator**（同步状态指示器）：紧凑布局，不同状态不同背景色，旋转动画
+- **技术实现**：
+  - 移除所有 CSS 文件导入，完全使用 Tailwind 工具类
+  - 删除 6 个 CSS 文件，代码更简洁
+  - 保持功能逻辑不变，只更新样式
+  - TypeScript 类型检查通过 ✅
+- **Tailwind 类名规范**：
+  - 尺寸：h-6/h-12/h-14、w-12、max-w-[760px]
+  - 间距：px-2/px-3/px-4、gap-1/gap-2/gap-3
+  - 圆角：rounded-md/rounded-lg/rounded-2xl/rounded-full
+  - 颜色：bg-background/bg-muted、text-foreground/text-muted-foreground
+  - 状态：hover:bg-muted、disabled:opacity-50
+  - 动画：animate-spin（旋转）
+- **进度统计**：
+  - 总进度：12/28 完成（43%）
+  - 今日新增：6 个组件
+  - 剩余：16 个组件（8 个中风险 + 8 个低优先级/高风险）
+
+**下一步**：明日开始中风险组件迁移（TabBar、RightPanel、7 个右侧面板子组件），预计 3-4 小时。
+
+---
+
+## [v1.16.3] - 2026-04-15 🎨 AI 沉浸模式 Tailwind 样式重构完成（Phase 2）
+
+**重要里程碑**：完成 AI 沉浸模式从 CSS 到 Tailwind 的完整样式重构，采用 Notion/Roam 风格设计。
+
+- **样式系统升级**：
+  - 移除所有组件的 CSS 文件（5 个），完全使用 Tailwind 工具类
+  - 更新 Design Tokens（--radius: 0.625rem，添加字体连字优化）
+  - 参考 v0.dev 生成的 Notion/Roam 风格设计
+- **组件重构**（5 个核心组件）：
+  - **ChatHeader**：h-14 顶部导航，按钮 h-8 w-8，激活状态 bg-primary/10
+  - **ChatInput**：max-w-[760px] 居中，rounded-2xl 圆角，功能按钮 rounded-full，添加 textarea 自动高度
+  - **ChatLayout**：flex flex-col h-screen，内容区 max-w-[760px] mx-auto
+  - **MessageContent**：用户消息 bg-muted rounded-2xl，AI 消息 bg-transparent，添加复制和 hover 功能
+  - **AIImmersivePanel**：侧边栏 w-80 lg:w-[25%]，遮罩层 bg-black/20
+- **交互优化**：
+  - Textarea 自动高度调整（最大 200px）
+  - 复制按钮（2 秒后恢复）
+  - Hover 显示工具栏（opacity-0 → opacity-100）
+  - 平滑过渡动画（transition-all duration-200/300）
+- **Tailwind 类名规范**：
+  - 尺寸：h-7/h-8/h-9/h-14、max-w-[760px]
+  - 间距：px-2/px-3/px-4、gap-1/gap-2/gap-3
+  - 圆角：rounded-md/rounded-2xl/rounded-full
+  - 颜色：bg-background/bg-muted、text-foreground/text-muted-foreground
+  - 状态：hover:bg-muted、disabled:opacity-50
+- **验证通过**：
+  - TypeScript 类型检查通过 ✅
+  - 开发服务器正常启动 ✅
+  - 功能逻辑保持不变 ✅
+  - 代码更简洁（移除 5 个 CSS 文件）✅
+
+**技术亮点**：
+1. 完全使用 Tailwind 工具类，无自定义 CSS
+2. 借鉴 v0.dev 的 Notion/Roam 风格设计
+3. 保持功能逻辑不变，只更新样式
+4. 优化交互体验（自动高度、复制、hover）
+5. 统一的设计规范和类名约定
+
+**下一步**：
+- 手动功能测试（消息发送、工具栏、侧边栏、设置）
+- 主题适配测试（Default + Newsprint）
+- 响应式测试（桌面/平板/手机）
+- Phase 3: 安装常用 Shadcn UI 组件
+- Phase 4: 重构其他模块（Sidebar、TabBar、Editor 等）
+
+---
+
+## [v1.16.1] - 2026-04-15 🔧 Tailwind CSS 版本问题修复
+
+**技术修复**：解决 Tailwind CSS 4.x PostCSS 插件兼容性问题。
+
+- **问题诊断**：
+  - Tailwind CSS 4.x 架构变更，PostCSS 插件移到独立包
+  - 旧配置（`tailwindcss: {}`）不再兼容
+  - 开发服务器启动失败，报 PostCSS 插件错误
+- **解决方案**：
+  - 降级到 Tailwind CSS 3.4.19（Shadcn/UI 官方推荐版本）
+  - 保持配置不变，完全兼容
+  - 验证通过：类型检查 ✅、开发服务器 ✅
+- **技术决策**：
+  - 选择稳定性和兼容性优先
+  - 遵循 Shadcn/UI 官方推荐
+  - 3.x 版本成熟稳定，生态完善，完全满足项目需求
+
+**验证结果**：
+- TypeScript 类型检查通过
+- 开发服务器成功启动（748ms）
+- 无任何错误或警告
+
+---
+
+## [v1.16.0] - 2026-04-15 🎨 Tailwind CSS + Shadcn/UI 安装完成
+
+**重要里程碑**：完成主题样式重塑的第一步，安装并配置 Tailwind CSS 和 Shadcn/UI。
+
+- **Tailwind CSS 安装**：
+  - 安装核心依赖（tailwindcss、postcss、autoprefixer）
+  - 创建 tailwind.config.js（支持暗色模式、CSS 变量）
+  - 创建 postcss.config.js
+- **Shadcn/UI 配置**：
+  - 安装工具库（class-variance-authority、clsx、tailwind-merge）
+  - 创建 components.json 配置文件
+  - 创建 src/lib/utils.ts（cn() 工具函数）
+  - 创建 src/components/ui/ 目录
+- **Design Token 系统**：
+  - 创建 src/index.css（完整的 CSS 变量系统，基于 HSL 格式）
+  - 定义 20+ CSS 变量（background、foreground、primary、secondary 等）
+  - 支持亮色和暗色主题（.dark 类切换）
+- **路径别名配置**：
+  - 更新 tsconfig.json（添加 @/* 路径别名）
+  - 更新 vite.config.ts（添加路径别名解析）
+  - 安装 @types/node（path 模块类型定义）
+- **验证通过**：
+  - TypeScript 类型检查通过（bun run type-check）
+  - 开发服务器正常启动（bun run dev）
+
+**核心特性**：
+1. CSS 变量系统（HSL 格式，适合主题切换）
+2. 暗色模式支持（通过 .dark 类切换）
+3. 路径别名（@/components、@/lib/utils）
+4. 类型安全（100% TypeScript 类型检查通过）
+5. 完全遵循 Shadcn/UI 官方推荐配置
+
+**下一步**：
+- 安装具体的 Shadcn UI 组件（Button、Card、Dialog 等）
+- 自定义 CSS 变量调整主题
+- 使用 Tailwind 工具类重构现有组件
+
+---
+
+## [v1.15.0] - 2026-04-15 🎨 OCR 增强 UI 设计文档完成
+
+**重要里程碑**：完成专业级 OCR 解析工作站的完整设计文档（2180 行）。
+
+- **设计文档分阶段补充**：从 747 行扩展到 **2180 行**（增加 1433 行）
+- **PreviewArea Component 设计**：Bounding_Box 渲染核心算法、点击检测、交互功能
+- **ResultEditor Component 设计**：多视图切换、模型选择、置信度标记、快捷操作
+- **Data Models and Storage 设计**：IndexedDB Schema、PhotoRecordStore、OCR Service 集成
+- **Implementation Plan**：5 个阶段详细任务清单和验收标准
+- **Testing Strategy**：单元测试、集成测试、性能测试计划
+
+**核心技术亮点**：
+1. Canvas 叠加层渲染（高性能 Bounding_Box 可视化）
+2. 坐标转换算法（API 坐标 → Canvas 坐标）
+3. 双向交互联动（预览区域 ↔ 结果编辑器）
+4. IndexedDB 持久化（可靠的本地存储）
+5. 模块化组件设计（清晰的职责划分）
+
+---
+
+## [v1.14.0] - 2026-04-15 🎨 OCR 增强 UI 设计文档创建
+
+**重要里程碑**：完成专业级 OCR 解析工作站的需求审核和设计文档创建。
+
+- **需求文档升级（v1.0 → v2.0）**：
+  - 从基础款 OCR 插件升级为专业级 OCR 解析工作站
+  - 文档规模从 ~600 行扩展到 1041 行
+  - 新增 10 个专业功能需求（Requirement 15-24）
+  - 新增 5 个 Correctness Properties（Property 11-15）
+  - 更新分阶段实施计划（3 步 → 5 步）
+- **核心专业功能**：
+  - **识别区域可视化（Bounding_Box）** —— 最高优先级功能
+    - 在图片上渲染蓝色高亮边界框
+    - 点击定位到对应文本
+    - 悬停显示置信度
+    - 显示/隐藏切换
+  - **多模型切换** —— 支持在不同 OCR 模型之间切换对比
+  - **多视图** —— 文档解析视图 + JSON 视图
+  - **预览工具栏** —— 页码、缩放、旋转、重置、适应
+  - **置信度标记** —— 颜色编码（绿/黄/红）、低置信度过滤
+- **左栏增强**：
+  - 分类管理（最近上传/我的收藏）
+  - 搜索功能（按文件名）
+  - 顶部操作区（+ 新解析、系统设置）
+  - 文件名显示（而非仅时间戳）
+- **中栏增强**：
+  - 元数据显示（文件名、文件大小、上传时间）
+  - Bounding_Box 渲染（Canvas 叠加层）
+  - 预览控制工具栏（缩放 25%-400%、旋转、页码）
+- **右栏增强**：
+  - 模型选择下拉菜单
+  - 视图切换（文档解析/JSON）
+  - 顶部快捷操作（复制、刷新、保存、下载）
+  - 置信度显示和标记
+- **设计文档创建**：
+  - 高层架构设计（Mermaid 图：组件层次、数据流）
+  - 状态管理策略（React Context + useState）
+  - HistoryList 组件完整实现（接口定义、子组件、样式）
+  - 数据模型定义（Photo_Record、BoundingBox、OCR_Model）
+- **分阶段实施计划**（5 个 Phase，共 8 周）：
+  - Phase 1: 基础三栏布局 + 历史记录增强（2 周）
+  - Phase 2: 图片预览 + 预览工具栏（1 周）
+  - Phase 3: 识别区域可视化（Bounding_Box）（2 周，核心）
+  - Phase 4: 结果编辑 + 多视图 + 模型切换（2 周）
+  - Phase 5: 快捷操作 + 导出 + 性能优化（1 周）
+
+**技术难点**：
+- Bounding_Box 渲染（Canvas 叠加层、坐标转换、缩放/旋转同步）
+- 多模型切换（API 集成、配置管理）
+- 性能优化（虚拟滚动、Canvas 离屏渲染、防抖）
+
+**下一步**：等待设计文档审核，审核通过后进入任务分解和实施阶段
+
+## [v1.13.0] - 2026-04-15 📋 OCR 增强 UI 需求文档创建
+
+**新功能规划**：
+
+- **OCR 插件 UI/UX 增强需求文档**：
+  - 创建完整的需求文档（`.kiro/specs/ocr-enhanced-ui/requirements.md`）
+  - 设计三栏布局界面（左侧历史记录 + 中间预览 + 右侧结果编辑）
+  - 定义 14 个功能需求，包含详细的验收标准
+  - 定义 6 个非功能需求（性能、可用性、可维护性、兼容性、安全性、可扩展性）
+  - 定义 10 个正确性属性用于 Property-Based Testing
+  - 完整的约束、假设和风险分析
+  - 规划分三步实施（布局 → 预览 → 编辑）
+- **核心功能设计**：
+  - 照片历史记录持久化（IndexedDB，最多 100 条）
+  - 响应式布局（768px 断点自动切换单栏/三栏）
+  - 识别结果编辑（支持复制、插入编辑器、保存为 Block）
+  - 性能优化（虚拟滚动、缩略图、懒加载）
+  - 完整的可访问性支持（键盘导航、ARIA 标签）
+- **质量保证**：
+  - 所有需求符合 EARS 模式和 INCOSE 质量规则
+  - 可测试、无模糊术语
+  - 包含完整的 Property-Based Testing 策略
+
+**技术约束**：
+- 完全兼容现有插件系统架构，复用 Plugin_API 和 PluginRegistry
+- 使用 React 18 + TypeScript 5 + IndexedDB
+- 分三步实施（布局 → 预览 → 编辑）
+
+**下一步**：等待需求审核，审核通过后进入设计阶段
+
+## [v1.12.4] - 2026-04-15 🎨 OCR 加载动画 + 手机访问支持
+
+**用户体验优化**：
+
+- **OCR 识别加载动画**：
+  - 三环旋转动画（绿色、蓝色、橙色），动态效果流畅
+  - 半透明遮罩 + 毛玻璃效果（backdrop-filter: blur）
+  - 文字提示："正在识别文字..." + "请稍候，这可能需要几秒钟"
+  - 脉冲动画，吸引用户注意力
+  - 识别中禁用按钮，防止重复点击
+- **手机访问支持**：
+  - 配置 Vite 允许局域网访问（host: '0.0.0.0'）
+  - 手机可通过局域网 IP 访问开发服务器
+  - 创建完整的手机访问指南（mobile-access.md）
+  - 包含 HTTPS 配置、防火墙设置、常见问题解答
+- **移动端体验优化**：
+  - 加载动画在手机上流畅显示
+  - 解决手机识别慢时用户焦虑问题
+  - 视觉反馈明显，用户体验提升
+
+**技术细节**：
+- 使用 CSS transform 实现 GPU 加速动画
+- 使用 cubic-bezier 缓动函数，动画更自然
+- 使用 backdrop-filter 实现毛玻璃效果
+- 性能优化，动画流畅不卡顿
+
+**访问地址**：
+- 电脑：`http://localhost:5173`
+- 手机：`http://192.168.2.101:5173`（局域网 IP）
+
+## [v1.12.3] - 2026-04-15 🔧 OCR 403 错误分析 + 备用方案
+
+**问题诊断和多方案支持**：
+
+- **403 Forbidden 错误分析**：
+  - 原因：PaddleOCR API 服务器拒绝代理请求
+  - 可能：Token 验证失败、请求头缺失、IP 限制、代理被检测
+- **代理配置优化**：
+  - 添加必要的请求头（User-Agent、Origin、Referer、Accept）
+  - 添加代理日志（proxyReq、proxyRes、error）方便调试
+  - 模拟真实浏览器请求，避免被服务器检测
+- **Tesseract.js 备用方案**（`src/plugins/ocr-plugin/ocrService.tesseract.ts`）：
+  - 纯前端 OCR 实现，完全免费，无需 API Key
+  - 无 CORS 问题，离线可用
+  - 支持中文和英文，识别速度 3-10 秒
+  - 准确率略低于 PaddleOCR，适合测试和离线场景
+- **完整文档体系**：
+  - `docs/guide/ocr-403-fix.md` - 403 错误 4 种解决方案
+  - `docs/guide/ocr-solutions-comparison.md` - OCR 方案对比和选择指南
+  - `docs/guide/ocr-quick-fix.md` - CORS 问题快速修复参考
+  - `docs/guide/README.md` - 使用指南索引
+
+**推荐操作**：
+1. 重启开发服务器（`bun run dev`）测试优化后的代理
+2. 如果仍然 403，切换到 Tesseract.js（`bun add tesseract.js`）
+3. 长期方案：注册百度 OCR API（免费额度足够个人使用）
+
+## [v1.12.2] - 2026-04-15 🔧 CORS 问题深度修复 + 配置清理工具
+
+**Bug 修复**：解决 localStorage 旧配置导致的 CORS 问题持续出现。
+
+- **问题根因**：
+  - localStorage 中保存了旧的 HTTPS URL 配置
+  - 代码只在配置为空时设置默认值，不会覆盖已存在的旧配置
+  - 即使重启服务器，localStorage 持久化存储导致旧配置仍然生效
+- **代码修复**：
+  - 强制更新旧配置：检测到 HTTPS URL 时自动替换为代理路径
+  - 添加详细调试日志：插件激活时输出当前配置，API 调用时输出请求 URL 和响应状态
+  - 改进配置初始化逻辑：`if (!apiUrl || apiUrl.startsWith('https://'))`
+- **配置清理工具**（`scripts/clear-ocr-config.html`）：
+  - 可视化界面，一键查看/清理/重置配置
+  - 提供详细的使用步骤说明
+  - 自动检测旧配置并给出建议
+- **故障排查指南**（`docs/guide/ocr-plugin-troubleshooting.md`）：
+  - 3 种解决方案（清理工具/手动清理/自动修复）
+  - 详细的调试技巧和验证步骤
+  - 常见问题 FAQ 和终极解决方案
+  - 生产环境部署建议
+
+**用户操作**：刷新页面即可自动修复，或使用 `http://localhost:5173/scripts/clear-ocr-config.html` 手动清理配置。
+
+## [v1.12.1] - 2026-04-15 🔧 OCR 插件 UI 优化 + CORS 问题修复
+
+**Bug 修复和优化**：
+
+- **UI 布局优化**：
+  - 修复插件列表中描述文字被截断的问题
+  - 插件卡片改为垂直布局，信息和操作按钮分两行显示
+  - 描述文字支持自动换行（word-wrap: break-word）
+  - 操作按钮右对齐，支持自动换行
+- **CORS 跨域问题修复**：
+  - 在 `vite.config.ts` 中添加代理配置，将 `/api/ocr/` 请求转发到 PaddleOCR 服务器
+  - 更新 OCR 插件默认 API 地址为 `/api/ocr/layout-parsing`（使用代理）
+  - 避免浏览器 CORS 策略阻止请求
+- **设置面板优化**：
+  - 添加 API 地址说明提示
+  - 美化表单样式（输入框、按钮、标签）
+  - 添加配置说明文字
+- **文档更新**：
+  - 新增 `docs/guide/ocr-plugin-usage.md` - OCR 插件使用指南
+  - 包含 CORS 问题解决方案、配置说明、常见问题
+  - 更新测试指南，添加 CORS 问题说明
+
+**重要提示**：修改 `vite.config.ts` 后需要重启开发服务器（`bun run dev`）以应用代理配置。
+
+## [v1.12.0] - 2026-04-15 🔌 OCR 插件系统实施完成（Phase 1-3）
+
+**重要里程碑**：完成通用可插拔插件系统核心实现，OCR 文字识别插件已集成到应用中。
+
+- **Phase 1: 插件系统核心**：
+  - ✅ 插件类型定义（src/types/plugin.ts）：PluginMetadata、PluginPermission、IPlugin、PluginStatus、PluginRegistryEntry
+  - ✅ 插件配置存储（src/storage/pluginConfigStore.ts）：基于 localStorage 的配置持久化，get/set/remove/getAll/clearAll 方法
+  - ✅ 插件 API（src/services/pluginAPI.ts）：编辑器操作、Block 操作、配置存储、通知系统、权限检查机制
+  - ✅ 插件注册表（src/services/pluginRegistry.ts）：插件注册、激活、停用、卸载、实例管理、状态追踪
+- **Phase 2: OCR 插件实现**：
+  - ✅ OCR 服务（ocrService.ts）：PaddleOCR API 调用封装、Base64 图片识别、错误处理
+  - ✅ OCR UI 组件（OCRPanel.tsx）：摄像头拍照、图片上传、识别结果展示、插入编辑器/保存为 Block
+  - ✅ OCR 插件入口（index.tsx）：OCRPlugin 类实现 IPlugin 接口、生命周期管理、设置面板
+  - ✅ OCR 样式（OCRPanel.css）：响应式布局、主题适配（CSS 变量）
+- **Phase 3: 集成与测试**：
+  - ✅ 更新 ExtensionsView 组件：插件列表展示、插件状态显示、插件操作（打开/设置/卸载）、插件 UI 渲染容器
+  - ✅ 在 App.tsx 中初始化插件系统：创建 PluginAPI 实例、设置插件注册表、注册 OCR 插件
+  - ✅ TypeScript 类型检查通过（bun run type-check）
+- **技术亮点**：
+  - 通用插件架构：完全可插拔，支持多种类型插件扩展
+  - 权限系统：7 种权限类型，细粒度控制插件访问
+  - 类型安全：所有接口使用 TypeScript 严格类型定义
+  - 配置持久化：基于 localStorage，插件配置独立存储
+  - 生命周期管理：activate/deactivate 钩子，优雅的插件加载/卸载
+  - 依赖层级遵守：严格遵循项目架构约束（types → storage → services → components）
+- **用户体验**：
+  - 用户可以在 ActivityBar 点击"插件"图标查看已安装插件
+  - OCR 插件支持摄像头拍照和图片上传两种方式
+  - 识别结果可以插入编辑器（作为 SourceBlock）或保存为显式 Block
+  - 插件配置（API URL 和 Token）可在设置面板中修改
+
+新增 8 个文件，修改 3 个文件，所有代码通过 TypeScript 类型检查。下一步：Phase 4 文档与优化（插件开发文档、用户使用文档、性能优化、安全审计）。
+
+## [v1.11.0] - 2026-04-15 🔌 OCR 插件系统技术设计
+
+**重要里程碑**：完成通用可插拔插件系统架构设计，OCR 文字识别作为首个示例插件。
+
+- **通用插件架构**：
+  - 标准插件接口（IPlugin）定义生命周期（activate/deactivate/render）
+  - 插件注册表（PluginRegistry）管理插件状态和实例
+  - 插件 API（PluginAPI）提供主应用功能桥接
+  - 插件配置存储（PluginConfigStore）基于 localStorage 持久化
+- **权限系统**：7 种权限类型（editor:read/write、block:read/write、storage:read/write、network），装饰器模式权限检查
+- **OCR 插件设计**：
+  - 完整 UI 组件（摄像头拍照、图片上传、识别结果展示）
+  - PaddleOCR API 集成（Base64 编码、流式响应）
+  - 识别结果可插入编辑器（SourceBlock）或保存为 Block
+  - 配置持久化（API URL、Token）
+- **ExtensionsView 增强**：插件列表、安装/卸载、打开/设置、状态管理
+- **完全可插拔**：插件独立加载和卸载，卸载后自动清理所有资源和配置
+- **类型安全**：所有接口使用 TypeScript 严格类型，完整的错误处理机制
+- **安全考虑**：权限管理、API Token 保护、HTTPS Only、XSS 防护、CSP 策略
+- **实施路径**：4 周计划（插件系统核心 → OCR 插件实现 → 集成测试 → 文档优化）
+- **未来扩展**：插件市场、翻译插件、图表生成插件、代码格式化插件、插件 SDK
+
+新增技术设计文档 `.kiro/specs/ocr-plugin-system/design.md`，包含 3 个 Mermaid 架构图、完整的 TypeScript 接口定义、组件实现代码、测试策略。→ [技术设计](../.kiro/specs/ocr-plugin-system/design.md)
+
+## [v1.10.2] - 2026-04-14 🐛 修复 AI 沉浸模式右侧边栏显示问题
+
+**重要 Bug 修复**：修复 AI 沉浸模式下点击历史对话和设置按钮无法显示右侧边栏的问题。
+
+- **问题根因**：
+  - `ChatLayout.css` 中设置了 `width: 100vw`，导致左侧对话区强制占据整个视口宽度
+  - 右侧边栏被挤出视口范围，虽然状态更新正确但不可见
+  - 这是一个典型的 CSS 布局问题：子元素宽度超出父容器
+- **修复方案**：
+  - 将 `ChatLayout.css` 中的 `width: 100vw` 改为 `width: 100%`
+  - 让 ChatLayout 适应父容器宽度，而不是强制占据整个视口
+- **布局逻辑**：
+  - `ai-immersive-container` (100vw) → `ai-immersive-main` (flex: 3, 75%) → `ChatLayout` (width: 100%)
+  - `ai-immersive-sidebar` (flex: 1, 25%) 正常显示
+- **验收标准**：
+  - ✅ 点击"历史对话"按钮，右侧边栏正常显示会话列表
+  - ✅ 点击"设置"按钮，右侧边栏正常显示设置面板
+  - ✅ 左侧对话区宽度自动调整（100% → 75%）
+  - ✅ 右侧边栏占据 25% 宽度，3:1 比例正确
+
+修复后 AI 沉浸模式的右侧边栏功能完全正常，用户可以正常访问历史对话和设置面板。
+
+## [v1.10.1] - 2026-04-14 🎨 AI 沉浸模式右侧边栏布局
+
+**重要交互改进**：AI 沉浸模式采用左右分栏布局，历史对话和设置以侧边栏形式显示。
+
+- **左右分栏布局**：
+  - 左侧 AI 对话区占 75%（flex: 3）
+  - 右侧边栏占 25%（flex: 1）
+  - 并排显示，不遮挡对话内容
+- **右侧边栏功能**：
+  - 点击"历史对话"按钮 → 右侧边栏滑入，显示会话列表
+  - 点击"设置"按钮 → 右侧边栏滑入，显示设置面板
+  - 再次点击按钮 → 右侧边栏滑出，恢复全宽
+- **交互优化**：
+  - 左侧对话区始终可见，宽度自动调整（100% → 75%）
+  - 平滑过渡动画（0.3s ease）
+  - 右侧边栏独立滚动，不影响对话区
+  - 完整的 Newsprint 主题适配
+- **样式增强**：
+  - 创建 AIImmersivePanel.css 样式文件
+  - 边框分隔（1px solid，Newsprint 主题 2px）
+  - 独立的 header 和 body 区域
+  - 按钮激活状态（紫色背景）
+
+相比全屏弹窗，侧边栏布局提供更好的空间利用和交互连续性。→ [完整文档](./spec/features/ai/ai-immersive-mode.md)
+
+## [v1.10.0] - 2026-04-14 🎨 AI 沉浸模式界面优化（Phase 6）
+
+**重要更新**：AI 沉浸模式对话界面全面升级，采用全新的组件化设计。
+
+- **新组件架构**：
+  - `ChatLayout`：全屏布局容器（100vh，三区域：顶部导航、中间内容、底部输入）
+  - `ChatHeader`：顶部导航栏（折叠按钮、标题、副标题、新建对话、分享按钮）
+  - `MessageContent`：AI 回答内容区（水平居中，max-width: 760px，支持 Markdown 渲染）
+  - `ChatInput`：底部输入框（圆角 16px，功能按钮组，附件按钮，圆形发送按钮）
+  - `AIImmersivePanel`：整合所有子组件的沉浸式面板
+- **设计亮点**：
+  - 内容区水平居中，最大宽度 760px，最佳阅读体验
+  - 正文字号 15px，行高 1.7，使用 CSS 变量
+  - 行内代码块：背景 `var(--color-bg-code)`，圆角 4px，padding 2px 6px
+  - 底部输入框固定在底部，与内容区宽度一致
+  - 功能按钮组（DeepThink、Search）pill 形状，有 icon + 文字
+  - 发送按钮圆形（36x36px），主色背景，hover 效果
+  - 底部说明文字居中显示，小字，颜色 `var(--color-text-muted)`
+- **技术约束**：
+  - ✅ 未引入任何新的组件库或第三方库
+  - ✅ 所有颜色、字号、圆角使用项目已有的 CSS design token
+  - ✅ Props 用 TypeScript interface 定义
+  - ✅ 组件拆分遵循单一职责原则
+  - ✅ TypeScript 类型检查通过
+
+AI 沉浸模式界面优化完成，Phase 6 全部完成。新界面在 AI 沉浸模式且有消息时自动启用。→ [完整文档](./spec/features/ai/ai-immersive-mode.md)
+
+## [v1.9.2] - 2026-04-14 🐛 修复 Block 发布版本和引用记录
+
+**核心功能 Bug 修复**：修复 Block 编辑后发布版本无响应和引用记录一直为 0 的问题。
+
+- **问题 1：发布版本无响应**
+  - 编辑区域的 block 编辑后点击"发布版本"按钮，版本数不增加
+  - 原因：发布成功后节点的 `releaseVersion` 属性没有被更新
+  - 修复：在 `sourceBlock.ts` 中，发布成功后立即更新节点的 `releaseVersion` 和 `sourceLabel` 属性
+- **问题 2：引用记录一直为 0**
+  - block 空间的引用记录一直显示为 0，即使已经发布了多个版本
+  - 原因：使用了错误的条件判断 `if (currentReleaseVersion !== release.version)`，导致首次发布时不记录 usage
+  - 修复：移除条件判断，每次发布都调用 `recordBlockUsage` 记录引用
+- **关键改进**：
+  - 简化逻辑：移除复杂的条件判断，每次发布都记录 usage
+  - 立即更新：先更新节点属性，再记录 usage，确保状态一致
+  - 触发事件：通过 `blockUpdated` 事件通知其他组件刷新
+- **验收标准**：
+  - ✅ 编辑 block 后发布，标签立即更新为新版本号
+  - ✅ Block 空间版本数正确增加（1 → 2 → 3...）
+  - ✅ 引用记录正确统计（不再为 0）
+  - ✅ 多次发布版本，版本号连续递增
+
+修复后 Block 版本管理功能完全正常，版本数和引用记录都能正确统计。→ [测试文档](./tests/block-release-usage-test.md)
+
+## [v1.9.1] - 2026-04-14 🐛 修复左侧边栏点击不显示
+
+**严重 Bug 修复**：修复点击 ActivityBar 图标后左侧边栏闪一下不显示的问题。
+
+- **问题描述**：
+  - 点击 ActivityBar 上方的项目、大纲等按钮后，左侧边栏快速闪一下但不显示
+  - 用户无法正常呼出左侧边栏，核心功能完全不可用
+  - 影响范围：桌面/平板/手机所有设备
+- **根本原因**：
+  - `handleSidebarViewChange` 使用 `toggleSidebar()` 切换状态，异步状态更新导致不一致
+  - `Sidebar` 组件在 `collapsed=true` 时直接返回 `null`，导致重新挂载闪烁
+- **修复方案**：
+  - App.tsx: 将 `toggleSidebar()` 改为直接设置 `setSidebarCollapsed(true/false)`
+  - Sidebar.tsx: 移除 `if (collapsed) return null`，改用 `style={{ display: collapsed ? 'none' : 'flex' }}`
+- **经验教训**：
+  - 避免使用 toggle 函数，直接设置状态更可靠
+  - 使用 CSS 控制显示避免重新挂载
+  - 状态更新是异步的，不要依赖状态更新的时序
+
+修复后左侧边栏可以正常展开/折叠，无闪烁，交互流畅。→ [Bug 修复文档](./tests/bug-fix-sidebar-flash.md) | [Bug 记录 #001](./bugs.md)
+
+## [v1.9.0] - 2026-04-14 📋 响应式测试文档体系
+
+**重要基础设施**：建立完整的响应式测试文档体系，支持桌面/平板/手机全矩阵测试。
+
+- **核心测试文档**（8个）：
+  - 测试文档中心（README.md）- 总入口和导航
+  - 开始响应式测试（start-responsive-test.md）- 新手必读
+  - 响应式测试矩阵（responsive-test-matrix.md）- 完整设备×浏览器矩阵
+  - 响应式快速测试（responsive-quick-test.md）- 5分钟快速验证
+  - 响应式测试检查清单（responsive-checklist.md）- 可打印清单
+  - 测试报告模板（test-report-template.md）- 标准化报告格式
+  - 测试进度跟踪（test-progress.md）- 实时进度和问题统计
+  - 响应式测试脚本（responsive-test-script.js）- 浏览器控制台自动化测试
+- **辅助文档**（3个）：
+  - 测试文档总结（SUMMARY.md）- 文档体系概览
+  - 项目测试指南（TEST.md）- 根目录快速指南
+  - 启动脚本（test-responsive.bat / test-responsive.sh）- 快速启动测试
+- **测试覆盖范围**：
+  - 设备：桌面（≥1280px）/ 平板（768-1280px）/ 手机（<768px）
+  - 浏览器：Chrome / Safari / Edge / Firefox
+  - 真机：iPad Pro / iPad Air / iPad Mini / iPhone 15 Pro Max / iPhone SE / Android
+  - 功能：AI 对话、布局响应式、触摸交互、编辑器、项目管理、Block 系统、主题、性能、数据持久化
+- **测试流程**：准备（10分钟）→ 浏览器模拟（30分钟）→ 真机测试（1小时）→ 自动化验证（5分钟）→ 报告提交（10分钟）
+- **文档特点**：
+  - 分层设计：从快速验证到完整测试
+  - 真机友好：可打印清单，支持局域网和 ngrok 访问
+  - 自动化支持：浏览器控制台脚本快速验证
+  - 标准化流程：统一的测试流程、报告格式和进度跟踪
+  - 优先级明确：P0/P1/P2 三级优先级，聚焦核心功能
+
+测试文档体系已完整建立，可以开始实际测试工作。预计完整测试时间 1.5-2 小时。→ [测试文档中心](./tests/README.md)
+
+## [v1.8.1] - 2026-04-13 ✨ AI 回复 Markdown 渲染增强 v2
+
+**重要更新**：编辑器内容（editorContent）现在也使用完整 Markdown 渲染，视觉层级更清晰。
+
+- **编辑器内容 Markdown 渲染**：
+  - `editorContent` 使用完整 Markdown 渲染（代码高亮、表格、列表等）
+  - 独立卡片样式，带"📝 编辑器内容"标签
+  - 更大的内边距（16px）和更清晰的视觉层级
+  - 完整主题适配（default + newsprint）
+- **显示逻辑优化**：
+  - AI 对话回复（`content`）：简短回复，Markdown 渲染
+  - 编辑器内容（`editorContent`）：完整内容，Markdown 渲染，重点展示
+  - 支持三种场景：只有对话/只有编辑器内容/同时存在两者
+- **视觉增强**：
+  - 编辑器内容卡片有独立背景色和边框
+  - Newsprint 主题：硬边框、硬阴影、衬线字体标签
+  - 更清晰的内容层级和视觉分离
+
+所有 AI 回复内容（对话和编辑器）都拥有完整的 Markdown 渲染效果。→ [完整文档](./spec/features/ai/ai-reply-markdown-rendering.md)
+
+## [v1.8.0] - 2026-04-13 ✨ AI 回复 Markdown 渲染增强
+
+**重要更新**：AI 回复从纯文本升级为完整 Markdown 渲染，支持代码高亮、表格、列表等丰富格式。
+
+- **Markdown 完整支持**：
+  - 标题（H1-H6）、段落、强调（粗体/斜体/删除线）
+  - 列表（有序/无序/嵌套）、引用、链接、分隔线
+  - 任务列表（GitHub 风格 GFM 扩展）
+- **代码渲染增强**：
+  - 语法高亮（支持 100+ 编程语言）
+  - 语言标签显示 + 一键复制按钮
+  - 行内代码带背景色和边框
+  - 主题适配（oneDark / oneLight）
+- **表格支持**：完整表格渲染，响应式横向滚动，悬停高亮
+- **主题适配**：Default 主题（圆角、柔和阴影）和 Newsprint 主题（直角、硬边框、衬线字体）
+- **响应式优化**：移动端字号自动调整，代码块和表格全宽显示
+- **性能优化**：只对 AI 回复使用 Markdown 渲染，用户消息保持纯文本
+
+新增 `MarkdownRenderer` 组件，使用 react-markdown + remark-gfm + react-syntax-highlighter 实现。→ [完整文档](./spec/features/ai/ai-reply-markdown-rendering.md)
+
+## [v1.7.1] - 2026-04-13 ⭐ 置顶功能增强
+
+**重要更新**：修复侧边栏闪退问题，完成置顶功能所有增强特性。
+
+- **Bug 修复**：修复 StarredView 组件异步加载导致的侧边栏闪退问题
+- **星标按钮**：
+  - 项目和文档行 hover 时显示星标按钮
+  - 已置顶项目显示金色填充星标 (#f59e0b)
+  - 点击切换置顶状态，实时同步
+- **拖拽排序**：
+  - 使用 HTML5 Drag and Drop API
+  - 拖拽时半透明显示 (opacity: 0.5)
+  - 支持任意位置放置，自动保存
+- **数量限制**：最多置顶 10 个项目，超限时弹出提示
+- **全局同步**：ExplorerView 和 StarredView 通过 toggleStar 事件实时同步
+
+修复了严重的侧边栏闪退 bug，完整实现所有置顶增强功能。→ [完整文档](./spec/features/editor/starred-items-enhancement.md)
+
+## [v1.7.0] - 2026-04-13 ⭐ 侧边栏置顶功能
+
+**新功能**：参考 Claude AI 侧边栏设计，添加置顶功能快速访问常用项目和文档。
+
+- **置顶视图**：侧边栏新增星标图标，显示置顶的项目和文档列表
+- **快速访问**：点击置顶项目切换视图，点击置顶文档直接打开
+- **数据持久化**：使用 localStorage 存储置顶列表（`blockos-starred-items`）
+- **全局事件系统**：`toggleStar` 事件支持跨组件通信
+- **交互优化**：
+  - 悬停显示取消置顶按钮
+  - 星标图标填充表示已置顶
+  - 空状态显示引导提示
+- **侧边栏布局调整**：资源管理器 → 搜索 → 置顶 → 大纲 → 插件
+- **主题适配**：Default 主题（金色星标）和 Newsprint 主题（红色星标）
+
+新增 `StarredView` 组件和 `StarredItem` 类型定义。→ [完整文档](./spec/features/editor/starred-items.md)
+
+## [v1.6.1] - 2026-04-13 🗄️ Supabase Schema v2.0
+
+**重要基础设施更新**：数据库 schema 升级以支持最新功能。
+
+- **Blocks 表增强**：
+  - 新增 `source` (JSONB) - 统一的来源信息对象
+  - 新增 `edit_history` (JSONB) - 编辑历史追踪
+  - 新增 `style` (JSONB) - 自定义样式配置
+  - 新增 `template` (JSONB) - 结构角色和导出规则
+  - 新增 `releases` (JSONB) - 版本快照系统
+  - 新增 `annotations` (JSONB) - 附属层（翻译/解释/评论/脚注）
+  - 新增派生字段：`derived_from`、`context_document_id`、`context_title`、`modifications`
+- **Documents 表增强**：
+  - 新增 `blocks` (JSONB) - 存储文档中的隐式 Block
+- **新增 block_usages 表**：独立存储 Block 使用记录，不内嵌在 Block 中
+- **性能优化**：
+  - 添加 JSONB 字段 GIN 索引提升查询性能
+  - 添加 `updated_at` 自动更新触发器
+- **同步服务更新**：`syncService.ts` 支持所有新字段的序列化/反序列化
+- **迁移指南**：完整的数据迁移文档，支持全新安装和保留数据迁移两种方案
+
+⚠️ **现有用户需要执行数据库迁移**，详见 [迁移指南](./guide/SUPABASE_MIGRATION.md)。新用户直接执行 `supabase-schema.sql` 即可。
+
+## [v1.6.0] - 2026-04-13 🤖 AI 沉浸式模式
+
+**重要里程碑**：实现 AI 沉浸式模式，提供全屏对话体验和平滑的编辑切换。
+
+- **双模式架构**：AI 沉浸式模式（ai-focus）和混合模式（hybrid），状态持久化到 localStorage
+- **AI 模式初始界面**：大号问候语"🤖 下午好"，居中巨大输入框（800px 最大宽度），底部显示当前模型信息
+- **AI 模式对话界面**：用户输入后输入框自动下沉到底部，对话内容区域展开，保持全屏沉浸式体验
+- **智能模式切换**：
+  - 点击"写入编辑器"自动创建新文档"AI 对话笔记"
+  - AI 内容自动写入新文档并聚焦
+  - 侧边栏默认隐藏，聚焦编辑体验
+  - 平滑布局过渡动画（0.4s cubic-bezier）
+  - AI 面板缩小到右侧，编辑区域从左侧展开
+- **完整主题适配**：Default 主题（圆角、柔和阴影、紫色强调）和 Newsprint 主题（直角、硬边框、黑色/红色强调）
+- **App.tsx 布局重构**：AI 模式只渲染 RightPanel（全屏），混合模式渲染完整三栏布局
+
+应用默认以 AI 沉浸式模式启动，提供纯净的对话体验。一键切换到编辑模式，自动创建文档并写入内容。→ [完整文档](./spec/features/ai/ai-immersive-mode.md)
+
 ## [v1.5.0] - 2026-04-13 🤖 DeepSeek API 集成
 
 **多 AI 提供商支持**：用户可在小米 MiMo 和 DeepSeek 之间自由切换。

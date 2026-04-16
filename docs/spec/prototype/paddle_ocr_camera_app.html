@@ -1,0 +1,265 @@
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PaddleOCR 拍照识别</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-sans, system-ui); background: transparent; color: var(--color-text-primary); }
+  .app { padding: 1rem 0; max-width: 720px; }
+  h2 { font-size: 18px; font-weight: 500; margin-bottom: 1rem; }
+  .card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg, 12px); padding: 1rem 1.25rem; margin-bottom: 1rem; }
+  .badge { display: inline-block; font-size: 12px; padding: 3px 10px; border-radius: var(--border-radius-md, 8px); font-weight: 500; }
+  .badge-info { background: var(--color-background-info); color: var(--color-text-info); }
+  .badge-success { background: var(--color-background-success); color: var(--color-text-success); }
+  .badge-danger { background: var(--color-background-danger); color: var(--color-text-danger); }
+  .badge-warn { background: var(--color-background-warning); color: var(--color-text-warning); }
+  video, canvas, img.preview { width: 100%; border-radius: var(--border-radius-md, 8px); background: var(--color-background-secondary); display: block; }
+  video { max-height: 300px; object-fit: cover; }
+  img.preview { max-height: 300px; object-fit: contain; }
+  .btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+  button { padding: 8px 18px; border-radius: var(--border-radius-md, 8px); border: 0.5px solid var(--color-border-secondary, #ccc); background: transparent; color: var(--color-text-primary); font-size: 14px; cursor: pointer; transition: background 0.15s; }
+  button:hover { background: var(--color-background-secondary); }
+  button:active { transform: scale(0.98); }
+  button:disabled { opacity: 0.4; cursor: not-allowed; }
+  button.primary { background: var(--color-background-info); color: var(--color-text-info); border-color: transparent; }
+  button.primary:hover { opacity: 0.85; }
+  button.danger { background: var(--color-background-danger); color: var(--color-text-danger); border-color: transparent; }
+  .result-box { white-space: pre-wrap; font-size: 14px; line-height: 1.7; background: var(--color-background-secondary); border-radius: var(--border-radius-md, 8px); padding: 12px; min-height: 80px; max-height: 320px; overflow-y: auto; color: var(--color-text-primary); }
+  .label { font-size: 13px; color: var(--color-text-secondary); margin-bottom: 6px; }
+  .status-row { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+  .spinner { width: 16px; height: 16px; border: 2px solid var(--color-border-secondary); border-top-color: var(--color-text-info); border-radius: 50%; animation: spin 0.7s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .error-msg { color: var(--color-text-danger); font-size: 13px; margin-top: 8px; }
+  .save-link { display: inline-block; margin-top: 10px; font-size: 13px; color: var(--color-text-info); text-decoration: underline; cursor: pointer; }
+  select, input[type="text"] { padding: 6px 10px; border: 0.5px solid var(--color-border-secondary, #ccc); border-radius: var(--border-radius-md, 8px); background: var(--color-background-primary); color: var(--color-text-primary); font-size: 14px; width: 100%; margin-top: 4px; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  @media (max-width: 480px) { .two-col { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="app">
+  <h2>PaddleOCR 拍照识别</h2>
+
+  <!-- 配置卡片 -->
+  <div class="card">
+    <p class="label">API 配置</p>
+    <div class="two-col">
+      <div>
+        <p class="label">API 地址</p>
+        <input type="text" id="apiUrl" value="https://lao3t2m4beyceb6c.aistudio-app.com/layout-parsing" />
+      </div>
+      <div>
+        <p class="label">Token</p>
+        <input type="text" id="apiToken" value="74fc1211d4321e9438158dae3d22f8005fd5e4e2" />
+      </div>
+    </div>
+  </div>
+
+  <!-- 摄像头卡片 -->
+  <div class="card">
+    <p class="label">摄像头 / 图片输入</p>
+    <div id="videoWrap" style="display:none;">
+      <video id="video" autoplay playsinline muted></video>
+    </div>
+    <div id="previewWrap" style="display:none;">
+      <img class="preview" id="previewImg" src="" alt="拍摄预览" />
+    </div>
+    <div id="placeholder" style="height:160px; display:flex; align-items:center; justify-content:center; color:var(--color-text-secondary); font-size:14px; background:var(--color-background-secondary); border-radius:var(--border-radius-md,8px);">
+      点击下方按钮开始
+    </div>
+    <div class="btn-row">
+      <button id="btnStart" onclick="startCamera()">开启摄像头</button>
+      <button id="btnCapture" onclick="capture()" disabled>拍照</button>
+      <button id="btnUpload" onclick="document.getElementById('fileInput').click()">上传图片</button>
+      <button id="btnOCR" class="primary" onclick="runOCR()" disabled>识别文字</button>
+      <button id="btnReset" onclick="resetAll()" style="display:none;">重置</button>
+    </div>
+    <input type="file" id="fileInput" accept="image/*" style="display:none;" onchange="onFileSelected(event)" />
+    <p class="error-msg" id="cameraError"></p>
+  </div>
+
+  <!-- 识别结果卡片 -->
+  <div class="card">
+    <div class="status-row">
+      <p class="label" style="margin:0;">识别结果</p>
+      <div class="spinner" id="spinner" style="display:none;"></div>
+      <span id="statusBadge" class="badge badge-info" style="display:none;"></span>
+    </div>
+    <div class="result-box" id="resultBox">等待识别...</div>
+    <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+      <span class="save-link" id="saveBtn" style="display:none;" onclick="saveResult()">保存为 .txt 文件</span>
+      <span class="save-link" id="copyBtn" style="display:none;" onclick="copyResult()">复制全部文字</span>
+    </div>
+    <p class="error-msg" id="ocrError"></p>
+  </div>
+</div>
+
+<canvas id="canvas" style="display:none;"></canvas>
+
+<script>
+let stream = null;
+let capturedBase64 = null;
+let resultText = '';
+
+function startCamera() {
+  document.getElementById('cameraError').textContent = '';
+  navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false })
+    .then(s => {
+      stream = s;
+      const video = document.getElementById('video');
+      video.srcObject = s;
+      document.getElementById('placeholder').style.display = 'none';
+      document.getElementById('previewWrap').style.display = 'none';
+      document.getElementById('videoWrap').style.display = 'block';
+      document.getElementById('btnCapture').disabled = false;
+      document.getElementById('btnStart').textContent = '摄像头已开启';
+      document.getElementById('btnStart').disabled = true;
+      document.getElementById('btnReset').style.display = 'inline-block';
+    })
+    .catch(err => {
+      document.getElementById('cameraError').textContent = '无法访问摄像头：' + err.message;
+    });
+}
+
+function capture() {
+  const video = document.getElementById('video');
+  const canvas = document.getElementById('canvas');
+  canvas.width = video.videoWidth || 640;
+  canvas.height = video.videoHeight || 480;
+  canvas.getContext('2d').drawImage(video, 0, 0);
+  capturedBase64 = canvas.toDataURL('image/jpeg', 0.9).split(',')[1];
+  document.getElementById('previewImg').src = 'data:image/jpeg;base64,' + capturedBase64;
+  document.getElementById('videoWrap').style.display = 'none';
+  document.getElementById('previewWrap').style.display = 'block';
+  document.getElementById('btnOCR').disabled = false;
+  stopCamera();
+}
+
+function onFileSelected(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const dataUrl = e.target.result;
+    capturedBase64 = dataUrl.split(',')[1];
+    document.getElementById('previewImg').src = dataUrl;
+    document.getElementById('placeholder').style.display = 'none';
+    document.getElementById('videoWrap').style.display = 'none';
+    document.getElementById('previewWrap').style.display = 'block';
+    document.getElementById('btnOCR').disabled = false;
+    document.getElementById('btnReset').style.display = 'inline-block';
+  };
+  reader.readAsDataURL(file);
+}
+
+function stopCamera() {
+  if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
+}
+
+function resetAll() {
+  stopCamera();
+  capturedBase64 = null;
+  resultText = '';
+  document.getElementById('placeholder').style.display = 'flex';
+  document.getElementById('videoWrap').style.display = 'none';
+  document.getElementById('previewWrap').style.display = 'none';
+  document.getElementById('btnStart').disabled = false;
+  document.getElementById('btnStart').textContent = '开启摄像头';
+  document.getElementById('btnCapture').disabled = true;
+  document.getElementById('btnOCR').disabled = true;
+  document.getElementById('btnReset').style.display = 'none';
+  document.getElementById('resultBox').textContent = '等待识别...';
+  document.getElementById('saveBtn').style.display = 'none';
+  document.getElementById('copyBtn').style.display = 'none';
+  document.getElementById('ocrError').textContent = '';
+  document.getElementById('statusBadge').style.display = 'none';
+  document.getElementById('cameraError').textContent = '';
+}
+
+async function runOCR() {
+  if (!capturedBase64) return;
+  const apiUrl = document.getElementById('apiUrl').value.trim();
+  const token = document.getElementById('apiToken').value.trim();
+  document.getElementById('spinner').style.display = 'block';
+  document.getElementById('statusBadge').style.display = 'none';
+  document.getElementById('ocrError').textContent = '';
+  document.getElementById('resultBox').textContent = '正在识别中，请稍候...';
+  document.getElementById('btnOCR').disabled = true;
+  document.getElementById('saveBtn').style.display = 'none';
+  document.getElementById('copyBtn').style.display = 'none';
+
+  try {
+    const payload = {
+      file: capturedBase64,
+      fileType: 1,
+      useDocOrientationClassify: false,
+      useDocUnwarping: false,
+      useChartRecognition: false
+    };
+    const resp = await fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'token ' + token
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (!resp.ok) {
+      throw new Error('HTTP ' + resp.status + ' ' + resp.statusText);
+    }
+
+    const data = await resp.json();
+    const results = data?.result?.layoutParsingResults || [];
+    const texts = results.map(r => r?.markdown?.text || '').filter(Boolean);
+
+    if (texts.length === 0) {
+      resultText = '（未识别到文字内容）';
+    } else {
+      resultText = texts.join('\n\n---\n\n');
+    }
+
+    document.getElementById('resultBox').textContent = resultText;
+    document.getElementById('statusBadge').className = 'badge badge-success';
+    document.getElementById('statusBadge').textContent = '识别成功';
+    document.getElementById('statusBadge').style.display = 'inline-block';
+    document.getElementById('saveBtn').style.display = 'inline-block';
+    document.getElementById('copyBtn').style.display = 'inline-block';
+
+  } catch (err) {
+    document.getElementById('resultBox').textContent = '识别失败';
+    document.getElementById('ocrError').textContent = '错误：' + err.message;
+    document.getElementById('statusBadge').className = 'badge badge-danger';
+    document.getElementById('statusBadge').textContent = '识别失败';
+    document.getElementById('statusBadge').style.display = 'inline-block';
+  } finally {
+    document.getElementById('spinner').style.display = 'none';
+    document.getElementById('btnOCR').disabled = false;
+  }
+}
+
+function saveResult() {
+  if (!resultText) return;
+  const blob = new Blob([resultText], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'ocr_result_' + new Date().toISOString().slice(0,19).replace(/[T:]/g,'-') + '.txt';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function copyResult() {
+  if (!resultText) return;
+  navigator.clipboard.writeText(resultText).then(() => {
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = '已复制！';
+    setTimeout(() => btn.textContent = '复制全部文字', 1500);
+  });
+}
+</script>
+</body>
+</html>

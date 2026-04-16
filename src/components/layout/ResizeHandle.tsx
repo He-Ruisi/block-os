@@ -1,5 +1,4 @@
 import { useEffect, useRef } from 'react'
-import './ResizeHandle.css'
 
 interface ResizeHandleProps {
   onResize: (width: number) => void
@@ -66,12 +65,12 @@ export function ResizeHandle({ onResize, minWidth, maxWidth }: ResizeHandleProps
 
   return (
     <div 
-      className="resize-handle"
+      className="group flex h-full w-2 flex-shrink-0 cursor-col-resize items-center justify-center bg-transparent transition-colors hover:bg-blue-500/10"
       onMouseDown={handleMouseDown}
       onDoubleClick={handleDoubleClick}
       title="拖拽调整宽度，双击恢复默认"
     >
-      <div className="resize-handle-line"></div>
+      <div className="h-10 w-0.5 rounded-sm bg-border transition-all group-hover:h-15 group-hover:bg-blue-500 group-active:bg-blue-600"></div>
     </div>
   )
 }

@@ -57,3 +57,56 @@
 .toast-container > * {
   pointer-events: auto;
 }
+
+/* AI 沉浸式模式布局 */
+.app.app-ai-focus {
+  display: block;
+}
+
+.app.app-ai-focus .right-panel {
+  width: 100vw;
+  height: 100vh;
+}
+
+/* 混合模式过渡动画 */
+.app {
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.app .right-panel {
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.app .editor-area {
+  transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.app .activity-bar,
+.app .sidebar-panel {
+  transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* AI 模式过渡动画 */
+.layout-transition {
+  transition: all 0.3s ease;
+}
+
+.fade-enter {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.fade-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.3s, transform 0.3s;
+}
+
+.fade-exit {
+  opacity: 1;
+}
+
+.fade-exit-active {
+  opacity: 0;
+  transition: opacity 0.2s;
+}

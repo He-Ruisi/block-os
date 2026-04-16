@@ -35,6 +35,7 @@ interface AppLayoutState {
   toggleFullscreen: () => void
   setEditorWidth: (width: number) => void
   setSidebarView: (view: SidebarView) => void
+  setSidebarCollapsed: (collapsed: boolean) => void
   minEditorWidth: number
   maxEditorWidth: number
 }
@@ -69,6 +70,10 @@ export function useAppLayout(): AppLayoutState {
     setPrefs(prev => ({ ...prev, sidebarCollapsed: !prev.sidebarCollapsed }))
   }, [])
 
+  const setSidebarCollapsed = useCallback((collapsed: boolean) => {
+    setPrefs(prev => ({ ...prev, sidebarCollapsed: collapsed }))
+  }, [])
+
   const setSidebarView = useCallback((view: SidebarView) => {
     setPrefs(prev => ({ ...prev, sidebarView: view }))
   }, [])
@@ -98,6 +103,7 @@ export function useAppLayout(): AppLayoutState {
     toggleFullscreen,
     setEditorWidth,
     setSidebarView,
+    setSidebarCollapsed,
     minEditorWidth: 400,
     maxEditorWidth: availableWidth * 0.8,
   }

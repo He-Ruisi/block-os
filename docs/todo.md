@@ -1,6 +1,198 @@
 # BlockOS 待办事项
 
+## 今日上线版 MVP 收口
+
+- [ ] 主路径联调与回归测试
+  - [x] AI 对话 → 写入编辑器 → 自动保存 → 重开恢复 → 同步状态 主链路验证
+  - [ ] 响应式主路径验证（桌面 / iPad / 手机）— [测试矩阵](./tests/responsive-test-matrix.md) | [快速指南](./tests/responsive-quick-test.md)
+  - [x] 关键回归点验证（项目 / 文档 / 标签页 / 置顶 / AI 回复渲染 / Block 捕获）
+- [ ] 本地文件读写最小闭环
+  - [ ] 至少具备可靠导出能力
+  - [ ] 明确导入 / 落盘方案与限制
+- [ ] Supabase schema 迁移闭环
+  - [ ] 现有用户迁移脚本执行说明
+  - [ ] 升级后兼容性验证
+- [x] 会话 / 文档状态恢复
+  - [x] 重启应用后恢复当前上下文
+  - [x] 异常中断后的最小恢复能力
+- [ ] Block 基础操作补齐
+  - [ ] `(())` 引用时版本选择
+  - [x] Block 编辑后发布版本（releaseVersion 更新 + usage 记录）
+  - [ ] Block 删除 / 归档
+
 ## P0 - 核心功能（当前优先）
+
+### 主题样式重塑 🎨 - [需求文档](./spec/features/styles/style.md)
+- [x] Phase 1: Tailwind CSS + Shadcn/UI 安装（2026-04-15 完成）
+  - [x] 安装 Tailwind CSS 核心依赖（tailwindcss、postcss、autoprefixer）
+  - [x] 安装 Shadcn/UI 工具库（class-variance-authority、clsx、tailwind-merge）
+  - [x] 创建 tailwind.config.js 配置
+  - [x] 创建 postcss.config.js 配置
+  - [x] 创建 components.json 配置
+  - [x] 创建 src/index.css（Design Token 系统）
+  - [x] 创建 src/lib/utils.ts（cn() 工具函数）
+  - [x] 更新 tsconfig.json（路径别名）
+  - [x] 更新 vite.config.ts（路径别名解析）
+  - [x] TypeScript 类型检查通过
+  - [x] 开发服务器正常启动
+- [x] Phase 2: AI 沉浸模式样式重构（Notion/Roam 风格）（2026-04-15 完成）
+  - [x] 分析当前 AI 沉浸模式实现
+  - [x] 制定 v0.dev 辅助设计方案
+  - [x] 生成精准的 v0.dev 提示词
+  - [x] 使用 v0.dev 生成 UI 组件
+  - [x] 应用 v0.dev 生成的样式到现有组件
+  - [x] 更新 ChatLayout 组件样式（移除 CSS，使用 Tailwind）
+  - [x] 更新 ChatHeader 组件样式（移除 CSS，使用 Tailwind）
+  - [x] 更新 ChatInput 组件样式（移除 CSS，使用 Tailwind，添加自动高度）
+  - [x] 更新 MessageContent 组件样式（移除 CSS，使用 Tailwind，添加复制和 hover）
+  - [x] 更新 AIImmersivePanel 组件样式（移除 CSS，使用 Tailwind）
+  - [x] TypeScript 类型检查通过
+  - [x] 开发服务器正常启动
+  - [x] 删除旧的 CSS 文件（5 个文件）
+  - [ ] 功能测试（所有功能保持正常）
+  - [ ] 主题适配（Default + Newsprint）
+  - [ ] 响应式测试（桌面/平板/手机）
+- [x] Phase 2.5: 左侧边栏样式重构（已完成）
+  - [x] 重构 Sidebar 主容器（移除 CSS，使用 Tailwind）
+  - [x] 重构 ExplorerView 组件（资源管理器）
+  - [x] 重构 StarredView 组件（置顶视图）
+  - [x] 重构 SearchView 组件（搜索视图）
+  - [x] 重构 OutlineView 组件（大纲视图）
+  - [x] 重构 ExtensionsView 组件（插件视图）
+  - [x] 重构 ActivityBar 组件（活动栏）
+  - [x] 重构 StatusBar 组件（状态栏）
+  - [x] 重构 ResizeHandle 组件（调整大小手柄）
+  - [x] 重构 Toast 组件（提示消息）
+  - [x] 重构 MarkdownRenderer 组件（Markdown 渲染器）
+  - [x] 重构 SyncStatusIndicator 组件（同步状态指示器）
+  - [x] TypeScript 类型检查通过
+  - [x] 删除所有旧的 CSS 文件（12 个文件）
+  - [ ] 功能测试（所有功能保持正常）
+  - [ ] 主题适配（Default + Newsprint）
+  - [ ] 响应式测试（桌面/平板/手机）
+- [ ] Phase 3: 安装常用 Shadcn UI 组件
+  - [ ] Button（按钮）
+  - [ ] Card（卡片）
+  - [ ] Dialog（对话框）
+  - [ ] Input（输入框）
+  - [ ] Textarea（文本域）
+  - [ ] Select（选择器）
+  - [ ] Tabs（标签页）
+  - [ ] Toast（通知）
+  - [ ] Dropdown Menu（下拉菜单）
+  - [ ] Popover（弹出层）
+- [ ] Phase 3: 自定义主题 CSS 变量
+  - [ ] 定义品牌色（primary、secondary）
+  - [ ] 定义语义色（success、warning、error、info）
+  - [ ] 定义中性色（gray 色阶）
+  - [ ] 定义圆角（radius）
+  - [ ] 定义阴影（shadow）
+  - [ ] 定义字体（font-family、font-size）
+  - [ ] 定义间距（spacing）
+  - [ ] 暗色模式适配
+- [ ] Phase 4: 重构现有组件
+  - [ ] 重构 Sidebar（使用 Tailwind 工具类）
+  - [ ] 重构 TabBar（使用 Shadcn Tabs）
+  - [ ] 重构 Editor（使用 Tailwind 样式）
+  - [ ] 重构 AIFloatPanel（使用 Shadcn Card）
+  - [ ] 重构 RightPanel（使用 Tailwind 布局）
+  - [ ] 重构 Toast（使用 Shadcn Toast）
+  - [ ] 重构 AuthPage（使用 Shadcn Form 组件）
+
+### OCR 插件系统 🔌 - [技术设计](../.kiro/specs/ocr-plugin-system/design.md)
+- [x] Phase 1: 插件系统核心（Week 1）
+  - [x] 创建插件类型定义（src/types/plugin.ts）
+  - [x] 实现插件 API（src/services/pluginAPI.ts）
+  - [x] 实现插件注册表（src/services/pluginRegistry.ts）
+  - [x] 实现插件配置存储（src/storage/pluginConfigStore.ts）
+  - [x] 更新 ExtensionsView 组件
+- [x] Phase 2: OCR 插件实现（Week 2）
+  - [x] 创建 OCR 插件目录结构
+  - [x] 实现 OCR 服务（ocrService.ts）
+  - [x] 实现 OCR UI 组件（OCRPanel.tsx）
+  - [x] 实现 OCR 插件入口（index.ts）
+  - [x] 添加 OCR 样式（OCRPanel.css）
+- [x] Phase 3: 集成与测试（Week 3）
+  - [x] 在 App.tsx 中初始化插件系统
+  - [x] 注册 OCR 插件
+  - [x] TypeScript 类型检查通过
+  - [ ] 编写单元测试
+  - [ ] 编写集成测试
+  - [ ] 手动测试完整流程
+- [ ] Phase 4: 文档与优化（Week 4）
+  - [ ] 编写插件开发文档
+  - [ ] 编写用户使用文档
+  - [ ] 优化 UI/UX
+  - [ ] 性能优化
+  - [ ] 安全审计
+
+### OCR 增强 UI 🎨 - [需求文档](../.kiro/specs/ocr-enhanced-ui/requirements.md) (2026-04-16实现)
+- [ ] Phase 1: 基础三栏布局 + 历史记录列表
+  - [ ] 创建 OCREnhancedPanel 组件（三栏布局容器）
+  - [ ] 创建 HistoryList 组件（左侧历史记录列表）
+  - [ ] 实现 IndexedDB 存储（ocr-photos 对象存储）
+  - [ ] 实现历史记录持久化（最多 100 条）
+  - [ ] 实现历史记录排序（时间倒序）
+  - [ ] 实现历史记录选择和高亮
+  - [ ] 响应式布局（768px 断点）
+- [ ] Phase 2: 图片预览 + 拍照/上传功能
+  - [ ] 创建 PreviewArea 组件（中间预览区域）
+  - [ ] 实现图片预览（保持宽高比、缩放适配）
+  - [ ] 实现拍照功能（摄像头 + 实时视频流）
+  - [ ] 实现上传功能（文件选择 + Base64 转换）
+  - [ ] 实现加载状态和错误处理
+  - [ ] 实现占位提示和空状态
+- [ ] Phase 3: 识别结果编辑 + 操作功能
+  - [ ] 创建 ResultEditor 组件（右侧结果编辑器）
+  - [ ] 实现 OCR 识别触发（手动触发 + 重新识别）
+  - [ ] 实现识别结果显示（加载动画 + 错误提示）
+  - [ ] 实现识别结果编辑（textarea + 自动保存）
+  - [ ] 实现识别结果操作（复制 + 插入编辑器 + 保存为 Block）
+  - [ ] 实现历史记录删除（确认对话框 + 清空显示）
+  - [ ] 性能优化（虚拟滚动 + 缩略图 + 懒加载）
+  - [ ] 可访问性（键盘导航 + ARIA 标签）
+
+### AI 沉浸式模式 🤖 - [详细文档](./spec/features/ai/ai-immersive-mode.md)
+- [x] Phase 1: 基础架构
+  - [x] 添加 viewMode 状态管理（ai-focus / hybrid）
+  - [x] 实现布局切换逻辑
+  - [x] 创建 AI 模式容器组件
+- [x] Phase 2: AI 模式 UI
+  - [x] 问候语组件（大号居中）
+  - [x] 大号输入框（初始状态）
+  - [x] 模型选择显示
+  - [x] 输入框位置动画（居中 → 底部）
+- [x] Phase 3: 模式切换增强
+  - [x] 写入编辑器触发切换到混合模式
+  - [x] 自动创建新文档"AI 对话笔记"
+  - [x] AI 内容自动写入新文档
+  - [x] 侧边栏默认隐藏
+  - [x] 平滑过渡动画（0.4s cubic-bezier）
+- [x] Phase 4: 优化和测试
+  - [x] 主题适配（default + newsprint）
+  - [x] TypeScript 类型检查通过
+  - [ ] 响应式适配（iPad/手机）- 待测试
+  - [ ] 性能优化 - 待测试
+- [x] Phase 5: AI 回复渲染增强 - [详细文档](./spec/features/ai/ai-reply-markdown-rendering.md)
+  - [x] Markdown 完整支持（标题/段落/列表/引用/链接）
+  - [x] 代码块语法高亮（100+ 语言）
+  - [x] 表格渲染支持
+  - [x] 一键复制代码
+  - [x] 主题适配（default + newsprint）
+  - [x] 响应式优化
+- [x] Phase 6: 沉浸式界面优化
+  - [x] 创建 ChatLayout 组件（全屏布局容器）
+  - [x] 创建 ChatHeader 组件（顶部导航栏）
+  - [x] 创建 MessageContent 组件（AI 回答内容区）
+  - [x] 创建 ChatInput 组件（底部输入框）
+  - [x] 创建 AIImmersivePanel 组件（整合所有子组件）
+  - [x] 集成到 RightPanel（AI 沉浸模式使用新界面）
+  - [x] 添加全屏按钮（混合模式 → AI 沉浸模式）
+  - [x] 同步功能按钮到 AI 沉浸模式（退出全屏、新建对话、历史对话、设置）
+  - [x] 集成历史对话面板和设置面板
+  - [x] 右侧边栏布局（3:1 比例，并排显示）
+  - [x] 实现双向模式切换
+  - [x] TypeScript 类型检查通过
 
 ### iPad 响应式设计 📱 - [详细文档](./spec/features/responsive/ipad-responsive-design.md)
 - [x] Phase 1: 基础响应式布局
@@ -41,6 +233,8 @@
 - [x] 数据自动同步（本地操作后自动上传）- [详细文档](./spec/features/storage/auto-sync.md)
 - [x] 首次登录从云端拉取数据
 - [x] 离线模式支持（断网时使用本地数据）
+- [x] Schema v2.0 升级（支持 releases、annotations、style、template 等新字段）- [迁移指南](./guide/SUPABASE_MIGRATION.md)
+- [ ] 现有用户数据库迁移（需手动执行迁移脚本）
 
 ### 文档管理系统 📁
 - [x] 文档可关联到项目（projectId 字段）
@@ -66,6 +260,14 @@
 - [x] 标签页拖拽重排序
 - [x] 标签页右键菜单（关闭/关闭其他/关闭右侧）
 - [x] 布局偏好持久化（localStorage）
+- [x] 置顶功能（Starred）- [详细文档](./spec/features/editor/starred-items-enhancement.md)
+  - [x] 置顶视图组件（StarredView）
+  - [x] 全局事件系统（toggleStar）
+  - [x] 数据持久化（localStorage）
+  - [x] ExplorerView 集成星标按钮
+  - [x] 拖拽排序置顶项目
+  - [x] 置顶数量限制（最多 10 个）
+  - [x] 修复侧边栏闪退问题
 
 ### 代码架构重构 🏗️（模块化分层）
 - [x] 审查现有代码，诊断架构问题
@@ -210,6 +412,6 @@
 
 ---
 
-**更新时间**: 2026-04-13 14:30  
-**当前阶段**: Supabase 云端集成全部完成（v1.0.0）  
-**下次评审**: Block 空间 annotations 展示 / 阶段三交互模式重构
+**更新时间**: 2026-04-15 20:30  
+**当前阶段**: OCR 插件系统 Phase 1-3 完成，OCR 增强 UI 需求文档已创建  
+**下次评审**: OCR 增强 UI 需求审核 / 设计文档创建

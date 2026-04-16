@@ -111,7 +111,7 @@
     height: 24px;
   }
   
-  .tab-action-btn {
+  .tab-action-button {
     width: 40px;
     height: 40px;
   }
@@ -257,7 +257,7 @@
     padding: 0 12px;
   }
   
-  .tab-bar-actions {
+  .tab-actions {
     gap: 8px;
   }
   
@@ -295,46 +295,36 @@
    Newsprint Theme Responsive Overrides
    ============================================================ */
 
-.theme-newsprint {
-  @media (max-width: 1024px) {
+@media (max-width: 1024px) {
+  .theme-newsprint {
     /* 保持硬阴影风格 */
     --shadow-sm: 3px 3px 0px 0px #111111;
     --shadow-md: 5px 5px 0px 0px #111111;
     --shadow-lg: 6px 6px 0px 0px #111111;
-    
+
     /* 字号调整 */
     --editor-font-size: 17px;
     --editor-line-height: 1.7;
   }
-}
 
-.theme-newsprint .editor-content h1 {
-  @media (max-width: 1024px) {
+  .theme-newsprint .editor-content h1 {
     font-size: 2.25rem;
   }
-}
 
-.theme-newsprint .editor-content h2 {
-  @media (max-width: 1024px) {
+  .theme-newsprint .editor-content h2 {
     font-size: 1.375rem;
   }
-}
 
-.theme-newsprint .activity-bar,
-.theme-newsprint .sidebar-panel {
-  @media (max-width: 1024px) {
+  .theme-newsprint .activity-bar,
+  .theme-newsprint .sidebar-panel {
     border-width: 2px;
   }
-}
 
-.theme-newsprint .sidebar-panel {
-  @media (max-width: 1024px) {
+  .theme-newsprint .sidebar-panel {
     box-shadow: 6px 6px 0px 0px #111111;
   }
-}
 
-.theme-newsprint .right-panel {
-  @media (max-width: 1024px) {
+  .theme-newsprint .right-panel {
     box-shadow: -6px 6px 0px 0px #111111;
   }
 }

@@ -1,14 +1,15 @@
-import { useState, useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   CalendarDays,
   ChevronDown,
   ChevronRight,
-  Folder,
   FileText,
-  Pencil,
-  Trash2,
+  Folder,
   FolderInput,
+  Pencil,
   Plus,
+  Star,
+  Trash2,
   X,
 } from 'lucide-react'
 import type { Project } from '../../types/project'
@@ -17,13 +18,134 @@ import { projectStore } from '../../storage/projectStore'
 import { documentStore } from '../../storage/documentStore'
 import { useLongPress } from '../../hooks/useLongPress'
 import { useViewport } from '../../hooks/useViewport'
-import './ExplorerView.css'
+
+const STORAGE_KEY = 'blockos-starred-items'
+const MAX_STARRED_ITEMS = 10
 
 interface ExplorerViewProps {
   onSelectToday: () => void
   onSelectProject: (projectId: string) => void
   onOpenDocument: (doc: Document) => void
   currentProjectId: string | null
+}
+
+interface ExplorerDocItemProps {
+  doc: Document
+  isRenaming: boolean
+  renameValue: string
+  renameInputRef: React.RefObject<HTMLInputElement | null>
+  isStarred: boolean
+  isTouchDevice: boolean
+  isMenuOpen: boolean
+  docActionMenuRef: React.RefObject<HTMLDivElement | null>
+  onRenameValueChange: (value: string) => void
+  onSubmitRename: (doc: Document) => void
+  onCancelRename: () => void
+  onToggleMenu: (e: React.MouseEvent, doc: Document) => void
+  onOpen: (doc: Document) => void
+  onDoubleClickOpen: (e: React.MouseEvent, doc: Document) => void
+  onStartRename: (e: React.MouseEvent, doc: Document) => void
+  onSaveToProject: (doc: Document) => void
+  onDelete: (e: React.MouseEvent, doc: Document) => void
+  onToggleStar: (e: React.MouseEvent, id: string, type: 'project' | 'document', name: string, projectId?: string) => void
+  onShowMenu: (doc: Document) => void
+}
+
+function ExplorerDocItem({
+  doc,
+  isRenaming,
+  renameValue,
+  renameInputRef,
+  isStarred,
+  isTouchDevice,
+  isMenuOpen,
+  docActionMenuRef,
+  onRenameValueChange,
+  onSubmitRename,
+  onCancelRename,
+  onToggleMenu,
+  onOpen,
+  onDoubleClickOpen,
+  onStartRename,
+  onSaveToProject,
+  onDelete,
+  onToggleStar,
+  onShowMenu,
+}: ExplorerDocItemProps) {
+  const longPressHandlers = useLongPress({
+    onLongPress: () => {
+      if (isTouchDevice) {
+        onShowMenu(doc)
+      }
+    },
+    onClick: () => {
+      if (isTouchDevice) {
+        onOpen(doc)
+      }
+    },
+    delay: 500,
+  })
+
+  return (
+    <div className="explorer-doc-item-wrapper">
+      <div
+        className="explorer-doc-item"
+        onClick={e => onToggleMenu(e, doc)}
+        onDoubleClick={e => onDoubleClickOpen(e, doc)}
+        {...longPressHandlers}
+      >
+        {isRenaming ? (
+          <input
+            ref={renameInputRef as React.RefObject<HTMLInputElement>}
+            className="explorer-rename-input"
+            value={renameValue}
+            onChange={e => onRenameValueChange(e.target.value)}
+            onBlur={() => onSubmitRename(doc)}
+            onKeyDown={e => {
+              if (e.key === 'Enter') onSubmitRename(doc)
+              if (e.key === 'Escape') onCancelRename()
+            }}
+            onClick={e => e.stopPropagation()}
+            autoFocus
+          />
+        ) : (
+          <>
+            <FileText size={14} className="explorer-doc-icon" />
+            <span className="explorer-doc-title">{doc.title}</span>
+            <button
+              className={`explorer-action-btn explorer-star-btn explorer-doc-star ${isStarred ? 'starred' : ''}`}
+              onClick={e => onToggleStar(e, doc.id, 'document', doc.title, doc.projectId)}
+              title={isStarred ? '取消置顶' : '置顶'}
+            >
+              <Star size={12} fill={isStarred ? 'currentColor' : 'none'} />
+            </button>
+          </>
+        )}
+      </div>
+
+      {isMenuOpen && (
+        <div className="explorer-doc-action-menu" ref={docActionMenuRef as React.RefObject<HTMLDivElement>}>
+          <button className="explorer-action-menu-item" onClick={() => onOpen(doc)}>
+            <FileText size={14} />
+            <span>打开文档</span>
+          </button>
+          <button className="explorer-action-menu-item" onClick={e => onStartRename(e, doc)}>
+            <Pencil size={14} />
+            <span>重命名</span>
+          </button>
+          <button className="explorer-action-menu-item" onClick={() => onSaveToProject(doc)}>
+            <FolderInput size={14} />
+            <span>保存到项目</span>
+          </button>
+          <div className="explorer-action-menu-sep" />
+          <button className="explorer-action-menu-item danger" onClick={e => onDelete(e, doc)}>
+            <Trash2 size={14} />
+            <span>删除</span>
+          </button>
+        </div>
+      )}
+    </div>
+  )
 }
 
 export function ExplorerView({
@@ -45,10 +167,11 @@ export function ExplorerView({
   const [renameProjectValue, setRenameProjectValue] = useState('')
   const renameProjectInputRef = useRef<HTMLInputElement>(null)
   const [movingDoc, setMovingDoc] = useState<Document | null>(null)
-  // 文档操作弹出菜单
   const [docActionMenu, setDocActionMenu] = useState<Document | null>(null)
   const docActionMenuRef = useRef<HTMLDivElement>(null)
+  const [starredIds, setStarredIds] = useState<Set<string>>(new Set())
   const viewport = useViewport()
+  const isTouchDevice = viewport.isTablet || viewport.isMobile
 
   const loadProjects = async () => {
     try {
@@ -59,35 +182,6 @@ export function ExplorerView({
     }
   }
 
-  useEffect(() => {
-    loadProjects()
-  }, [])
-
-  useEffect(() => {
-    const handleDocumentCreated = (e: Event) => {
-      const { projectId } = (e as CustomEvent<{ projectId?: string }>).detail
-      if (projectId) {
-        loadProjectDocs(projectId)
-        loadProjects()
-        setExpandedProjects(prev => new Set([...prev, projectId]))
-      }
-    }
-    window.addEventListener('documentCreated', handleDocumentCreated)
-    return () => window.removeEventListener('documentCreated', handleDocumentCreated)
-  }, [])
-
-  // 点击外部关闭文档操作菜单
-  useEffect(() => {
-    if (!docActionMenu) return
-    const handleClickOutside = (e: MouseEvent) => {
-      if (docActionMenuRef.current && !docActionMenuRef.current.contains(e.target as Node)) {
-        setDocActionMenu(null)
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [docActionMenu])
-
   const loadProjectDocs = async (projectId: string) => {
     try {
       const docs = await documentStore.getDocumentsByProject(projectId)
@@ -96,6 +190,58 @@ export function ExplorerView({
       console.error('Failed to load project docs:', error)
     }
   }
+
+  const loadStarredIds = () => {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY)
+      if (!raw) {
+        setStarredIds(new Set())
+        return
+      }
+
+      const items = JSON.parse(raw) as Array<{ id: string; type: string }>
+      setStarredIds(new Set(items.map(item => `${item.type}-${item.id}`)))
+    } catch (error) {
+      console.error('Failed to load starred ids:', error)
+    }
+  }
+
+  useEffect(() => {
+    loadProjects()
+    loadStarredIds()
+  }, [])
+
+  useEffect(() => {
+    const handleDocumentCreated = (e: Event) => {
+      const { projectId } = (e as CustomEvent<{ projectId?: string }>).detail
+      if (!projectId) return
+      loadProjectDocs(projectId)
+      loadProjects()
+      setExpandedProjects(prev => new Set([...prev, projectId]))
+    }
+
+    window.addEventListener('documentCreated', handleDocumentCreated)
+    return () => window.removeEventListener('documentCreated', handleDocumentCreated)
+  }, [])
+
+  useEffect(() => {
+    if (!docActionMenu) return
+
+    const handleClickOutside = (e: MouseEvent) => {
+      if (docActionMenuRef.current && !docActionMenuRef.current.contains(e.target as Node)) {
+        setDocActionMenu(null)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [docActionMenu])
+
+  useEffect(() => {
+    const handleToggleStar = () => loadStarredIds()
+    window.addEventListener('toggleStar', handleToggleStar)
+    return () => window.removeEventListener('toggleStar', handleToggleStar)
+  }, [])
 
   const toggleProject = (projectId: string) => {
     setExpandedProjects(prev => {
@@ -112,52 +258,54 @@ export function ExplorerView({
   }
 
   const handleCreateProject = async () => {
-    if (!newProjectName.trim()) return
     const name = newProjectName.trim()
-    // 校验项目名唯一
-    if (projects.some(p => p.name === name)) {
+    if (!name) return
+
+    if (projects.some(project => project.name === name)) {
       alert('项目名称已存在，请使用其他名称')
       return
     }
+
     try {
-      const project = await projectStore.createProject(
-        name,
-        newProjectDescription.trim() || undefined
-      )
-      // 创建项目同名主文档
+      const project = await projectStore.createProject(name, newProjectDescription.trim() || undefined)
       const doc = await documentStore.createDocument(project.name, project.id)
       await projectStore.addDocumentToProject(project.id, doc.id)
+
       setProjects(prev => [{ ...project, documents: [doc.id] }, ...prev])
+      setExpandedProjects(prev => new Set([...prev, project.id]))
+      setProjectDocs(prev => ({ ...prev, [project.id]: [doc] }))
       setShowNewProjectDialog(false)
       setNewProjectName('')
       setNewProjectDescription('')
-      // 自动展开项目并打开文档
-      setExpandedProjects(prev => new Set([...prev, project.id]))
-      setProjectDocs(prev => ({ ...prev, [project.id]: [doc] }))
       onOpenDocument(doc)
     } catch (error) {
       console.error('[ExplorerView] Failed to create project:', error)
-      alert('创建项目失败：' + (error instanceof Error ? error.message : '未知错误'))
+      alert(`创建项目失败: ${error instanceof Error ? error.message : '未知错误'}`)
     }
   }
 
   const handleDeleteDoc = async (e: React.MouseEvent, doc: Document) => {
     e.stopPropagation()
     setDocActionMenu(null)
-    if (!confirm(`确定删除文档「${doc.title}」？`)) return
+
+    if (!confirm(`确定删除文档“${doc.title}”吗？`)) return
+
     try {
       if (doc.projectId) {
         await projectStore.removeDocumentFromProject(doc.projectId, doc.id)
         setProjectDocs(prev => ({
           ...prev,
-          [doc.projectId!]: (prev[doc.projectId!] || []).filter(d => d.id !== doc.id),
+          [doc.projectId!]: (prev[doc.projectId!] || []).filter(item => item.id !== doc.id),
         }))
-        setProjects(prev => prev.map(p =>
-          p.id === doc.projectId
-            ? { ...p, documents: p.documents.filter(id => id !== doc.id) }
-            : p
-        ))
+        setProjects(prev => prev.map(project => (
+          project.id === doc.projectId
+            ? { ...project, documents: project.documents.filter(id => id !== doc.id) }
+            : project
+        )))
       }
+
+      await documentStore.deleteDocument(doc.id)
+      window.dispatchEvent(new CustomEvent('documentDeleted', { detail: { documentId: doc.id } }))
     } catch (error) {
       console.error('Failed to delete doc:', error)
     }
@@ -177,40 +325,51 @@ export function ExplorerView({
       setRenamingDocId(null)
       return
     }
+
     try {
       const updated = { ...doc, title: newTitle, metadata: { ...doc.metadata, updatedAt: new Date() } }
       await documentStore.saveDocument(updated)
+
       if (doc.projectId) {
         setProjectDocs(prev => ({
           ...prev,
-          [doc.projectId!]: (prev[doc.projectId!] || []).map(d => d.id === doc.id ? updated : d),
+          [doc.projectId!]: (prev[doc.projectId!] || []).map(item => item.id === doc.id ? updated : item),
         }))
       }
     } catch (error) {
       console.error('Failed to rename doc:', error)
     }
+
     setRenamingDocId(null)
   }
 
   const handleMoveDoc = async (doc: Document, targetProjectId: string) => {
-    if (doc.projectId === targetProjectId) { setMovingDoc(null); return }
+    if (doc.projectId === targetProjectId) {
+      setMovingDoc(null)
+      return
+    }
+
     try {
       if (doc.projectId) {
         await projectStore.removeDocumentFromProject(doc.projectId, doc.id)
         setProjectDocs(prev => ({
           ...prev,
-          [doc.projectId!]: (prev[doc.projectId!] || []).filter(d => d.id !== doc.id),
+          [doc.projectId!]: (prev[doc.projectId!] || []).filter(item => item.id !== doc.id),
         }))
       }
+
       await projectStore.addDocumentToProject(targetProjectId, doc.id)
       await documentStore.updateDocumentProject(doc.id, targetProjectId)
+
       if (expandedProjects.has(targetProjectId)) {
         await loadProjectDocs(targetProjectId)
       }
+
       await loadProjects()
     } catch (error) {
       console.error('Failed to move doc:', error)
     }
+
     setMovingDoc(null)
   }
 
@@ -223,80 +382,123 @@ export function ExplorerView({
 
   const submitRenameProject = async (projectId: string) => {
     const newName = renameProjectValue.trim()
-    if (!newName) { setRenamingProjectId(null); return }
-    // 校验项目名唯一（排除自身）
-    if (projects.some(p => p.id !== projectId && p.name === newName)) {
+    if (!newName) {
+      setRenamingProjectId(null)
+      return
+    }
+
+    if (projects.some(project => project.id !== projectId && project.name === newName)) {
       alert('项目名称已存在，请使用其他名称')
       return
     }
+
     try {
       await projectStore.updateProject(projectId, { name: newName })
-      setProjects(prev => prev.map(p => p.id === projectId ? { ...p, name: newName } : p))
+      setProjects(prev => prev.map(project => (
+        project.id === projectId ? { ...project, name: newName } : project
+      )))
     } catch (error) {
       console.error('Failed to rename project:', error)
     }
+
     setRenamingProjectId(null)
   }
 
   const handleDeleteProject = async (e: React.MouseEvent, project: Project) => {
     e.stopPropagation()
-    if (!confirm(`确定删除项目「${project.name}」？项目下的文档不会被删除。`)) return
+
+    if (!confirm(`确定删除项目“${project.name}”吗？项目下的文档不会被删除。`)) return
+
     try {
       await projectStore.deleteProject(project.id)
-      setProjects(prev => prev.filter(p => p.id !== project.id))
-      setExpandedProjects(prev => { const n = new Set(prev); n.delete(project.id); return n })
+      setProjects(prev => prev.filter(item => item.id !== project.id))
+      setExpandedProjects(prev => {
+        const next = new Set(prev)
+        next.delete(project.id)
+        return next
+      })
+      window.dispatchEvent(new CustomEvent('projectDeleted', { detail: { projectId: project.id } }))
     } catch (error) {
       console.error('Failed to delete project:', error)
     }
   }
 
-  // 点击文档：打开操作菜单（桌面）或直接打开（触摸设备双击）
   const handleDocClick = (e: React.MouseEvent, doc: Document) => {
     e.stopPropagation()
-    // 触摸设备上单击显示菜单
+    if (isTouchDevice) return
     setDocActionMenu(prev => prev?.id === doc.id ? null : doc)
   }
 
-  // 双击文档：直接打开
   const handleDocDoubleClick = (e: React.MouseEvent, doc: Document) => {
     e.stopPropagation()
     setDocActionMenu(null)
     onOpenDocument(doc)
   }
 
-  // 长按文档：显示操作菜单（触摸设备）
-  const createDocLongPressHandlers = (doc: Document) => {
-    return useLongPress({
-      onLongPress: () => {
-        if (viewport.isTablet || viewport.isMobile) {
-          setDocActionMenu(doc)
-        }
-      },
-      onClick: () => {
-        // 触摸设备：单击直接打开
-        if (viewport.isTablet || viewport.isMobile) {
-          onOpenDocument(doc)
-        }
-      },
-      delay: 500,
-    })
-  }
-
-  // 从菜单中打开文档
   const handleDocOpen = (doc: Document) => {
     setDocActionMenu(null)
     onOpenDocument(doc)
   }
 
-  // 从菜单中保存到项目
   const handleDocSaveToProject = (doc: Document) => {
     setDocActionMenu(null)
     setMovingDoc(doc)
   }
 
-  // 在项目中新建文档
+  const showDocActionMenu = (doc: Document) => {
+    setDocActionMenu(doc)
+  }
+
+  const toggleStar = (
+    e: React.MouseEvent,
+    id: string,
+    type: 'project' | 'document',
+    name: string,
+    projectId?: string
+  ) => {
+    e.stopPropagation()
+
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY)
+      const items = raw ? JSON.parse(raw) as Array<{ id: string; type: string }> : []
+      const exists = items.find(item => item.id === id && item.type === type)
+
+      let nextItems
+      if (exists) {
+        nextItems = items.filter(item => !(item.id === id && item.type === type))
+      } else {
+        if (items.length >= MAX_STARRED_ITEMS) {
+          alert(`最多只能置顶 ${MAX_STARRED_ITEMS} 个项目`)
+          return
+        }
+
+        nextItems = [
+          ...items,
+          {
+            id,
+            type,
+            name,
+            projectId,
+            starredAt: new Date().toISOString(),
+          },
+        ]
+      }
+
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(nextItems))
+      loadStarredIds()
+      window.dispatchEvent(new CustomEvent('toggleStar', { detail: { id, type, name, projectId } }))
+    } catch (error) {
+      console.error('Failed to toggle star:', error)
+    }
+  }
+
+  const isStarred = (id: string, type: 'project' | 'document') => {
+    return starredIds.has(`${type}-${id}`)
+  }
+
   const handleNewDocInProject = async (e: React.MouseEvent, projectId: string) => {
     e.stopPropagation()
+
     try {
       const doc = await documentStore.createDocument('新文档', projectId)
       await projectStore.addDocumentToProject(projectId, doc.id)
@@ -304,9 +506,9 @@ export function ExplorerView({
         ...prev,
         [projectId]: [...(prev[projectId] || []), doc],
       }))
-      setProjects(prev => prev.map(p =>
-        p.id === projectId ? { ...p, documents: [...p.documents, doc.id] } : p
-      ))
+      setProjects(prev => prev.map(project => (
+        project.id === projectId ? { ...project, documents: [...project.documents, doc.id] } : project
+      )))
       onOpenDocument(doc)
     } catch (error) {
       console.error('Failed to create doc in project:', error)
@@ -315,16 +517,14 @@ export function ExplorerView({
 
   return (
     <div className="explorer-view">
-      {/* 今日 */}
       <div
         className={`explorer-item ${currentProjectId === 'today' ? 'active' : ''}`}
         onClick={onSelectToday}
       >
         <CalendarDays size={18} className="explorer-item-icon" />
-        <span className="explorer-item-text">今日</span>
+        <span className="explorer-item-text">今天</span>
       </div>
 
-      {/* 项目列表 */}
       <div className="explorer-section">
         <div className="explorer-section-header">
           <span className="explorer-section-title">项目</span>
@@ -344,10 +544,7 @@ export function ExplorerView({
                   onClick={() => toggleProject(project.id)}
                 >
                   <span className="explorer-project-expand">
-                    {expandedProjects.has(project.id)
-                      ? <ChevronDown size={14} />
-                      : <ChevronRight size={14} />
-                    }
+                    {expandedProjects.has(project.id) ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
                   </span>
                   <Folder size={16} className="explorer-project-icon" />
                   {renamingProjectId === project.id ? (
@@ -371,6 +568,13 @@ export function ExplorerView({
                         <span className="explorer-project-count">{project.documents.length}</span>
                       )}
                       <div className="explorer-doc-actions explorer-project-actions">
+                        <button
+                          className={`explorer-action-btn explorer-star-btn ${isStarred(project.id, 'project') ? 'starred' : ''}`}
+                          onClick={e => toggleStar(e, project.id, 'project', project.name)}
+                          title={isStarred(project.id, 'project') ? '取消置顶' : '置顶'}
+                        >
+                          <Star size={14} fill={isStarred(project.id, 'project') ? 'currentColor' : 'none'} />
+                        </button>
                         <button className="explorer-action-btn" onClick={e => handleNewDocInProject(e, project.id)} title="新建文档">
                           <Plus size={14} />
                         </button>
@@ -388,65 +592,32 @@ export function ExplorerView({
                 {expandedProjects.has(project.id) && (
                   <div className="explorer-project-docs">
                     {(projectDocs[project.id] || []).length === 0 ? (
-                      <div className="explorer-doc-empty">暂无文档</div>
+                      <div className="explorer-doc-empty">暂无文档。</div>
                     ) : (
-                      (projectDocs[project.id] || []).map(doc => {
-                        const longPressHandlers = createDocLongPressHandlers(doc)
-                        return (
-                        <div key={doc.id} className="explorer-doc-item-wrapper">
-                          <div
-                            className="explorer-doc-item"
-                            onClick={e => handleDocClick(e, doc)}
-                            onDoubleClick={e => handleDocDoubleClick(e, doc)}
-                            {...longPressHandlers}
-                          >
-                            {renamingDocId === doc.id ? (
-                              <input
-                                ref={renameInputRef}
-                                className="explorer-rename-input"
-                                value={renameValue}
-                                onChange={e => setRenameValue(e.target.value)}
-                                onBlur={() => submitRename(doc)}
-                                onKeyDown={e => {
-                                  if (e.key === 'Enter') submitRename(doc)
-                                  if (e.key === 'Escape') setRenamingDocId(null)
-                                }}
-                                onClick={e => e.stopPropagation()}
-                                autoFocus
-                              />
-                            ) : (
-                              <>
-                                <FileText size={14} className="explorer-doc-icon" />
-                                <span className="explorer-doc-title">{doc.title}</span>
-                              </>
-                            )}
-                          </div>
-
-                          {/* 文档操作弹出菜单 */}
-                          {docActionMenu?.id === doc.id && (
-                            <div className="explorer-doc-action-menu" ref={docActionMenuRef}>
-                              <button className="explorer-action-menu-item" onClick={() => handleDocOpen(doc)}>
-                                <FileText size={14} />
-                                <span>打开文档</span>
-                              </button>
-                              <button className="explorer-action-menu-item" onClick={e => startRename(e, doc)}>
-                                <Pencil size={14} />
-                                <span>重命名</span>
-                              </button>
-                              <button className="explorer-action-menu-item" onClick={() => handleDocSaveToProject(doc)}>
-                                <FolderInput size={14} />
-                                <span>保存到项目</span>
-                              </button>
-                              <div className="explorer-action-menu-sep" />
-                              <button className="explorer-action-menu-item danger" onClick={e => handleDeleteDoc(e, doc)}>
-                                <Trash2 size={14} />
-                                <span>删除</span>
-                              </button>
-                            </div>
-                          )}
-                        </div>
-                      )
-                      })
+                      (projectDocs[project.id] || []).map(doc => (
+                        <ExplorerDocItem
+                          key={doc.id}
+                          doc={doc}
+                          isRenaming={renamingDocId === doc.id}
+                          renameValue={renameValue}
+                          renameInputRef={renameInputRef}
+                          isStarred={isStarred(doc.id, 'document')}
+                          isTouchDevice={isTouchDevice}
+                          isMenuOpen={docActionMenu?.id === doc.id}
+                          docActionMenuRef={docActionMenuRef}
+                          onRenameValueChange={setRenameValue}
+                          onSubmitRename={submitRename}
+                          onCancelRename={() => setRenamingDocId(null)}
+                          onToggleMenu={handleDocClick}
+                          onOpen={handleDocOpen}
+                          onDoubleClickOpen={handleDocDoubleClick}
+                          onStartRename={startRename}
+                          onSaveToProject={handleDocSaveToProject}
+                          onDelete={handleDeleteDoc}
+                          onToggleStar={toggleStar}
+                          onShowMenu={showDocActionMenu}
+                        />
+                      ))
                     )}
                   </div>
                 )}
@@ -464,7 +635,6 @@ export function ExplorerView({
         </button>
       </div>
 
-      {/* 新建项目对话框 */}
       {showNewProjectDialog && (
         <div className="explorer-dialog-overlay" onClick={() => setShowNewProjectDialog(false)}>
           <div className="explorer-dialog-content" onClick={e => e.stopPropagation()}>
@@ -506,7 +676,6 @@ export function ExplorerView({
         </div>
       )}
 
-      {/* 移动文档对话框 */}
       {movingDoc && (
         <div className="explorer-dialog-overlay" onClick={() => setMovingDoc(null)}>
           <div className="explorer-dialog-content" onClick={e => e.stopPropagation()}>
@@ -517,27 +686,21 @@ export function ExplorerView({
               </button>
             </div>
             <div className="explorer-dialog-body">
-              <p className="explorer-move-hint">将「{movingDoc.title}」保存到：</p>
+              <p className="explorer-move-hint">将“{movingDoc.title}”保存到：</p>
               <div className="explorer-move-list">
                 {projects
-                  .filter(p => p.id !== movingDoc.projectId)
-                  .map(p => (
+                  .filter(project => project.id !== movingDoc.projectId)
+                  .map(project => (
                     <button
-                      key={p.id}
+                      key={project.id}
                       className="explorer-move-option"
-                      onClick={() => handleMoveDoc(movingDoc, p.id)}
+                      onClick={() => handleMoveDoc(movingDoc, project.id)}
                     >
                       <Folder size={16} />
-                      <span>{p.name}</span>
+                      <span>{project.name}</span>
                     </button>
                   ))}
-                {projects.filter(p => p.id !== movingDoc.projectId).length === 0 && (
-                  <p className="explorer-doc-empty">没有其他项目</p>
-                )}
               </div>
-            </div>
-            <div className="explorer-dialog-footer">
-              <button className="explorer-btn-secondary" onClick={() => setMovingDoc(null)}>取消</button>
             </div>
           </div>
         </div>
