@@ -3,6 +3,7 @@ import { Search, Tag, ChevronDown } from 'lucide-react'
 import type { Block, BlockRelease } from '@/types/models/block'
 import { blockStore } from '@/storage/blockStore'
 import { BlockDetailPanel } from './BlockDetailPanel'
+import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
 import '@/styles/modules/blocks.css'
 import '@/styles/modules/common-patterns.css'
@@ -135,13 +136,13 @@ export function BlockSpacePanel() {
     <div className="flex flex-col h-full">
       {/* Search */}
       <div className="relative mb-4 shrink-0">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <input
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+        <Input
           type="text"
           placeholder="搜索 Block..."
           value={searchQuery}
           onChange={e => setSearchQuery(e.target.value)}
-          className="w-full pl-10 pr-4 py-2 text-sm bg-input border border-border rounded-md focus:outline-none focus:border-border-focus focus:ring-3 focus:ring-focus-ring transition-all"
+          className="pl-10"
           aria-label="搜索 Block"
         />
       </div>
