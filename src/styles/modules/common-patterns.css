@@ -1,0 +1,342 @@
+/**
+ * BlockOS 公共组件模式
+ * 从 V0 右侧边栏提取的可复用样式模式
+ */
+
+/* ============================================================
+   卡片系统 (Card Pattern)
+   ============================================================ */
+
+/* 基础卡片 */
+.card-base {
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border-primary);
+  border-radius: var(--border-radius-md);
+  padding: var(--spacing-md);
+}
+
+/* 可交互卡片 */
+.card-interactive {
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border-primary);
+  border-radius: var(--border-radius-md);
+  padding: var(--spacing-md);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.card-interactive:hover {
+  background: var(--color-bg-hover);
+  border-color: var(--color-purple);
+  box-shadow: var(--shadow-card);
+}
+
+/* 高亮卡片 */
+.card-highlighted {
+  background: var(--color-purple-light);
+  border: 2px solid var(--color-purple);
+  border-radius: var(--border-radius-md);
+  padding: var(--spacing-md);
+}
+
+/* ============================================================
+   标签系统 (Badge Pattern)
+   ============================================================ */
+
+/* 基础标签 */
+.badge-base {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  font-size: 10px;
+  font-weight: 500;
+  border-radius: var(--border-radius-sm);
+  white-space: nowrap;
+}
+
+/* 主色标签 */
+.badge-primary {
+  background: var(--color-purple-light);
+  color: var(--color-purple);
+  border: 1px solid transparent;
+}
+
+/* 轮廓标签 */
+.badge-outline {
+  background: transparent;
+  color: var(--color-text-tertiary);
+  border: 1px solid var(--color-border-primary);
+}
+
+/* 标签专用（带图标） */
+.badge-tag {
+  background: var(--color-purple-light);
+  color: var(--color-purple);
+  border: 1px solid var(--color-purple);
+  padding: 2px 6px;
+  font-size: 10px;
+  border-radius: var(--border-radius-sm);
+}
+
+/* 绿色强调标签 */
+.badge-success {
+  background: rgba(53, 171, 103, 0.1);
+  color: var(--color-accent-green);
+  border: 1px solid var(--color-accent-green);
+}
+
+/* ============================================================
+   输入框系统 (Input Pattern)
+   ============================================================ */
+
+/* 基础输入框 */
+.input-base {
+  width: 100%;
+  padding: 8px 12px;
+  font-size: 13px;
+  color: var(--color-text-primary);
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border-primary);
+  border-radius: var(--border-radius-md);
+  transition: all 0.2s ease;
+}
+
+.input-base:focus {
+  outline: none;
+  border-color: var(--color-border-focus);
+  box-shadow: 0 0 0 3px var(--color-focus-ring);
+}
+
+.input-base::placeholder {
+  color: var(--color-text-muted);
+}
+
+/* 搜索框（带图标） */
+.input-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border-primary);
+  border-radius: var(--border-radius-md);
+}
+
+.input-search input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-size: 13px;
+  color: var(--color-text-primary);
+  outline: none;
+}
+
+.input-search input::placeholder {
+  color: var(--color-text-muted);
+}
+
+.input-search:focus-within {
+  border-color: var(--color-border-focus);
+  box-shadow: 0 0 0 3px var(--color-focus-ring);
+}
+
+/* ============================================================
+   滚动区域 (ScrollArea Pattern)
+   ============================================================ */
+
+.scroll-area {
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* 自定义滚动条 */
+.scroll-area::-webkit-scrollbar {
+  width: 8px;
+}
+
+.scroll-area::-webkit-scrollbar-track {
+  background: var(--color-bg-secondary);
+  border-radius: var(--border-radius-sm);
+}
+
+.scroll-area::-webkit-scrollbar-thumb {
+  background: var(--color-border-primary);
+  border-radius: var(--border-radius-sm);
+}
+
+.scroll-area::-webkit-scrollbar-thumb:hover {
+  background: var(--color-border-secondary);
+}
+
+/* ============================================================
+   空状态 (Empty State Pattern)
+   ============================================================ */
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-xl) var(--spacing-lg);
+  text-align: center;
+  color: var(--color-text-tertiary);
+}
+
+.empty-state__icon {
+  font-size: 48px;
+  margin-bottom: var(--spacing-md);
+  opacity: 0.5;
+}
+
+.empty-state__text {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.empty-state__hint {
+  font-size: 12px;
+  color: var(--color-text-tertiary);
+  max-width: 300px;
+}
+
+/* ============================================================
+   按钮系统 (Button Pattern)
+   ============================================================ */
+
+.btn-base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 12px;
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: var(--border-radius-md);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  outline: none;
+}
+
+.btn-primary {
+  background: var(--color-purple);
+  color: #ffffff;
+}
+
+.btn-primary:hover {
+  background: var(--color-purple-hover);
+}
+
+.btn-secondary {
+  background: var(--color-bg-secondary);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border-primary);
+}
+
+.btn-secondary:hover {
+  background: var(--color-bg-hover);
+  border-color: var(--color-border-secondary);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--color-text-secondary);
+}
+
+.btn-ghost:hover {
+  background: var(--color-bg-hover);
+}
+
+/* ============================================================
+   分隔符 (Separator Pattern)
+   ============================================================ */
+
+.separator-horizontal {
+  width: 100%;
+  height: 1px;
+  background: var(--color-border-primary);
+  margin: var(--spacing-md) 0;
+}
+
+.separator-vertical {
+  width: 1px;
+  height: 100%;
+  background: var(--color-border-primary);
+  margin: 0 var(--spacing-sm);
+}
+
+/* ============================================================
+   Newsprint 主题适配
+   ============================================================ */
+
+.theme-newsprint .card-base,
+.theme-newsprint .card-interactive,
+.theme-newsprint .card-highlighted {
+  border-radius: 0;
+}
+
+.theme-newsprint .card-interactive {
+  border: 2px solid var(--color-border-primary);
+}
+
+.theme-newsprint .card-interactive:hover {
+  box-shadow: var(--shadow-card);
+}
+
+.theme-newsprint .card-highlighted {
+  border: 2px solid var(--color-purple);
+  box-shadow: var(--shadow-card);
+}
+
+.theme-newsprint .badge-base,
+.theme-newsprint .badge-primary,
+.theme-newsprint .badge-outline,
+.theme-newsprint .badge-tag,
+.theme-newsprint .badge-success {
+  border-radius: 0;
+  border-width: 1px;
+  border-style: solid;
+}
+
+.theme-newsprint .input-base,
+.theme-newsprint .input-search {
+  border-radius: 0;
+  border-width: 2px;
+}
+
+.theme-newsprint .input-base:focus,
+.theme-newsprint .input-search:focus-within {
+  box-shadow: 2px 2px 0px 0px var(--color-border-focus);
+}
+
+.theme-newsprint .btn-base {
+  border-radius: 0;
+}
+
+.theme-newsprint .btn-primary,
+.theme-newsprint .btn-secondary {
+  border-width: 2px;
+  border-style: solid;
+}
+
+.theme-newsprint .btn-primary {
+  border-color: var(--color-purple);
+}
+
+.theme-newsprint .btn-secondary {
+  border-color: var(--color-border-primary);
+}
+
+.theme-newsprint .separator-horizontal,
+.theme-newsprint .separator-vertical {
+  background: var(--color-border-primary);
+  height: 2px;
+}
+
+.theme-newsprint .separator-vertical {
+  width: 2px;
+  height: 100%;
+}

@@ -253,7 +253,8 @@ export function Editor({ onEditorReady, onTextSelected, documentId }: EditorProp
       if (!editor) return
       if (loadedDocumentIdRef.current === documentId) return
 
-      // 鍒囨崲鏂囨。鍓嶏紝鍏堜繚瀛樺綋鍓嶆枃妗?      const prevDocId = currentDocIdRef.current
+      // 切换文档前，先保存当前文档
+      const prevDocId = currentDocIdRef.current
       if (prevDocId && prevDocId !== documentId) {
         try {
           await documentStore.updateDocumentBlocks(prevDocId, editor.getJSON())
