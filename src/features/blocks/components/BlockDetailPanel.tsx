@@ -28,6 +28,7 @@ export function BlockDetailPanel({ blockId, onClose, onInsertRelease }: BlockDet
   const [showNewRelease, setShowNewRelease] = useState(false)
   const [newReleaseTitle, setNewReleaseTitle] = useState('')
   const [selectedVersion, setSelectedVersion] = useState<number | null>(null)
+  const [hoveredVersion, setHoveredVersion] = useState<number | null>(null)
 
   const loadData = useCallback(async () => {
     try {
@@ -200,7 +201,13 @@ export function BlockDetailPanel({ blockId, onClose, onInsertRelease }: BlockDet
             ) : (
               <div className="space-y-2">
                 {[...releases].reverse().map(release => (
-                  <Popover key={release.version}>
+                  <Popover 
+                    key={release.version}
+                    open={hoveredVersion === release.version}
+                    onOpenChange={(open) => {
+                      if (!open) setHoveredVersion(null)
+                    }}
+                  >
                     <PopoverTrigger asChild>
                       <Card
                         className={cn(
@@ -208,6 +215,8 @@ export function BlockDetailPanel({ blockId, onClose, onInsertRelease }: BlockDet
                           selectedVersion === release.version && "border-accent-green bg-accent-green/5"
                         )}
                         onClick={() => setSelectedVersion(selectedVersion === release.version ? null : release.version)}
+                        onMouseEnter={() => setHoveredVersion(release.version)}
+                        onMouseLeave={() => setHoveredVersion(null)}
                         role="button"
                         tabIndex={0}
                         aria-label={`版本 ${release.version}: ${release.title}`}
@@ -236,6 +245,8 @@ export function BlockDetailPanel({ blockId, onClose, onInsertRelease }: BlockDet
                       side="left"
                       align="start"
                       onOpenAutoFocus={(e) => e.preventDefault()}
+                      onMouseEnter={() => setHoveredVersion(release.version)}
+                      onMouseLeave={() => setHoveredVersion(null)}
                     >
                       <div className="p-3 border-b bg-secondary">
                         <div className="flex items-center gap-2">
