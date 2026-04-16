@@ -252,7 +252,7 @@ This plan focuses on:
 
 ### Cross-cutting Tasks (Apply to All Steps)
 
-- [ ] 12. Update documentation
+- [-] 12. Update documentation
   - [ ] 12.1 Update CLAUDE.md
     - Update project structure section with new directory layout
     - _Requirements: 11.1_
