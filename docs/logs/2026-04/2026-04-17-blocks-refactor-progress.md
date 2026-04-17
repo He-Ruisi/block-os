@@ -7,8 +7,10 @@
 ## 进度概览
 
 - ✅ **BlockSpacePanel** - 已完成（1/3）
-- ⏸️ **BlockDetailPanel** - 待开始（2/3）
-- ⏸️ **BlockDerivativeSelector** - 待开始（3/3）
+- ✅ **BlockDetailPanel** - 已完成（2/3）
+- ✅ **BlockDerivativeSelector** - 已完成（3/3）
+
+**状态**: 🎉 全部完成！
 
 ---
 
@@ -149,3 +151,175 @@ interface BlockSpaceStats {
 - [Container/View 模式 Skill](../../../.kiro/skills/container-view-pattern.md)
 - [Shell 组件 API 文档](../../../src/components/shells/API.md)
 - [架构规范增强文档](./2026-04-17-architecture-enhancement.md)
+
+
+---
+
+## 2. BlockDetailPanel 重构（已完成）
+
+### 文件结构
+```
+src/features/blocks/components/BlockDetailPanel/
+├── BlockDetailPanelContainer.tsx   # 容器组件（逻辑）
+├── BlockDetailPanelView.tsx        # 主展示组件
+├── CurrentContentSection.tsx       # 当前内容展示
+├── ReleasesSection.tsx             # 版本历史展示
+├── UsagesSection.tsx               # 引用记录展示
+├── mappers.ts                      # 数据转换层
+├── types.ts                        # ViewModel 类型
+└── index.ts                        # 导出
+```
+
+### 职责划分
+
+**Container（BlockDetailPanelContainer.tsx）**
+- ✅ 使用 `blockStore.getBlock()` 和 `usageStore.getUsagesByBlock()` 加载数据
+- ✅ 发布新版本逻辑（`publishBlockVersion`）
+- ✅ 版本选择和悬停状态管理
+- ✅ 使用 mappers 转换数据（`toBlockDetailViewModel`、`toReleaseViewModels`、`toUsageViewModels`）
+
+**View（BlockDetailPanelView.tsx）**
+- ✅ 使用 Shadcn UI 组件（Button、ScrollArea）
+- ✅ 只 import ViewModel 类型
+- ✅ 拆分为 3 个子 Section 组件
+
+**Mappers（mappers.ts）**
+- ✅ `toBlockDetailViewModel()` - Block 转换
+- ✅ `toReleaseViewModel()` / `toReleaseViewModels()` - Release 转换
+- ✅ `toUsageViewModel()` / `toUsageViewModels()` - Usage 转换
+
+**ViewModel（types.ts）**
+```typescript
+interface BlockDetailViewModel {
+  id: string;
+  title: string;
+  content: string;
+  type: string;
+  tags: string[];
+  createdAt: string;
+}
+
+interface ReleaseViewModel {
+  version: number;
+  title: string;
+  content: string;
+  releasedAt: string;
+}
+
+interface UsageViewModel {
+  id: string;
+  documentTitle: string;
+  releaseVersion: number;
+  insertedAt: string;
+}
+```
+
+### 技术亮点
+- ✅ 拆分为 3 个子 Section 组件（CurrentContent、Releases、Usages）
+- ✅ 使用 mappers 转换数据
+- ✅ Popover 悬停显示完整版本内容
+- ✅ 保持所有功能：详情展示、版本历史、引用记录、发布新版本、插入编辑器
+- ✅ TypeScript 类型检查通过
+
+---
+
+## 3. BlockDerivativeSelector 重构（已完成）
+
+### 文件结构
+```
+src/features/blocks/components/BlockDerivativeSelector/
+├── BlockDerivativeSelectorContainer.tsx  # 容器组件（逻辑）
+├── BlockDerivativeSelectorView.tsx       # 主展示组件
+├── SourceBlockSection.tsx                # 源 Block 展示
+├── DerivativesSection.tsx                # 派生版本列表展示
+├── mappers.ts                            # 数据转换层
+├── types.ts                              # ViewModel 类型
+└── index.ts                              # 导出
+```
+
+### 职责划分
+
+**Container（BlockDerivativeSelectorContainer.tsx）**
+- ✅ 使用 `blockStore.getDerivativeTree()` 加载派生树
+- ✅ 键盘导航（Escape 关闭、Enter 确认）
+- ✅ 选择状态管理
+- ✅ 使用 `toDerivativeTreeViewModel` mapper 转换数据
+
+**View（BlockDerivativeSelectorView.tsx）**
+- ✅ 模态框布局（role="dialog"）
+- ✅ 使用 Shadcn UI 组件（Button、Card、ScrollArea）
+- ✅ 只 import ViewModel 类型
+- ✅ 拆分为 2 个子 Section 组件
+
+**Mappers（mappers.ts）**
+- ✅ `toBlockSummaryViewModel()` - Block 转换
+- ✅ `toDerivativeTreeViewModel()` - 派生树转换
+
+**ViewModel（types.ts）**
+```typescript
+interface BlockSummaryViewModel {
+  id: string;
+  title: string;
+  content: string;
+  tags: string[];
+  createdAt: string;
+  contextTitle?: string;
+  modifications?: string;
+}
+
+interface DerivativeTreeViewModel {
+  source: BlockSummaryViewModel;
+  derivatives: BlockSummaryViewModel[];
+}
+```
+
+### 技术亮点
+- ✅ 拆分为 2 个子 Section 组件（SourceBlock、Derivatives）
+- ✅ 使用 mappers 转换数据
+- ✅ 处理 source 可能为 null 的情况
+- ✅ 保持所有功能：源 Block 显示、派生版本列表、单选选择、键盘导航
+- ✅ TypeScript 类型检查通过
+
+---
+
+## 总结
+
+### 完成统计
+- ✅ 重构组件：3/3（100%）
+- ✅ 新增文件：23 个
+- ✅ 删除文件：3 个
+- ✅ 新增 Hook：1 个（useBlocks）
+- ✅ TypeScript 类型检查：全部通过
+
+### 架构改进
+1. **逻辑与 UI 完全分离**
+   - Container 负责业务逻辑、数据加载、事件处理
+   - View 负责纯渲染、Shadcn UI 组件、无状态
+
+2. **严格遵循架构边界**
+   - Container 通过 hooks 访问数据（不直接访问 store）
+   - View 只 import ViewModel 类型（不 import 领域模型）
+   - 使用 mappers 转换数据（不在 Container 内转换）
+   - 使用 Shell 组件（SearchInput）
+
+3. **组件拆分粒度合理**
+   - BlockSpacePanel: 4 个子组件
+   - BlockDetailPanel: 3 个子 Section 组件
+   - BlockDerivativeSelector: 2 个子 Section 组件
+
+4. **代码质量提升**
+   - 可测试性：mappers 是纯函数，易于单测
+   - 可维护性：职责单一，易于理解和修改
+   - 可复用性：ViewModel 和 mappers 可在其他场景复用
+
+### 遵循的规范
+- ✅ Container/View 模式 Skill
+- ✅ Shell 组件 API 规范
+- ✅ Shadcn UI 重构规范
+- ✅ 架构边界严格约束
+
+### 下一步建议
+1. 为 mappers 编写单元测试
+2. 为 View 组件编写快照测试
+3. 创建更多 hooks 封装 store 访问（useDocuments、useProjects）
+4. 继续重构其他 feature 的组件
