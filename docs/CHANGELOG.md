@@ -1,5 +1,76 @@
 # BlockOS 更新日志
 
+## [v1.42.0] - 2026-04-17 🎉 Components 架构重构全部完成！
+
+**重大里程碑**：完成所有 4 个 Phase 的架构重构，13 个组件成功迁移，59+ 个新文件创建，严格遵循 Container-View 模式。
+
+### 架构重构总结
+
+**Phase 4: 项目管理 + 重命名容器** ✅
+- ProjectOverview → `features/projects/`（Container/View 拆分）
+- RightPanel → `panels/RightPanelShell.tsx`（重命名 + 移动）
+- 清理空目录（`components/panel/`、`components/project/`）
+
+**全部 4 个 Phase 完成**：
+- ✅ Phase 1: 左侧边栏功能域（6 个组件）
+- ✅ Phase 2: 右侧边栏功能域（4 个组件）
+- ✅ Phase 3: 设置功能域（1 个组件）
+- ✅ Phase 4: 项目管理 + 重命名容器（2 个组件）
+
+**总计成果**：
+- **13 个组件**迁移完成
+- **59+ 个新文件**创建
+- **架构边界清晰**：Storage → Hooks → Container → Mapper → View
+- **类型安全**：View 只知道 ViewModel，不知道领域模型
+- **可维护性**：清晰的职责边界，易于理解和修改
+- **可测试性**：Mapper 是纯函数，易于单测
+
+### 最终目录结构
+
+```
+src/
+├── components/
+│   ├── layout/（5 个骨架文件）
+│   ├── panels/（1 个 Shell 容器）
+│   ├── shells/（UI 模式）
+│   ├── shared/（通用组件）
+│   └── ui/（Shadcn 组件）
+│
+├── features/
+│   ├── sidebar/（6 个子功能）
+│   ├── right-sidebar/（4 个子功能）
+│   ├── settings/（1 个组件）
+│   ├── projects/（1 个组件）
+│   ├── blocks/（核心逻辑）
+│   ├── ai/（AI 功能）
+│   ├── auth/（认证）
+│   └── editor/（编辑器）
+```
+
+### 架构优势
+
+1. **功能域聚合**：相关功能在同一目录，易于理解和维护
+2. **职责清晰**：sidebar、right-sidebar、settings、projects 边界明确
+3. **架构边界**：Storage → Hooks → Container → Mapper → View
+4. **类型安全**：View 只知道 ViewModel，不知道领域模型
+5. **可维护性**：清晰的职责边界，易于理解和修改
+6. **可测试性**：Mapper 是纯函数，易于单测
+
+### 验证结果
+
+- ✅ TypeScript 类型检查通过
+- ✅ 所有功能保持正常工作
+- ✅ 架构规范严格遵循
+
+### 技术文档
+
+- [架构重构 Spec](./spec/architecture/components-restructure.md)
+- [Container/View 模式](../.kiro/skills/container-view-pattern.md)
+- [UI 重构规范](../.kiro/skills/ui-refactor.md)
+- [Shell 组件设计](../.kiro/skills/shells-design.md)
+
+---
+
 ## [v1.41.0] - 2026-04-17 🏗️ Components 架构重构 Phase 3 完成
 
 **重要里程碑**：完成设置功能域迁移，SettingsPanel 成功迁移到 `features/settings/`，严格遵循 Container-View 模式。

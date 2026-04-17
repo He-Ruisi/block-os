@@ -22,7 +22,7 @@
 
 ## P0 - 核心功能（当前优先）
 
-### Components 架构重构 🏗️ - [技术设计](./spec/architecture/components-restructure.md)
+### Components 架构重构 🏗️ - [技术设计](./spec/architecture/components-restructure.md) ✅ 完成（2026-04-17）
 - [x] Phase 1: 左侧边栏功能域（6 个组件）- ✅ 完成（2026-04-17 23:00）
   - [x] 迁移 ExplorerView → features/sidebar/explorer/
   - [x] 迁移 SearchView → features/sidebar/search/
@@ -46,12 +46,19 @@
   - [x] Container/View 拆分
   - [x] 更新所有 import 路径
   - [x] TypeScript 类型检查通过
-- [ ] Phase 4: 项目管理 + 重命名容器（2 个组件）
-  - [ ] 迁移 ProjectOverview → features/projects/
-  - [ ] 重命名 RightPanel.tsx → panels/RightPanelShell.tsx
-  - [ ] 删除空目录（layout/、panel/、project/）
-  - [ ] 更新所有 import 路径
-  - [ ] TypeScript 类型检查通过
+- [x] Phase 4: 项目管理 + 重命名容器（2 个组件）- ✅ 完成（2026-04-17 00:00）
+  - [x] 迁移 ProjectOverview → features/projects/
+  - [x] 重命名 RightPanel.tsx → panels/RightPanelShell.tsx
+  - [x] 删除空目录（panel/、project/）
+  - [x] 更新所有 import 路径
+  - [x] TypeScript 类型检查通过
+
+**架构重构完成统计**：
+- ✅ 13 个组件迁移完成
+- ✅ 59+ 个新文件创建
+- ✅ 架构边界清晰：Storage → Hooks → Container → Mapper → View
+- ✅ 类型安全：View 只知道 ViewModel
+- ✅ 所有功能正常工作
 
 ### 主题样式重塑 🎨 - [需求文档](./spec/features/styles/style.md)
 - [x] Phase 1: Tailwind CSS + Shadcn/UI 安装（2026-04-15 完成）
