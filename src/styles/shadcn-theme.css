@@ -1,0 +1,146 @@
+/* ============================================================
+   Shadcn UI Theme - BlockOS Custom Colors
+   ============================================================
+   
+   这个文件专门存放 Shadcn UI 的全局颜色配置
+   与 Tailwind CSS 配合使用，通过 CSS 变量定义主题色
+   ============================================================ */
+
+@layer base {
+  :root {
+    /* ========== Shadcn UI 默认颜色（HSL 格式）========== */
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+    
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+    
+    --radius: 0.625rem;
+    
+    --chart-1: 12 76% 61%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+    
+    /* ========== BlockOS 自定义强调色 ========== */
+    
+    /* 主绿色 - #35AB67 */
+    --accent-green: 145 52% 44%;
+    --accent-green-rgb: 53 171 103;
+    --accent-green-hex: #35AB67;
+    
+    /* 深绿色 - #00362F */
+    --accent-green-dark: 170 100% 11%;
+    --accent-green-dark-rgb: 0 54 47;
+    --accent-green-dark-hex: #00362F;
+    
+    /* 强调红色 - #D9323D */
+    --accent-red: 356 63% 52%;
+    --accent-red-rgb: 217 50 61;
+    --accent-red-hex: #D9323D;
+  }
+
+  .dark {
+    /* ========== Shadcn UI 暗色模式 ========== */
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+    
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+    
+    /* ========== BlockOS 自定义强调色（暗色模式保持不变）========== */
+    
+    /* 主绿色 - #35AB67 */
+    --accent-green: 145 52% 44%;
+    --accent-green-rgb: 53 171 103;
+    --accent-green-hex: #35AB67;
+    
+    /* 深绿色 - #00362F */
+    --accent-green-dark: 170 100% 11%;
+    --accent-green-dark-rgb: 0 54 47;
+    --accent-green-dark-hex: #00362F;
+    
+    /* 强调红色 - #D9323D */
+    --accent-red: 356 63% 52%;
+    --accent-red-rgb: 217 50 61;
+    --accent-red-hex: #D9323D;
+  }
+}
+
+/* ============================================================
+   使用说明
+   ============================================================
+   
+   1. HSL 格式（推荐用于 Shadcn UI 组件）
+      className="bg-[hsl(var(--accent-green))]"
+      className="text-[hsl(var(--accent-green-dark))]"
+      className="border-[hsl(var(--accent-red))]"
+   
+   2. RGB 格式（用于需要透明度的场景）
+      className="bg-[rgb(var(--accent-green-rgb)_/_0.5)]"
+      className="shadow-[0_0_10px_rgb(var(--accent-red-rgb)_/_0.3)]"
+   
+   3. HEX 格式（通过 Tailwind 配置使用）
+      className="bg-accent-green"
+      className="text-accent-green-dark"
+      className="border-accent-red"
+   
+   4. 在 CSS 中使用
+      .my-class {
+        background-color: hsl(var(--accent-green));
+        color: var(--accent-green-dark-hex);
+        border-color: rgb(var(--accent-red-rgb));
+      }
+   
+   ============================================================ */
