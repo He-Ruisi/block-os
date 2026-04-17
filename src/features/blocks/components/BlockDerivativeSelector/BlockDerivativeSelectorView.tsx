@@ -1,18 +1,26 @@
-import { X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { SourceBlockSection } from './SourceBlockSection';
-import { DerivativesSection } from './DerivativesSection';
-import type { DerivativeTreeViewModel } from './types';
+import { GitBranch, Layers3 } from 'lucide-react'
+import { EmptyState } from '@/components/shells'
+import { Button } from '@/components/ui/button'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { DerivativesSection } from './DerivativesSection'
+import { SourceBlockSection } from './SourceBlockSection'
+import type { DerivativeTreeViewModel } from './types'
 
 interface Props {
-  tree: DerivativeTreeViewModel | null;
-  isLoading: boolean;
-  selectedBlockId: string;
-  onSelect: () => void;
-  onCancel: () => void;
-  onBlockSelect: (blockId: string) => void;
+  tree: DerivativeTreeViewModel | null
+  isLoading: boolean
+  selectedBlockId: string
+  onSelect: () => void
+  onCancel: () => void
+  onBlockSelect: (blockId: string) => void
 }
 
 export function BlockDerivativeSelectorView({
@@ -24,74 +32,64 @@ export function BlockDerivativeSelectorView({
   onBlockSelect,
 }: Props) {
   return (
-    <div
-      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
-      onClick={onCancel}
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="derivative-selector-title"
-    >
-      <Card className="w-full max-w-2xl max-h-[80vh] flex flex-col" onClick={e => e.stopPropagation()}>
-        {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b shrink-0">
-          <h3 id="derivative-selector-title" className="text-lg font-semibold">选择 Block 版本</h3>
-          <Button variant="ghost" size="icon" onClick={onCancel} aria-label="关闭对话框">
-            <X className="h-4 w-4" />
-          </Button>
-        </div>
+    <Dialog open onOpenChange={(open) => !open && onCancel()}>
+      <DialogContent className="flex max-h-[80vh] max-w-3xl flex-col gap-0 p-0">
+        <DialogHeader className="border-b px-6 py-4 text-left">
+          <DialogTitle className="flex items-center gap-2">
+            <GitBranch className="h-4 w-4" />
+            选择 Block 版本
+          </DialogTitle>
+          <DialogDescription>
+            从源 Block 或其派生版本中选择要插入的内容。
+          </DialogDescription>
+        </DialogHeader>
 
-        {/* Body */}
-        <ScrollArea className="flex-1 px-6">
-          {isLoading ? (
-            <div className="flex flex-col items-center justify-center py-12">
-              <div className="text-4xl mb-3">⏳</div>
-              <div className="text-sm text-muted-foreground">加载中...</div>
-            </div>
-          ) : tree ? (
-            <div className="py-6 space-y-6">
-              {/* Source Block */}
-              <SourceBlockSection
-                source={tree.source}
-                isSelected={selectedBlockId === tree.source.id}
-                onSelect={() => onBlockSelect(tree.source.id)}
-              />
-
-              {/* Derivatives */}
-              {tree.derivatives.length > 0 ? (
-                <DerivativesSection
-                  derivatives={tree.derivatives}
-                  selectedBlockId={selectedBlockId}
-                  onSelect={onBlockSelect}
+        <ScrollArea className="flex-1">
+          <div className="space-y-6 px-6 py-5">
+            {isLoading ? (
+              <EmptyState compact icon={Layers3} title="正在加载版本树" />
+            ) : tree ? (
+              <>
+                <SourceBlockSection
+                  source={tree.source}
+                  isSelected={selectedBlockId === tree.source.id}
+                  onSelect={() => onBlockSelect(tree.source.id)}
                 />
-              ) : (
-                <div className="flex flex-col items-center justify-center py-12">
-                  <div className="text-4xl mb-3">📝</div>
-                  <div className="text-sm text-muted-foreground mb-1">暂无派生版本</div>
-                  <div className="text-xs text-muted-foreground">
-                    引用此 Block 并修改后会自动创建派生版本
-                  </div>
-                </div>
-              )}
-            </div>
-          ) : null}
+                {tree.derivatives.length > 0 ? (
+                  <DerivativesSection
+                    derivatives={tree.derivatives}
+                    selectedBlockId={selectedBlockId}
+                    onSelect={onBlockSelect}
+                  />
+                ) : (
+                  <EmptyState
+                    compact
+                    icon={Layers3}
+                    title="暂无派生版本"
+                    description="引用这个 Block 并继续编辑后，这里会出现新的派生版本。"
+                  />
+                )}
+              </>
+            ) : (
+              <EmptyState
+                compact
+                icon={Layers3}
+                title="没有可选版本"
+                description="当前无法构建这个 Block 的版本树。"
+              />
+            )}
+          </div>
         </ScrollArea>
 
-        {/* Footer */}
-        <div className="flex items-center justify-end gap-2 p-6 border-t shrink-0">
-          <Button variant="secondary" onClick={onCancel} aria-label="取消选择">
+        <DialogFooter className="border-t px-6 py-4">
+          <Button variant="outline" onClick={onCancel}>
             取消
           </Button>
-          <Button
-            variant="default"
-            onClick={onSelect}
-            disabled={!selectedBlockId}
-            aria-label="确认选择此版本"
-            className="bg-accent-green hover:bg-accent-green/90"
-          >
+          <Button onClick={onSelect} disabled={!selectedBlockId}>
             选择此版本
           </Button>
-        </div>
-      </Card>
-    </div>
-  );
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
 }

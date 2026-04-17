@@ -39,7 +39,7 @@ export function SearchInput({
           className="absolute right-1 top-1/2 h-7 w-7 -translate-y-1/2"
           onClick={() => onChange('')}
         >
-          <X size={14} />
+          <X className="h-3.5 w-3.5" />
         </Button>
       )}
     </div>

@@ -1,5 +1,129 @@
 # BlockOS 更新日志
 
+## [v1.37.0] - 2026-04-17 📐 UI 重构 Skill 体系建立 - 三份独立 Skill
+
+**重要里程碑**：建立完整的 UI 重构 Skill 体系，解决 6 个核心问题，新增 3 项关键规范，创建 3 份独立 Skill。
+
+### 核心改进（6 改 3 加）
+
+#### 6 个必须改的问题全部解决 ✅
+
+1. **作用域不清** → 限定 ui-refactor skill 只对 View/Shell/Layout 生效
+   - 禁止用于 Container 组件
+   - 如果 Container 有大量 JSX，必须先触发 container-view-pattern skill
+
+2. **标题编号重复** → 修正为 1/2/3/4/5/6/7/8
+
+3. **禁止原生 HTML 太绝对** → 明确禁止和允许的范围
+   - 必须替换：button、input、textarea、select、dialog、dropdown 等
+   - 允许保留：div、span、section、header、nav、ul、li、a、p、h1~h6、form、label
+
+4. **禁止创建 CSS 文件太一刀切** → 允许保留合理的 CSS
+   - 禁止：为 View/Shell 组件创建新 CSS
+   - 允许：Tiptap 内容样式、全局 design tokens/reset/responsive
+
+5. **缺少 className 长度上限规则** → 添加严格的长度控制
+   - 单元素 Tailwind 类不超过 8 个
+   - 超过 8 个必须用 cn() 拆行
+   - ≥2 个状态必须用 cva()
+   - 严禁原样粘贴 v0 长 className
+
+6. **没有规定 View 不能 import 的边界** → 添加 import 白名单和黑名单
+   - 白名单：ui/*、shells/*、layout/*、lib/utils、lucide-react、同目录 ViewModel
+   - 黑名单：storage/*、services/*、hooks/*、editor 实例、store、types/models/*
+
+#### 3 项建议补充全部添加 ✅
+
+1. **cva 使用规范** - 状态变体管理
+   - ≥2 个状态必须用 cva
+   - 禁止用一堆 cn(condition && '...') 堆叠
+   - 提供完整的 cva 模板
+
+2. **图标使用规范** - 统一图标库
+   - 统一使用 lucide-react
+   - 禁止混用 react-icons/heroicons/自定义 SVG
+   - 尺寸通过 className 控制（h-4 w-4），不用 size 属性
+
+3. **硬验证标准** - 可机器检查
+   - 4 条 grep 命令（原生元素、import store、长 className、import 领域模型）
+   - 必须全部为空才算迁移完成
+   - 防止 AI 假装完成
+
+### 三份独立 Skill 建立
+
+| Skill | 作用 | 触发时机 | 文件 |
+|---|---|---|---|
+| `container-view-pattern` | 拆分逻辑/展示 | 重构组件结构时 | `.kiro/skills/container-view-pattern.md` |
+| `shells-design` | 设计/扩展 shells | 出现重复 UI 模式时 | `.kiro/skills/shells-design.md` |
+| `ui-refactor` | View 内部 shadcn 化 | View 已存在，需要美化时 | `.kiro/skills/ui-refactor.md` |
+
+**为什么要分开**：
+- 职责不同：拆分是"架构"，shadcn 化是"UI 实现"
+- 触发时机不同：拆分一次性，shadcn 化是反复迭代的
+- AI 一次只能聚焦一件事，混在一起很容易写跑
+
+### shells-design Skill（新增）
+
+**用途**：识别重复 UI 模式并创建可复用 Shell 组件
+
+**核心内容**：
+- 何时创建 Shell（4 个触发条件）
+- Shell 组件设计流程（5 步）
+- 何时扩展 Shell（3 个触发条件）
+- Shell 组件最佳实践（5 个推荐 + 5 个避免）
+- 现有 Shell 组件清单（5 个）
+
+**触发条件**：
+1. 重复 UI 模式：同一段 UI 代码出现在 ≥2 个 View 中
+2. 长 className：单个元素的 className 超过 8 个 Tailwind 类
+3. 复杂组合：多个 Shadcn UI 组件组合成固定模式
+4. v0 导出：从 v0.dev 导出的长 className 代码
+
+### View 重构 Checklist（新增）
+
+**用途**：每个 View 组件完成 Shadcn UI 重构后的验证清单
+
+**核心内容**：
+- 硬验证命令（4 条 grep，必须全部为空）
+- 软验证清单（功能、样式、文档）
+- 常见问题排查（5 个问题 + 解决方案）
+- 重构优先级建议（10 个组件）
+- 重构节奏建议（拆完立刻 shadcn 化）
+- 示例 Checklist（DocumentBlocksPanelView）
+
+**硬验证命令**：
+```bash
+# 1. 无原生 HTML 元素
+grep -RnE "<(button|input|textarea|select)\b" src/features/**/components/**/*View.tsx
+
+# 2. 无 import store/service
+grep -RnE "from ['\"]@/(storage|services)" src/features/**/components/**/*View.tsx
+
+# 3. 无超长 className
+grep -RnE 'className="[^"]{120,}"' src/features
+
+# 4. 无 import 领域模型类型
+grep -RnE "from ['\"]@/types/models" src/features/**/components/**/*View.tsx
+```
+
+### 影响范围
+
+- **对现有代码**：无破坏性变更，现有代码继续工作
+- **对开发流程**：提供清晰的重构模板和验证标准
+- **对代码质量**：架构边界更严格，可机器检查，防止架构腐化
+
+### 技术亮点
+
+- ✅ 三份 Skill 职责清晰，互不干扰
+- ✅ 硬验证命令可机器检查，防止 AI 假装完成
+- ✅ import 白名单和黑名单，严格控制 View 层依赖
+- ✅ className 长度上限，防止 v0 长 className 污染
+- ✅ cva 使用规范，统一状态变体管理
+- ✅ 图标使用规范，统一图标库和尺寸控制
+- ✅ 完整的 Checklist，每个 View 完成后立即验证
+
+---
+
 ## [v1.36.0] - 2026-04-17 🎉 Blocks Feature Container/View 重构完成
 
 **重要里程碑**：完成 Blocks Feature 全部 3 个组件的 Container/View 模式重构，代码质量和可维护性显著提升。

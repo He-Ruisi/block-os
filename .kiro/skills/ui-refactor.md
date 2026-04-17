@@ -1,13 +1,31 @@
 ---
 name: ui-refactor
-description: UI 组件重构专家 - 将原生 HTML 元素迁移到 Shadcn UI 组件
+description: View 层 Shadcn UI 重构专家 - 仅对 View/Shell/Layout 组件生效
 activation: manual
-tags: [ui, refactor, shadcn, tailwind]
+tags: [ui, refactor, shadcn, tailwind, view-layer]
 ---
 
-# UI Refactor Skill - UI 组件重构专家
+# UI Refactor Skill - View 层 Shadcn UI 重构专家
 
-你是一个专业的 UI 组件重构专家，负责将项目中的原生 HTML 元素迁移到 Shadcn UI 组件，并使用 Tailwind CSS 替代自定义 CSS。
+## ⚠️ 作用域限定
+
+**本 skill 仅对以下组件生效**：
+- ✅ **View 组件**（`*View.tsx`，如 `BlockSpacePanelView.tsx`）
+- ✅ **Shell 组件**（`src/components/shells/*`）
+- ✅ **Layout 组件**（`src/components/layout/*`）
+
+**禁止用于以下组件**：
+- ❌ **Container 组件**（`*Container.tsx`）
+- ❌ **Hook 文件**（`src/hooks/*`、`src/features/*/hooks/*`）
+- ❌ **Service 文件**（`src/services/*`、`src/features/*/services/*`）
+
+**重要规则**：
+- 如果发现 Container 中仍有大量 JSX（超过 50 行），**必须先触发 `container-view-pattern` skill 进行拆分**
+- 不要在本 skill 中处理 Container 的 JSX，这会破坏架构边界
+
+---
+
+你是一个专业的 View 层 UI 重构专家，负责将 View 组件中的原生 HTML 元素迁移到 Shadcn UI 组件，并使用 Tailwind CSS 替代自定义 CSS。
 
 ## 核心原则
 
@@ -38,17 +56,146 @@ components/
   - 例如：BlockSpacePanel、EditorToolbar、SessionHistoryPanel
 
 ### 2. 必须使用 Shadcn UI 组件
-- **禁止**使用原生 HTML 元素（`<button>`, `<input>`, `<textarea>`, `<select>` 等）
-- **必须**使用对应的 Shadcn UI 组件替代
-- **必须**从 `@/components/ui/` 导入组件
 
-### 2. 必须使用 Tailwind CSS
-- **禁止**创建新的 CSS 文件
-- **必须**使用 Tailwind CSS 工具类
-- **必须**使用 `cn()` 工具函数动态组合类名
-- **必须**使用 Tailwind 语义化颜色变量
+**必须替换为 Shadcn UI 的**：
+- `<button>` → `<Button>`
+- `<input>` → `<Input>`
+- `<textarea>` → `<Textarea>`
+- `<select>` → `<Select>`
+- 自定义 dialog/dropdown/popover/tabs/card → 对应的 Shadcn UI 组件
 
-### 3. 保持功能完整
+**允许保留的原生 HTML**：
+- `<div>`、`<span>`、`<section>`、`<header>`、`<nav>`、`<main>`、`<aside>`
+- `<ul>`、`<li>`、`<a>`、`<p>`、`<h1>~<h6>`
+- `<form>`、`<label>`
+
+**优先使用 Shells**：
+- 已存在 shells 的场景必须用 shells，不允许在 View 内重复实现 shell 级 UI
+- 如果 shells 中没有，必须先在 `components/shells/` 中实现，再使用
+
+### 3. 必须使用 Tailwind CSS
+
+**禁止为 View / Shell 组件创建新的 CSS 文件**。
+
+**允许保留的 CSS 文件**：
+- Tiptap 内容样式（`editor-wysiwyg.css`）
+- 全局 design tokens / reset / responsive（`styles/global/*`）
+
+**业务组件视觉样式必须使用**：
+- Tailwind CSS 工具类
+- `cn()` 工具函数动态组合类名
+- `cva()` 定义状态变体
+- Tailwind 语义化颜色变量
+
+### 4. className 控制规则
+
+**长度上限**：
+- 单元素 Tailwind 类不超过 **8 个**
+- 超过 8 个时，必须使用 `cn()` 拆行
+- 如果是状态变体（≥2 个状态），必须使用 `cva()`
+
+**禁止行为**：
+- ❌ 严禁原样粘贴 v0 导出的长 className
+- ❌ 禁止字符串拼接（`className={a + ' ' + b}`）
+- ❌ 禁止条件三元组合（`className={a ? 'x' : 'y'} + ' ' + {b ? 'z' : 'w'}`）
+
+**必须行为**：
+- ✅ 条件样式必须使用 `cn()`
+- ✅ 状态变体必须使用 `cva()`
+- ✅ 同一段 className 出现在 ≥2 个 View 中，必须抽 shell 或 cva
+
+### 5. cva 使用规范
+
+**使用场景**：
+当一个 View 元素出现 ≥2 个状态（如 default / selected / dragging / editing）时，**必须使用 `cva` 定义变体**，禁止用一堆 `cn(condition && '...')` 堆叠。
+
+**适用场景**：
+- BlockCardShell（default / selected / dragging）
+- PanelHeader（collapsed / expanded）
+- 按钮组（primary / secondary / ghost）
+- 状态标签（success / warning / error）
+
+**cva 模板**：
+```typescript
+import { cva, type VariantProps } from 'class-variance-authority'
+
+const cardVariants = cva(
+  // 基础样式
+  'rounded-lg border p-4 transition-colors',
+  {
+    variants: {
+      variant: {
+        default: 'bg-card text-card-foreground',
+        selected: 'bg-accent text-accent-foreground border-primary',
+        dragging: 'opacity-50 cursor-grabbing',
+      },
+      size: {
+        sm: 'p-2 text-sm',
+        md: 'p-4 text-base',
+        lg: 'p-6 text-lg',
+      },
+    },
+    defaultVariants: {
+      variant: 'default',
+      size: 'md',
+    },
+  }
+)
+
+interface CardProps extends VariantProps<typeof cardVariants> {
+  className?: string
+  children: React.ReactNode
+}
+
+function Card({ variant, size, className, children }: CardProps) {
+  return (
+    <div className={cn(cardVariants({ variant, size }), className)}>
+      {children}
+    </div>
+  )
+}
+```
+
+### 6. View 组件 Import 边界
+
+**View 组件 Import 白名单**（只能 import 这些）：
+- ✅ `@/components/ui/*`（Shadcn UI 基础组件）
+- ✅ `@/components/shells/*`（Shell 组件）
+- ✅ `@/components/layout/*`（仅当 View 是 layout 子组件）
+- ✅ `@/lib/utils`（cn、cva 等工具函数）
+- ✅ `lucide-react`（图标）
+- ✅ 同目录下的子 View 与 ViewModel 类型
+
+**View 组件 Import 黑名单**（禁止 import）：
+- ❌ `@/storage/*`（store）
+- ❌ `@/services/*`（service）
+- ❌ `@/features/*/hooks/*`（业务 hooks）
+- ❌ `@/features/*/services/*`（feature service）
+- ❌ 任何 Tiptap editor 实例
+- ❌ 任何 store 实例
+- ❌ `@/types/models/*`（领域模型类型，必须经过 ViewModel 转换）
+
+### 7. 图标使用规范
+
+**统一使用 `lucide-react`**：
+- ✅ 统一使用 `lucide-react`
+- ❌ 禁止混用 `react-icons` / `heroicons` / 自定义 SVG（除非业务必需）
+
+**图标尺寸规则**：
+- 默认图标尺寸通过 className 控制：`className="h-4 w-4"`
+- 不使用 `size` 属性，统一用 className，方便响应式
+- 常用尺寸：`h-3 w-3`（12px）、`h-4 w-4`（16px）、`h-5 w-5`（20px）、`h-6 w-6`（24px）
+
+**示例**：
+```typescript
+import { Plus, Trash2, Edit, MoreVertical } from 'lucide-react'
+
+<Button variant="ghost" size="icon">
+  <Plus className="h-4 w-4" />
+</Button>
+```
+
+### 8. 保持功能完整
 - **必须**保留所有原有功能
 - **必须**保持所有交互逻辑不变
 - **必须**保持响应式设计
@@ -200,7 +347,24 @@ rm src/components/MyComponent.css
 
 ### 4. 验证和测试 ✅
 
-**验证清单**：
+**硬验证（必须执行）**：
+```bash
+# 1. View 文件中不应出现原生 button/input/textarea/select
+grep -RnE "<(button|input|textarea|select)\b" src/features/**/components/**/*View.tsx
+
+# 2. View 文件中不应 import store/service
+grep -RnE "from ['\"]@/(storage|services)" src/features/**/components/**/*View.tsx
+
+# 3. 单行 className 长度不应超过 120 字符
+grep -RnE 'className="[^"]{120,}"' src/features
+
+# 4. View 文件中不应 import 领域模型类型
+grep -RnE "from ['\"]@/types/models" src/features/**/components/**/*View.tsx
+```
+
+**上述命令必须全部为空才算迁移完成。**
+
+**软验证清单**：
 - [ ] TypeScript 类型检查通过（`bun run type-check`）
 - [ ] 所有原生 HTML 元素已替换
 - [ ] 所有自定义 CSS 已迁移到 Tailwind
@@ -211,11 +375,12 @@ rm src/components/MyComponent.css
 - [ ] 无破坏性变更
 
 **测试步骤**：
-1. 运行类型检查：`bun run type-check`
-2. 启动开发服务器：`bun run dev`
-3. 手动测试所有功能
-4. 检查不同屏幕尺寸的响应式效果
-5. 检查不同状态的视觉反馈
+1. 运行硬验证命令（上述 4 条 grep）
+2. 运行类型检查：`bun run type-check`
+3. 启动开发服务器：`bun run dev`
+4. 手动测试所有功能
+5. 检查不同屏幕尺寸的响应式效果
+6. 检查不同状态的视觉反馈
 
 ### 5. 更新文档 📝
 
@@ -248,9 +413,9 @@ rm src/components/MyComponent.css
 ---
 ```
 
-## 常见场景处理
+## 典型迁移模式
 
-### 场景 1：使用 Shell 组件构建面板
+### 模式 1：面板（Panel）- 使用 Shell 组件构建
 ```tsx
 // ✅ 使用 PanelShell + PanelHeader
 import { PanelShell } from '@/components/shells/PanelShell'
@@ -302,7 +467,7 @@ function MyPanel() {
 }
 ```
 
-### 场景 2：使用 BlockCardShell 展示列表
+### 模式 2：列表卡片（List Card）- 使用 BlockCardShell
 ```tsx
 // ✅ 使用 BlockCardShell
 import { BlockCardShell } from '@/components/shells/BlockCardShell'
@@ -327,25 +492,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 </ScrollArea>
 ```
 
-### 场景 3：复杂的条件样式
-```tsx
-// 使用 cn() 处理复杂条件
-<Button 
-  className={cn(
-    'base-class',
-    variant === 'primary' && 'bg-blue-500',
-    variant === 'secondary' && 'bg-gray-500',
-    isActive && 'ring-2 ring-blue-300',
-    isDisabled && 'opacity-50 cursor-not-allowed',
-    size === 'sm' && 'h-8 px-3 text-sm',
-    size === 'lg' && 'h-12 px-6 text-lg'
-  )}
->
-  按钮
-</Button>
-```
-
-### 场景 2：自定义对话框迁移
+### 模式 3：对话框（Dialog）- 自定义对话框迁移
 ```tsx
 // ❌ 自定义对话框
 {showDialog && (
@@ -373,7 +520,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 </Dialog>
 ```
 
-### 场景 3：自定义下拉菜单迁移
+### 模式 4：下拉菜单（DropdownMenu）- 自定义菜单迁移
 ```tsx
 // ❌ 自定义菜单
 {showMenu && (
@@ -403,7 +550,42 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 </DropdownMenu>
 ```
 
-### 场景 4：HTML 内容样式
+### 模式 5：复杂条件样式 - 使用 cn() 和 cva()
+
+**简单条件（≤2 个状态）- 使用 cn()**：
+```tsx
+<Button 
+  className={cn(
+    'base-class',
+    isActive && 'ring-2 ring-blue-300',
+    isDisabled && 'opacity-50 cursor-not-allowed'
+  )}
+>
+  按钮
+</Button>
+```
+
+**复杂变体（≥2 个状态）- 使用 cva()**：
+```tsx
+const buttonVariants = cva('base-class', {
+  variants: {
+    variant: {
+      primary: 'bg-blue-500',
+      secondary: 'bg-gray-500',
+    },
+    size: {
+      sm: 'h-8 px-3 text-sm',
+      lg: 'h-12 px-6 text-lg',
+    },
+  },
+})
+
+<Button className={buttonVariants({ variant: 'primary', size: 'sm' })}>
+  按钮
+</Button>
+```
+
+### 模式 6：HTML 内容样式 - 使用 Tailwind 任意值选择器
 ```tsx
 // 使用 Tailwind 任意值选择器为动态 HTML 添加样式
 <div className="prose prose-sm max-w-none [&_h1]:text-2xl [&_h1]:font-bold [&_p]:text-base [&_blockquote]:border-l-4">
@@ -460,10 +642,16 @@ grep -r "<textarea" src/components/
 
 ## 成功标准
 
+**硬标准（必须通过）**：
+- ✅ 硬验证 4 条 grep 命令全部为空
+- ✅ TypeScript 类型检查通过（0 错误）
+- ✅ View 组件不 import store/service/领域模型
+- ✅ 单行 className 不超过 120 字符
+
+**软标准（必须满足）**：
 - ✅ 所有原生 HTML 元素已替换为 Shadcn UI 组件
 - ✅ 所有自定义 CSS 已迁移到 Tailwind CSS
 - ✅ CSS 文件已删除
-- ✅ TypeScript 类型检查通过（0 错误）
 - ✅ 所有功能正常工作
 - ✅ 响应式设计保持不变
 - ✅ 文档已更新（工作日志、迁移清单、CHANGELOG）

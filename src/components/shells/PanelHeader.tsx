@@ -4,6 +4,8 @@ import { X } from 'lucide-react'
 
 interface PanelHeaderProps {
   title: string
+  description?: string
+  leading?: React.ReactNode
   onClose?: () => void
   actions?: React.ReactNode
   className?: string
@@ -15,20 +17,35 @@ interface PanelHeaderProps {
  * 用于面板顶部的标题栏，包含标题、关闭按钮和可选的操作按钮。
  * 基于 Shadcn UI Button 组合而成，无业务逻辑。
  */
-export function PanelHeader({ title, onClose, actions, className }: PanelHeaderProps) {
+export function PanelHeader({
+  title,
+  description,
+  leading,
+  onClose,
+  actions,
+  className,
+}: PanelHeaderProps) {
   return (
     <div
       className={cn(
-        'flex items-center justify-between border-b bg-background px-4 py-3',
+        'flex items-start justify-between border-b bg-background px-4 py-3',
         className
       )}
     >
-      <h2 className="text-lg font-semibold">{title}</h2>
+      <div className="flex min-w-0 items-start gap-3">
+        {leading ? <div className="mt-0.5 text-muted-foreground">{leading}</div> : null}
+        <div className="min-w-0 space-y-1">
+          <h2 className="text-sm font-semibold leading-none">{title}</h2>
+          {description ? (
+            <p className="text-xs text-muted-foreground">{description}</p>
+          ) : null}
+        </div>
+      </div>
       <div className="flex items-center gap-2">
         {actions}
         {onClose && (
           <Button variant="ghost" size="icon" onClick={onClose}>
-            <X size={16} />
+            <X className="h-4 w-4" />
           </Button>
         )}
       </div>

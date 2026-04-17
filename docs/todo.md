@@ -300,6 +300,22 @@
   - [x] 重构 BlockDetailPanel
   - [x] 重构 BlockDerivativeSelector
   - [x] 创建 useBlocks hook
+- [x] **步骤 10**: UI 重构 Skill 体系建立（2026-04-17）✅
+  - [x] 全面增强 ui-refactor skill（6 改 3 加）
+  - [x] 创建 shells-design skill
+  - [x] 创建 View 重构 Checklist
+  - [x] 建立三份独立 Skill（container-view-pattern、shells-design、ui-refactor）
+- [ ] **步骤 11**: View 层 Shadcn UI 重构（进行中）
+  - [ ] DocumentBlocksPanelView（已拆分，待 shadcn 化）
+  - [ ] BlockSpacePanelView（已拆分，待 shadcn 化）
+  - [ ] BlockDetailPanelView（已拆分，待 shadcn 化）
+  - [ ] BlockDerivativeSelectorView（已拆分，待 shadcn 化）
+  - [ ] EditorToolbar
+  - [ ] EditorBreadcrumb
+  - [ ] SuggestionMenu
+  - [ ] AIFloatPanel
+  - [ ] ChatInput
+  - [ ] ChatLayout
 
 ### 项目架构优化 🔧（已完成）
 - [x] 设计新的文档组织结构 - [详细方案](./spec/2026-04-09-project-structure-improvement.md)

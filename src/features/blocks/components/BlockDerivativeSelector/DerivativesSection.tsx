@@ -1,73 +1,80 @@
-import { Sprout } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import { Card } from '@/components/ui/card';
-import { cn } from '@/lib/utils';
-import type { BlockSummaryViewModel } from './types';
+import { CircleDot, GitBranchPlus } from 'lucide-react'
+import { BlockCardShell } from '@/components/shells'
+import { Badge } from '@/components/ui/badge'
+import { cn } from '@/lib/utils'
+import type { BlockSummaryViewModel } from './types'
 
 interface Props {
-  derivatives: BlockSummaryViewModel[];
-  selectedBlockId: string;
-  onSelect: (blockId: string) => void;
+  derivatives: BlockSummaryViewModel[]
+  selectedBlockId: string
+  onSelect: (blockId: string) => void
 }
 
-export function DerivativesSection({ derivatives, selectedBlockId, onSelect }: Props) {
+export function DerivativesSection({
+  derivatives,
+  selectedBlockId,
+  onSelect,
+}: Props) {
   return (
     <section className="space-y-3">
-      <h4 className="text-xs font-medium text-muted-foreground flex items-center gap-1">
-        <Sprout className="h-3 w-3" />
-        派生版本 ({derivatives.length})
-      </h4>
+      <div className="flex items-center gap-2 text-sm font-medium">
+        <GitBranchPlus className="h-4 w-4 text-muted-foreground" />
+        <span>派生版本</span>
+        <Badge variant="secondary">{derivatives.length}</Badge>
+      </div>
       <div className="space-y-2">
-        {derivatives.map(derivative => (
-          <Card
-            key={derivative.id}
-            className={cn(
-              "p-4 cursor-pointer transition-all hover:border-accent-green/50",
-              selectedBlockId === derivative.id && "border-accent-green bg-accent-green/5"
-            )}
-            onClick={() => onSelect(derivative.id)}
-            role="radio"
-            aria-checked={selectedBlockId === derivative.id}
-            tabIndex={0}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                onSelect(derivative.id);
-              }
-            }}
-          >
-            <div className="flex items-start gap-3 mb-3">
-              <input
-                type="radio"
-                checked={selectedBlockId === derivative.id}
-                onChange={() => onSelect(derivative.id)}
-                className="mt-0.5"
-              />
-              <div className="flex-1">
-                <h5 className="text-sm font-medium mb-2">{derivative.title}</h5>
-                <p className="text-xs text-muted-foreground leading-relaxed line-clamp-3">
-                  {derivative.content}
-                </p>
+        {derivatives.map((derivative) => {
+          const isSelected = selectedBlockId === derivative.id
+
+          return (
+            <BlockCardShell
+              key={derivative.id}
+              tone={isSelected ? 'selected' : 'interactive'}
+              className={cn('border-border/70', isSelected && 'ring-1 ring-primary/25')}
+            >
+              <div
+                onClick={() => onSelect(derivative.id)}
+                role="radio"
+                aria-checked={isSelected}
+                tabIndex={0}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault()
+                    onSelect(derivative.id)
+                  }
+                }}
+                className="space-y-3"
+              >
+                <div className="flex items-start gap-3">
+                  <CircleDot
+                    className={cn(
+                      'mt-0.5 h-4 w-4 text-muted-foreground',
+                      isSelected && 'text-primary'
+                    )}
+                  />
+                  <div className="min-w-0 flex-1 space-y-2">
+                    <h5 className="text-sm font-medium">{derivative.title}</h5>
+                    <p className="line-clamp-3 text-xs leading-relaxed text-muted-foreground">
+                      {derivative.content}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex flex-wrap gap-1.5">
+                  {derivative.contextTitle ? (
+                    <Badge variant="outline">{derivative.contextTitle}</Badge>
+                  ) : null}
+                  <Badge variant="outline">{derivative.createdAt}</Badge>
+                </div>
+                {derivative.modifications ? (
+                  <p className="text-xs italic text-muted-foreground">
+                    {derivative.modifications}
+                  </p>
+                ) : null}
               </div>
-            </div>
-            <div className="flex flex-wrap gap-2 ml-6">
-              {derivative.contextTitle && (
-                <Badge variant="outline" className="text-[10px]">
-                  {derivative.contextTitle}
-                </Badge>
-              )}
-              <Badge variant="outline" className="text-[10px]">
-                {derivative.createdAt}
-              </Badge>
-            </div>
-            {derivative.modifications && (
-              <div className="ml-6 mt-2 text-xs text-muted-foreground italic">
-                {derivative.modifications}
-              </div>
-            )}
-          </Card>
-        ))}
+            </BlockCardShell>
+          )
+        })}
       </div>
     </section>
-  );
+  )
 }

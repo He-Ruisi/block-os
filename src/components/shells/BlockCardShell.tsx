@@ -1,13 +1,30 @@
 import { cn } from '@/lib/utils'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { cva, type VariantProps } from 'class-variance-authority'
+
+const blockCardVariants = cva(
+  'rounded-lg border transition-colors',
+  {
+    variants: {
+      tone: {
+        default: 'hover:border-accent hover:bg-accent/50',
+        selected: 'border-primary bg-accent/60',
+        interactive: 'cursor-pointer hover:border-primary/40 hover:bg-accent/60',
+      },
+    },
+    defaultVariants: {
+      tone: 'default',
+    },
+  }
+)
 
 interface BlockCardShellProps {
   title?: string
   tags?: string[]
   children: React.ReactNode
   onClick?: () => void
-  isActive?: boolean
+  tone?: VariantProps<typeof blockCardVariants>['tone']
   className?: string
 }
 
@@ -22,16 +39,12 @@ export function BlockCardShell({
   tags,
   children,
   onClick,
-  isActive,
+  tone,
   className,
 }: BlockCardShellProps) {
   return (
     <Card
-      className={cn(
-        'cursor-pointer transition-colors hover:bg-accent',
-        isActive && 'border-primary bg-accent',
-        className
-      )}
+      className={cn(blockCardVariants({ tone }), className)}
       onClick={onClick}
     >
       {(title || tags) && (

@@ -1,28 +1,27 @@
-import { SearchInput } from '@/components/shells';
-import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { ChevronDown } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { BlockListView } from './BlockListView';
-import { BlockDetailPanel } from '../BlockDetailPanel';
-import type { Block, BlockRelease } from '@/types/models/block';
-import type { BlockViewModel, BlockSpaceStats } from './types';
+import { Filter, Sparkles } from 'lucide-react'
+import { BlockDetailPanel } from '../BlockDetailPanel'
+import { BlockListView } from './BlockListView'
+import { PanelHeader, PanelShell, SearchInput, EmptyState } from '@/components/shells'
+import { Button } from '@/components/ui/button'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import type { Block, BlockRelease } from '@/types/models/block'
+import type { BlockViewModel, BlockSpaceStats } from './types'
 
 interface Props {
-  blocks: BlockViewModel[];
-  isLoading: boolean;
-  searchQuery: string;
-  selectedTag: string;
-  allTags: string[];
-  highlightedBlockId: string | null;
-  detailBlockId: string | null;
-  stats: BlockSpaceStats;
-  onSearchChange: (query: string) => void;
-  onTagSelect: (tag: string) => void;
-  onBlockClick: (blockId: string) => void;
-  onBlockDragStart: (blockId: string, block: BlockViewModel) => string;
-  onInsertRelease: (block: Block, release: BlockRelease) => void;
-  onCloseDetail: () => void;
+  blocks: BlockViewModel[]
+  isLoading: boolean
+  searchQuery: string
+  selectedTag: string
+  allTags: string[]
+  highlightedBlockId: string | null
+  detailBlockId: string | null
+  stats: BlockSpaceStats
+  onSearchChange: (query: string) => void
+  onTagSelect: (tag: string) => void
+  onBlockClick: (blockId: string) => void
+  onBlockDragStart: (blockId: string, block: BlockViewModel) => string
+  onInsertRelease: (block: Block, release: BlockRelease) => void
+  onCloseDetail: () => void
 }
 
 export function BlockSpacePanelView({
@@ -41,7 +40,6 @@ export function BlockSpacePanelView({
   onInsertRelease,
   onCloseDetail,
 }: Props) {
-  // 如果显示详情面板，渲染详情
   if (detailBlockId) {
     return (
       <BlockDetailPanel
@@ -49,73 +47,76 @@ export function BlockSpacePanelView({
         onClose={onCloseDetail}
         onInsertRelease={onInsertRelease}
       />
-    );
+    )
   }
 
+  const visibleTags = ['全部', ...allTags.slice(0, 5)]
+
   return (
-    <div className="flex flex-col gap-4">
-      {/* 搜索框 */}
-      <div className="mb-4 shrink-0">
+    <PanelShell>
+      <PanelHeader
+        title="Block 空间"
+        description={`${stats.filteredBlocks} / ${stats.totalBlocks} 个可用 Block`}
+        leading={<Sparkles className="h-4 w-4" />}
+      />
+
+      <div className="space-y-3 border-b px-4 py-3">
         <SearchInput
           value={searchQuery}
           onChange={onSearchChange}
           placeholder="搜索 Block..."
         />
+        <div className="flex flex-wrap gap-2">
+          {visibleTags.map((tag) => (
+            <Button
+              key={tag}
+              variant={selectedTag === tag ? 'default' : 'secondary'}
+              size="sm"
+              onClick={() => onTagSelect(tag)}
+              className="h-7 px-2.5 text-xs"
+            >
+              {tag}
+            </Button>
+          ))}
+          {allTags.length > 5 ? (
+            <Button variant="outline" size="sm" className="h-7 gap-1 px-2.5 text-xs" disabled>
+              <Filter className="h-3 w-3" />
+              更多标签
+            </Button>
+          ) : null}
+        </div>
       </div>
 
-      {/* 标签过滤 */}
-      <div className="flex flex-wrap gap-2 mb-4 shrink-0">
-        {['全部', ...allTags.slice(0, 5)].map((tag) => (
-          <Button
-            key={tag}
-            variant={selectedTag === tag ? "default" : "secondary"}
-            size="sm"
-            onClick={() => onTagSelect(tag)}
-            className={cn(
-              "h-7 px-2.5 text-xs",
-              selectedTag === tag && "bg-accent-green hover:bg-accent-green/90"
-            )}
-          >
-            {tag}
-          </Button>
-        ))}
-        {allTags.length > 5 && (
-          <Button
-            variant="secondary"
-            size="sm"
-            className="h-7 px-2.5 text-xs"
-          >
-            更多 <ChevronDown className="h-3 w-3 ml-1" />
-          </Button>
-        )}
-      </div>
-
-      {/* Block 列表 */}
       <ScrollArea className="flex-1">
-        {isLoading ? (
-          <div className="flex flex-col items-center justify-center py-12">
-            <div className="text-4xl mb-3">⏳</div>
-            <div className="text-sm text-muted-foreground">加载中...</div>
-          </div>
-        ) : blocks.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12">
-            <div className="text-4xl mb-3">📦</div>
-            <div className="text-sm text-muted-foreground mb-1">
-              {stats.totalBlocks === 0 ? '还没有 Block' : '没有找到匹配的 Block'}
-            </div>
-            <div className="text-xs text-muted-foreground">
-              {stats.totalBlocks === 0 ? '捕获 AI 回复或选中文字来创建 Block' : '尝试其他搜索条件'}
-            </div>
-          </div>
-        ) : (
-          <BlockListView
-            blocks={blocks}
-            highlightedBlockId={highlightedBlockId}
-            onBlockClick={onBlockClick}
-            onBlockDragStart={onBlockDragStart}
-          />
-        )}
+        <div className="p-4">
+          {isLoading ? (
+            <EmptyState
+              compact
+              icon={Sparkles}
+              title="正在加载 Block"
+              description="稍后即可查看可复用内容。"
+            />
+          ) : blocks.length === 0 ? (
+            <EmptyState
+              compact
+              icon={Sparkles}
+              title={stats.totalBlocks === 0 ? '还没有 Block' : '没有匹配的 Block'}
+              description={
+                stats.totalBlocks === 0
+                  ? '捕获 AI 回复或选中文本后会在这里出现。'
+                  : '调整搜索词或切换标签后再试一次。'
+              }
+            />
+          ) : (
+            <BlockListView
+              blocks={blocks}
+              highlightedBlockId={highlightedBlockId}
+              onBlockClick={onBlockClick}
+              onBlockDragStart={onBlockDragStart}
+            />
+          )}
+        </div>
       </ScrollArea>
-    </div>
-  );
+    </PanelShell>
+  )
 }

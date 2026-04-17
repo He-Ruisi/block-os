@@ -1,17 +1,22 @@
-import { BlockItemView } from './BlockItemView';
-import type { BlockViewModel } from './types';
+import { BlockItemView } from './BlockItemView'
+import type { BlockViewModel } from './types'
 
 interface Props {
-  blocks: BlockViewModel[];
-  highlightedBlockId: string | null;
-  onBlockClick: (blockId: string) => void;
-  onBlockDragStart: (blockId: string, block: BlockViewModel) => string;
+  blocks: BlockViewModel[]
+  highlightedBlockId: string | null
+  onBlockClick: (blockId: string) => void
+  onBlockDragStart: (blockId: string, block: BlockViewModel) => string
 }
 
-export function BlockListView({ blocks, highlightedBlockId, onBlockClick, onBlockDragStart }: Props) {
+export function BlockListView({
+  blocks,
+  highlightedBlockId,
+  onBlockClick,
+  onBlockDragStart,
+}: Props) {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-1">
-      {blocks.map(block => (
+    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+      {blocks.map((block) => (
         <BlockItemView
           key={block.id}
           block={block}
@@ -21,5 +26,5 @@ export function BlockListView({ blocks, highlightedBlockId, onBlockClick, onBloc
         />
       ))}
     </div>
-  );
+  )
 }

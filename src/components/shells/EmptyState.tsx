@@ -6,6 +6,7 @@ interface EmptyStateProps {
   icon?: LucideIcon
   title: string
   description?: string
+  compact?: boolean
   action?: {
     label: string
     onClick: () => void
@@ -23,19 +24,23 @@ export function EmptyState({
   icon: Icon,
   title,
   description,
+  compact = false,
   action,
   className,
 }: EmptyStateProps) {
   return (
     <div
       className={cn(
-        'flex flex-col items-center justify-center gap-4 py-12 text-center',
+        'flex flex-col items-center justify-center text-center',
+        compact ? 'gap-3 py-8' : 'gap-4 py-12',
         className
       )}
     >
-      {Icon && <Icon className="h-12 w-12 text-muted-foreground" />}
+      {Icon && (
+        <Icon className={cn('text-muted-foreground', compact ? 'h-8 w-8' : 'h-12 w-12')} />
+      )}
       <div className="space-y-2">
-        <h3 className="text-lg font-semibold">{title}</h3>
+        <h3 className={cn('font-semibold', compact ? 'text-sm' : 'text-lg')}>{title}</h3>
         {description && <p className="text-sm text-muted-foreground">{description}</p>}
       </div>
       {action && (

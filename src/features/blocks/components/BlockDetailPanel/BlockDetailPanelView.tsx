@@ -1,28 +1,29 @@
-import { ArrowLeft } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { CurrentContentSection } from './CurrentContentSection';
-import { ReleasesSection } from './ReleasesSection';
-import { UsagesSection } from './UsagesSection';
-import type { BlockDetailViewModel, ReleaseViewModel, UsageViewModel } from './types';
+import { ArrowLeft, FileText } from 'lucide-react'
+import { EmptyState, PanelHeader, PanelShell } from '@/components/shells'
+import { Button } from '@/components/ui/button'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { CurrentContentSection } from './CurrentContentSection'
+import { ReleasesSection } from './ReleasesSection'
+import { UsagesSection } from './UsagesSection'
+import type { BlockDetailViewModel, ReleaseViewModel, UsageViewModel } from './types'
 
 interface Props {
-  block: BlockDetailViewModel | null;
-  releases: ReleaseViewModel[];
-  usages: UsageViewModel[];
-  isLoading: boolean;
-  showNewRelease: boolean;
-  newReleaseTitle: string;
-  selectedVersion: number | null;
-  hoveredVersion: number | null;
-  onClose: () => void;
-  onCreateRelease: () => void;
-  onInsert: () => void;
-  onVersionSelect: (version: number) => void;
-  onVersionHover: (version: number | null) => void;
-  onShowNewRelease: () => void;
-  onCancelNewRelease: () => void;
-  onNewReleaseTitleChange: (title: string) => void;
+  block: BlockDetailViewModel | null
+  releases: ReleaseViewModel[]
+  usages: UsageViewModel[]
+  isLoading: boolean
+  showNewRelease: boolean
+  newReleaseTitle: string
+  selectedVersion: number | null
+  hoveredVersion: number | null
+  onClose: () => void
+  onCreateRelease: () => void
+  onInsert: () => void
+  onVersionSelect: (version: number) => void
+  onVersionHover: (version: number | null) => void
+  onShowNewRelease: () => void
+  onCancelNewRelease: () => void
+  onNewReleaseTitleChange: (title: string) => void
 }
 
 export function BlockDetailPanelView({
@@ -43,61 +44,57 @@ export function BlockDetailPanelView({
   onCancelNewRelease,
   onNewReleaseTitleChange,
 }: Props) {
+  const backAction = (
+    <Button variant="ghost" size="sm" onClick={onClose} className="gap-1.5">
+      <ArrowLeft className="h-4 w-4" />
+      返回
+    </Button>
+  )
+
   if (isLoading) {
     return (
-      <div className="flex flex-col h-full">
-        <div className="flex items-center gap-2 p-4 border-b shrink-0">
-          <Button variant="ghost" size="sm" onClick={onClose}>
-            <ArrowLeft className="h-4 w-4 mr-1" />
-            返回
-          </Button>
+      <PanelShell>
+        <PanelHeader title="Block 详情" actions={backAction} />
+        <div className="flex flex-1 items-center justify-center p-4">
+          <EmptyState compact icon={FileText} title="正在加载详情" />
         </div>
-        <div className="flex-1 flex items-center justify-center">
-          <div className="text-sm text-muted-foreground">加载中...</div>
-        </div>
-      </div>
-    );
+      </PanelShell>
+    )
   }
 
   if (!block) {
     return (
-      <div className="flex flex-col h-full">
-        <div className="flex items-center gap-2 p-4 border-b shrink-0">
-          <Button variant="ghost" size="sm" onClick={onClose}>
-            <ArrowLeft className="h-4 w-4 mr-1" />
-            返回
-          </Button>
+      <PanelShell>
+        <PanelHeader title="Block 详情" actions={backAction} />
+        <div className="flex flex-1 items-center justify-center p-4">
+          <EmptyState
+            compact
+            icon={FileText}
+            title="Block 不存在"
+            description="当前 Block 可能已被删除或不可访问。"
+          />
         </div>
-        <div className="flex-1 flex items-center justify-center">
-          <div className="text-sm text-muted-foreground">Block 不存在</div>
-        </div>
-      </div>
-    );
+      </PanelShell>
+    )
   }
 
   return (
-    <div className="flex flex-col h-full">
-      {/* Header */}
-      <div className="flex items-center gap-2 p-4 border-b shrink-0">
-        <Button variant="ghost" size="sm" onClick={onClose}>
-          <ArrowLeft className="h-4 w-4 mr-1" />
-          返回
-        </Button>
-        <span className="text-sm font-medium">{block.title}</span>
-      </div>
+    <PanelShell>
+      <PanelHeader
+        title={block.title}
+        description="查看当前内容、版本和引用记录"
+        leading={<FileText className="h-4 w-4" />}
+        actions={backAction}
+      />
 
-      {/* Body */}
       <ScrollArea className="flex-1">
-        <div className="p-4 space-y-6">
-          {/* Current Content */}
+        <div className="space-y-6 p-4">
           <CurrentContentSection
             content={block.content}
             type={block.type}
             tags={block.tags}
             createdAt={block.createdAt}
           />
-
-          {/* Releases */}
           <ReleasesSection
             releases={releases}
             showNewRelease={showNewRelease}
@@ -111,26 +108,16 @@ export function BlockDetailPanelView({
             onVersionSelect={onVersionSelect}
             onVersionHover={onVersionHover}
           />
-
-          {/* Usages */}
           <UsagesSection usages={usages} />
         </div>
       </ScrollArea>
 
-      {/* Footer */}
-      {selectedVersion !== null && (
-        <div className="flex items-center justify-between p-4 border-t shrink-0">
-          <span className="text-xs text-muted-foreground">已选择 v{selectedVersion}</span>
-          <Button
-            variant="default"
-            size="sm"
-            onClick={onInsert}
-            className="bg-accent-green hover:bg-accent-green/90"
-          >
-            插入到编辑器
-          </Button>
+      {selectedVersion !== null ? (
+        <div className="flex items-center justify-between border-t p-4">
+          <span className="text-xs text-muted-foreground">已选择版本 v{selectedVersion}</span>
+          <Button onClick={onInsert}>插入到编辑器</Button>
         </div>
-      )}
-    </div>
-  );
+      ) : null}
+    </PanelShell>
+  )
 }
