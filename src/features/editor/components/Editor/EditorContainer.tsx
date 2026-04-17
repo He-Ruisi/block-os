@@ -11,7 +11,7 @@ import {
 import { getEditorExtensions } from '../../config/editorExtensions'
 import { documentStore } from '@/storage/documentStore'
 import { EditorView } from './EditorView'
-import '../styles/editor-wysiwyg.css'
+import '../../styles/editor-wysiwyg.css'
 
 interface EditorContainerProps {
   onEditorReady?: (editor: TiptapEditor) => void
