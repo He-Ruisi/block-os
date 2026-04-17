@@ -14,6 +14,19 @@ components/ ← 依赖以上所有层
 App.tsx     ← 组装层
 ```
 
+### View 组件禁止 import：
+storage/*
+services/*
+features/*/hooks
+tiptap editor instance
+任何业务 store
+### View 组件允许 import：
+components/ui/*
+components/shells/*
+lib/utils
+lucide-react
+types/*
+
 ## 目录说明
 ```
 src/
