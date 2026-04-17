@@ -1,5 +1,81 @@
 # BlockOS 更新日志
 
+## [v1.38.0] - 2026-04-17 🏗️ 架构重构完成 - 精简 Steering + 创建自动检测 Hook
+
+**重要里程碑**：完成架构重构，精简 steering 文件，创建自动检测 Hook，优化 token 消耗和维护成本。
+
+### P0 重构：精简 shadcn-ui-refactor.md
+
+**精简效果**：
+- 从约 600 行精简为约 350 行（减少 42%）
+- 每次对话减少约 1500 tokens
+- 每天 20 次对话节省约 30,000 tokens
+
+**精简内容**：
+- 移除 Shell 组件清单的详细内容（API、使用示例、添加步骤）
+- 保留快速参考（5 个 Shell 组件名称）
+- 添加指向 `.kiro/skills/shells-design.md` 的引用
+- 添加"何时创建新 Shell"和"如何创建新 Shell"的简要说明
+
+**交叉引用更新**：
+- `container-view-pattern.md` - 添加 Shell 设计指南引用
+- `shells-design.md` - 添加 Shadcn UI 重构规范引用
+- `ui-refactor.md` - 添加 Shell 设计指南引用
+- `shadcn-ui-refactor.md` - 添加 Shell 设计指南引用
+
+### P1 Hook：创建 shell-component-detector
+
+**用途**：自动检测 View 文件中的重复 UI 模式，提示是否需要创建 Shell 组件
+
+**触发条件**：
+- 编辑 `src/features/**/components/**/*View.tsx` 文件
+- 编辑 `src/components/shells/*.tsx` 文件
+
+**检测内容**（4 种情况）：
+1. **重复 UI 模式**：同一段 UI 代码在其他 View 中也出现
+2. **长 className**：单个元素的 className 超过 8 个 Tailwind 类
+3. **复杂组合**：多个 Shadcn UI 组件组合成固定模式
+4. **v0 导出**：从 v0.dev 导出的长 className 代码
+
+**行为**：
+- 发现问题时提示（建议创建的 Shell 组件名称）
+- 未发现问题则不输出
+- 不强制执行，只是提醒
+
+### 架构优化效果
+
+**Token 消耗优化**：
+- Steering 文件每次对话自动包含
+- 精简 250 行 ≈ 减少约 1500 tokens/次对话
+- 每天 20 次对话 ≈ 节省约 30,000 tokens/天
+
+**维护成本降低**：
+- Shell 组件清单只在 `shells-design.md` 中维护（单一数据源）
+- 修改 Shell 清单只需改一处，不会遗漏
+- 通过引用链接，保持文档同步
+
+**职责更清晰**：
+- **Steering**（shadcn-ui-refactor.md）：持续性规范，快速参考
+- **Skill**（shells-design.md）：专家指南，完整流程
+- **Hook**（shell-component-detector）：自动检测，及时提醒
+
+### 影响范围
+
+- **对现有代码**：无破坏性变更，现有代码继续工作
+- **对开发流程**：自动检测重复 UI 模式，及时提醒
+- **对 token 消耗**：每次对话减少约 1500 tokens
+- **对维护成本**：Shell 清单单一数据源，易于维护
+
+### 技术亮点
+
+- ✅ 精简 steering 文件，降低 token 消耗
+- ✅ 单一数据源，避免重复维护
+- ✅ 自动检测 Hook，及时发现重复模式
+- ✅ 交叉引用完善，文档同步
+- ✅ 职责清晰，易于理解和使用
+
+---
+
 ## [v1.37.0] - 2026-04-17 📐 UI 重构 Skill 体系建立 - 三份独立 Skill
 
 **重要里程碑**：建立完整的 UI 重构 Skill 体系，解决 6 个核心问题，新增 3 项关键规范，创建 3 份独立 Skill。
