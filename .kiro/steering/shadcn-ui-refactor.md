@@ -10,12 +10,68 @@ priority: high
 
 ## 核心原则
 
-### 1. 优先使用 Shadcn UI 组件
+### 1. 三层组件架构
+```
+components/
+├── ui/           # Shadcn UI 基础组件（Button、Input、Dialog 等）
+├── shells/       # 项目级展示壳组件（PanelShell、SearchInput 等）
+└── layout/       # 应用框架组件（Sidebar、TabBar、StatusBar 等）
+```
+
+**组件分层规则**：
+- **components/ui/** - 只放 Shadcn UI 基础组件
+  - 禁止：放业务逻辑、放 feature 专属 UI
+  - 允许：Button、Card、Input、Dialog、Tabs 等基础组件
+  
+- **components/shells/** - 项目级展示壳组件
+  - 基于 Shadcn UI 组合而成，无业务逻辑
+  - 用于减少重复的 className，提供统一的 UI 模式
+  - 例如：PanelShell、PanelHeader、SearchInput、BlockCardShell、EmptyState
+  
+- **components/layout/** - 应用框架组件
+  - 应用级的布局组件，可以包含状态管理
+  - 例如：Sidebar、TabBar、StatusBar、ActivityBar
+
+- **features/*/components/** - 功能模块组件
+  - 包含业务逻辑的功能组件
+  - 例如：BlockSpacePanel、EditorToolbar、SessionHistoryPanel
+
+### 2. 优先使用 Shadcn UI 组件
 - **禁止**使用原生 HTML 元素（`<button>`, `<input>`, `<textarea>`, `<select>` 等）
 - **必须**使用对应的 Shadcn UI 组件替代
-- **必须**从 `@/components/ui/` 导入组件
+- **必须**从 `@/components/ui/` 导入基础组件
+- **优先**使用 `@/components/shells/` 中的壳组件（如果适用）
 
-### 2. 已安装的 Shadcn UI 组件
+### 3. Shell 组件（项目级展示壳组件）
+```typescript
+// 面板相关
+import { PanelShell } from '@/components/shells/PanelShell'
+import { PanelHeader } from '@/components/shells/PanelHeader'
+
+// 搜索和输入
+import { SearchInput } from '@/components/shells/SearchInput'
+
+// 卡片和列表
+import { BlockCardShell } from '@/components/shells/BlockCardShell'
+
+// 空状态
+import { EmptyState } from '@/components/shells/EmptyState'
+```
+
+**使用场景**：
+- **PanelShell** - 右侧面板的统一容器
+- **PanelHeader** - 面板头部（标题 + 关闭按钮 + 操作按钮）
+- **SearchInput** - 带搜索图标和清除按钮的输入框
+- **BlockCardShell** - Block 卡片容器（标题 + 标签 + 内容）
+- **EmptyState** - 空状态占位（图标 + 标题 + 描述 + 操作按钮）
+
+**优势**：
+- ✅ 减少重复的 className
+- ✅ 统一的视觉风格
+- ✅ 无业务逻辑，易于复用
+- ✅ 基于 Shadcn UI 组合而成
+
+### 4. 已安装的 Shadcn UI 组件
 ```typescript
 // 按钮和交互
 import { Button } from '@/components/ui/button'
@@ -203,6 +259,76 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 <ScrollArea className="max-h-[500px]">
   {items.map(item => <div key={item.id}>{item.name}</div>)}
 </ScrollArea>
+```
+
+## Shell 组件使用示例
+
+### PanelShell + PanelHeader
+```tsx
+// ✅ 使用 Shell 组件构建面板
+import { PanelShell } from '@/components/shells/PanelShell'
+import { PanelHeader } from '@/components/shells/PanelHeader'
+import { Button } from '@/components/ui/button'
+import { Settings } from 'lucide-react'
+
+<PanelShell>
+  <PanelHeader
+    title="Block 空间"
+    onClose={() => setShowPanel(false)}
+    actions={
+      <Button variant="ghost" size="icon">
+        <Settings size={16} />
+      </Button>
+    }
+  />
+  <div className="flex-1 overflow-y-auto p-4">
+    {/* 面板内容 */}
+  </div>
+</PanelShell>
+```
+
+### SearchInput
+```tsx
+// ✅ 使用 SearchInput 组件
+import { SearchInput } from '@/components/shells/SearchInput'
+
+<SearchInput
+  value={searchQuery}
+  onChange={setSearchQuery}
+  placeholder="搜索 Block..."
+/>
+```
+
+### BlockCardShell
+```tsx
+// ✅ 使用 BlockCardShell 展示 Block
+import { BlockCardShell } from '@/components/shells/BlockCardShell'
+
+<BlockCardShell
+  title="Block 标题"
+  tags={['标签1', '标签2']}
+  onClick={() => handleBlockClick(block.id)}
+  isActive={selectedBlockId === block.id}
+>
+  <p className="text-sm text-muted-foreground">Block 内容预览...</p>
+</BlockCardShell>
+```
+
+### EmptyState
+```tsx
+// ✅ 使用 EmptyState 展示空状态
+import { EmptyState } from '@/components/shells/EmptyState'
+import { Inbox } from 'lucide-react'
+
+<EmptyState
+  icon={Inbox}
+  title="还没有 Block"
+  description="创建你的第一个 Block 开始使用"
+  action={{
+    label: '创建 Block',
+    onClick: handleCreateBlock,
+  }}
+/>
 ```
 
 ## 样式规范

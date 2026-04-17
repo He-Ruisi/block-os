@@ -25,14 +25,42 @@ src/
 ├── editor/         # TipTap 扩展（blockLink, blockReference, sourceBlock, suggestion）
 ├── hooks/          # React Hooks（useAppLayout, useTabs, useSession, useBlockSearch, useAuth）
 ├── components/
-│   ├── ui/         # Shadcn UI 组件（button, input, dialog, dropdown-menu 等）
-│   ├── layout/     # 布局组件（Sidebar, TabBar, ResizeHandle, ActivityBar）
+│   ├── ui/         # Shadcn UI 基础组件（button, input, dialog, dropdown-menu 等）
+│   ├── shells/     # 项目级展示壳组件（PanelShell, SearchInput, BlockCardShell 等）
+│   ├── layout/     # 应用框架组件（Sidebar, TabBar, ResizeHandle, ActivityBar）
 │   ├── editor/     # 编辑器组件（Editor, EditorBubbleMenu, EditorToolbar 等）
 │   ├── panel/      # 右侧面板（RightPanel, BlockSpacePanel, PreviewPanel 等）
 │   ├── auth/       # 认证页面
 │   └── shared/     # 通用组件（Toast）
 └── App.tsx         # 主应用入口
 ```
+
+## 组件分层规则
+
+### components/ui/ - Shadcn UI 基础组件
+- **只放**：Shadcn UI 基础组件（Button、Card、Input、Dialog、Tabs 等）
+- **禁止**：放业务逻辑、放 feature 专属 UI
+- **来源**：通过 `bunx shadcn@latest add <component>` 安装
+
+### components/shells/ - 项目级展示壳组件
+- **用途**：基于 Shadcn UI 组合而成的通用 UI 模式
+- **特点**：无业务逻辑、可复用、减少重复 className
+- **示例**：
+  - PanelShell - 面板容器
+  - PanelHeader - 面板头部
+  - SearchInput - 搜索输入框
+  - BlockCardShell - Block 卡片
+  - EmptyState - 空状态
+
+### components/layout/ - 应用框架组件
+- **用途**：应用级的布局组件
+- **特点**：可以包含状态管理和应用逻辑
+- **示例**：Sidebar、TabBar、StatusBar、ActivityBar
+
+### features/*/components/ - 功能模块组件
+- **用途**：包含业务逻辑的功能组件
+- **特点**：与具体功能模块绑定
+- **示例**：BlockSpacePanel、EditorToolbar、SessionHistoryPanel
 
 ## 命名规范
 - 组件: PascalCase (`Editor.tsx`)

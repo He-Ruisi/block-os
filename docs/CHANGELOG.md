@@ -1,5 +1,96 @@
 # BlockOS 更新日志
 
+## [v1.33.0] - 2026-04-16 🏗️ 三层组件架构建立 - Shell 组件层创建
+
+**重要里程碑**：建立了完整的三层组件架构，创建了 Shell 组件层，填补了 Shadcn UI 基础组件和业务组件之间的空白。
+
+### 三层组件架构
+```
+components/
+├── ui/           # Shadcn UI 基础组件（Button、Input、Dialog 等）
+├── shells/       # 项目级展示壳组件（PanelShell、SearchInput 等）
+└── layout/       # 应用框架组件（Sidebar、TabBar 等）
+```
+
+### Shell 组件层（新增）
+- **PanelShell** - 面板容器壳组件
+  - 用于右侧面板的统一容器
+  - 提供一致的布局和样式
+  
+- **PanelHeader** - 面板头部壳组件
+  - 包含标题、关闭按钮和可选的操作按钮
+  - 统一的面板头部样式
+  
+- **SearchInput** - 搜索输入框壳组件
+  - 带搜索图标和清除按钮的输入框
+  - 用于各种搜索场景
+  
+- **BlockCardShell** - Block 卡片壳组件
+  - 用于展示 Block 的卡片容器
+  - 包含标题、标签和内容区域
+  
+- **EmptyState** - 空状态壳组件
+  - 用于展示空状态的占位组件
+  - 包含图标、标题、描述和可选的操作按钮
+
+### 组件分层规则
+- **components/ui/** - 只放 Shadcn UI 基础组件（禁止放业务逻辑）
+- **components/shells/** - 项目级展示壳组件（基于 Shadcn UI 组合，无业务逻辑）
+- **components/layout/** - 应用框架组件（可以包含状态管理）
+- **features/*/components/** - 功能模块组件（包含业务逻辑）
+
+### 技术亮点
+- ✅ 填补了 Shadcn UI 基础组件和业务组件之间的空白
+- ✅ 提供了可复用的 UI 模式库
+- ✅ 大幅减少重复代码（减少重复的 className）
+- ✅ 确保整个应用的视觉一致性
+- ✅ 提高开发效率
+- ✅ 保持灵活性（通过 props 和 className 定制）
+
+### 更新规范文件
+- **shadcn-ui-refactor.md** - 添加三层架构和 Shell 组件说明
+- **structure.md** - 更新目录结构和组件分层规则
+- **ui-refactor.md** - 添加 Shell 组件选择策略和使用示例
+
+### 文档
+- **src/components/shells/README.md** - 完整的 Shell 组件使用文档（约 400 行）
+
+---
+
+## [v1.32.0] - 2026-04-16 📚 Shadcn UI 重构规范和 Agent Skills 建立
+
+**重要里程碑**：建立了完整的 Shadcn UI 组件重构规范体系，所有 AI agent 将自动遵循统一的 UI 开发标准。
+
+### Steering 规范文件
+- **shadcn-ui-refactor.md** - Shadcn UI 组件重构规范（约 400 行）
+  - 核心原则：禁止使用原生 HTML 元素，必须使用 Shadcn UI 组件
+  - 已安装组件列表：Button、Input、Textarea、Dialog、DropdownMenu、ScrollArea 等
+  - 详细的组件替换规则和示例代码
+  - 样式规范：cn() 工具函数、Tailwind 语义化颜色、工具类
+  - 图标规范：lucide-react 图标库
+  - 重构检查清单和常见问题解答
+
+### Agent Skills 文件
+- **ui-refactor.md** - UI 组件重构专家 skill（约 500 行）
+  - 完整的工作流程：分析 → 选择组件 → 实施重构 → 验证测试 → 更新文档
+  - 常见场景处理：复杂条件样式、对话框迁移、下拉菜单迁移、HTML 内容样式
+  - 特殊情况处理：组件未安装、自定义样式、复杂组件分步迁移
+  - 快速命令和成功标准
+
+### 更新现有规范
+- **tech.md** - 添加 Shadcn UI + Tailwind CSS 到核心技术栈
+- **structure.md** - 更新目录结构和命名规范（添加 lib/、components/ui/）
+- **fix.md** - 添加 UI 组件修复规范
+
+### 技术亮点
+- ✅ 建立了统一的 UI 组件开发规范
+- ✅ 所有 AI agent 都将自动遵循相同的标准
+- ✅ 确保代码质量和一致性
+- ✅ 提供了完整的参考文档和示例
+- ✅ 覆盖所有 UI 相关工作（新增、重构、修复、开发）
+
+---
+
 ## [v1.31.0] - 2026-04-16 🎨 ExplorerView 组件 Shadcn UI 重构完成
 
 **重要里程碑**：完成 ExplorerView 组件的 Shadcn UI 重构，所有对话框和菜单使用 Shadcn UI 组件，代码更加规范和易于维护。
