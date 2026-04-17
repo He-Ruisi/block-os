@@ -22,7 +22,7 @@ export function DocumentBlocksPanelView({
     <PanelShell>
       <PanelHeader
         title={documentTitle}
-        description="当前文档的隐式 Block 结构"
+        description="Implicit block structure for the current document"
         leading={<FileText className="h-4 w-4" />}
       />
 
@@ -32,15 +32,15 @@ export function DocumentBlocksPanelView({
             <EmptyState
               compact
               icon={FileText}
-              title="正在解析文档"
-              description="文档中的 Block 结构正在生成。"
+              title="Parsing document"
+              description="Document blocks are still being generated."
             />
           ) : blocks.length === 0 ? (
             <EmptyState
               compact
               icon={FileText}
-              title="文档里还没有 Block"
-              description="开始写作后，每个段落都会自动映射为 Block。"
+              title="No blocks in this document yet"
+              description="Once you start writing, each paragraph can become a block."
             />
           ) : (
             <BlockListView blocks={blocks} />
@@ -53,7 +53,7 @@ export function DocumentBlocksPanelView({
           <CardContent className="flex items-center gap-3 p-4">
             <FileText className="h-4 w-4 text-muted-foreground" />
             <div className="space-y-1">
-              <p className="text-xs text-muted-foreground">段落 Block</p>
+              <p className="text-xs text-muted-foreground">Paragraph blocks</p>
               <p className="text-base font-semibold">{stats.totalBlocks}</p>
             </div>
           </CardContent>
@@ -62,7 +62,7 @@ export function DocumentBlocksPanelView({
           <CardContent className="flex items-center gap-3 p-4">
             <Link2 className="h-4 w-4 text-muted-foreground" />
             <div className="space-y-1">
-              <p className="text-xs text-muted-foreground">文档链接</p>
+              <p className="text-xs text-muted-foreground">Block links</p>
               <p className="text-base font-semibold">{stats.totalLinks}</p>
             </div>
           </CardContent>

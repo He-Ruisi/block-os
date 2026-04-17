@@ -37,17 +37,17 @@ export function BlockDerivativeSelectorView({
         <DialogHeader className="border-b px-6 py-4 text-left">
           <DialogTitle className="flex items-center gap-2">
             <GitBranch className="h-4 w-4" />
-            选择 Block 版本
+            Select block version
           </DialogTitle>
           <DialogDescription>
-            从源 Block 或其派生版本中选择要插入的内容。
+            Choose either the source block or one of its derived versions.
           </DialogDescription>
         </DialogHeader>
 
         <ScrollArea className="flex-1">
           <div className="space-y-6 px-6 py-5">
             {isLoading ? (
-              <EmptyState compact icon={Layers3} title="正在加载版本树" />
+              <EmptyState compact icon={Layers3} title="Loading version tree" />
             ) : tree ? (
               <>
                 <SourceBlockSection
@@ -65,8 +65,8 @@ export function BlockDerivativeSelectorView({
                   <EmptyState
                     compact
                     icon={Layers3}
-                    title="暂无派生版本"
-                    description="引用这个 Block 并继续编辑后，这里会出现新的派生版本。"
+                    title="No derived versions yet"
+                    description="Derived versions will appear here after you reuse and edit this block."
                   />
                 )}
               </>
@@ -74,8 +74,8 @@ export function BlockDerivativeSelectorView({
               <EmptyState
                 compact
                 icon={Layers3}
-                title="没有可选版本"
-                description="当前无法构建这个 Block 的版本树。"
+                title="No versions available"
+                description="The version tree could not be loaded for this block."
               />
             )}
           </div>
@@ -83,10 +83,10 @@ export function BlockDerivativeSelectorView({
 
         <DialogFooter className="border-t px-6 py-4">
           <Button variant="outline" onClick={onCancel}>
-            取消
+            Cancel
           </Button>
           <Button onClick={onSelect} disabled={!selectedBlockId}>
-            选择此版本
+            Use selected version
           </Button>
         </DialogFooter>
       </DialogContent>

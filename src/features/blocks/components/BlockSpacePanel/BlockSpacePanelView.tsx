@@ -1,7 +1,7 @@
 import { Filter, Sparkles } from 'lucide-react'
 import { BlockDetailPanel } from '../BlockDetailPanel'
 import { BlockListView } from './BlockListView'
-import { PanelHeader, PanelShell, SearchInput, EmptyState } from '@/components/shells'
+import { EmptyState, PanelHeader, PanelShell, SearchInput } from '@/components/shells'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import type { Block, BlockRelease } from '@/types/models/block'
@@ -50,13 +50,13 @@ export function BlockSpacePanelView({
     )
   }
 
-  const visibleTags = ['全部', ...allTags.slice(0, 5)]
+  const visibleTags = ['All', ...allTags.slice(0, 5)]
 
   return (
     <PanelShell>
       <PanelHeader
-        title="Block 空间"
-        description={`${stats.filteredBlocks} / ${stats.totalBlocks} 个可用 Block`}
+        title="Block Library"
+        description={`${stats.filteredBlocks} / ${stats.totalBlocks} blocks available`}
         leading={<Sparkles className="h-4 w-4" />}
       />
 
@@ -64,7 +64,7 @@ export function BlockSpacePanelView({
         <SearchInput
           value={searchQuery}
           onChange={onSearchChange}
-          placeholder="搜索 Block..."
+          placeholder="Search blocks..."
         />
         <div className="flex flex-wrap gap-2">
           {visibleTags.map((tag) => (
@@ -81,7 +81,7 @@ export function BlockSpacePanelView({
           {allTags.length > 5 ? (
             <Button variant="outline" size="sm" className="h-7 gap-1 px-2.5 text-xs" disabled>
               <Filter className="h-3 w-3" />
-              更多标签
+              More tags
             </Button>
           ) : null}
         </div>
@@ -93,18 +93,18 @@ export function BlockSpacePanelView({
             <EmptyState
               compact
               icon={Sparkles}
-              title="正在加载 Block"
-              description="稍后即可查看可复用内容。"
+              title="Loading blocks"
+              description="Reusable content is being prepared."
             />
           ) : blocks.length === 0 ? (
             <EmptyState
               compact
               icon={Sparkles}
-              title={stats.totalBlocks === 0 ? '还没有 Block' : '没有匹配的 Block'}
+              title={stats.totalBlocks === 0 ? 'No blocks yet' : 'No matching blocks'}
               description={
                 stats.totalBlocks === 0
-                  ? '捕获 AI 回复或选中文本后会在这里出现。'
-                  : '调整搜索词或切换标签后再试一次。'
+                  ? 'Capture AI output or selected text to create your first block.'
+                  : 'Try a different search term or switch the active tag.'
               }
             />
           ) : (

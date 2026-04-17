@@ -47,16 +47,16 @@ export function BlockDetailPanelView({
   const backAction = (
     <Button variant="ghost" size="sm" onClick={onClose} className="gap-1.5">
       <ArrowLeft className="h-4 w-4" />
-      返回
+      Back
     </Button>
   )
 
   if (isLoading) {
     return (
       <PanelShell>
-        <PanelHeader title="Block 详情" actions={backAction} />
+        <PanelHeader title="Block Details" actions={backAction} />
         <div className="flex flex-1 items-center justify-center p-4">
-          <EmptyState compact icon={FileText} title="正在加载详情" />
+          <EmptyState compact icon={FileText} title="Loading details" />
         </div>
       </PanelShell>
     )
@@ -65,13 +65,13 @@ export function BlockDetailPanelView({
   if (!block) {
     return (
       <PanelShell>
-        <PanelHeader title="Block 详情" actions={backAction} />
+        <PanelHeader title="Block Details" actions={backAction} />
         <div className="flex flex-1 items-center justify-center p-4">
           <EmptyState
             compact
             icon={FileText}
-            title="Block 不存在"
-            description="当前 Block 可能已被删除或不可访问。"
+            title="Block not found"
+            description="The selected block may have been removed."
           />
         </div>
       </PanelShell>
@@ -82,7 +82,7 @@ export function BlockDetailPanelView({
     <PanelShell>
       <PanelHeader
         title={block.title}
-        description="查看当前内容、版本和引用记录"
+        description="Review the current content, version history, and usages"
         leading={<FileText className="h-4 w-4" />}
         actions={backAction}
       />
@@ -114,8 +114,8 @@ export function BlockDetailPanelView({
 
       {selectedVersion !== null ? (
         <div className="flex items-center justify-between border-t p-4">
-          <span className="text-xs text-muted-foreground">已选择版本 v{selectedVersion}</span>
-          <Button onClick={onInsert}>插入到编辑器</Button>
+          <span className="text-xs text-muted-foreground">Selected version: v{selectedVersion}</span>
+          <Button onClick={onInsert}>Insert into editor</Button>
         </div>
       ) : null}
     </PanelShell>
