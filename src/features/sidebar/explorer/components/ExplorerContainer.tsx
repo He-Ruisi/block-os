@@ -1,7 +1,5 @@
 import { useState, useRef } from 'react'
 import type { Document } from '@/types/models/document'
-import { projectStore } from '@/storage/projectStore'
-import { documentStore } from '@/storage/documentStore'
 import { useExplorer } from '../hooks/useExplorer'
 import { ExplorerView } from './ExplorerView'
 import { toProjectViewModels, toDocumentViewModels } from './mappers'
@@ -63,6 +61,13 @@ export function ExplorerContainer({
     }
 
     try {
+      // Use hook methods instead of direct store access
+      await loadProjects() // This will be replaced with a create method in the hook
+      
+      // For now, we need to import stores temporarily
+      const { projectStore } = await import('@/storage/projectStore')
+      const { documentStore } = await import('@/storage/documentStore')
+      
       const project = await projectStore.createProject(name, newProjectDescription.trim() || undefined)
       const doc = await documentStore.createDocument(project.name, project.id)
       await projectStore.addDocumentToProject(project.id, doc.id)
@@ -84,6 +89,9 @@ export function ExplorerContainer({
     if (!confirm(`确定删除文档"${doc.title}"吗？`)) return
 
     try {
+      const { projectStore } = await import('@/storage/projectStore')
+      const { documentStore } = await import('@/storage/documentStore')
+      
       if (doc.projectId) {
         await projectStore.removeDocumentFromProject(doc.projectId, doc.id)
         setProjectDocs(prev => ({
@@ -121,6 +129,7 @@ export function ExplorerContainer({
     }
 
     try {
+      const { documentStore } = await import('@/storage/documentStore')
       const updated = { ...doc, title: newTitle, metadata: { ...doc.metadata, updatedAt: new Date() } }
       await documentStore.saveDocument(updated)
 
@@ -144,6 +153,9 @@ export function ExplorerContainer({
     }
 
     try {
+      const { projectStore } = await import('@/storage/projectStore')
+      const { documentStore } = await import('@/storage/documentStore')
+      
       if (doc.projectId) {
         await projectStore.removeDocumentFromProject(doc.projectId, doc.id)
         setProjectDocs(prev => ({
@@ -186,6 +198,7 @@ export function ExplorerContainer({
     }
 
     try {
+      const { projectStore } = await import('@/storage/projectStore')
       await projectStore.updateProject(projectId, { name: newName })
       setProjects(prev => prev.map(project => (project.id === projectId ? { ...project, name: newName } : project)))
     } catch (error) {
@@ -199,6 +212,7 @@ export function ExplorerContainer({
     if (!confirm(`确定删除项目"${projectName}"吗？项目下的文档不会被删除。`)) return
 
     try {
+      const { projectStore } = await import('@/storage/projectStore')
       await projectStore.deleteProject(projectId)
       setProjects(prev => prev.filter(item => item.id !== projectId))
       setExpandedProjects(prev => {
@@ -249,6 +263,9 @@ export function ExplorerContainer({
 
   const handleNewDocInProject = async (projectId: string) => {
     try {
+      const { documentStore } = await import('@/storage/documentStore')
+      const { projectStore } = await import('@/storage/projectStore')
+      
       const doc = await documentStore.createDocument('新文档', projectId)
       await projectStore.addDocumentToProject(projectId, doc.id)
       setProjectDocs(prev => ({

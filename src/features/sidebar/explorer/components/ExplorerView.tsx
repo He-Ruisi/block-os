@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { EmptyState } from '@/components/shells/EmptyState'
+import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 import { useLongPress } from '@/hooks/useLongPress'
 import type { ProjectViewModel, DocumentViewModel } from './types'
@@ -95,35 +96,72 @@ export function ExplorerView({
   onSetDocActionMenu,
 }: ExplorerViewProps) {
   return (
-    <div className="explorer-view">
-      <div className={`explorer-item ${currentProjectId === 'today' ? 'active' : ''}`} onClick={onSelectToday}>
-        <CalendarDays size={18} className="explorer-item-icon" />
-        <span className="explorer-item-text">今天</span>
-      </div>
+    <div className="flex flex-col gap-2">
+      {/* Today Button */}
+      <Button
+        variant="ghost"
+        className={cn(
+          'w-full justify-start gap-2 h-9 px-3',
+          currentProjectId === 'today' && 'bg-accent text-accent-foreground'
+        )}
+        onClick={onSelectToday}
+      >
+        <CalendarDays className="h-4 w-4" />
+        <span className="text-sm">今天</span>
+      </Button>
 
-      <div className="explorer-section">
-        <div className="explorer-section-header">
-          <span className="explorer-section-title">项目</span>
+      {/* Projects Section */}
+      <div className="flex flex-col gap-1">
+        <div className="px-3 py-1.5">
+          <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">项目</span>
         </div>
 
-        <ScrollArea className="explorer-projects">
+        <div className="flex flex-col gap-0.5">
           {projects.length === 0 ? (
-            <EmptyState title="还没有项目" description="点击下方按钮创建" />
+            <div className="px-3 py-8">
+              <EmptyState 
+                title="还没有项目" 
+                description="点击下方按钮创建"
+                className="py-4"
+              />
+            </div>
           ) : (
             projects.map(project => (
-              <div key={project.id} className="explorer-project-group">
+              <div key={project.id} className="flex flex-col">
+                {/* Project Item */}
                 <div
-                  className={`explorer-project-item ${currentProjectId === project.id ? 'active' : ''}`}
+                  className={cn(
+                    'group flex items-center gap-2 px-2 py-1.5 rounded-md cursor-pointer transition-colors',
+                    'hover:bg-accent/50',
+                    currentProjectId === project.id && 'bg-accent text-accent-foreground'
+                  )}
                   onClick={() => onToggleProject(project.id)}
                 >
-                  <span className="explorer-project-expand">
-                    {project.isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-                  </span>
-                  <Folder size={16} className="explorer-project-icon" />
+                  {/* Expand Icon */}
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-5 w-5 p-0 hover:bg-accent"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onToggleProject(project.id)
+                    }}
+                  >
+                    {project.isExpanded ? (
+                      <ChevronDown className="h-3.5 w-3.5" />
+                    ) : (
+                      <ChevronRight className="h-3.5 w-3.5" />
+                    )}
+                  </Button>
+
+                  {/* Folder Icon */}
+                  <Folder className="h-4 w-4 flex-shrink-0 text-muted-foreground" />
+
+                  {/* Project Name or Rename Input */}
                   {renamingProjectId === project.id ? (
                     <Input
                       ref={renameProjectInputRef}
-                      className="h-7 text-sm"
+                      className="h-7 text-sm flex-1"
                       value={renameProjectValue}
                       onChange={e => onSetRenameProjectValue(e.target.value)}
                       onBlur={() => onSubmitRenameProject(project.id)}
@@ -136,66 +174,80 @@ export function ExplorerView({
                     />
                   ) : (
                     <>
-                      <span className="explorer-project-name">{project.name}</span>
-                      {project.documentCount > 0 && <span className="explorer-project-count">{project.documentCount}</span>}
-                      <div className="explorer-doc-actions explorer-project-actions">
+                      <span className="flex-1 text-sm truncate">{project.name}</span>
+                      
+                      {/* Document Count Badge */}
+                      {project.documentCount > 0 && (
+                        <Badge variant="secondary" className="h-5 px-1.5 text-xs">
+                          {project.documentCount}
+                        </Badge>
+                      )}
+
+                      {/* Action Buttons */}
+                      <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
                         <Button
                           variant="ghost"
                           size="icon"
-                          className={cn('explorer-action-btn explorer-star-btn h-6 w-6', project.isStarred && 'starred')}
+                          className={cn(
+                            'h-6 w-6',
+                            project.isStarred && 'text-yellow-500'
+                          )}
                           onClick={e => {
                             e.stopPropagation()
                             onToggleStar(project.id, 'project', project.name)
                           }}
                           title={project.isStarred ? '取消置顶' : '置顶'}
                         >
-                          <Star size={14} fill={project.isStarred ? 'currentColor' : 'none'} />
+                          <Star className="h-3.5 w-3.5" fill={project.isStarred ? 'currentColor' : 'none'} />
                         </Button>
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="explorer-action-btn h-6 w-6"
+                          className="h-6 w-6"
                           onClick={e => {
                             e.stopPropagation()
                             onNewDocInProject(project.id)
                           }}
                           title="新建文档"
                         >
-                          <Plus size={14} />
+                          <Plus className="h-3.5 w-3.5" />
                         </Button>
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="explorer-action-btn h-6 w-6"
+                          className="h-6 w-6"
                           onClick={e => {
                             e.stopPropagation()
                             onStartRenameProject(project.id, project.name)
                           }}
                           title="重命名"
                         >
-                          <Pencil size={14} />
+                          <Pencil className="h-3.5 w-3.5" />
                         </Button>
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="explorer-action-btn danger h-6 w-6"
+                          className="h-6 w-6 text-destructive hover:text-destructive"
                           onClick={e => {
                             e.stopPropagation()
                             onDeleteProject(project.id, project.name)
                           }}
                           title="删除项目"
                         >
-                          <Trash2 size={14} />
+                          <Trash2 className="h-3.5 w-3.5" />
                         </Button>
                       </div>
                     </>
                   )}
                 </div>
 
+                {/* Project Documents */}
                 {project.isExpanded && (
-                  <div className="explorer-project-docs">
+                  <div className="ml-6 flex flex-col gap-0.5 mt-0.5">
                     {(projectDocs[project.id] || []).length === 0 ? (
-                      <div className="explorer-doc-empty">暂无文档。</div>
+                      <div className="px-3 py-2 text-xs text-muted-foreground">
+                        暂无文档
+                      </div>
                     ) : (
                       docViewModels(projectDocs[project.id] || [], isStarred).map(doc => {
                         const fullDoc = (projectDocs[project.id] || []).find(d => d.id === doc.id)!
@@ -227,11 +279,16 @@ export function ExplorerView({
               </div>
             ))
           )}
-        </ScrollArea>
+        </div>
 
-        <Button className="explorer-new-project-button w-full justify-start" variant="ghost" onClick={() => onSetShowNewProjectDialog(true)}>
-          <Plus size={16} />
-          <span className="explorer-button-text">新建项目</span>
+        {/* New Project Button */}
+        <Button 
+          className="w-full justify-start gap-2 mt-2" 
+          variant="ghost" 
+          onClick={() => onSetShowNewProjectDialog(true)}
+        >
+          <Plus className="h-4 w-4" />
+          <span className="text-sm">新建项目</span>
         </Button>
       </div>
 
@@ -355,9 +412,12 @@ function ExplorerDocItem({
   })
 
   return (
-    <div className="explorer-doc-item-wrapper group">
+    <div className="group">
       <div
-        className="explorer-doc-item"
+        className={cn(
+          'flex items-center gap-2 px-2 py-1.5 rounded-md cursor-pointer transition-colors',
+          'hover:bg-accent/50'
+        )}
         onDoubleClick={e => {
           e.stopPropagation()
           onToggleMenu(null)
@@ -368,7 +428,7 @@ function ExplorerDocItem({
         {isRenaming ? (
           <Input
             ref={renameInputRef}
-            className="h-7 text-sm"
+            className="h-7 text-sm flex-1"
             value={renameValue}
             onChange={e => onRenameValueChange(e.target.value)}
             onBlur={() => onSubmitRename(doc)}
@@ -381,37 +441,44 @@ function ExplorerDocItem({
           />
         ) : (
           <>
-            <FileText size={14} className="explorer-doc-icon" />
-            <span className="explorer-doc-title">{doc.title}</span>
+            <FileText className="h-3.5 w-3.5 flex-shrink-0 text-muted-foreground" />
+            <span className="flex-1 text-sm truncate">{doc.title}</span>
+            
+            {/* Star Button */}
             <Button
               variant="ghost"
               size="icon"
-              className={cn('explorer-action-btn explorer-star-btn explorer-doc-star h-6 w-6', isStarred && 'starred')}
+              className={cn(
+                'h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity',
+                isStarred && 'opacity-100 text-yellow-500'
+              )}
               onClick={e => {
                 e.stopPropagation()
                 onToggleStar(doc.id, 'document', doc.title, doc.projectId)
               }}
               title={isStarred ? '取消置顶' : '置顶'}
             >
-              <Star size={12} fill={isStarred ? 'currentColor' : 'none'} />
+              <Star className="h-3 w-3" fill={isStarred ? 'currentColor' : 'none'} />
             </Button>
+            
+            {/* More Actions Menu */}
             <DropdownMenu open={isMenuOpen} onOpenChange={open => !open && onToggleMenu(null)}>
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-6 w-6 opacity-0 group-hover:opacity-100"
+                  className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
                   onClick={e => {
                     e.stopPropagation()
                     onToggleMenu(isMenuOpen ? null : doc)
                   }}
                 >
-                  <MoreVertical size={14} />
+                  <MoreVertical className="h-3.5 w-3.5" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuItem onClick={() => onOpen(doc)}>
-                  <FileText size={14} />
+                  <FileText className="h-3.5 w-3.5" />
                   <span>打开文档</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem
@@ -420,11 +487,11 @@ function ExplorerDocItem({
                     onStartRename(doc)
                   }}
                 >
-                  <Pencil size={14} />
+                  <Pencil className="h-3.5 w-3.5" />
                   <span>重命名</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={onSaveToProject}>
-                  <FolderInput size={14} />
+                  <FolderInput className="h-3.5 w-3.5" />
                   <span>保存到项目</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
@@ -435,7 +502,7 @@ function ExplorerDocItem({
                   }}
                   className="text-destructive"
                 >
-                  <Trash2 size={14} />
+                  <Trash2 className="h-3.5 w-3.5" />
                   <span>删除</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
