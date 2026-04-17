@@ -364,7 +364,7 @@ touch src/components/shells/[ShellName].tsx
 
 ## 参考资源
 
-- Shell 组件 API 文档：`src/components/shells/API.md`
-- Container/View 模式：`.kiro/skills/container-view-pattern.md`
-- UI 重构规范：`.kiro/skills/ui-refactor.md`
+- **Shell 组件设计指南**：`.kiro/skills/shells-design.md`
+- **Shell 组件 API 文档**：`src/components/shells/API.md`
+- **Shadcn UI 重构规范**：`.kiro/steering/shadcn-ui-refactor.md`
 - Shadcn UI 文档：https://ui.shadcn.com/

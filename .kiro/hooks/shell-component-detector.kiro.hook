@@ -1,0 +1,17 @@
+{
+  "version": "1.0.0",
+  "enabled": true,
+  "name": "shell-component-detector",
+  "description": "自动检测 View 文件中的重复 UI 模式，提示是否需要创建 Shell 组件",
+  "when": {
+    "type": "fileEdited",
+    "patterns": ["src/features/**/components/**/*View.tsx", "src/components/shells/*.tsx"]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "检查当前编辑的文件是否存在以下情况（参考 `.kiro/skills/shells-design.md` 中的触发条件）：\n\n1. **重复 UI 模式**：这段 UI 代码是否在其他 View 中也出现过？\n2. **长 className**：是否有单个元素的 className 超过 8 个 Tailwind 类？\n3. **复杂组合**：是否有多个 Shadcn UI 组件组合成固定模式（如面板头部 = 标题 + 关闭按钮 + 操作按钮）？\n4. **v0 导出**：是否有从 v0.dev 导出的长 className 代码？\n\n如果发现符合以上任一条件，简要提示：\n- 发现的重复模式或长 className 的位置\n- 建议创建的 Shell 组件名称\n- 是否需要立即创建（如果用户同意，调用 `.kiro/skills/shells-design.md` skill）\n\n如果没有发现问题，不输出任何内容。"
+  },
+  "workspaceFolderName": "project_blockos",
+  "shortName": "shell-detector",
+  "displayName": "Shell 组件检测器"
+}

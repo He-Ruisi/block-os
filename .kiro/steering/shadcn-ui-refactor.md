@@ -42,115 +42,43 @@ components/
 - **必须**从 `@/components/ui/` 导入基础组件
 - **优先**使用 `@/components/shells/` 中的壳组件（如果适用）
 
-### 3. Shell 组件清单（项目级展示壳组件）
+### 3. Shell 组件使用
 
 **重要规则**：
 - ✅ **优先使用** Shell 组件（如果适用）
 - ❌ **禁止在 View 内部临时实现** shell 级组件
 - ✅ **如果需要新的 Shell 组件**，必须先在 `components/shells/` 中实现，再使用
 
-#### 当前可用 Shell 组件（5 个）
+**详细设计指南**：`.kiro/skills/shells-design.md`
+
+#### 快速参考（当前可用 Shell 组件）
 
 ```typescript
 // 1. PanelShell - 面板容器
 import { PanelShell } from '@/components/shells/PanelShell'
-// 用途：右侧面板的统一容器
-// API: { children, className? }
 
 // 2. PanelHeader - 面板头部
 import { PanelHeader } from '@/components/shells/PanelHeader'
-// 用途：面板标题栏（标题 + 关闭按钮 + 操作按钮）
-// API: { title, onClose?, actions?, className? }
 
 // 3. SearchInput - 搜索输入框
 import { SearchInput } from '@/components/shells/SearchInput'
-// 用途：带搜索图标和清除按钮的输入框
-// API: { value, onChange: (value: string) => void, placeholder?, className? }
-// 注意：onChange 传 string，不传 Event
 
 // 4. BlockCardShell - Block 卡片
 import { BlockCardShell } from '@/components/shells/BlockCardShell'
-// 用途：Block 卡片容器（标题 + 标签 + 内容）
-// API: { title?, tags?, children, onClick?, onDragStart?, isActive?, draggable?, className? }
 
 // 5. EmptyState - 空状态占位
 import { EmptyState } from '@/components/shells/EmptyState'
-// 用途：空状态占位（图标 + 标题 + 描述 + 操作按钮）
-// API: { icon?: LucideIcon, title, description?, action?, className? }
 ```
 
-#### Shell 组件完整 API 文档
+**完整 API 文档**：`src/components/shells/API.md`
 
-详见：`src/components/shells/API.md`
+**何时创建新 Shell**：
+- 重复 UI 模式（≥2 个 View）
+- 长 className（>8 个 Tailwind 类）
+- 复杂组合（多个 Shadcn UI 组合）
+- v0 导出（长 className 代码）
 
-#### Shell 组件使用示例
-
-```tsx
-import { PanelShell, PanelHeader, SearchInput, BlockCardShell, EmptyState } from '@/components/shells';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Inbox } from 'lucide-react';
-
-function MyPanel() {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [blocks, setBlocks] = useState([]);
-
-  return (
-    <PanelShell>
-      {/* 头部 */}
-      <PanelHeader
-        title="Block 空间"
-        onClose={() => setShowPanel(false)}
-      />
-
-      {/* 搜索栏 */}
-      <div className="p-4 border-b">
-        <SearchInput
-          value={searchQuery}
-          onChange={setSearchQuery}  // 直接传函数，不处理 Event
-          placeholder="搜索 Block..."
-        />
-      </div>
-
-      {/* 内容区域 */}
-      <ScrollArea className="flex-1">
-        {blocks.length === 0 ? (
-          <EmptyState
-            icon={Inbox}
-            title="还没有 Block"
-            description="创建你的第一个 Block 开始使用"
-          />
-        ) : (
-          <div className="p-4 space-y-2">
-            {blocks.map(block => (
-              <BlockCardShell
-                key={block.id}
-                title={block.title}
-                tags={block.tags}
-                onClick={() => handleBlockClick(block.id)}
-                isActive={selectedBlockId === block.id}
-              >
-                <p className="text-sm text-muted-foreground">{block.content}</p>
-              </BlockCardShell>
-            ))}
-          </div>
-        )}
-      </ScrollArea>
-    </PanelShell>
-  );
-}
-```
-
-#### 如何添加新 Shell 组件
-
-如果发现重复的 UI 模式，按以下步骤添加：
-
-1. **在 `components/shells/` 中创建组件文件**
-2. **定义 TypeScript 接口**（导出 Props 类型）
-3. **实现组件**（基于 Shadcn UI，无业务逻辑）
-4. **回调统一传值**（传 string/boolean/id，不传 Event）
-5. **添加到 `index.ts`** 导出
-6. **更新 `API.md`** 文档
-7. **更新本清单**
+**如何创建新 Shell**：参考 `.kiro/skills/shells-design.md` 中的 5 步设计流程
 
 ### 4. 已安装的 Shadcn UI 组件
 ```typescript
@@ -342,76 +270,6 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 </ScrollArea>
 ```
 
-## Shell 组件使用示例
-
-### PanelShell + PanelHeader
-```tsx
-// ✅ 使用 Shell 组件构建面板
-import { PanelShell } from '@/components/shells/PanelShell'
-import { PanelHeader } from '@/components/shells/PanelHeader'
-import { Button } from '@/components/ui/button'
-import { Settings } from 'lucide-react'
-
-<PanelShell>
-  <PanelHeader
-    title="Block 空间"
-    onClose={() => setShowPanel(false)}
-    actions={
-      <Button variant="ghost" size="icon">
-        <Settings size={16} />
-      </Button>
-    }
-  />
-  <div className="flex-1 overflow-y-auto p-4">
-    {/* 面板内容 */}
-  </div>
-</PanelShell>
-```
-
-### SearchInput
-```tsx
-// ✅ 使用 SearchInput 组件
-import { SearchInput } from '@/components/shells/SearchInput'
-
-<SearchInput
-  value={searchQuery}
-  onChange={setSearchQuery}
-  placeholder="搜索 Block..."
-/>
-```
-
-### BlockCardShell
-```tsx
-// ✅ 使用 BlockCardShell 展示 Block
-import { BlockCardShell } from '@/components/shells/BlockCardShell'
-
-<BlockCardShell
-  title="Block 标题"
-  tags={['标签1', '标签2']}
-  onClick={() => handleBlockClick(block.id)}
-  isActive={selectedBlockId === block.id}
->
-  <p className="text-sm text-muted-foreground">Block 内容预览...</p>
-</BlockCardShell>
-```
-
-### EmptyState
-```tsx
-// ✅ 使用 EmptyState 展示空状态
-import { EmptyState } from '@/components/shells/EmptyState'
-import { Inbox } from 'lucide-react'
-
-<EmptyState
-  icon={Inbox}
-  title="还没有 Block"
-  description="创建你的第一个 Block 开始使用"
-  action={{
-    label: '创建 Block',
-    onClick: handleCreateBlock,
-  }}
-/>
-```
-
 ## 样式规范
 
 ### 1. 使用 cn() 工具函数
@@ -543,6 +401,8 @@ import { cn } from '@/lib/utils'
 
 ## 参考资源
 
+- **Shell 组件设计指南**：`.kiro/skills/shells-design.md`
+- **Shell 组件 API 文档**：`src/components/shells/API.md`
 - Shadcn UI 官方文档：https://ui.shadcn.com/
 - Tailwind CSS 文档：https://tailwindcss.com/docs
 - lucide-react 图标库：https://lucide.dev/

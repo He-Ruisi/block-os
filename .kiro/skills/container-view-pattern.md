@@ -565,6 +565,9 @@ const blockViewModels = toBlockViewModels(blocks);
 
 ## 参考资源
 
+- **Shell 组件设计指南**：`.kiro/skills/shells-design.md`
+- **Shell 组件 API 文档**：`src/components/shells/API.md`
+- **Shadcn UI 重构规范**：`.kiro/steering/shadcn-ui-refactor.md`
 - [Shadcn UI 组件库](https://ui.shadcn.com/)
 - [Container/Presentational Pattern](https://www.patterns.dev/posts/presentational-container-pattern)
 - 项目规范：`.kiro/steering/shadcn-ui-refactor.md`

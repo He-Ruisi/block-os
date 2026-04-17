@@ -658,8 +658,10 @@ grep -r "<textarea" src/components/
 
 ## 参考资源
 
-- Shadcn UI 重构规范：`.kiro/steering/shadcn-ui-refactor.md`
-- 已安装组件列表：`docs/guide/shadcn-components-installed.md`
-- CSS 迁移清单：`docs/guide/CSS迁移清单.md`
-- Shadcn UI 官方文档：https://ui.shadcn.com/
+- **Shell 组件设计指南**：`.kiro/skills/shells-design.md`
+- **Shell 组件 API 文档**：`src/components/shells/API.md`
+- **Shadcn UI 重构规范**：`.kiro/steering/shadcn-ui-refactor.md`
+- Shell 组件 API 文档：`src/components/shells/API.md`
+- Container/View 模式：`.kiro/skills/container-view-pattern.md`
+- Shadcn UI 文档：https://ui.shadcn.com/
 - Tailwind CSS 文档：https://tailwindcss.com/docs
