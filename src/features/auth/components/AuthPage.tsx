@@ -1,6 +1,13 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
-import '../../../styles/modules/panels.css'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { AlertCircle } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 interface AuthPageProps {
   onSignIn: (username: string, password: string) => Promise<void>
@@ -55,89 +62,123 @@ export function AuthPage({ onSignIn, onSignUp, loading, error, isPullingData }: 
   const displayError = localError || error
 
   return (
-    <div className="auth-page">
-      <div className="auth-card">
-        <div className="auth-header">
-          <h1 className="auth-logo">BlockOS</h1>
-          <p className="auth-subtitle">写作优先的知识操作系统</p>
-        </div>
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-purple-50 to-blue-50 p-4">
+      <Card className="w-full max-w-md shadow-lg">
+        <CardHeader className="text-center space-y-2">
+          <CardTitle className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+            BlockOS
+          </CardTitle>
+          <CardDescription className="text-base">
+            写作优先的知识操作系统
+          </CardDescription>
+        </CardHeader>
 
-        <div className="auth-tabs">
-          <button
-            className={`auth-tab ${isLogin ? 'auth-tab--active' : ''}`}
-            onClick={() => { setIsLogin(true); setLocalError(null) }}
-          >
-            登录
-          </button>
-          <button
-            className={`auth-tab ${!isLogin ? 'auth-tab--active' : ''}`}
-            onClick={() => { setIsLogin(false); setLocalError(null) }}
-          >
-            注册
-          </button>
-        </div>
+        <CardContent className="space-y-6">
+          <Tabs value={isLogin ? 'login' : 'signup'} className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger
+                value="login"
+                onClick={() => { setIsLogin(true); setLocalError(null) }}
+              >
+                登录
+              </TabsTrigger>
+              <TabsTrigger
+                value="signup"
+                onClick={() => { setIsLogin(false); setLocalError(null) }}
+              >
+                注册
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
 
-        <form className="auth-form" onSubmit={handleSubmit}>
-          <div className="auth-field">
-            <label className="auth-label">用户名</label>
-            <input
-              type="text"
-              className="auth-input"
-              placeholder="输入用户名"
-              value={username}
-              onChange={e => setUsername(e.target.value)}
-              autoFocus
-              disabled={loading}
-            />
-          </div>
-
-          <div className="auth-field">
-            <label className="auth-label">密码</label>
-            <input
-              type="password"
-              className="auth-input"
-              placeholder="输入密码"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              disabled={loading}
-            />
-          </div>
-
-          {!isLogin && (
-            <div className="auth-field">
-              <label className="auth-label">确认密码</label>
-              <input
-                type="password"
-                className="auth-input"
-                placeholder="再次输入密码"
-                value={confirmPassword}
-                onChange={e => setConfirmPassword(e.target.value)}
+          <form className="space-y-4" onSubmit={handleSubmit}>
+            <div className="space-y-2">
+              <Label htmlFor="username">用户名</Label>
+              <Input
+                id="username"
+                type="text"
+                placeholder="输入用户名"
+                value={username}
+                onChange={e => setUsername(e.target.value)}
+                autoFocus
                 disabled={loading}
               />
             </div>
-          )}
 
-          {displayError && (
-            <div className="auth-error">{displayError}</div>
-          )}
+            <div className="space-y-2">
+              <Label htmlFor="password">密码</Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="输入密码"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                disabled={loading}
+              />
+            </div>
 
-          <button
-            type="submit"
-            className="auth-submit"
-            disabled={loading}
-          >
-            {isPullingData ? '正在同步云端数据...' : loading ? '处理中...' : isLogin ? '登录' : '注册'}
-          </button>
-        </form>
+            {!isLogin && (
+              <div className="space-y-2">
+                <Label htmlFor="confirmPassword">确认密码</Label>
+                <Input
+                  id="confirmPassword"
+                  type="password"
+                  placeholder="再次输入密码"
+                  value={confirmPassword}
+                  onChange={e => setConfirmPassword(e.target.value)}
+                  disabled={loading}
+                />
+              </div>
+            )}
 
-        <div className="auth-footer">
-          {isLogin ? (
-            <p>还没有账号？<button className="auth-link" onClick={() => setIsLogin(false)}>立即注册</button></p>
-          ) : (
-            <p>已有账号？<button className="auth-link" onClick={() => setIsLogin(true)}>去登录</button></p>
-          )}
-        </div>
-      </div>
+            {displayError && (
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>{displayError}</AlertDescription>
+              </Alert>
+            )}
+
+            <Button
+              type="submit"
+              className={cn(
+                'w-full bg-gradient-to-r from-purple-600 to-blue-600',
+                'hover:from-purple-700 hover:to-blue-700'
+              )}
+              disabled={loading}
+            >
+              {isPullingData ? '正在同步云端数据...' : loading ? '处理中...' : isLogin ? '登录' : '注册'}
+            </Button>
+          </form>
+        </CardContent>
+
+        <CardFooter className="flex justify-center">
+          <p className="text-sm text-muted-foreground">
+            {isLogin ? (
+              <>
+                还没有账号？
+                <Button
+                  variant="link"
+                  className="p-0 h-auto font-normal"
+                  onClick={() => { setIsLogin(false); setLocalError(null) }}
+                >
+                  立即注册
+                </Button>
+              </>
+            ) : (
+              <>
+                已有账号？
+                <Button
+                  variant="link"
+                  className="p-0 h-auto font-normal"
+                  onClick={() => { setIsLogin(true); setLocalError(null) }}
+                >
+                  去登录
+                </Button>
+              </>
+            )}
+          </p>
+        </CardFooter>
+      </Card>
     </div>
   )
 }

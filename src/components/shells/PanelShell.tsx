@@ -13,7 +13,12 @@ interface PanelShellProps {
  */
 export function PanelShell({ children, className }: PanelShellProps) {
   return (
-    <div className={cn('flex h-full flex-col bg-background', className)}>
+    <div
+      className={cn(
+        'surface-glow flex h-full flex-col bg-background/95',
+        className
+      )}
+    >
       {children}
     </div>
   )

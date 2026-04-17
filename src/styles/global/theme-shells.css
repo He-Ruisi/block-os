@@ -1,0 +1,168 @@
+/**
+ * Minimalist Modern 全局外壳样式
+ * 包含：section label、gradient text、inverted surface、dot texture、全局壳层细节
+ */
+
+@layer components {
+  .theme-minimal-modern {
+    min-height: 100vh;
+    color: var(--color-text-primary);
+  }
+
+  .app.theme-minimal-modern {
+    background:
+      radial-gradient(circle at top left, rgba(0, 82, 255, 0.06), transparent 24rem),
+      radial-gradient(circle at bottom right, rgba(53, 171, 103, 0.05), transparent 22rem),
+      var(--color-bg-primary);
+  }
+
+  .theme-minimal-modern .app__loading,
+  .theme-minimal-modern .auth-page {
+    background:
+      radial-gradient(circle at top, rgba(77, 124, 255, 0.22), transparent 28rem),
+      linear-gradient(135deg, #0f172a 0%, #111d3b 55%, #0052ff 100%);
+  }
+
+  .theme-minimal-modern .auth-card,
+  .theme-minimal-modern .settings-panel {
+    border: 1px solid var(--color-border-primary);
+    border-radius: var(--border-radius-xl);
+    box-shadow: var(--shadow-panel);
+    backdrop-filter: blur(12px);
+  }
+
+  .theme-minimal-modern .settings-panel__header,
+  .theme-minimal-modern .settings-panel__tabs {
+    border-color: rgba(0, 82, 255, 0.12);
+  }
+
+  .theme-minimal-modern .settings-panel__tab--active {
+    color: var(--color-purple);
+    border-bottom-color: var(--color-purple);
+  }
+
+  .theme-minimal-modern .tab-bar,
+  .theme-minimal-modern .sidebar-panel,
+  .theme-minimal-modern .right-panel,
+  .theme-minimal-modern .activity-bar {
+    background-color: color-mix(in srgb, var(--color-bg-secondary) 88%, white);
+  }
+
+  .theme-minimal-modern .right-panel,
+  .theme-minimal-modern .sidebar-panel {
+    position: relative;
+  }
+
+  .theme-minimal-modern .right-panel::before,
+  .theme-minimal-modern .sidebar-panel::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: var(--surface-glow);
+    opacity: 0.9;
+  }
+
+  .gradient-text {
+    background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent-secondary)));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .section-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 1rem;
+    border: 1px solid rgba(0, 82, 255, 0.18);
+    border-radius: 9999px;
+    background: rgba(0, 82, 255, 0.05);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  }
+
+  .section-label__dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 9999px;
+    background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent-secondary)));
+    box-shadow: 0 0 0 0 rgba(0, 82, 255, 0.32);
+    animation: pulse-accent 2s ease-in-out infinite;
+  }
+
+  .section-label__text {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: hsl(var(--primary));
+  }
+
+  .surface-inverted {
+    color: hsl(var(--primary-foreground));
+    background:
+      radial-gradient(circle at top right, rgba(77, 124, 255, 0.22), transparent 28rem),
+      #0f172a;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .surface-inverted::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: var(--surface-grid);
+    background-size: 32px 32px;
+    opacity: 0.03;
+    pointer-events: none;
+  }
+
+  .surface-featured {
+    position: relative;
+    border-radius: calc(var(--border-radius-lg) + 2px);
+    background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent-secondary)));
+    padding: 1px;
+  }
+
+  .surface-featured > * {
+    height: 100%;
+    border-radius: var(--border-radius-lg);
+  }
+
+  .surface-glow {
+    position: relative;
+    isolation: isolate;
+  }
+
+  .surface-glow::after {
+    content: '';
+    position: absolute;
+    inset: auto -3rem -3rem auto;
+    width: 12rem;
+    height: 12rem;
+    border-radius: 9999px;
+    background: rgba(0, 82, 255, 0.14);
+    filter: blur(72px);
+    z-index: -1;
+    pointer-events: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .section-label__dot {
+      animation: none;
+    }
+  }
+}
+
+@keyframes pulse-accent {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  50% {
+    transform: scale(1.3);
+    opacity: 0.72;
+  }
+}

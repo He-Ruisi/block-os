@@ -1,19 +1,26 @@
+@import url('https://fonts.googleapis.com/css2?family=Calistoga&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400&family=Lora:ital,wght@0,400;0,600;1,400&display=swap');
+@import './styles/shadcn-theme.css';
+@import './styles/themes/minimal-modern.css';
+@import './styles/global/design-tokens.css';
+@import './styles/global/theme-shells.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-/* Import Shadcn UI Theme (主要颜色系统) */
-@import './styles/shadcn-theme.css';
-
-/* Import BlockOS Design Tokens (编辑器和主题特定样式) */
-@import './styles/global/design-tokens.css';
 
 @layer base {
   * {
     @apply border-border;
   }
+
+  html {
+    font-family: var(--font-body);
+    background: hsl(var(--background));
+  }
+
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-body);
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 }

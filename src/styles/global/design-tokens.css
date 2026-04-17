@@ -9,9 +9,6 @@
    3. 编辑器组件样式（工具栏、代码块等）
    ============================================================ */
 
-/* Newsprint 字体（仅在 newsprint 主题激活时加载） */
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400&family=Lora:ital,wght@0,400;0,600;1,400&display=swap');
-
 :root {
   /* ========== 编辑器专用变量 ========== */
   

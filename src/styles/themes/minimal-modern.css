@@ -1,0 +1,102 @@
+/**
+ * Minimalist Modern 主题变量
+ * 包含：shadcn token、遗留模块兼容 token、字体与阴影系统
+ */
+
+@layer base {
+  :root,
+  .theme-minimal-modern {
+    --background: 210 20% 98%;
+    --foreground: 222 47% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+    --primary: 221 100% 50%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222 47% 11%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%;
+    --accent: 221 100% 50%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 356 67% 53%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 221 100% 50%;
+    --radius: 1rem;
+    --accent-secondary: 223 100% 65%;
+    --font-display: "Calistoga", Georgia, serif;
+    --font-body: "Inter", system-ui, sans-serif;
+    --font-mono: "JetBrains Mono", monospace;
+    --color-bg-primary: #fafafa;
+    --color-bg-secondary: #ffffff;
+    --color-bg-tertiary: #f1f5f9;
+    --color-bg-hover: #eff6ff;
+    --color-bg-active: #dbeafe;
+    --color-border-primary: #e2e8f0;
+    --color-border-secondary: #cbd5e1;
+    --color-border-focus: #0052ff;
+    --color-text-primary: #0f172a;
+    --color-text-secondary: #334155;
+    --color-text-tertiary: #475569;
+    --color-text-muted: #64748b;
+    --color-purple: #0052ff;
+    --color-purple-light: rgba(0, 82, 255, 0.08);
+    --color-purple-hover: #0047dd;
+    --color-accent-gold: #00362f;
+    --color-accent-gold-light: rgba(53, 171, 103, 0.08);
+    --color-accent-red: #d9323d;
+    --accent-green: 145 52% 44%;
+    --accent-green-rgb: 53 171 103;
+    --accent-green-hex: #35ab67;
+    --accent-green-dark: 172 100% 11%;
+    --accent-green-dark-rgb: 0 54 47;
+    --accent-green-dark-hex: #00362f;
+    --accent-red: 356 67% 53%;
+    --accent-red-rgb: 217 50 61;
+    --accent-red-hex: #d9323d;
+    --border-radius: 12px;
+    --border-radius-sm: 10px;
+    --border-radius-md: 12px;
+    --border-radius-lg: 16px;
+    --border-radius-xl: 24px;
+    --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.06);
+    --shadow-md: 0 4px 6px rgba(15, 23, 42, 0.07);
+    --shadow-lg: 0 20px 25px rgba(15, 23, 42, 0.1);
+    --shadow-card: 0 10px 24px rgba(15, 23, 42, 0.08);
+    --shadow-panel: 0 24px 48px rgba(15, 23, 42, 0.14);
+    --shadow-accent: 0 4px 14px rgba(0, 82, 255, 0.25);
+    --shadow-accent-lg: 0 8px 24px rgba(0, 82, 255, 0.35);
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 12px;
+    --spacing-lg: 16px;
+    --spacing-xl: 24px;
+    --section-space-y: clamp(5rem, 7vw, 8rem);
+    --container-max-width: 72rem;
+    --surface-glow: radial-gradient(circle at top right, rgba(77, 124, 255, 0.14), transparent 36%);
+    --surface-grid: radial-gradient(circle, rgba(255, 255, 255, 0.16) 1px, transparent 1px);
+  }
+
+  .theme-minimal-modern {
+    color: var(--color-text-primary);
+    background:
+      radial-gradient(circle at top left, rgba(0, 82, 255, 0.06), transparent 24rem),
+      radial-gradient(circle at bottom right, rgba(53, 171, 103, 0.05), transparent 22rem),
+      var(--color-bg-primary);
+  }
+
+  .theme-minimal-modern h1,
+  .theme-minimal-modern h2 {
+    font-family: var(--font-display);
+  }
+
+  .theme-minimal-modern code,
+  .theme-minimal-modern kbd,
+  .theme-minimal-modern samp,
+  .theme-minimal-modern pre {
+    font-family: var(--font-mono);
+  }
+}

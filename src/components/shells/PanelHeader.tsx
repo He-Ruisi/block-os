@@ -28,16 +28,16 @@ export function PanelHeader({
   return (
     <div
       className={cn(
-        'flex items-start justify-between border-b bg-background px-4 py-3',
+        'flex items-start justify-between border-b border-border/80 bg-background/90 px-5 py-4 backdrop-blur-sm',
         className
       )}
     >
       <div className="flex min-w-0 items-start gap-3">
         {leading ? <div className="mt-0.5 text-muted-foreground">{leading}</div> : null}
         <div className="min-w-0 space-y-1">
-          <h2 className="text-sm font-semibold leading-none">{title}</h2>
+          <h2 className="text-base font-semibold leading-none tracking-[-0.01em]">{title}</h2>
           {description ? (
-            <p className="text-xs text-muted-foreground">{description}</p>
+            <p className="text-sm leading-6 text-muted-foreground">{description}</p>
           ) : null}
         </div>
       </div>

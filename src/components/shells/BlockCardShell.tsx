@@ -4,13 +4,13 @@ import { Badge } from '@/components/ui/badge'
 import { cva, type VariantProps } from 'class-variance-authority'
 
 const blockCardVariants = cva(
-  'rounded-lg border transition-colors',
+  'rounded-2xl border border-border/80 transition-all duration-300 ease-out',
   {
     variants: {
       tone: {
-        default: 'hover:border-accent hover:bg-accent/50',
-        selected: 'border-primary bg-accent/60',
-        interactive: 'cursor-pointer hover:border-primary/40 hover:bg-accent/60',
+        default: 'hover:border-primary/20 hover:bg-primary/[0.03]',
+        selected: 'border-primary/30 bg-primary/[0.06] shadow-[var(--shadow-accent)]',
+        interactive: 'cursor-pointer hover:-translate-y-1 hover:border-primary/30 hover:bg-primary/[0.04] hover:shadow-[var(--shadow-lg)]',
       },
     },
     defaultVariants: {

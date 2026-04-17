@@ -161,6 +161,14 @@ function App() {
     previousViewModeRef.current = viewMode
   }, [viewMode, setSidebarCollapsed])
 
+  useEffect(() => {
+    document.body.classList.add('theme-minimal-modern')
+
+    return () => {
+      document.body.classList.remove('theme-minimal-modern')
+    }
+  }, [])
+
   // 统一初始化所有 Store
   useEffect(() => {
     initStorage()
@@ -388,7 +396,7 @@ function App() {
   }
 
   return (
-    <div className={`app ${isFullscreen ? 'app--fullscreen' : ''} ${viewMode === 'ai-focus' ? 'app--ai-focus' : ''}`}>
+    <div className={`app theme-minimal-modern ${isFullscreen ? 'app--fullscreen' : ''} ${viewMode === 'ai-focus' ? 'app--ai-focus' : ''}`}>
       {/* AI 沉浸式模式 */}
       {viewMode === 'ai-focus' && (
         <RightPanelShell
