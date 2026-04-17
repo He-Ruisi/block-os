@@ -1,5 +1,92 @@
 # BlockOS 更新日志
 
+## [v1.35.0] - 2026-04-17 📐 架构规范增强 - 严格边界约束建立
+
+**重要里程碑**：全面增强架构规范，建立严格的边界约束，解决 5 个核心架构问题。
+
+### 核心改进（5 个问题全部解决）
+
+1. **Shell 组件清单缺失** ✅
+   - 显式列出 5 个可用 Shell 组件（PanelShell、PanelHeader、SearchInput、BlockCardShell、EmptyState）
+   - 规则：如果 shells 中没有，必须先在 `components/shells/` 中实现，再使用
+   - 禁止在 View 内部临时实现 shell 级组件
+
+2. **ViewModel 转换位置不够严格** ✅
+   - 规则：转换逻辑超过 5 行或被多处使用时，必须抽到 `mappers.ts`
+   - 新增 Mappers 模板（数据转换层）
+   - 好处：可单测、Container 更干净、可复用
+
+3. **Container 不应直接 import blockStore** ✅
+   - 规则：Container 不直接访问 `storage/*`，必须通过 `hooks/*` 间接访问
+   - 架构边界：Container (编排层) → Hooks (接入层) → Storage (存储层)
+   - 更新 Container 模板使用 hooks
+
+4. **SearchInput 的 onChange 签名不一致** ✅
+   - 规则：回调统一传值（`onChange: (value: string) => void`），不传 Event
+   - 创建 `src/components/shells/API.md` 文档化所有 Shell 组件 API
+   - 内部处理 Event，对外传值
+
+5. **缺少类型导入边界约束** ✅
+   - 规则：View 禁止 import `types/models/*`，只能 import 本目录的 ViewModel 类型
+   - 原因：ViewModel 是"防腐层"，隔离领域模型变化
+   - 更新 View 模板只 import ViewModel
+
+### 架构边界严格约束（新增）
+
+```
+1. Container 数据访问边界
+   ❌ import { blockStore } from '@/storage/blockStore'
+   ✅ import { useBlocks } from '@/features/blocks/hooks/useBlocks'
+
+2. View 类型导入边界
+   ❌ import type { Block } from '@/types/models/block'
+   ✅ import type { BlockViewModel } from './types'
+
+3. Shell 组件回调边界
+   ❌ onChange: (e: React.ChangeEvent) => void
+   ✅ onChange: (value: string) => void
+
+4. ViewModel 转换边界
+   ❌ Container 内直接 map 转换（超过 5 行）
+   ✅ 使用 mappers.ts 中的纯函数
+```
+
+### 新增文档
+
+- **src/components/shells/API.md**（约 400 行）
+  - 所有 Shell 组件的 TypeScript 接口
+  - 回调命名规范和 Props 接口定义模板
+  - 内部 Event 处理模板
+  - 测试规范和常见问题解答
+
+### 增强文档
+
+- **.kiro/skills/container-view-pattern.md**（新增约 300 行）
+  - 可用 Shell 组件清单（5 个组件）
+  - Mappers 模板（数据转换层）
+  - 架构边界严格约束（4 个边界规则）
+
+- **.kiro/steering/shadcn-ui-refactor.md**（新增约 100 行）
+  - Shell 组件清单（5 个组件 + API + 使用示例）
+  - 如何添加新 Shell 组件（7 步流程）
+
+### 技术亮点
+
+- ✅ 完整的 Shell 组件 API 文档（TypeScript 接口 + 规范）
+- ✅ 严格的架构边界约束（4 个边界规则）
+- ✅ 清晰的组件分层规则（ui → shells → layout → features）
+- ✅ 可复用的代码模板（Mappers、Container、View、Shell）
+- ✅ 无破坏性变更（现有代码继续工作）
+- ✅ 渐进式改进（新代码遵循新规范）
+
+### 影响范围
+
+- **对现有代码**：无破坏性变更，现有代码继续工作
+- **对开发流程**：更严格的架构约束，防止架构腐化
+- **对代码质量**：可测试、可维护、可复用
+
+---
+
 ## [v1.34.0] - 2026-04-17 🏗️ Container/View 模式重构 - 架构优化里程碑
 
 **重要里程碑**：建立了 Container/View 拆分模式，实现逻辑与 UI 分离，完成 DocumentBlocksPanel 试点重构。

@@ -1,3 +1,10 @@
+---
+name: container-view-pattern
+description: Container/View 拆分模式专家 - 将复杂组件拆分为逻辑层和展示层
+activation: manual
+tags: [architecture, refactor, container-view, separation-of-concerns]
+---
+
 # Container/View 拆分模式
 
 ## 目标
