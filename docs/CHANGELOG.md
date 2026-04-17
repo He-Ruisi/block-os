@@ -1,5 +1,49 @@
 # BlockOS 更新日志
 
+## [v1.30.0] - 2026-04-16 🎨 Editor 组件拆分与 Shadcn UI 重构完成
+
+**重要里程碑**：完成 Editor 和 Sidebar 组件的 Shadcn UI 重构，组件结构更清晰，代码可维护性大幅提升。
+
+### Editor 组件拆分（4个独立组件）
+- **EditorBreadcrumb** - 面包屑导航工具栏
+  - 文档路径导航（工作空间 > 项目 > 文档）
+  - 操作按钮（收藏、评论、分享、更多）
+  - 最后编辑时间显示
+  - 响应式布局（移动端优化）
+
+- **EditorToolbar** - 顶部 Markdown 工具栏
+  - 第一行：撤销/重做、清除格式、标题、文本格式、列表
+  - 第二行：引用、分隔线、代码块、快捷键提示
+  - 使用 lucide-react 图标（Undo2、Redo2、Bold、Italic 等）
+  - 激活状态视觉反馈（紫色高亮）
+
+- **EditorContentArea** - 编辑渲染区域
+  - 页面图标和标题
+  - 标签显示和管理
+  - 所见即所得 Markdown 渲染（参考 MarkdownRenderer）
+  - 拖拽处理（AI 内容、Block 内容）
+
+- **EditorBubbleMenu** - AI 浮动工具栏（已完成）
+  - Markdown 格式工具
+  - AI 操作（续写、改写、缩写、扩写、翻译、解释）
+  - 自定义指令输入
+
+### Sidebar 组件重构
+- 使用 Shadcn UI Button 组件（移动端关闭按钮）
+- 使用 Shadcn UI ScrollArea 组件（内容滚动优化）
+- 动画优化（遮罩层淡入、侧边栏滑入）
+- 响应式优化（移动端遮罩层、关闭按钮）
+
+### 技术亮点
+- ✅ 组件职责单一，易于维护和测试
+- ✅ 使用 Shadcn UI 组件替代原生 HTML 元素
+- ✅ 使用 lucide-react 图标库
+- ✅ 使用 Tailwind CSS 语义化颜色变量
+- ✅ 使用 `cn()` 工具函数动态组合类名
+- ✅ 完整的 TypeScript 类型定义
+
+---
+
 ## [v1.29.0] - 2026-04-16 ✨ 编辑器所见即所得 Markdown 渲染完成
 
 **重要里程碑**：编辑器区域实现真正的所见即所得 Markdown 渲染，与 AI 对话区域的渲染效果完全一致。
