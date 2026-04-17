@@ -22,6 +22,37 @@
 
 ## P0 - 核心功能（当前优先）
 
+### Components 架构重构 🏗️ - [技术设计](./spec/architecture/components-restructure.md)
+- [x] Phase 1: 左侧边栏功能域（6 个组件）- ✅ 完成（2026-04-17 23:00）
+  - [x] 迁移 ExplorerView → features/sidebar/explorer/
+  - [x] 迁移 SearchView → features/sidebar/search/
+  - [x] 迁移 OutlineView → features/sidebar/outline/
+  - [x] 迁移 StarredView → features/sidebar/starred/
+  - [x] 迁移 ExtensionsView → features/sidebar/extensions/
+  - [x] 迁移 PluginWorkspaceView → features/sidebar/plugin-workspace/
+  - [x] 每个组件做 Container/View 拆分
+  - [x] 更新所有 import 路径
+  - [x] TypeScript 类型检查通过
+- [ ] Phase 2: 右侧边栏功能域（4 个组件）
+  - [ ] 迁移 PreviewPanel → features/right-sidebar/preview/
+  - [ ] 迁移 SessionHistoryPanel → features/right-sidebar/session-history/
+  - [ ] 迁移 DocumentBlocksPanel → features/right-sidebar/document-blocks/
+  - [ ] 迁移 BlockSpacePanel → features/right-sidebar/block-space/
+  - [ ] 每个组件做 Container/View 拆分（如需要）
+  - [ ] 更新所有 import 路径
+  - [ ] TypeScript 类型检查通过
+- [ ] Phase 3: 设置功能域（1 个组件）
+  - [ ] 迁移 SettingsPanel → features/settings/
+  - [ ] Container/View 拆分
+  - [ ] 更新所有 import 路径
+  - [ ] TypeScript 类型检查通过
+- [ ] Phase 4: 项目管理 + 重命名容器（2 个组件）
+  - [ ] 迁移 ProjectOverview → features/projects/
+  - [ ] 重命名 RightPanel.tsx → panels/RightPanelShell.tsx
+  - [ ] 删除空目录（layout/、panel/、project/）
+  - [ ] 更新所有 import 路径
+  - [ ] TypeScript 类型检查通过
+
 ### 主题样式重塑 🎨 - [需求文档](./spec/features/styles/style.md)
 - [x] Phase 1: Tailwind CSS + Shadcn/UI 安装（2026-04-15 完成）
 - [x] Phase 2: AI 沉浸模式样式重构（2026-04-15 完成）

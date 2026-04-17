@@ -11,7 +11,7 @@ import type { AIMode } from './features/ai/components/AIFloatPanel'
 import { AuthPage } from './features/auth'
 import { SettingsPanel } from './components/panel/SettingsPanel'
 import { StatusBar } from './components/layout/StatusBar'
-import { PluginWorkspaceView } from './components/layout/PluginWorkspaceView'
+import { PluginWorkspace } from './features/sidebar/plugin-workspace'
 import { Toaster } from './components/ui/toaster'
 import { ProjectOverview } from './components/project/ProjectOverview'
 import { initStorage } from './storage'
@@ -437,7 +437,7 @@ function App() {
                 onCreateProject={handleCreateProject}
               />
             ) : activePluginWorkspace ? (
-              <PluginWorkspaceView
+              <PluginWorkspace
                 pluginId={activePluginWorkspace.pluginId}
                 showSettings={activePluginWorkspace.showSettings}
                 onClose={() => setActivePluginWorkspace(null)}

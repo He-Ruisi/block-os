@@ -1,10 +1,10 @@
 import type { SidebarView } from '../../types/common/layout'
 import type { Document } from '../../types/models/document'
-import { ExplorerView } from './ExplorerView'
-import { SearchView } from './SearchView'
-import { StarredView } from './StarredView'
-import { OutlineView } from './OutlineView'
-import { ExtensionsView } from './ExtensionsView'
+import { Explorer } from '@/features/sidebar/explorer'
+import { Search } from '@/features/sidebar/search'
+import { Starred } from '@/features/sidebar/starred'
+import { Outline } from '@/features/sidebar/outline'
+import { Extensions } from '@/features/sidebar/extensions'
 import { SyncStatusIndicator } from '../shared/SyncStatusIndicator'
 import { useSwipeGesture } from '../../hooks/useSwipeGesture'
 import { useViewport } from '../../hooks/useViewport'
@@ -107,7 +107,7 @@ export function Sidebar({
         <ScrollArea className="flex-1">
           <div className="p-2">
             {activeView === 'explorer' && (
-              <ExplorerView
+              <Explorer
                 onSelectToday={onSelectToday}
                 onSelectProject={onSelectProject}
                 onOpenDocument={onOpenDocument}
@@ -115,21 +115,21 @@ export function Sidebar({
               />
             )}
             {activeView === 'search' && (
-              <SearchView onOpenBlock={(blockId) => {
+              <Search onOpenBlock={(blockId) => {
                 window.dispatchEvent(new CustomEvent('openBlockDetail', { detail: blockId }))
               }} />
             )}
             {activeView === 'starred' && (
-              <StarredView
+              <Starred
                 onSelectProject={onSelectProject}
                 onOpenDocument={onOpenDocument}
               />
             )}
             {activeView === 'outline' && (
-              <OutlineView documentId={documentId} />
+              <Outline documentId={documentId} />
             )}
             {activeView === 'extensions' && (
-              <ExtensionsView
+              <Extensions
                 onOpenPlugin={onOpenPlugin}
                 onOpenPluginSettings={onOpenPluginSettings}
               />
