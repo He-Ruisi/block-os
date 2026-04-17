@@ -1,5 +1,8 @@
 import { useState, useRef, KeyboardEvent, useEffect } from 'react'
-import { Send, Paperclip, Zap, Search } from 'lucide-react'
+import { Paperclip, Search, Send, Zap } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Textarea } from '@/components/ui/textarea'
+import { cn } from '@/lib/utils'
 
 interface ChatInputProps {
   value: string
@@ -18,7 +21,7 @@ export function ChatInput({
   onChange,
   onSend,
   disabled,
-  placeholder = '输入消息...',
+  placeholder = 'Type a message...',
   showDeepThink,
   showSearch,
   onToggleDeepThink,
@@ -35,9 +38,9 @@ export function ChatInput({
     }
   }, [value])
 
-  const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault()
+  const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault()
       if (!disabled && value.trim()) {
         onSend()
       }
@@ -55,76 +58,70 @@ export function ChatInput({
   }
 
   return (
-    <div className="w-full max-w-[760px] mx-auto px-4 pb-4">
-      <div className="bg-background border border-border rounded-2xl shadow-sm overflow-hidden">
-        {/* 功能按钮组 */}
+    <div className="mx-auto w-full max-w-[760px] px-4 pb-4">
+      <div className="overflow-hidden rounded-2xl border bg-background shadow-sm">
         <div className="flex items-center gap-2 px-3 pt-3">
-          {showDeepThink && (
-            <button
+          {showDeepThink ? (
+            <Button
               type="button"
+              variant="secondary"
               onClick={handleDeepThinkToggle}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200 ${
-                deepThinkActive
-                  ? 'bg-primary text-primary-foreground'
-                  : 'bg-muted text-muted-foreground hover:bg-muted/80'
-              }`}
+              className={cn(
+                'rounded-full',
+                deepThinkActive && 'bg-primary text-primary-foreground hover:bg-primary/90'
+              )}
             >
               <Zap className="h-3.5 w-3.5" />
               DeepThink
-            </button>
-          )}
-          {showSearch && (
-            <button
+            </Button>
+          ) : null}
+          {showSearch ? (
+            <Button
               type="button"
+              variant="secondary"
               onClick={handleSearchToggle}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200 ${
-                searchActive
-                  ? 'bg-primary text-primary-foreground'
-                  : 'bg-muted text-muted-foreground hover:bg-muted/80'
-              }`}
+              className={cn(
+                'rounded-full',
+                searchActive && 'bg-primary text-primary-foreground hover:bg-primary/90'
+              )}
             >
               <Search className="h-3.5 w-3.5" />
               Search
-            </button>
-          )}
+            </Button>
+          ) : null}
         </div>
 
-        {/* 输入框 */}
         <div className="flex items-end gap-2 p-3">
-          <button
-            type="button"
-            className="h-9 w-9 shrink-0 flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors"
-            aria-label="附件"
-          >
+          <Button type="button" variant="ghost" size="icon" aria-label="Attach file">
             <Paperclip className="h-4 w-4" />
-          </button>
+          </Button>
 
-          <textarea
+          <Textarea
             ref={textareaRef}
             value={value}
-            onChange={(e) => onChange(e.target.value)}
+            onChange={(event) => onChange(event.target.value)}
             onKeyDown={handleKeyDown}
             placeholder={placeholder}
             disabled={disabled}
             rows={1}
-            className="flex-1 resize-none bg-transparent text-[15px] leading-relaxed text-foreground placeholder:text-muted-foreground focus:outline-none disabled:opacity-50 py-2"
+            className="min-h-0 flex-1 resize-none border-0 bg-transparent px-0 py-2 text-[15px] shadow-none focus-visible:ring-0"
           />
 
-          <button
+          <Button
             type="button"
+            size="icon"
             onClick={onSend}
             disabled={!value.trim() || disabled}
-            className="h-9 w-9 shrink-0 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center"
-            aria-label="发送"
+            className="shrink-0 rounded-full"
+            aria-label="Send message"
           >
             <Send className="h-4 w-4" />
-          </button>
+          </Button>
         </div>
       </div>
 
-      {/* 底部说明 */}
-      <p className="text-center text-xs text-muted-foreground mt-2">
-        BlockOS AI 可能会出错，请核实重要信息
+      <p className="mt-2 text-center text-xs text-muted-foreground">
+        BlockOS AI can make mistakes. Verify important information.
       </p>
     </div>
   )

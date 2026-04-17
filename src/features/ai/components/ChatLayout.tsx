@@ -8,12 +8,10 @@ interface ChatLayoutProps {
 
 export function ChatLayout({ header, content, input }: ChatLayoutProps) {
   return (
-    <div className="flex flex-col h-screen w-full bg-background">
+    <div className="flex h-screen w-full flex-col bg-background">
       {header}
       <div className="flex-1 overflow-y-auto">
-        <div className="max-w-[760px] mx-auto px-4 py-6">
-          {content}
-        </div>
+        <div className="mx-auto max-w-[760px] px-4 py-6">{content}</div>
       </div>
       {input}
     </div>

@@ -5,6 +5,7 @@ import {
   setCurrentProvider,
   type AIProvider,
 } from '../../services/aiService'
+import { exportSessionAsJSON } from '../../services/sessionService'
 import { AIImmersivePanelView } from './AIImmersivePanelView'
 import {
   formatModelLabel,
@@ -57,6 +58,7 @@ export function AIImmersivePanelContainer({
   aiModel,
   setAIModel,
 }: AIImmersivePanelContainerProps) {
+  void refreshSessions
   const [showHistory, setShowHistory] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
   const [tempSystemPrompt, setTempSystemPrompt] = useState(systemPrompt)
@@ -93,6 +95,12 @@ export function AIImmersivePanelContainer({
     setAIModel(settingsModel)
     setCurrentModel(settingsModel)
     setShowSettings(false)
+  }
+
+  const handleExportSession = (sessionId: string) => {
+    const session = allSessions.find((item) => item.id === sessionId)
+    if (!session) return
+    exportSessionAsJSON(session)
   }
 
   const handleCancelSettings = () => {
@@ -132,7 +140,7 @@ export function AIImmersivePanelContainer({
       currentSessionId={currentSession.id}
       onLoadSession={handleLoadSession}
       onDeleteSession={onDeleteSession}
-      onRefreshSessions={refreshSessions}
+      onExportSession={handleExportSession}
       selectedProvider={settingsProvider}
       selectedModel={settingsModel}
       providerOptions={providerOptions}

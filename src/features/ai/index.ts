@@ -1,6 +1,7 @@
 // AI Feature - Components
 export { AIImmersivePanel } from './components/AIImmersivePanel';
 export { AIFloatPanel } from './components/AIFloatPanel';
+export type { AIMode } from './components/AIFloatPanel';
 export { ChatLayout } from './components/ChatLayout';
 export { ChatHeader } from './components/ChatHeader';
 export { ChatInput } from './components/ChatInput';

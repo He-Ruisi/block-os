@@ -1,10 +1,13 @@
-import { useRef, useEffect, useState } from 'react'
-import type { Message } from '@/types/models/chat'
+import { useEffect, useRef, useState } from 'react'
+import { Check, Copy, FileInput, GripVertical, SquareDashedBottom } from 'lucide-react'
 import { MarkdownRenderer } from '@/components/shared/MarkdownRenderer'
-import { FileInput, SquareDashedBottom, GripVertical, Copy, Check } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+import { cn } from '@/lib/utils'
+import type { AIMessageViewModel } from './types'
 
 interface MessageContentProps {
-  messages: Message[]
+  messages: AIMessageViewModel[]
   isLoading?: boolean
   onInsertToEditor?: (messageId: string) => void
   onCapture?: (messageId: string) => void
@@ -34,99 +37,91 @@ export function MessageContent({
 
   return (
     <div className="flex flex-col gap-6">
-      {messages.map(msg => {
-        const isUser = msg.role === 'user'
-        const showToolbar = hoveredMessageId === msg.id && !isUser
-        const isCopied = copiedMessageId === msg.id
+      {messages.map((message) => {
+        const isUser = message.role === 'user'
+        const showToolbar = hoveredMessageId === message.id && !isUser
+        const isCopied = copiedMessageId === message.id
 
         return (
           <div
-            key={msg.id}
-            className={`py-4 ${isUser ? 'flex justify-end' : 'flex justify-start'}`}
-            onMouseEnter={() => setHoveredMessageId(msg.id)}
+            key={message.id}
+            className={cn('py-4', isUser ? 'flex justify-end' : 'flex justify-start')}
+            onMouseEnter={() => setHoveredMessageId(message.id)}
             onMouseLeave={() => setHoveredMessageId(null)}
           >
-            <div className={`relative ${isUser ? 'ml-auto max-w-[85%]' : 'mr-auto w-full'}`}>
+            <div className={cn('relative', isUser ? 'ml-auto max-w-[85%]' : 'mr-auto w-full')}>
               <div
-                className={`rounded-2xl px-4 py-3 text-[15px] leading-relaxed ${
-                  isUser
-                    ? 'bg-muted text-foreground'
-                    : 'bg-transparent text-foreground'
-                }`}
+                className={cn(
+                  'rounded-2xl px-4 py-3 text-[15px] leading-relaxed',
+                  isUser ? 'bg-muted text-foreground' : 'bg-transparent text-foreground'
+                )}
               >
                 {isUser ? (
-                  <p className="whitespace-pre-wrap">{msg.content}</p>
+                  <p className="whitespace-pre-wrap">{message.content}</p>
                 ) : (
                   <div className="prose prose-sm max-w-none prose-p:my-2 prose-headings:my-3 prose-ul:my-2 prose-ol:my-2 prose-li:my-0.5">
-                    <MarkdownRenderer content={msg.content} />
+                    <MarkdownRenderer content={message.content} />
                   </div>
                 )}
               </div>
 
-              {msg.role === 'assistant' && msg.editorContent && (
-                <div className="mt-3 bg-muted/50 border border-border rounded-xl p-4">
-                  <div className="text-xs font-semibold text-muted-foreground mb-2">
-                    📝 编辑器内容
-                  </div>
-                  <div className="prose prose-sm max-w-none">
-                    <MarkdownRenderer content={msg.editorContent} />
-                  </div>
-                </div>
-              )}
+              {message.role === 'assistant' && message.editorContent ? (
+                <Card className="mt-3 bg-muted/20">
+                  <CardContent className="p-4">
+                    <div className="mb-2 text-xs font-semibold text-muted-foreground">
+                      Editor Content
+                    </div>
+                    <div className="prose prose-sm max-w-none">
+                      <MarkdownRenderer content={message.editorContent} />
+                    </div>
+                  </CardContent>
+                </Card>
+              ) : null}
 
-              {!isUser && (
+              {!isUser ? (
                 <div
-                  className={`flex items-center gap-1 mt-2 transition-opacity duration-200 ${
+                  className={cn(
+                    'mt-2 flex items-center gap-1 transition-opacity duration-200',
                     showToolbar ? 'opacity-100' : 'opacity-0'
-                  }`}
+                  )}
                 >
-                  <button
-                    className="h-7 px-2 text-xs text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors flex items-center gap-1"
-                    onClick={() => onInsertToEditor?.(msg.id)}
-                  >
+                  <Button variant="ghost" size="sm" onClick={() => onInsertToEditor?.(message.id)}>
                     <FileInput className="h-3.5 w-3.5" />
-                    {msg.insertedToEditor ? '已写入编辑器' : '写入编辑器'}
-                  </button>
-                  <button
-                    className="h-7 px-2 text-xs text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors flex items-center gap-1"
-                    onClick={() => onCapture?.(msg.id)}
-                  >
+                    {message.insertedToEditor ? 'Inserted' : 'Insert'}
+                  </Button>
+                  <Button variant="ghost" size="sm" onClick={() => onCapture?.(message.id)}>
                     <SquareDashedBottom className="h-3.5 w-3.5" />
-                    捕获
-                  </button>
-                  <button
-                    className="h-7 px-2 text-xs text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors flex items-center gap-1"
-                    onClick={() => handleCopy(msg.id, msg.content)}
-                  >
-                    {isCopied ? (
-                      <Check className="h-3.5 w-3.5" />
-                    ) : (
-                      <Copy className="h-3.5 w-3.5" />
-                    )}
-                    {isCopied ? '已复制' : '复制'}
-                  </button>
-                  <button
-                    className="h-7 w-7 text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors flex items-center justify-center cursor-grab"
-                    onClick={() => onDrag?.(msg.id)}
-                    aria-label="拖拽"
+                    Capture
+                  </Button>
+                  <Button variant="ghost" size="sm" onClick={() => handleCopy(message.id, message.content)}>
+                    {isCopied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+                    {isCopied ? 'Copied' : 'Copy'}
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => onDrag?.(message.id)}
+                    aria-label="Drag message"
                   >
                     <GripVertical className="h-3.5 w-3.5" />
-                  </button>
+                  </Button>
                 </div>
-              )}
+              ) : null}
             </div>
           </div>
         )
       })}
-      {isLoading && messages[messages.length - 1]?.role !== 'assistant' && (
-        <div className="py-4 flex justify-start">
+
+      {isLoading && messages[messages.length - 1]?.role !== 'assistant' ? (
+        <div className="flex justify-start py-4">
           <div className="flex items-center gap-1 px-4 py-3">
-            <span className="w-2 h-2 bg-primary/60 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-            <span className="w-2 h-2 bg-primary/60 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-            <span className="w-2 h-2 bg-primary/60 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+            <span className="h-2 w-2 animate-bounce rounded-full bg-primary/60" style={{ animationDelay: '0ms' }} />
+            <span className="h-2 w-2 animate-bounce rounded-full bg-primary/60" style={{ animationDelay: '150ms' }} />
+            <span className="h-2 w-2 animate-bounce rounded-full bg-primary/60" style={{ animationDelay: '300ms' }} />
           </div>
         </div>
-      )}
+      ) : null}
+
       <div ref={messagesEndRef} />
     </div>
   )

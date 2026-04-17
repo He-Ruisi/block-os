@@ -1,4 +1,6 @@
-import { Minimize2, Plus, Menu as MenuIcon, Settings } from 'lucide-react'
+import { History, Minimize2, Plus, Settings2 } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 
 interface ChatHeaderProps {
   title: string
@@ -22,56 +24,38 @@ export function ChatHeader({
   showSettings,
 }: ChatHeaderProps) {
   return (
-    <header className="h-14 flex items-center justify-between px-4 border-b border-border bg-background">
+    <header className="flex h-14 items-center justify-between border-b bg-background px-4">
       <div className="flex items-center gap-3">
-        <button
-          className="flex items-center justify-center h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors rounded-md"
-          onClick={onExitFullscreen}
-          title="退出全屏"
-        >
-          <Minimize2 size={16} />
-        </button>
+        <Button variant="ghost" size="icon" onClick={onExitFullscreen} title="Exit full screen">
+          <Minimize2 className="h-4 w-4" />
+        </Button>
         <div className="flex flex-col">
-          <h1 className="text-lg font-semibold text-foreground leading-tight">
-            {title}
-          </h1>
-          {subtitle && (
-            <span className="text-xs text-muted-foreground">
-              {subtitle}
-            </span>
-          )}
+          <h1 className="text-lg font-semibold leading-tight text-foreground">{title}</h1>
+          {subtitle ? <span className="text-xs text-muted-foreground">{subtitle}</span> : null}
         </div>
       </div>
       <div className="flex items-center gap-1">
-        <button
-          className="flex items-center justify-center h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors rounded-md"
-          onClick={onNewChat}
-          title="新建对话"
-        >
-          <Plus size={16} />
-        </button>
-        <button
-          className={`flex items-center justify-center h-8 w-8 transition-colors rounded-md ${
-            showHistory
-              ? 'bg-primary/10 text-primary'
-              : 'text-muted-foreground hover:text-foreground hover:bg-muted'
-          }`}
+        <Button variant="ghost" size="icon" onClick={onNewChat} title="New chat">
+          <Plus className="h-4 w-4" />
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          className={cn(showHistory && 'bg-primary/10 text-primary hover:bg-primary/15')}
           onClick={onToggleHistory}
-          title="历史对话"
+          title="History"
         >
-          <MenuIcon size={16} />
-        </button>
-        <button
-          className={`flex items-center justify-center h-8 w-8 transition-colors rounded-md ${
-            showSettings
-              ? 'bg-primary/10 text-primary'
-              : 'text-muted-foreground hover:text-foreground hover:bg-muted'
-          }`}
+          <History className="h-4 w-4" />
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          className={cn(showSettings && 'bg-primary/10 text-primary hover:bg-primary/15')}
           onClick={onOpenSettings}
-          title="设置"
+          title="Settings"
         >
-          <Settings size={16} />
-        </button>
+          <Settings2 className="h-4 w-4" />
+        </Button>
       </div>
     </header>
   )

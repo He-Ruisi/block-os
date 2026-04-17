@@ -1,3 +1,4 @@
+import type React from 'react'
 import type { AIMessageViewModel } from '../types'
 
 export type AIMode = 'bubble' | 'float' | 'sidebar'

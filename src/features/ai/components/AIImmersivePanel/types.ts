@@ -26,7 +26,7 @@ export interface AIImmersivePanelViewProps {
   currentSessionId: string
   onLoadSession: (sessionId: string) => void
   onDeleteSession: (sessionId: string) => void
-  onRefreshSessions: () => Promise<void>
+  onExportSession: (sessionId: string) => void
   selectedProvider: 'mimo' | 'deepseek'
   selectedModel: string
   providerOptions: AIProviderOptionViewModel[]
