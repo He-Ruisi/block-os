@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import type { Block, BlockRelease } from '@/types/models/block'
 import { useBlocks } from '@/features/blocks/hooks/useBlocks'
+import { BlockDetailPanel } from '@/features/blocks/components/BlockDetailPanel'
 import { BlockSpacePanelView } from './BlockSpacePanelView'
 import { toBlockViewModels } from './mappers'
 import type { BlockViewModel, BlockSpaceStats } from './types'
@@ -105,6 +106,18 @@ export function BlockSpacePanelContainer() {
     setDetailBlockId(null)
   }, [])
 
+  // 如果正在查看详情，渲染 BlockDetailPanel（Container 组件）
+  if (detailBlockId) {
+    return (
+      <BlockDetailPanel
+        blockId={detailBlockId}
+        onClose={handleCloseDetail}
+        onInsertRelease={handleInsertRelease}
+      />
+    )
+  }
+
+  // 否则渲染 BlockSpacePanel 的 View
   return (
     <BlockSpacePanelView
       blocks={blockViewModels}
@@ -113,14 +126,11 @@ export function BlockSpacePanelContainer() {
       selectedTag={selectedTag}
       allTags={allTags}
       highlightedBlockId={highlightedBlockId}
-      detailBlockId={detailBlockId}
       stats={stats}
       onSearchChange={setSearchQuery}
       onTagSelect={setSelectedTag}
       onBlockClick={handleBlockClick}
       onBlockDragStart={handleBlockDragStart}
-      onInsertRelease={handleInsertRelease}
-      onCloseDetail={handleCloseDetail}
     />
   )
 }

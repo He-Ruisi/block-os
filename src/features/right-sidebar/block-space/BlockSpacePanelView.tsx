@@ -1,10 +1,8 @@
 import { Filter, Sparkles } from 'lucide-react'
-import { BlockDetailPanel } from '@/features/blocks/components/BlockDetailPanel'
 import { BlockListView } from './BlockListView'
 import { EmptyState, PanelHeader, PanelShell, SearchInput } from '@/components/shells'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import type { Block, BlockRelease } from '@/types/models/block'
 import type { BlockViewModel, BlockSpaceStats } from './types'
 
 interface Props {
@@ -14,14 +12,11 @@ interface Props {
   selectedTag: string
   allTags: string[]
   highlightedBlockId: string | null
-  detailBlockId: string | null
   stats: BlockSpaceStats
   onSearchChange: (query: string) => void
   onTagSelect: (tag: string) => void
   onBlockClick: (blockId: string) => void
   onBlockDragStart: (blockId: string, block: BlockViewModel) => string
-  onInsertRelease: (block: Block, release: BlockRelease) => void
-  onCloseDetail: () => void
 }
 
 export function BlockSpacePanelView({
@@ -31,25 +26,12 @@ export function BlockSpacePanelView({
   selectedTag,
   allTags,
   highlightedBlockId,
-  detailBlockId,
   stats,
   onSearchChange,
   onTagSelect,
   onBlockClick,
   onBlockDragStart,
-  onInsertRelease,
-  onCloseDetail,
 }: Props) {
-  if (detailBlockId) {
-    return (
-      <BlockDetailPanel
-        blockId={detailBlockId}
-        onClose={onCloseDetail}
-        onInsertRelease={onInsertRelease}
-      />
-    )
-  }
-
   const visibleTags = ['All', ...allTags.slice(0, 5)]
 
   return (
