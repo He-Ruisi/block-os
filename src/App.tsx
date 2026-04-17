@@ -5,7 +5,7 @@ import { Sidebar } from './components/layout/Sidebar'
 import { TabBar } from './components/layout/TabBar'
 import { Editor } from './features/editor'
 import { ResizeHandle } from './components/layout/ResizeHandle'
-import { RightPanel } from './components/panel/RightPanel'
+import { RightPanelShell } from './components/panels/RightPanelShell'
 import { AIFloatPanel } from './features/ai'
 import type { AIMode } from './features/ai/components/AIFloatPanel'
 import { AuthPage } from './features/auth'
@@ -13,7 +13,7 @@ import { SettingsPanel } from './features/settings'
 import { StatusBar } from './components/layout/StatusBar'
 import { PluginWorkspace } from './features/sidebar/plugin-workspace'
 import { Toaster } from './components/ui/toaster'
-import { ProjectOverview } from './components/project/ProjectOverview'
+import { ProjectOverview } from './features/projects'
 import { initStorage } from './storage'
 import { documentStore } from './storage/documentStore'
 import { useAppLayout } from './hooks/useAppLayout'
@@ -391,7 +391,7 @@ function App() {
     <div className={`app ${isFullscreen ? 'app--fullscreen' : ''} ${viewMode === 'ai-focus' ? 'app--ai-focus' : ''}`}>
       {/* AI 沉浸式模式 */}
       {viewMode === 'ai-focus' && (
-        <RightPanel
+        <RightPanelShell
           onInsertContent={handleInsertAIContent}
           selectedText={selectedText}
           onTextSentToAI={() => setSelectedText('')}
@@ -505,7 +505,7 @@ function App() {
                 minWidth={minEditorWidth}
                 maxWidth={maxEditorWidth}
               />
-              <RightPanel
+              <RightPanelShell
                 onInsertContent={handleInsertAIContent}
                 selectedText={selectedText}
                 onTextSentToAI={() => setSelectedText('')}

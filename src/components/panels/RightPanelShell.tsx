@@ -27,7 +27,7 @@ import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { cn } from '@/lib/utils'
 
-interface RightPanelProps {
+interface RightPanelShellProps {
   onInsertContent?: (content: string) => void
   selectedText?: string
   onTextSentToAI?: () => void
@@ -37,7 +37,7 @@ interface RightPanelProps {
   onSwitchToAIFocus?: () => void
 }
 
-export function RightPanel({ onInsertContent, selectedText, onTextSentToAI, onClose, viewMode = 'hybrid', onSwitchToHybrid, onSwitchToAIFocus }: RightPanelProps) {
+export function RightPanelShell({ onInsertContent, selectedText, onTextSentToAI, onClose, viewMode = 'hybrid', onSwitchToHybrid, onSwitchToAIFocus }: RightPanelShellProps) {
   const [activeTab, setActiveTab] = useState<PanelTab>('chat')
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
