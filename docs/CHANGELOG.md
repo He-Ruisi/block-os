@@ -1,5 +1,74 @@
 # BlockOS 更新日志
 
+## [v1.36.0] - 2026-04-17 🎉 Blocks Feature Container/View 重构完成
+
+**重要里程碑**：完成 Blocks Feature 全部 3 个组件的 Container/View 模式重构，代码质量和可维护性显著提升。
+
+### 重构完成（3/3 组件）
+
+1. **BlockSpacePanel** - 全局 Block 管理
+   - 7 个文件（Container、View、BlockListView、BlockItemView、mappers、types、index）
+   - 新增 `useBlocks` hook 封装 blockStore 访问
+   - Bento Grid 卡片布局（响应式 2 列）
+   - 搜索、标签过滤、拖拽、高亮、详情面板
+
+2. **BlockDetailPanel** - Block 详情展示
+   - 8 个文件（Container、View、3 个 Section、mappers、types、index）
+   - 拆分为 CurrentContentSection、ReleasesSection、UsagesSection
+   - 版本历史 + 引用记录 + 发布新版本 + 插入编辑器
+   - Popover 悬停显示完整版本内容
+
+3. **BlockDerivativeSelector** - 派生版本选择器
+   - 7 个文件（Container、View、2 个 Section、mappers、types、index）
+   - 拆分为 SourceBlockSection、DerivativesSection
+   - 源 Block 显示 + 派生版本列表 + 单选选择 + 键盘导航
+
+### 重构统计
+
+- ✅ **新增文件**: 23 个
+- ✅ **删除文件**: 3 个（旧的单文件组件）
+- ✅ **新增 Hook**: 1 个（useBlocks）
+- ✅ **TypeScript 类型检查**: 全部通过
+
+### 架构改进
+
+1. **逻辑与 UI 完全分离**
+   - Container 负责：hooks、数据加载、事件处理、状态管理
+   - View 负责：纯渲染、Shadcn UI、Tailwind CSS、无状态
+
+2. **严格遵循架构边界**
+   - Container 通过 hooks 访问数据（不直接访问 blockStore）
+   - View 只 import ViewModel 类型（不 import Block 领域模型）
+   - 使用 mappers.ts 转换数据（不在 Container 内转换）
+   - 使用 Shell 组件（SearchInput，回调传 string 不传 Event）
+
+3. **组件拆分粒度合理**
+   - BlockSpacePanel: 4 个子组件
+   - BlockDetailPanel: 3 个子 Section 组件
+   - BlockDerivativeSelector: 2 个子 Section 组件
+   - 总计 9 个子组件，职责单一
+
+4. **代码质量显著提升**
+   - **可测试性**: mappers 是纯函数，易于单测
+   - **可维护性**: 职责单一，易于理解和修改
+   - **可复用性**: ViewModel 和 mappers 可在其他场景复用
+
+### 技术亮点
+
+- ✅ 使用 container-view-pattern skill 指导重构
+- ✅ 遵循 Shell 组件 API 规范
+- ✅ 遵循 Shadcn UI 重构规范
+- ✅ 遵循架构边界严格约束（4 个边界规则）
+- ✅ 保持所有功能完整，无破坏性变更
+
+### 影响范围
+
+- **对现有代码**: 导出路径不变，无破坏性变更
+- **对开发流程**: 提供清晰的重构模板和规范
+- **对代码质量**: 可测试性、可维护性、可复用性全面提升
+
+---
+
 ## [v1.35.0] - 2026-04-17 📐 架构规范增强 - 严格边界约束建立
 
 **重要里程碑**：全面增强架构规范，建立严格的边界约束，解决 5 个核心架构问题。

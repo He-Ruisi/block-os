@@ -6,11 +6,11 @@ import {
   FileText,
   Folder,
   FolderInput,
+  MoreVertical,
   Pencil,
   Plus,
   Star,
   Trash2,
-  X,
 } from 'lucide-react'
 import type { Project } from '../../types/models/project'
 import type { Document } from '../../types/models/document'
@@ -18,6 +18,26 @@ import { projectStore } from '../../storage/projectStore'
 import { documentStore } from '../../storage/documentStore'
 import { useLongPress } from '../../hooks/useLongPress'
 import { useViewport } from '../../hooks/useViewport'
+import { Button } from '../ui/button'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '../ui/dialog'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '../ui/dropdown-menu'
+import { Input } from '../ui/input'
+import { Textarea } from '../ui/textarea'
+import { ScrollArea } from '../ui/scroll-area'
+import { cn } from '../../lib/utils'
 
 const STORAGE_KEY = 'blockos-starred-items'
 const MAX_STARRED_ITEMS = 10
@@ -37,7 +57,6 @@ interface ExplorerDocItemProps {
   isStarred: boolean
   isTouchDevice: boolean
   isMenuOpen: boolean
-  docActionMenuRef: React.RefObject<HTMLDivElement | null>
   onRenameValueChange: (value: string) => void
   onSubmitRename: (doc: Document) => void
   onCancelRename: () => void
@@ -59,7 +78,6 @@ function ExplorerDocItem({
   isStarred,
   isTouchDevice,
   isMenuOpen,
-  docActionMenuRef,
   onRenameValueChange,
   onSubmitRename,
   onCancelRename,
@@ -87,17 +105,16 @@ function ExplorerDocItem({
   })
 
   return (
-    <div className="explorer-doc-item-wrapper">
+    <div className="explorer-doc-item-wrapper group">
       <div
         className="explorer-doc-item"
-        onClick={e => onToggleMenu(e, doc)}
         onDoubleClick={e => onDoubleClickOpen(e, doc)}
         {...longPressHandlers}
       >
         {isRenaming ? (
-          <input
+          <Input
             ref={renameInputRef as React.RefObject<HTMLInputElement>}
-            className="explorer-rename-input"
+            className="h-7 text-sm"
             value={renameValue}
             onChange={e => onRenameValueChange(e.target.value)}
             onBlur={() => onSubmitRename(doc)}
@@ -112,38 +129,52 @@ function ExplorerDocItem({
           <>
             <FileText size={14} className="explorer-doc-icon" />
             <span className="explorer-doc-title">{doc.title}</span>
-            <button
-              className={`explorer-action-btn explorer-star-btn explorer-doc-star ${isStarred ? 'starred' : ''}`}
+            <Button
+              variant="ghost"
+              size="icon"
+              className={cn(
+                'explorer-action-btn explorer-star-btn explorer-doc-star h-6 w-6',
+                isStarred && 'starred'
+              )}
               onClick={e => onToggleStar(e, doc.id, 'document', doc.title, doc.projectId)}
               title={isStarred ? '取消置顶' : '置顶'}
             >
               <Star size={12} fill={isStarred ? 'currentColor' : 'none'} />
-            </button>
+            </Button>
+            <DropdownMenu open={isMenuOpen} onOpenChange={open => !open && onToggleMenu({} as React.MouseEvent, doc)}>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-6 w-6 opacity-0 group-hover:opacity-100"
+                  onClick={e => onToggleMenu(e, doc)}
+                >
+                  <MoreVertical size={14} />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => onOpen(doc)}>
+                  <FileText size={14} />
+                  <span>打开文档</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={e => onStartRename(e, doc)}>
+                  <Pencil size={14} />
+                  <span>重命名</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => onSaveToProject(doc)}>
+                  <FolderInput size={14} />
+                  <span>保存到项目</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={e => onDelete(e, doc)} className="text-destructive">
+                  <Trash2 size={14} />
+                  <span>删除</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </>
         )}
       </div>
-
-      {isMenuOpen && (
-        <div className="explorer-doc-action-menu" ref={docActionMenuRef as React.RefObject<HTMLDivElement>}>
-          <button className="explorer-action-menu-item" onClick={() => onOpen(doc)}>
-            <FileText size={14} />
-            <span>打开文档</span>
-          </button>
-          <button className="explorer-action-menu-item" onClick={e => onStartRename(e, doc)}>
-            <Pencil size={14} />
-            <span>重命名</span>
-          </button>
-          <button className="explorer-action-menu-item" onClick={() => onSaveToProject(doc)}>
-            <FolderInput size={14} />
-            <span>保存到项目</span>
-          </button>
-          <div className="explorer-action-menu-sep" />
-          <button className="explorer-action-menu-item danger" onClick={e => onDelete(e, doc)}>
-            <Trash2 size={14} />
-            <span>删除</span>
-          </button>
-        </div>
-      )}
     </div>
   )
 }
@@ -168,7 +199,6 @@ export function ExplorerView({
   const renameProjectInputRef = useRef<HTMLInputElement>(null)
   const [movingDoc, setMovingDoc] = useState<Document | null>(null)
   const [docActionMenu, setDocActionMenu] = useState<Document | null>(null)
-  const docActionMenuRef = useRef<HTMLDivElement>(null)
   const [starredIds, setStarredIds] = useState<Set<string>>(new Set())
   const viewport = useViewport()
   const isTouchDevice = viewport.isTablet || viewport.isMobile
@@ -225,19 +255,6 @@ export function ExplorerView({
   }, [])
 
   useEffect(() => {
-    if (!docActionMenu) return
-
-    const handleClickOutside = (e: MouseEvent) => {
-      if (docActionMenuRef.current && !docActionMenuRef.current.contains(e.target as Node)) {
-        setDocActionMenu(null)
-      }
-    }
-
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [docActionMenu])
-
-  useEffect(() => {
     const handleToggleStar = () => loadStarredIds()
     window.addEventListener('toggleStar', handleToggleStar)
     return () => window.removeEventListener('toggleStar', handleToggleStar)
@@ -288,7 +305,7 @@ export function ExplorerView({
     e.stopPropagation()
     setDocActionMenu(null)
 
-    if (!confirm(`确定删除文档“${doc.title}”吗？`)) return
+    if (!confirm(`确定删除文档"${doc.title}"吗？`)) return
 
     try {
       if (doc.projectId) {
@@ -407,7 +424,7 @@ export function ExplorerView({
   const handleDeleteProject = async (e: React.MouseEvent, project: Project) => {
     e.stopPropagation()
 
-    if (!confirm(`确定删除项目“${project.name}”吗？项目下的文档不会被删除。`)) return
+    if (!confirm(`确定删除项目"${project.name}"吗？项目下的文档不会被删除。`)) return
 
     try {
       await projectStore.deleteProject(project.id)
@@ -530,7 +547,7 @@ export function ExplorerView({
           <span className="explorer-section-title">项目</span>
         </div>
 
-        <div className="explorer-projects">
+        <ScrollArea className="explorer-projects">
           {projects.length === 0 ? (
             <div className="explorer-empty">
               <div className="explorer-empty-text">还没有项目</div>
@@ -548,9 +565,9 @@ export function ExplorerView({
                   </span>
                   <Folder size={16} className="explorer-project-icon" />
                   {renamingProjectId === project.id ? (
-                    <input
+                    <Input
                       ref={renameProjectInputRef}
-                      className="explorer-rename-input"
+                      className="h-7 text-sm"
                       value={renameProjectValue}
                       onChange={e => setRenameProjectValue(e.target.value)}
                       onBlur={() => submitRenameProject(project.id)}
@@ -568,22 +585,45 @@ export function ExplorerView({
                         <span className="explorer-project-count">{project.documents.length}</span>
                       )}
                       <div className="explorer-doc-actions explorer-project-actions">
-                        <button
-                          className={`explorer-action-btn explorer-star-btn ${isStarred(project.id, 'project') ? 'starred' : ''}`}
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className={cn(
+                            'explorer-action-btn explorer-star-btn h-6 w-6',
+                            isStarred(project.id, 'project') && 'starred'
+                          )}
                           onClick={e => toggleStar(e, project.id, 'project', project.name)}
                           title={isStarred(project.id, 'project') ? '取消置顶' : '置顶'}
                         >
                           <Star size={14} fill={isStarred(project.id, 'project') ? 'currentColor' : 'none'} />
-                        </button>
-                        <button className="explorer-action-btn" onClick={e => handleNewDocInProject(e, project.id)} title="新建文档">
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="explorer-action-btn h-6 w-6"
+                          onClick={e => handleNewDocInProject(e, project.id)}
+                          title="新建文档"
+                        >
                           <Plus size={14} />
-                        </button>
-                        <button className="explorer-action-btn" onClick={e => startRenameProject(e, project)} title="重命名">
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="explorer-action-btn h-6 w-6"
+                          onClick={e => startRenameProject(e, project)}
+                          title="重命名"
+                        >
                           <Pencil size={14} />
-                        </button>
-                        <button className="explorer-action-btn danger" onClick={e => handleDeleteProject(e, project)} title="删除项目">
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="explorer-action-btn danger h-6 w-6"
+                          onClick={e => handleDeleteProject(e, project)}
+                          title="删除项目"
+                        >
                           <Trash2 size={14} />
-                        </button>
+                        </Button>
                       </div>
                     </>
                   )}
@@ -604,7 +644,6 @@ export function ExplorerView({
                           isStarred={isStarred(doc.id, 'document')}
                           isTouchDevice={isTouchDevice}
                           isMenuOpen={docActionMenu?.id === doc.id}
-                          docActionMenuRef={docActionMenuRef}
                           onRenameValueChange={setRenameValue}
                           onSubmitRename={submitRename}
                           onCancelRename={() => setRenamingDocId(null)}
@@ -624,87 +663,84 @@ export function ExplorerView({
               </div>
             ))
           )}
-        </div>
+        </ScrollArea>
 
-        <button
-          className="explorer-new-project-button"
+        <Button
+          className="explorer-new-project-button w-full justify-start"
+          variant="ghost"
           onClick={() => setShowNewProjectDialog(true)}
         >
           <Plus size={16} />
           <span className="explorer-button-text">新建项目</span>
-        </button>
+        </Button>
       </div>
 
-      {showNewProjectDialog && (
-        <div className="explorer-dialog-overlay" onClick={() => setShowNewProjectDialog(false)}>
-          <div className="explorer-dialog-content" onClick={e => e.stopPropagation()}>
-            <div className="explorer-dialog-header">
-              <h3 className="explorer-dialog-title">新建项目</h3>
-              <button className="explorer-dialog-close" onClick={() => setShowNewProjectDialog(false)}>
-                <X size={18} />
-              </button>
+      <Dialog open={showNewProjectDialog} onOpenChange={setShowNewProjectDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>新建项目</DialogTitle>
+            <DialogDescription>创建一个新的项目来组织你的文档</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">项目名称</label>
+              <Input
+                type="text"
+                placeholder="输入项目名称..."
+                value={newProjectName}
+                onChange={e => setNewProjectName(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && handleCreateProject()}
+                autoFocus
+              />
             </div>
-            <div className="explorer-dialog-body">
-              <div className="explorer-form-group">
-                <label className="explorer-form-label">项目名称</label>
-                <input
-                  type="text"
-                  className="explorer-form-input"
-                  placeholder="输入项目名称..."
-                  value={newProjectName}
-                  onChange={e => setNewProjectName(e.target.value)}
-                  onKeyDown={e => e.key === 'Enter' && handleCreateProject()}
-                  autoFocus
-                />
-              </div>
-              <div className="explorer-form-group">
-                <label className="explorer-form-label">项目描述（可选）</label>
-                <textarea
-                  className="explorer-form-textarea"
-                  placeholder="输入项目描述..."
-                  value={newProjectDescription}
-                  onChange={e => setNewProjectDescription(e.target.value)}
-                  rows={3}
-                />
-              </div>
-            </div>
-            <div className="explorer-dialog-footer">
-              <button className="explorer-btn-secondary" onClick={() => setShowNewProjectDialog(false)}>取消</button>
-              <button className="explorer-btn-primary" onClick={handleCreateProject} disabled={!newProjectName.trim()}>创建</button>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">项目描述（可选）</label>
+              <Textarea
+                placeholder="输入项目描述..."
+                value={newProjectDescription}
+                onChange={e => setNewProjectDescription(e.target.value)}
+                rows={3}
+              />
             </div>
           </div>
-        </div>
-      )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowNewProjectDialog(false)}>
+              取消
+            </Button>
+            <Button onClick={handleCreateProject} disabled={!newProjectName.trim()}>
+              创建
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
-      {movingDoc && (
-        <div className="explorer-dialog-overlay" onClick={() => setMovingDoc(null)}>
-          <div className="explorer-dialog-content" onClick={e => e.stopPropagation()}>
-            <div className="explorer-dialog-header">
-              <h3 className="explorer-dialog-title">保存到项目</h3>
-              <button className="explorer-dialog-close" onClick={() => setMovingDoc(null)}>
-                <X size={18} />
-              </button>
+      <Dialog open={!!movingDoc} onOpenChange={open => !open && setMovingDoc(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>保存到项目</DialogTitle>
+            <DialogDescription>
+              将"{movingDoc?.title}"保存到：
+            </DialogDescription>
+          </DialogHeader>
+          <ScrollArea className="max-h-[300px]">
+            <div className="space-y-2">
+              {projects
+                .filter(project => project.id !== movingDoc?.projectId)
+                .map(project => (
+                  <Button
+                    key={project.id}
+                    variant="outline"
+                    className="w-full justify-start"
+                    onClick={() => movingDoc && handleMoveDoc(movingDoc, project.id)}
+                  >
+                    <Folder size={16} />
+                    <span>{project.name}</span>
+                  </Button>
+                ))}
             </div>
-            <div className="explorer-dialog-body">
-              <p className="explorer-move-hint">将“{movingDoc.title}”保存到：</p>
-              <div className="explorer-move-list">
-                {projects
-                  .filter(project => project.id !== movingDoc.projectId)
-                  .map(project => (
-                    <button
-                      key={project.id}
-                      className="explorer-move-option"
-                      onClick={() => handleMoveDoc(movingDoc, project.id)}
-                    >
-                      <Folder size={16} />
-                      <span>{project.name}</span>
-                    </button>
-                  ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+          </ScrollArea>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
