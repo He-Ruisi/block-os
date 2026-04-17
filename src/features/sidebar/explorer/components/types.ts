@@ -1,3 +1,10 @@
+export interface DocumentViewModel {
+  id: string
+  title: string
+  projectId?: string
+  isStarred: boolean
+}
+
 export interface ProjectViewModel {
   id: string
   name: string
@@ -5,11 +12,14 @@ export interface ProjectViewModel {
   documentCount: number
   isExpanded: boolean
   isStarred: boolean
+  documents: DocumentViewModel[]
 }
 
-export interface DocumentViewModel {
+export interface StarredItemViewModel {
   id: string
-  title: string
+  type: 'project' | 'document'
+  name: string
+  displayName: string
   projectId?: string
-  isStarred: boolean
+  starredAt: Date
 }

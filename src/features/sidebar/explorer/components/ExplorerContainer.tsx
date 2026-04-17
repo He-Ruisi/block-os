@@ -1,8 +1,9 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useMemo } from 'react'
 import type { Document } from '@/types/models/document'
 import { useExplorer } from '../hooks/useExplorer'
+import { useStarred } from '../hooks/useStarred'
 import { ExplorerView } from './ExplorerView'
-import { toProjectViewModels, toDocumentViewModels } from './mappers'
+import { toProjectViewModels, toStarredItemViewModels } from './mappers'
 import { useViewport } from '@/hooks/useViewport'
 
 const STORAGE_KEY = 'blockos-starred-items'
@@ -35,6 +36,17 @@ export function ExplorerContainer({
     isStarred,
   } = useExplorer()
 
+  const {
+    starredItems,
+    itemNames,
+    draggedItem,
+    removeStaleItem,
+    handleUnstar,
+    handleDragStart,
+    handleDragEnd,
+    handleDrop,
+  } = useStarred()
+
   const [showNewProjectDialog, setShowNewProjectDialog] = useState(false)
   const [newProjectName, setNewProjectName] = useState('')
   const [newProjectDescription, setNewProjectDescription] = useState('')
@@ -44,12 +56,38 @@ export function ExplorerContainer({
   const [renamingProjectId, setRenamingProjectId] = useState<string | null>(null)
   const [renameProjectValue, setRenameProjectValue] = useState('')
   const renameProjectInputRef = useRef<HTMLInputElement>(null)
-  const [movingDoc, setMovingDoc] = useState<Document | null>(null)
-  const [docActionMenu, setDocActionMenu] = useState<Document | null>(null)
+  const [movingDocId, setMovingDocId] = useState<string | null>(null)
+  const [docActionMenuId, setDocActionMenuId] = useState<string | null>(null)
   const viewport = useViewport()
   const isTouchDevice = viewport.isTablet || viewport.isMobile
 
-  const projectViewModels = toProjectViewModels(projects, expandedProjects, isStarred)
+  const projectViewModels = useMemo(
+    () => toProjectViewModels(projects, projectDocs, expandedProjects, isStarred),
+    [projects, projectDocs, expandedProjects, isStarred]
+  )
+
+  const starredViewModels = useMemo(
+    () => toStarredItemViewModels(starredItems, itemNames),
+    [starredItems, itemNames]
+  )
+
+  const findDocumentById = (docId: string) => {
+    for (const docs of Object.values(projectDocs)) {
+      const doc = docs.find(item => item.id === docId)
+      if (doc) return doc
+    }
+    return null
+  }
+
+  const loadDocumentById = async (docId: string) => {
+    const existing = findDocumentById(docId)
+    if (existing) {
+      return existing
+    }
+
+    const { documentStore } = await import('@/storage/documentStore')
+    return documentStore.getDocument(docId)
+  }
 
   const handleCreateProject = async () => {
     const name = newProjectName.trim()
@@ -61,13 +99,9 @@ export function ExplorerContainer({
     }
 
     try {
-      // Use hook methods instead of direct store access
-      await loadProjects() // This will be replaced with a create method in the hook
-      
-      // For now, we need to import stores temporarily
       const { projectStore } = await import('@/storage/projectStore')
       const { documentStore } = await import('@/storage/documentStore')
-      
+
       const project = await projectStore.createProject(name, newProjectDescription.trim() || undefined)
       const doc = await documentStore.createDocument(project.name, project.id)
       await projectStore.addDocumentToProject(project.id, doc.id)
@@ -80,18 +114,20 @@ export function ExplorerContainer({
       setNewProjectDescription('')
       onOpenDocument(doc)
     } catch (error) {
-      console.error('[ExplorerView] Failed to create project:', error)
+      console.error('[ExplorerContainer] Failed to create project:', error)
       alert(`创建项目失败: ${error instanceof Error ? error.message : '未知错误'}`)
     }
   }
 
-  const handleDeleteDoc = async (doc: Document) => {
-    if (!confirm(`确定删除文档"${doc.title}"吗？`)) return
+  const handleDeleteDoc = async (docId: string) => {
+    const doc = await loadDocumentById(docId)
+    if (!doc) return
+    if (!confirm(`确定删除文档“${doc.title}”吗？`)) return
 
     try {
       const { projectStore } = await import('@/storage/projectStore')
       const { documentStore } = await import('@/storage/documentStore')
-      
+
       if (doc.projectId) {
         await projectStore.removeDocumentFromProject(doc.projectId, doc.id)
         setProjectDocs(prev => ({
@@ -114,14 +150,19 @@ export function ExplorerContainer({
     }
   }
 
-  const startRename = (doc: Document) => {
-    setDocActionMenu(null)
+  const startRename = async (docId: string) => {
+    const doc = await loadDocumentById(docId)
+    if (!doc) return
+    setDocActionMenuId(null)
     setRenamingDocId(doc.id)
     setRenameValue(doc.title)
     setTimeout(() => renameInputRef.current?.select(), 50)
   }
 
-  const submitRename = async (doc: Document) => {
+  const submitRename = async (docId: string) => {
+    const doc = await loadDocumentById(docId)
+    if (!doc) return
+
     const newTitle = renameValue.trim()
     if (!newTitle || newTitle === doc.title) {
       setRenamingDocId(null)
@@ -146,16 +187,18 @@ export function ExplorerContainer({
     setRenamingDocId(null)
   }
 
-  const handleMoveDoc = async (doc: Document, targetProjectId: string) => {
-    if (doc.projectId === targetProjectId) {
-      setMovingDoc(null)
+  const handleMoveDoc = async (targetProjectId: string) => {
+    if (!movingDocId) return
+    const doc = await loadDocumentById(movingDocId)
+    if (!doc || doc.projectId === targetProjectId) {
+      setMovingDocId(null)
       return
     }
 
     try {
       const { projectStore } = await import('@/storage/projectStore')
       const { documentStore } = await import('@/storage/documentStore')
-      
+
       if (doc.projectId) {
         await projectStore.removeDocumentFromProject(doc.projectId, doc.id)
         setProjectDocs(prev => ({
@@ -176,7 +219,7 @@ export function ExplorerContainer({
       console.error('Failed to move doc:', error)
     }
 
-    setMovingDoc(null)
+    setMovingDocId(null)
   }
 
   const startRenameProject = (projectId: string, currentName: string) => {
@@ -209,7 +252,7 @@ export function ExplorerContainer({
   }
 
   const handleDeleteProject = async (projectId: string, projectName: string) => {
-    if (!confirm(`确定删除项目"${projectName}"吗？项目下的文档不会被删除。`)) return
+    if (!confirm(`确定删除项目“${projectName}”吗？项目下的文档不会被删除。`)) return
 
     try {
       const { projectStore } = await import('@/storage/projectStore')
@@ -241,16 +284,7 @@ export function ExplorerContainer({
           return
         }
 
-        nextItems = [
-          ...items,
-          {
-            id,
-            type,
-            name,
-            projectId,
-            starredAt: new Date().toISOString(),
-          },
-        ]
+        nextItems = [...items, { id, type, name, projectId, starredAt: new Date().toISOString() }]
       }
 
       localStorage.setItem(STORAGE_KEY, JSON.stringify(nextItems))
@@ -265,7 +299,7 @@ export function ExplorerContainer({
     try {
       const { documentStore } = await import('@/storage/documentStore')
       const { projectStore } = await import('@/storage/projectStore')
-      
+
       const doc = await documentStore.createDocument('新文档', projectId)
       await projectStore.addDocumentToProject(projectId, doc.id)
       setProjectDocs(prev => ({
@@ -273,7 +307,9 @@ export function ExplorerContainer({
         [projectId]: [...(prev[projectId] || []), doc],
       }))
       setProjects(prev =>
-        prev.map(project => (project.id === projectId ? { ...project, documents: [...project.documents, doc.id] } : project))
+        prev.map(project =>
+          project.id === projectId ? { ...project, documents: [...project.documents, doc.id] } : project
+        )
       )
       onOpenDocument(doc)
     } catch (error) {
@@ -281,13 +317,48 @@ export function ExplorerContainer({
     }
   }
 
+  const handleOpenDocumentById = async (docId: string) => {
+    const doc = await loadDocumentById(docId)
+    if (doc) {
+      onOpenDocument(doc)
+    }
+  }
+
+  const handleStarredItemClick = async (item: { id: string; type: 'project' | 'document' }) => {
+    try {
+      if (item.type === 'project') {
+        const { projectStore } = await import('@/storage/projectStore')
+        const project = await projectStore.getProject(item.id)
+        if (project) {
+          onSelectProject(item.id)
+          setExpandedProjects(prev => new Set([...prev, item.id]))
+          await loadProjectDocs(item.id)
+        } else {
+          const staleItem = starredItems.find(i => i.id === item.id && i.type === item.type)
+          if (staleItem) removeStaleItem(staleItem)
+        }
+      } else {
+        const doc = await loadDocumentById(item.id)
+        if (doc) {
+          onOpenDocument(doc)
+        } else {
+          const staleItem = starredItems.find(i => i.id === item.id && i.type === item.type)
+          if (staleItem) removeStaleItem(staleItem)
+        }
+      }
+    } catch (error) {
+      console.error('Failed to handle starred item click:', error)
+    }
+  }
+
+  const movingDocument = movingDocId ? findDocumentById(movingDocId) : null
+
   return (
     <ExplorerView
       currentProjectId={currentProjectId}
       projects={projectViewModels}
-      projectDocs={projectDocs}
-      docViewModels={toDocumentViewModels}
-      isStarred={isStarred}
+      starredItems={starredViewModels}
+      draggedStarredItemId={draggedItem?.id || null}
       isTouchDevice={isTouchDevice}
       showNewProjectDialog={showNewProjectDialog}
       newProjectName={newProjectName}
@@ -298,10 +369,11 @@ export function ExplorerContainer({
       renamingProjectId={renamingProjectId}
       renameProjectValue={renameProjectValue}
       renameProjectInputRef={renameProjectInputRef}
-      movingDoc={movingDoc}
-      docActionMenu={docActionMenu}
+      movingDocumentTitle={movingDocument?.title || null}
+      movingDocumentProjectId={movingDocument?.projectId || null}
+      docActionMenuId={docActionMenuId}
       onSelectToday={onSelectToday}
-      onToggleProject={(projectId) => {
+      onToggleProject={projectId => {
         toggleProject(projectId)
         onSelectProject(projectId)
       }}
@@ -317,14 +389,19 @@ export function ExplorerContainer({
       onDeleteProject={handleDeleteProject}
       onToggleStar={toggleStar}
       onNewDocInProject={handleNewDocInProject}
-      onOpenDocument={onOpenDocument}
+      onOpenDocument={handleOpenDocumentById}
+      onOpenStarredItem={handleStarredItemClick}
+      onUnstar={handleUnstar}
+      onDragStarredItem={handleDragStart}
+      onDragEndStarred={handleDragEnd}
+      onDropStarredItem={handleDrop}
       onSetShowNewProjectDialog={setShowNewProjectDialog}
       onSetNewProjectName={setNewProjectName}
       onSetNewProjectDescription={setNewProjectDescription}
       onSetRenameValue={setRenameValue}
       onSetRenameProjectValue={setRenameProjectValue}
-      onSetMovingDoc={setMovingDoc}
-      onSetDocActionMenu={setDocActionMenu}
+      onSetMovingDocId={setMovingDocId}
+      onSetDocActionMenuId={setDocActionMenuId}
     />
   )
 }

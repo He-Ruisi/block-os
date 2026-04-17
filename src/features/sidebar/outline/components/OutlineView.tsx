@@ -1,6 +1,6 @@
 import { FilePenLine, List } from 'lucide-react'
-import { ScrollArea } from '@/components/ui/scroll-area'
 import { EmptyState } from '@/components/shells/EmptyState'
+import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import type { OutlineItemViewModel } from './types'
 
@@ -19,58 +19,54 @@ export function OutlineView({
 }: OutlineViewProps) {
   if (!documentId) {
     return (
-      <ScrollArea className="flex-1">
-        <div className="p-2">
-          <EmptyState
-            icon={FilePenLine}
-            title="没有打开的文档"
-            description="打开文档后显示大纲"
-          />
-        </div>
-      </ScrollArea>
+      <div className="rounded-2xl border border-dashed border-border bg-secondary/30 px-4 py-8">
+        <EmptyState compact icon={FilePenLine} title="没有打开的文档" description="打开文档后会在这里显示标题大纲。" />
+      </div>
+    )
+  }
+
+  if (outline.length === 0) {
+    return (
+      <div className="rounded-2xl border border-dashed border-border bg-secondary/30 px-4 py-8">
+        <EmptyState compact icon={List} title="暂无标题" description="使用 H1-H6 标题后，这里会自动生成大纲。" />
+      </div>
     )
   }
 
   return (
-    <ScrollArea className="flex-1">
-      <div className="p-2">
-        {outline.length === 0 ? (
-          <EmptyState
-            icon={List}
-            title="暂无标题"
-            description="使用标题（H1-H6）生成文档大纲"
-          />
-        ) : (
-          <div className="flex flex-col">
-            <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider py-1 px-3 pb-2 overflow-hidden text-ellipsis whitespace-nowrap">
-              {documentTitle}
-            </div>
-            {outline.map(item => (
-              <div
-                key={item.id}
-                className="flex items-center gap-2 py-1.5 px-3 rounded cursor-pointer transition-colors mb-px hover:bg-muted"
-                style={{ paddingLeft: `${(item.level - 1) * 16 + 12}px` }}
-                onClick={() => onHeadingClick(item)}
-                title={item.text}
-              >
-                <span className="text-[10px] font-semibold text-muted-foreground bg-muted px-1 py-0.5 rounded shrink-0 min-w-[24px] text-center font-mono">
-                  H{item.level}
-                </span>
-                <span
-                  className={cn(
-                    'text-sm overflow-hidden text-ellipsis whitespace-nowrap flex-1',
-                    item.level === 1
-                      ? 'font-semibold text-foreground'
-                      : 'text-muted-foreground'
-                  )}
-                >
-                  {item.text}
-                </span>
-              </div>
-            ))}
-          </div>
-        )}
+    <div className="space-y-4">
+      <div className="section-label w-fit">
+        <span className="section-label__dot" />
+        <span className="section-label__text">Outline</span>
       </div>
-    </ScrollArea>
+
+      <div className="rounded-2xl border border-border/80 bg-background/90 p-3 shadow-[var(--shadow-sm)]">
+        <div className="mb-3 truncate px-2 text-sm font-semibold text-foreground">{documentTitle}</div>
+        <div className="space-y-1">
+          {outline.map(item => (
+            <Button
+              key={item.id}
+              variant="ghost"
+              className="h-auto w-full justify-start gap-2 rounded-xl px-2 py-2 text-left transition-colors hover:bg-primary/[0.04]"
+              style={{ paddingLeft: `${(item.level - 1) * 16 + 12}px` }}
+              onClick={() => onHeadingClick(item)}
+              title={item.text}
+            >
+              <span className="min-w-[28px] shrink-0 rounded-md bg-primary/[0.08] px-1.5 py-1 text-center font-mono text-[10px] font-semibold text-primary">
+                H{item.level}
+              </span>
+              <span
+                className={cn(
+                  'flex-1 truncate text-sm',
+                  item.level === 1 ? 'font-semibold text-foreground' : 'text-muted-foreground'
+                )}
+              >
+                {item.text}
+              </span>
+            </Button>
+          ))}
+        </div>
+      </div>
+    </div>
   )
 }

@@ -18,6 +18,7 @@ function loadStarredItems(): StarredItem[] {
   } catch (error) {
     console.error('Failed to load starred items:', error)
   }
+
   return []
 }
 
@@ -42,7 +43,6 @@ export function useStarred() {
     })
   }
 
-  // 加载项目和文档名称
   useEffect(() => {
     if (starredItems.length === 0) {
       setItemNames({})
@@ -60,7 +60,7 @@ export function useStarred() {
               if (project) {
                 names[item.id] = project.name
               }
-            } else if (item.type === 'document') {
+            } else {
               const doc = await documentStore.getDocument(item.id)
               if (doc) {
                 names[item.id] = doc.title
@@ -68,7 +68,6 @@ export function useStarred() {
             }
           } catch (error) {
             console.error(`Failed to load name for ${item.type} ${item.id}:`, error)
-            // 使用缓存的名称作为后备
             names[item.id] = item.name
           }
         }
@@ -82,7 +81,6 @@ export function useStarred() {
     loadNames()
   }, [starredItems])
 
-  // 监听全局置顶事件
   useEffect(() => {
     const handleToggleStar = (e: Event) => {
       const { id, type, name, projectId } = (e as CustomEvent<{
@@ -94,24 +92,18 @@ export function useStarred() {
 
       setStarredItems(prev => {
         const exists = prev.find(item => item.id === id && item.type === type)
-        let next: StarredItem[]
-
-        if (exists) {
-          // 取消置顶
-          next = prev.filter(item => !(item.id === id && item.type === type))
-        } else {
-          // 添加置顶
-          next = [
-            ...prev,
-            {
-              id,
-              type,
-              name,
-              projectId,
-              starredAt: new Date(),
-            },
-          ]
-        }
+        const next = exists
+          ? prev.filter(item => !(item.id === id && item.type === type))
+          : [
+              ...prev,
+              {
+                id,
+                type,
+                name,
+                projectId,
+                starredAt: new Date(),
+              },
+            ]
 
         saveStarredItems(next)
         return next
@@ -129,7 +121,6 @@ export function useStarred() {
       return next
     })
 
-    // 触发全局事件通知其他组件
     window.dispatchEvent(
       new CustomEvent('toggleStar', {
         detail: {
@@ -160,12 +151,13 @@ export function useStarred() {
       const draggedIndex = prev.findIndex(i => i.id === draggedItem.id && i.type === draggedItem.type)
       const targetIndex = prev.findIndex(i => i.id === targetItem.id && i.type === targetItem.type)
 
-      if (draggedIndex === -1 || targetIndex === -1) return prev
+      if (draggedIndex === -1 || targetIndex === -1) {
+        return prev
+      }
 
       const next = [...prev]
       next.splice(draggedIndex, 1)
       next.splice(targetIndex, 0, draggedItem)
-
       saveStarredItems(next)
       return next
     })

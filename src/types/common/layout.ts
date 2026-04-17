@@ -1,5 +1,5 @@
 // 侧边栏视图类型
-export type SidebarView = 'explorer' | 'search' | 'outline' | 'extensions' | 'starred'
+export type SidebarView = 'explorer' | 'search' | 'outline' | 'extensions'
 
 // 插件清单（预留接口）
 export interface PluginManifest {

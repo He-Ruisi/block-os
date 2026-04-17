@@ -1,6 +1,7 @@
 import { ArrowLeft, ChevronRight, PanelTop, Settings, Workflow } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Badge } from '@/components/ui/badge'
 import type { PluginWorkspaceViewModel } from './types'
 
 interface PluginWorkspaceViewProps {
@@ -23,14 +24,14 @@ export function PluginWorkspaceView({
   if (!plugin) {
     return (
       <div className="flex h-full flex-col bg-background">
-        <div className="flex items-center gap-2 border-b border-border px-6 py-4">
+        <div className="flex items-center gap-2 border-b border-border/80 px-6 py-4">
           <Button variant="outline" onClick={onClose}>
             <ArrowLeft className="h-4 w-4" />
             <span className="ml-2">返回插件列表</span>
           </Button>
         </div>
         <div className="flex flex-1 items-center justify-center text-sm text-muted-foreground">
-          插件未找到或尚未加载完成
+          插件未找到或尚未完成加载
         </div>
       </div>
     )
@@ -40,45 +41,36 @@ export function PluginWorkspaceView({
 
   return (
     <div className="flex h-full flex-col bg-background">
-      <div className="border-b border-border bg-muted/20">
+      <div className="border-b border-border/80 bg-background/90 backdrop-blur-sm">
         <div className="flex flex-wrap items-center gap-2 border-b border-border/70 px-6 py-3 text-sm text-muted-foreground">
-          <button
-            className="inline-flex items-center gap-2 rounded-md px-2 py-1 transition-colors hover:bg-muted hover:text-foreground"
-            onClick={onClose}
-          >
-            <ArrowLeft size={15} />
+          <Button variant="ghost" className="gap-2 px-2" onClick={onClose}>
+            <ArrowLeft className="h-4 w-4" />
             <span>插件列表</span>
-          </button>
-          <ChevronRight size={14} />
+          </Button>
+          <ChevronRight className="h-4 w-4" />
           <span>{plugin.name}</span>
-          <ChevronRight size={14} />
+          <ChevronRight className="h-4 w-4" />
           <span>{showSettings ? '设置页' : '工作台'}</span>
         </div>
 
         <div className="flex flex-wrap items-start justify-between gap-4 px-6 py-5">
           <div className="flex items-start gap-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-border bg-background text-2xl shadow-sm">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/[0.08] text-2xl text-primary shadow-[var(--shadow-sm)]">
               {plugin.icon}
             </div>
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">
-                <h1 className="m-0 text-xl font-semibold text-foreground">{plugin.name}</h1>
-                <span className="rounded-full border border-border bg-background px-2.5 py-0.5 text-xs text-muted-foreground">
-                  v{plugin.version}
-                </span>
-                <span className="rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-xs font-medium text-emerald-700">
-                  插件工作台
-                </span>
+                <h1 className="text-xl font-semibold text-foreground">{plugin.name}</h1>
+                <Badge variant="outline">v{plugin.version}</Badge>
+                <Badge variant="outline" className="bg-[rgb(var(--accent-green-rgb)_/_0.08)] text-[var(--accent-green-dark-hex)]">
+                  workspace
+                </Badge>
               </div>
-              <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground">
-                {plugin.description}
-              </p>
+              <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground">{plugin.description}</p>
               <div className="mt-3 flex flex-wrap gap-2 text-xs text-muted-foreground">
-                <span className="rounded-md bg-background px-2 py-1">ID: {plugin.id}</span>
-                <span className="rounded-md bg-background px-2 py-1">作者: {plugin.author}</span>
-                <span className="rounded-md bg-background px-2 py-1">
-                  权限: {plugin.permissions.length}
-                </span>
+                <span className="rounded-md bg-secondary px-2 py-1">ID: {plugin.id}</span>
+                <span className="rounded-md bg-secondary px-2 py-1">作者: {plugin.author}</span>
+                <span className="rounded-md bg-secondary px-2 py-1">权限: {plugin.permissions.length}</span>
               </div>
             </div>
           </div>
@@ -109,7 +101,7 @@ export function PluginWorkspaceView({
                 }}
                 className="gap-2"
               >
-                <Workflow size={16} />
+                <Workflow className="h-4 w-4" />
                 <span>插件页</span>
               </TabsTrigger>
               <TabsTrigger
@@ -122,7 +114,7 @@ export function PluginWorkspaceView({
                 }}
                 className="gap-2"
               >
-                <PanelTop size={16} />
+                <PanelTop className="h-4 w-4" />
                 <span>设置页</span>
               </TabsTrigger>
             </TabsList>

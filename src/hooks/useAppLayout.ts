@@ -3,18 +3,30 @@ import type { SidebarView } from '../types/common/layout'
 import { LOCAL_STORAGE_KEYS, UI_SIZES } from '../constants'
 
 const STORAGE_KEY = LOCAL_STORAGE_KEYS.LAYOUT_PREFERENCES
+const VALID_SIDEBAR_VIEWS: SidebarView[] = ['explorer', 'search', 'outline', 'extensions']
 
 interface LayoutPrefs {
   sidebarCollapsed: boolean
-  editorWidthRatio: number // 0-1，编辑器占可用宽度的比例
+  editorWidthRatio: number
   sidebarView: SidebarView
 }
 
 function loadPrefs(): LayoutPrefs {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
-    if (raw) return JSON.parse(raw) as LayoutPrefs
-  } catch { /* ignore */ }
+    if (raw) {
+      const parsed = JSON.parse(raw) as LayoutPrefs
+      return {
+        ...parsed,
+        sidebarView: VALID_SIDEBAR_VIEWS.includes(parsed.sidebarView)
+          ? parsed.sidebarView
+          : 'explorer',
+      }
+    }
+  } catch {
+    // ignore invalid persisted data
+  }
+
   return {
     sidebarCollapsed: false,
     editorWidthRatio: 0.6,
@@ -25,7 +37,9 @@ function loadPrefs(): LayoutPrefs {
 function savePrefs(prefs: LayoutPrefs): void {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(prefs))
-  } catch { /* ignore */ }
+  } catch {
+    // ignore storage failures
+  }
 }
 
 interface AppLayoutState {
@@ -48,23 +62,23 @@ export function useAppLayout(): AppLayoutState {
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [editorWidth, setEditorWidthState] = useState(0)
 
-  // ActivityBar(48px) + SidebarPanel(0|240px)
-  const sidebarWidth = UI_SIZES.ACTIVITY_BAR_WIDTH + (prefs.sidebarCollapsed ? 0 : UI_SIZES.SIDEBAR_WIDTH)
+  const sidebarWidth =
+    UI_SIZES.ACTIVITY_BAR_WIDTH + (prefs.sidebarCollapsed ? 0 : UI_SIZES.SIDEBAR_WIDTH)
 
-  // 根据比例计算实际宽度
   useEffect(() => {
     const calculate = () => {
       const available = window.innerWidth - sidebarWidth
       return available * prefs.editorWidthRatio
     }
+
     setEditorWidthState(calculate())
 
     const handleResize = () => setEditorWidthState(calculate())
     window.addEventListener('resize', handleResize)
+
     return () => window.removeEventListener('resize', handleResize)
   }, [prefs.sidebarCollapsed, prefs.editorWidthRatio, sidebarWidth])
 
-  // 持久化偏好
   useEffect(() => {
     savePrefs(prefs)
   }, [prefs])
@@ -85,14 +99,17 @@ export function useAppLayout(): AppLayoutState {
     setIsFullscreen(v => !v)
   }, [])
 
-  const setEditorWidth = useCallback((width: number) => {
-    setEditorWidthState(width)
-    const available = window.innerWidth - sidebarWidth
-    if (available > 0) {
-      const ratio = Math.max(0.2, Math.min(0.9, width / available))
-      setPrefs(prev => ({ ...prev, editorWidthRatio: ratio }))
-    }
-  }, [sidebarWidth])
+  const setEditorWidth = useCallback(
+    (width: number) => {
+      setEditorWidthState(width)
+      const available = window.innerWidth - sidebarWidth
+      if (available > 0) {
+        const ratio = Math.max(0.2, Math.min(0.9, width / available))
+        setPrefs(prev => ({ ...prev, editorWidthRatio: ratio }))
+      }
+    },
+    [sidebarWidth]
+  )
 
   const availableWidth = window.innerWidth - sidebarWidth
 

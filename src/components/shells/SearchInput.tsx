@@ -8,19 +8,17 @@ interface SearchInputProps {
   onChange: (value: string) => void
   placeholder?: string
   className?: string
+  autoFocus?: boolean
+  onKeyDown?: React.KeyboardEventHandler<HTMLInputElement>
 }
 
-/**
- * SearchInput - 搜索输入框壳组件
- * 
- * 带搜索图标和清除按钮的输入框，用于各种搜索场景。
- * 基于 Shadcn UI Input 和 Button 组合而成，无业务逻辑。
- */
 export function SearchInput({
   value,
   onChange,
   placeholder = '搜索...',
   className,
+  autoFocus,
+  onKeyDown,
 }: SearchInputProps) {
   return (
     <div className={cn('relative', className)}>
@@ -31,6 +29,8 @@ export function SearchInput({
         onChange={e => onChange(e.target.value)}
         placeholder={placeholder}
         className="pl-9 pr-9"
+        autoFocus={autoFocus}
+        onKeyDown={onKeyDown}
       />
       {value && (
         <Button
