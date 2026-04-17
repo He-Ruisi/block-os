@@ -2,8 +2,12 @@
    Shadcn UI Theme - BlockOS Custom Colors
    ============================================================
    
-   这个文件专门存放 Shadcn UI 的全局颜色配置
-   与 Tailwind CSS 配合使用，通过 CSS 变量定义主题色
+   这个文件是 BlockOS 的主要颜色系统
+   包含：
+   1. Shadcn UI 默认颜色（HSL 格式）
+   2. BlockOS 自定义强调色（HSL、RGB、HEX 三种格式）
+   3. 通用设计变量（圆角、阴影、间距等）
+   4. 暗色模式支持
    ============================================================ */
 
 @layer base {
@@ -61,6 +65,29 @@
     --accent-red: 356 63% 52%;
     --accent-red-rgb: 217 50 61;
     --accent-red-hex: #D9323D;
+    
+    /* ========== 通用设计变量 ========== */
+    
+    /* 圆角 */
+    --border-radius: 6px;
+    --border-radius-sm: 4px;
+    --border-radius-md: 6px;
+    --border-radius-lg: 8px;
+    --border-radius-xl: 12px;
+    
+    /* 阴影 */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+    --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.08);
+    --shadow-panel: 0 4px 16px rgba(0, 0, 0, 0.12);
+    
+    /* 间距 */
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 12px;
+    --spacing-lg: 16px;
+    --spacing-xl: 24px;
   }
 
   .dark {
@@ -115,6 +142,29 @@
     --accent-red: 356 63% 52%;
     --accent-red-rgb: 217 50 61;
     --accent-red-hex: #D9323D;
+    
+    /* ========== 通用设计变量（暗色模式保持不变）========== */
+    
+    /* 圆角 */
+    --border-radius: 6px;
+    --border-radius-sm: 4px;
+    --border-radius-md: 6px;
+    --border-radius-lg: 8px;
+    --border-radius-xl: 12px;
+    
+    /* 阴影（暗色模式下稍微调整） */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.4);
+    --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.25);
+    --shadow-panel: 0 4px 16px rgba(0, 0, 0, 0.35);
+    
+    /* 间距 */
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 12px;
+    --spacing-lg: 16px;
+    --spacing-xl: 24px;
   }
 }
 

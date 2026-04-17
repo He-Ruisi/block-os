@@ -2,11 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Import BlockOS Design Tokens */
-@import './styles/global/design-tokens.css';
-
-/* Import Shadcn UI Theme */
+/* Import Shadcn UI Theme (主要颜色系统) */
 @import './styles/shadcn-theme.css';
+
+/* Import BlockOS Design Tokens (编辑器和主题特定样式) */
+@import './styles/global/design-tokens.css';
 
 @layer base {
   * {

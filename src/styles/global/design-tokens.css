@@ -1,42 +1,21 @@
 ﻿/* ============================================================
-   BlockOS Design Tokens
+   BlockOS Design Tokens - 编辑器和主题特定样式
+   ============================================================
+   
+   注意：全局颜色系统使用 shadcn-theme.css
+   本文件专注于：
+   1. 编辑器特定的样式变量
+   2. Newsprint 主题样式
+   3. 编辑器组件样式（工具栏、代码块等）
    ============================================================ */
 
 /* Newsprint 字体（仅在 newsprint 主题激活时加载） */
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400&family=Lora:ital,wght@0,400;0,600;1,400&display=swap');
 
 :root {
-  /* 背景 */
-  --color-bg-primary: #ffffff;
-  --color-bg-secondary: #f8f9fa;
-  --color-bg-tertiary: #f1f3f5;
-  --color-bg-hover: #f0f0f0;
-  --color-bg-active: #e8e8e8;
-
-  /* 边框 */
-  --color-border-primary: #e1e4e8;
-  --color-border-secondary: #d1d5da;
-  --color-border-focus: #7F77DD;
-
-  /* 文字 */
-  --color-text-primary: #1a1a1a;
-  --color-text-secondary: #4a4a4a;
-  --color-text-tertiary: #6a737d;
-  --color-text-muted: #9ca3af;
-
-  /* 品牌色 */
-  --color-purple: #7F77DD;
-  --color-purple-light: #EEEDFE;
-  --color-purple-hover: #6e65d0;
-
-  /* 功能色 */
-  --color-accent-gold: #d4a053;
-  --color-accent-gold-light: #fff9e6;
-  --color-accent-green: #35AB67; /* V0: 主绿色 */
-  --color-accent-green-dark: #00362F; /* V0: 深绿色 */
-  --color-accent-red: #D9323D; /* V0: 强调红色 */
-
-  /* 编辑器 */
+  /* ========== 编辑器专用变量 ========== */
+  
+  /* 编辑器字体 */
   --editor-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
   --editor-font-serif: Georgia, 'Times New Roman', serif;
   --editor-font-mono: 'SF Mono', 'Monaco', 'Menlo', 'Consolas', monospace;
@@ -54,32 +33,6 @@
   --toolbar-height: 44px;
   --toolbar-btn-size: 32px;
   --toolbar-btn-radius: 6px;
-
-  /* 圆角 */
-  --border-radius: 6px;
-  --border-radius-sm: 4px; /* V0: 小圆角 */
-  --border-radius-md: 6px; /* V0: 中圆角 */
-  --border-radius-lg: 8px;
-  --border-radius-xl: 12px; /* V0: 大圆角 */
-
-  /* 阴影 */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
-  --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.08); /* V0: 卡片阴影 */
-  --shadow-panel: 0 4px 16px rgba(0, 0, 0, 0.12); /* V0: 面板阴影 */
-
-  /* 间距 */
-  --spacing-xs: 4px;
-  --spacing-sm: 8px;
-  --spacing-md: 12px;
-  --spacing-lg: 16px;
-  --spacing-xl: 24px;
-
-  /* 交互状态 */
-  --color-hover: rgba(0, 0, 0, 0.04);
-  --color-active: rgba(0, 0, 0, 0.08);
-  --color-focus-ring: rgba(127, 119, 221, 0.3); /* 基于 --color-purple */
 }
 
 /* ============================================================
