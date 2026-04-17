@@ -51,12 +51,14 @@ tags: [bug-fix, debugging, troubleshooting]
 - 保持一致性：遵循项目的代码风格
 - 考虑边界情况：确保修复不引入新问题
 - 添加防御性代码：避免类似问题再次发生
+- **使用 Shadcn UI 组件**：如果修复涉及 UI 组件，必须使用 Shadcn UI 组件替代原生 HTML 元素
 
 **修复步骤**：
 1. 实施代码修改
-2. 运行类型检查：`bun run type-check`
-3. 测试修复效果
-4. 验证没有引入新问题
+2. 如果涉及 UI 组件，确保使用 Shadcn UI 组件（参考 `.kiro/steering/shadcn-ui-refactor.md`）
+3. 运行类型检查：`bun run type-check`
+4. 测试修复效果
+5. 验证没有引入新问题
 
 ### 4. 记录到 bugs.md 📝
 

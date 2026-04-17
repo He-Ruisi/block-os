@@ -1,5 +1,46 @@
 # BlockOS 更新日志
 
+## [v1.31.0] - 2026-04-16 🎨 ExplorerView 组件 Shadcn UI 重构完成
+
+**重要里程碑**：完成 ExplorerView 组件的 Shadcn UI 重构，所有对话框和菜单使用 Shadcn UI 组件，代码更加规范和易于维护。
+
+### ExplorerView 组件重构
+- **Button 组件**：替代所有原生 button 元素
+  - 使用 `variant="ghost"` 和 `size="icon"` 实现图标按钮
+  - 使用 `variant="outline"` 实现次要按钮
+  - 使用 `cn()` 工具函数动态组合类名
+
+- **Dialog 组件**：替代自定义对话框
+  - 新建项目对话框使用 Dialog + DialogContent + DialogHeader + DialogFooter
+  - 移动文档对话框使用相同结构
+  - 使用 `open` 和 `onOpenChange` 控制显示状态
+
+- **DropdownMenu 组件**：替代自定义文档操作菜单
+  - 使用 DropdownMenuTrigger + DropdownMenuContent + DropdownMenuItem
+  - 使用 DropdownMenuSeparator 分隔危险操作
+  - 使用 `className="text-destructive"` 标记删除操作
+
+- **Input 组件**：替代原生 input 元素
+  - 用于项目/文档重命名
+  - 用于新建项目表单
+
+- **Textarea 组件**：替代原生 textarea 元素
+  - 用于项目描述输入
+
+- **ScrollArea 组件**：优化滚动体验
+  - 包裹项目列表
+  - 包裹移动文档对话框中的项目选择列表
+
+### 技术亮点
+- ✅ 所有 Shadcn UI 组件均从 `../ui/` 导入
+- ✅ 使用 `cn()` 工具函数（来自 `../../lib/utils`）动态组合类名
+- ✅ 保持所有现有功能：项目管理、文档管理、置顶、重命名、删除、移动等
+- ✅ TypeScript 类型安全，无类型错误
+- ✅ 使用 Tailwind CSS 语义化颜色变量
+- ✅ 使用 `group` 和 `group-hover:` 实现悬停效果
+
+---
+
 ## [v1.30.0] - 2026-04-16 🎨 Editor 组件拆分与 Shadcn UI 重构完成
 
 **重要里程碑**：完成 Editor 和 Sidebar 组件的 Shadcn UI 重构，组件结构更清晰，代码可维护性大幅提升。

@@ -19,14 +19,16 @@ App.tsx     ← 组装层
 src/
 ├── types/          # 类型定义（block, document, project, chat）
 ├── utils/          # 纯工具函数（uuid, markdown, date）
+├── lib/            # 工具库（cn() 函数等）
 ├── storage/        # IndexedDB Store（blockStore, documentStore, projectStore, sessionStore）
 ├── services/       # 业务逻辑（aiService, exportService, blockCaptureService, sessionService）
 ├── editor/         # TipTap 扩展（blockLink, blockReference, sourceBlock, suggestion）
 ├── hooks/          # React Hooks（useAppLayout, useTabs, useSession, useBlockSearch, useAuth）
 ├── components/
+│   ├── ui/         # Shadcn UI 组件（button, input, dialog, dropdown-menu 等）
 │   ├── layout/     # 布局组件（Sidebar, TabBar, ResizeHandle, ActivityBar）
-│   ├── editor/     # 编辑器组件（Editor, SuggestionMenu）
-│   ├── panel/      # 右侧面板（RightPanel, BlockSpacePanel, PreviewPanel, DocumentBlocksPanel, SessionHistoryPanel）
+│   ├── editor/     # 编辑器组件（Editor, EditorBubbleMenu, EditorToolbar 等）
+│   ├── panel/      # 右侧面板（RightPanel, BlockSpacePanel, PreviewPanel 等）
 │   ├── auth/       # 认证页面
 │   └── shared/     # 通用组件（Toast）
 └── App.tsx         # 主应用入口
@@ -36,8 +38,9 @@ src/
 - 组件: PascalCase (`Editor.tsx`)
 - 工具/服务: camelCase (`aiService.ts`)
 - 类型文件: camelCase (`block.ts`)
-- CSS: 与组件同名 (`Editor.css`)
+- ~~CSS: 与组件同名 (`Editor.css`)~~ **已废弃，使用 Tailwind CSS**
 - Hooks: `use` 前缀 (`useAppLayout.ts`)
+- Shadcn UI 组件: kebab-case (`button.tsx`, `dropdown-menu.tsx`)
 
 ## 文档结构
 ```
