@@ -41,11 +41,11 @@
   - [x] PreviewPanel 和 SessionHistoryPanel 做 Container/View 拆分
   - [x] 更新所有 import 路径
   - [x] TypeScript 类型检查通过
-- [ ] Phase 3: 设置功能域（1 个组件）
-  - [ ] 迁移 SettingsPanel → features/settings/
-  - [ ] Container/View 拆分
-  - [ ] 更新所有 import 路径
-  - [ ] TypeScript 类型检查通过
+- [x] Phase 3: 设置功能域（1 个组件）- ✅ 完成（2026-04-17 23:45）
+  - [x] 迁移 SettingsPanel → features/settings/
+  - [x] Container/View 拆分
+  - [x] 更新所有 import 路径
+  - [x] TypeScript 类型检查通过
 - [ ] Phase 4: 项目管理 + 重命名容器（2 个组件）
   - [ ] 迁移 ProjectOverview → features/projects/
   - [ ] 重命名 RightPanel.tsx → panels/RightPanelShell.tsx

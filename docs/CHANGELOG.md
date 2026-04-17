@@ -1,5 +1,42 @@
 # BlockOS 更新日志
 
+## [v1.41.0] - 2026-04-17 🏗️ Components 架构重构 Phase 3 完成
+
+**重要里程碑**：完成设置功能域迁移，SettingsPanel 成功迁移到 `features/settings/`，严格遵循 Container-View 模式。
+
+### Phase 3: 设置功能域迁移 ✅
+
+**迁移组件**（1 个）：
+- SettingsPanel → `features/settings/components/SettingsPanel/`（Container/View 拆分）
+
+**架构改进**：
+- ✅ 按功能域聚合（settings 功能域）
+- ✅ 严格遵循 Container-View 模式（7 个文件）
+- ✅ View 拆分为主 View + 2 个子 View（AccountTabView、SyncTabView）
+- ✅ 使用 mappers 进行数据转换（formatLastSyncTime、toSyncStateViewModel）
+- ✅ Container 通过 useAutoSync hook 访问同步状态
+
+**文件变更**：
+- 新增：`src/features/settings/` 目录（7 个文件）
+- 删除：`src/components/panel/SettingsPanel.tsx`
+- 更新：`App.tsx` 的 import 路径
+
+**验证结果**：
+- ✅ TypeScript 类型检查通过
+- ✅ 所有功能保持正常工作
+- ✅ 架构边界清晰
+
+**累计完成**：
+- Phase 1: 左侧边栏功能域（6 个组件）✅
+- Phase 2: 右侧边栏功能域（4 个组件）✅
+- Phase 3: 设置功能域（1 个组件）✅
+- **总计**：11 个组件，52+ 个新文件
+
+**下一步**：
+- Phase 4: 项目管理功能域迁移 + 重命名容器（2 个组件）
+
+---
+
 ## [v1.40.0] - 2026-04-17 🏗️ Components 架构重构 Phase 2 完成
 
 **重要里程碑**：完成右侧边栏功能域迁移，4 个组件成功迁移到 `features/right-sidebar/`，严格遵循 Container-View 模式。

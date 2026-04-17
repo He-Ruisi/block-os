@@ -137,13 +137,26 @@ src/
 |--------|--------|------|----------------|
 | `panel/SettingsPanel.tsx` | `features/settings/` | 设置功能域 | ✅ 必须 |
 
-**预计时间**: <!-- 填写预计时间 -->
+**预计时间**: 已完成 (2026-04-17)
 
 **验收标准**:
-- [ ] 组件迁移完成
-- [ ] TypeScript 类型检查通过
-- [ ] 所有功能正常工作
-- [ ] 更新所有 import 路径
+- [x] 组件迁移完成
+- [x] TypeScript 类型检查通过
+- [x] 所有功能正常工作
+- [x] 更新所有 import 路径
+
+**迁移详情**:
+- ✅ 创建 `features/settings/components/SettingsPanel/` 目录
+- ✅ Container/View 拆分完成：
+  - `SettingsPanelContainer.tsx` - 逻辑层（hooks、事件处理）
+  - `SettingsPanelView.tsx` - 主展示层
+  - `AccountTabView.tsx` - 账号标签页
+  - `SyncTabView.tsx` - 同步标签页
+  - `types.ts` - ViewModel 类型定义
+  - `mappers.ts` - 数据转换层
+- ✅ 更新 `App.tsx` import 路径
+- ✅ 删除原文件 `components/panel/SettingsPanel.tsx`
+- ✅ TypeScript 类型检查通过
 
 ### Phase 4: 项目管理 + 重命名容器（2 个组件）
 
