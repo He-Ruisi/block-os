@@ -293,6 +293,12 @@
 - [x] **步骤 6**: 按功能域重组 `components/`（layout/editor/panel/shared）
 - [x] **步骤 7**: 提取 `hooks/`（useAppLayout, useTabs, useBlockSearch）
 - [x] **步骤 8**: 精简 `App.tsx` 为布局壳
+- [x] **步骤 9**: Container/View 模式重构（2026-04-17）
+  - [x] 创建 Container/View 拆分模式 Skill
+  - [x] 重构 DocumentBlocksPanel（试点）
+  - [ ] 重构 BlockDetailPanel
+  - [ ] 重构 BlockSpacePanel
+  - [ ] 重构 BlockDerivativeSelector
 
 ### 项目架构优化 🔧（已完成）
 - [x] 设计新的文档组织结构 - [详细方案](./spec/2026-04-09-project-structure-improvement.md)

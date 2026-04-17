@@ -42,34 +42,115 @@ components/
 - **必须**从 `@/components/ui/` 导入基础组件
 - **优先**使用 `@/components/shells/` 中的壳组件（如果适用）
 
-### 3. Shell 组件（项目级展示壳组件）
+### 3. Shell 组件清单（项目级展示壳组件）
+
+**重要规则**：
+- ✅ **优先使用** Shell 组件（如果适用）
+- ❌ **禁止在 View 内部临时实现** shell 级组件
+- ✅ **如果需要新的 Shell 组件**，必须先在 `components/shells/` 中实现，再使用
+
+#### 当前可用 Shell 组件（5 个）
+
 ```typescript
-// 面板相关
+// 1. PanelShell - 面板容器
 import { PanelShell } from '@/components/shells/PanelShell'
+// 用途：右侧面板的统一容器
+// API: { children, className? }
+
+// 2. PanelHeader - 面板头部
 import { PanelHeader } from '@/components/shells/PanelHeader'
+// 用途：面板标题栏（标题 + 关闭按钮 + 操作按钮）
+// API: { title, onClose?, actions?, className? }
 
-// 搜索和输入
+// 3. SearchInput - 搜索输入框
 import { SearchInput } from '@/components/shells/SearchInput'
+// 用途：带搜索图标和清除按钮的输入框
+// API: { value, onChange: (value: string) => void, placeholder?, className? }
+// 注意：onChange 传 string，不传 Event
 
-// 卡片和列表
+// 4. BlockCardShell - Block 卡片
 import { BlockCardShell } from '@/components/shells/BlockCardShell'
+// 用途：Block 卡片容器（标题 + 标签 + 内容）
+// API: { title?, tags?, children, onClick?, onDragStart?, isActive?, draggable?, className? }
 
-// 空状态
+// 5. EmptyState - 空状态占位
 import { EmptyState } from '@/components/shells/EmptyState'
+// 用途：空状态占位（图标 + 标题 + 描述 + 操作按钮）
+// API: { icon?: LucideIcon, title, description?, action?, className? }
 ```
 
-**使用场景**：
-- **PanelShell** - 右侧面板的统一容器
-- **PanelHeader** - 面板头部（标题 + 关闭按钮 + 操作按钮）
-- **SearchInput** - 带搜索图标和清除按钮的输入框
-- **BlockCardShell** - Block 卡片容器（标题 + 标签 + 内容）
-- **EmptyState** - 空状态占位（图标 + 标题 + 描述 + 操作按钮）
+#### Shell 组件完整 API 文档
 
-**优势**：
-- ✅ 减少重复的 className
-- ✅ 统一的视觉风格
-- ✅ 无业务逻辑，易于复用
-- ✅ 基于 Shadcn UI 组合而成
+详见：`src/components/shells/API.md`
+
+#### Shell 组件使用示例
+
+```tsx
+import { PanelShell, PanelHeader, SearchInput, BlockCardShell, EmptyState } from '@/components/shells';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Inbox } from 'lucide-react';
+
+function MyPanel() {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [blocks, setBlocks] = useState([]);
+
+  return (
+    <PanelShell>
+      {/* 头部 */}
+      <PanelHeader
+        title="Block 空间"
+        onClose={() => setShowPanel(false)}
+      />
+
+      {/* 搜索栏 */}
+      <div className="p-4 border-b">
+        <SearchInput
+          value={searchQuery}
+          onChange={setSearchQuery}  // 直接传函数，不处理 Event
+          placeholder="搜索 Block..."
+        />
+      </div>
+
+      {/* 内容区域 */}
+      <ScrollArea className="flex-1">
+        {blocks.length === 0 ? (
+          <EmptyState
+            icon={Inbox}
+            title="还没有 Block"
+            description="创建你的第一个 Block 开始使用"
+          />
+        ) : (
+          <div className="p-4 space-y-2">
+            {blocks.map(block => (
+              <BlockCardShell
+                key={block.id}
+                title={block.title}
+                tags={block.tags}
+                onClick={() => handleBlockClick(block.id)}
+                isActive={selectedBlockId === block.id}
+              >
+                <p className="text-sm text-muted-foreground">{block.content}</p>
+              </BlockCardShell>
+            ))}
+          </div>
+        )}
+      </ScrollArea>
+    </PanelShell>
+  );
+}
+```
+
+#### 如何添加新 Shell 组件
+
+如果发现重复的 UI 模式，按以下步骤添加：
+
+1. **在 `components/shells/` 中创建组件文件**
+2. **定义 TypeScript 接口**（导出 Props 类型）
+3. **实现组件**（基于 Shadcn UI，无业务逻辑）
+4. **回调统一传值**（传 string/boolean/id，不传 Event）
+5. **添加到 `index.ts`** 导出
+6. **更新 `API.md`** 文档
+7. **更新本清单**
 
 ### 4. 已安装的 Shadcn UI 组件
 ```typescript

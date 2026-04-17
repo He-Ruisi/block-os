@@ -1,5 +1,47 @@
 # BlockOS 更新日志
 
+## [v1.34.0] - 2026-04-17 🏗️ Container/View 模式重构 - 架构优化里程碑
+
+**重要里程碑**：建立了 Container/View 拆分模式，实现逻辑与 UI 分离，完成 DocumentBlocksPanel 试点重构。
+
+### Container/View 拆分模式
+- **核心原则**：
+  - Container 负责：hooks、store、service、数据转换、事件处理
+  - View 负责：纯渲染、Shadcn UI、Tailwind CSS、无状态
+- **文件组织**：feature 内部拆分（不创建全局 containers/ 目录）
+- **ViewModel 模式**：隐藏 store 内部类型，只暴露展示需要的字段
+
+### DocumentBlocksPanel 重构（试点）
+```
+DocumentBlocksPanel/
+├── DocumentBlocksPanelContainer.tsx  # 逻辑层
+├── DocumentBlocksPanelView.tsx       # 主展示层
+├── BlockListView.tsx                 # 列表展示
+├── BlockItemView.tsx                 # 单项展示
+├── types.ts                          # ViewModel 类型
+└── index.ts                          # 导出
+```
+
+### 技术亮点
+- ✅ 逻辑与 UI 完全分离，提升可维护性和可测试性
+- ✅ ViewModel 模式隐藏内部类型，预计算派生数据
+- ✅ 组件拆分粒度合理（主 View → 列表 View → 单项 View）
+- ✅ 保持向后兼容（导出路径和组件名不变）
+- ✅ TypeScript 类型检查通过
+
+### Skill 文档
+- **container-view-pattern.md** - 完整的拆分指南
+  - 代码模板（Container、View、子 View、ViewModel）
+  - 拆分步骤和注意事项
+  - 测试策略和迁移优先级
+
+### 下一步计划
+- BlockDetailPanel - 详情展示，逻辑较多
+- BlockSpacePanel - 全局 Block 管理
+- BlockDerivativeSelector - 派生选择器
+
+---
+
 ## [v1.33.0] - 2026-04-16 🏗️ 三层组件架构建立 - Shell 组件层创建
 
 **重要里程碑**：建立了完整的三层组件架构，创建了 Shell 组件层，填补了 Shadcn UI 基础组件和业务组件之间的空白。
