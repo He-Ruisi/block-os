@@ -32,7 +32,8 @@ function App() {
   const [editor, setEditor] = useState<TiptapEditor | null>(null)
   const editorRef = useRef<TiptapEditor | null>(null)
   const [selectedText, setSelectedText] = useState('')
-  const [theme, setTheme] = useState<string>(() => localStorage.getItem(LOCAL_STORAGE_KEYS.THEME) || 'default')
+  // 主题功能已禁用，始终使用默认主题
+  // const [theme] = useState<string>('default')
   const [showSettings, setShowSettings] = useState(false)
   const [showProjectOverview, setShowProjectOverview] = useState(false)
   const [storageReady, setStorageReady] = useState(false)
@@ -54,13 +55,10 @@ function App() {
   
   const viewport = useViewport()
 
-  const toggleTheme = useCallback(() => {
-    setTheme(prev => {
-      const next = prev === 'default' ? 'newsprint' : 'default'
-      localStorage.setItem(LOCAL_STORAGE_KEYS.THEME, next)
-      return next
-    })
-  }, [])
+  // 主题切换功能已禁用
+  // const toggleTheme = useCallback(() => {
+  //   // 不执行任何操作
+  // }, [])
 
   const auth = useAuth()
 
@@ -390,7 +388,7 @@ function App() {
   }
 
   return (
-    <div className={`app ${isFullscreen ? 'app--fullscreen' : ''} ${theme === 'newsprint' ? 'theme-newsprint' : ''} ${viewMode === 'ai-focus' ? 'app--ai-focus' : ''}`}>
+    <div className={`app ${isFullscreen ? 'app--fullscreen' : ''} ${viewMode === 'ai-focus' ? 'app--ai-focus' : ''}`}>
       {/* AI 沉浸式模式 */}
       {viewMode === 'ai-focus' && (
         <RightPanel
@@ -415,8 +413,6 @@ function App() {
                 username={auth.user?.username}
                 onSignOut={auth.signOut}
                 onOpenSettings={() => setShowSettings(true)}
-                theme={theme}
-                onToggleTheme={toggleTheme}
               />
               <Sidebar
                 activeView={sidebarView}

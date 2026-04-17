@@ -1,4 +1,4 @@
-import { Folder, Search, List, Puzzle, Newspaper, Palette, User, LogOut, Star } from 'lucide-react'
+import { Folder, Search, List, Puzzle, User, LogOut, Star } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import type { SidebarView } from '../../types/common/layout'
 
@@ -9,8 +9,6 @@ interface ActivityBarProps {
   username?: string
   onSignOut?: () => void
   onOpenSettings?: () => void
-  theme?: string
-  onToggleTheme?: () => void
 }
 
 const VIEWS: { view: SidebarView; Icon: LucideIcon; title: string }[] = [
@@ -28,8 +26,6 @@ export function ActivityBar({
   username,
   onSignOut,
   onOpenSettings,
-  theme,
-  onToggleTheme,
 }: ActivityBarProps) {
   return (
     <div className="flex h-screen w-12 flex-shrink-0 flex-col border-r border-border bg-secondary">
@@ -53,15 +49,6 @@ export function ActivityBar({
 
       {/* Bottom icons */}
       <div className="mt-auto flex flex-col items-center gap-1 border-t border-border py-2">
-        {onToggleTheme && (
-          <div
-            className="flex h-12 w-12 cursor-pointer items-center justify-center text-muted-foreground transition-colors hover:text-foreground"
-            onClick={onToggleTheme}
-            title={theme === 'newsprint' ? 'Newsprint' : '默认主题'}
-          >
-            {theme === 'newsprint' ? <Newspaper size={20} /> : <Palette size={20} />}
-          </div>
-        )}
         {username && (
           <>
             <div 
