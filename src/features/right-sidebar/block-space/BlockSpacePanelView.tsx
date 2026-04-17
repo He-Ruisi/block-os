@@ -1,5 +1,5 @@
 import { Filter, Sparkles } from 'lucide-react'
-import { BlockDetailPanel } from '../BlockDetailPanel'
+import { BlockDetailPanel } from '@/features/blocks/components/BlockDetailPanel'
 import { BlockListView } from './BlockListView'
 import { EmptyState, PanelHeader, PanelShell, SearchInput } from '@/components/shells'
 import { Button } from '@/components/ui/button'

@@ -1,8 +1,8 @@
 // Blocks Feature - Components
-export { BlockSpacePanel } from './components/BlockSpacePanel';
+export { BlockSpacePanel } from '../right-sidebar/block-space';
 export { BlockDetailPanel } from './components/BlockDetailPanel';
 export { BlockDerivativeSelector } from './components/BlockDerivativeSelector';
-export { DocumentBlocksPanel } from './components/DocumentBlocksPanel';
+export { DocumentBlocksPanel } from '../right-sidebar/document-blocks';
 
 // Blocks Feature - Hooks
 export { useBlockSearch } from './hooks/useBlockSearch';

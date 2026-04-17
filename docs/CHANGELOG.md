@@ -1,5 +1,84 @@
 # BlockOS 更新日志
 
+## [v1.40.0] - 2026-04-17 🏗️ Components 架构重构 Phase 2 完成
+
+**重要里程碑**：完成右侧边栏功能域迁移，4 个组件成功迁移到 `features/right-sidebar/`，严格遵循 Container-View 模式。
+
+### Phase 2: 右侧边栏功能域迁移 ✅
+
+**迁移组件**（4 个）：
+- PreviewPanel → `features/right-sidebar/preview/`（Container/View 拆分）
+- SessionHistoryPanel → `features/right-sidebar/session-history/`（Container/View 拆分）
+- DocumentBlocksPanel → `features/right-sidebar/document-blocks/`（目录移动）
+- BlockSpacePanel → `features/right-sidebar/block-space/`（目录移动）
+
+**架构改进**：
+- ✅ 按功能域聚合（right-sidebar 功能域包含 4 个子功能）
+- ✅ 严格遵循 Container-View 模式（15+ 个新文件）
+- ✅ 创建 usePreview hook 封装预览逻辑
+- ✅ 创建统一的 right-sidebar feature 导出入口
+- ✅ 类型隔离：View 只知道 ViewModel，不知道领域模型
+
+**文件变更**：
+- 新增：`src/features/right-sidebar/` 目录（4 个子功能域，15+ 个文件）
+- 删除：`src/components/panel/` 中的 2 个 Panel 文件
+- 移动：`src/features/blocks/components/` 中的 2 个 Panel 目录
+- 更新：`RightPanel.tsx` 和 `blocks/index.ts` 的 import 路径
+
+**验证结果**：
+- ✅ TypeScript 类型检查通过
+- ✅ 所有功能保持正常工作
+- ✅ 架构边界清晰
+
+**累计完成**：
+- Phase 1: 左侧边栏功能域（6 个组件）✅
+- Phase 2: 右侧边栏功能域（4 个组件）✅
+- **总计**：10 个组件，45+ 个新文件
+
+**下一步**：
+- Phase 3: 设置功能域迁移（1 个组件）
+- Phase 4: 项目管理功能域迁移（2 个组件）
+
+---
+
+## [v1.39.0] - 2026-04-17 🏗️ Components 架构重构 Phase 1 完成
+
+**重要里程碑**：完成左侧边栏功能域迁移，6 个组件成功迁移到 `features/sidebar/`，严格遵循 Container-View 模式。
+
+### Phase 1: 左侧边栏功能域迁移 ✅
+
+**迁移组件**（6 个）：
+- ExplorerView → `features/sidebar/explorer/`
+- SearchView → `features/sidebar/search/`
+- OutlineView → `features/sidebar/outline/`
+- StarredView → `features/sidebar/starred/`
+- ExtensionsView → `features/sidebar/extensions/`
+- PluginWorkspaceView → `features/sidebar/plugin-workspace/`
+
+**架构改进**：
+- ✅ 按功能域聚合（sidebar 功能域包含 6 个子功能）
+- ✅ 严格遵循 Container-View 模式（30+ 个新文件）
+- ✅ 数据流向清晰：Storage → Hooks → Container → Mapper → View
+- ✅ 类型隔离：View 只知道 ViewModel，不知道领域模型
+- ✅ 职责分离：Container 负责逻辑，View 负责渲染
+
+**文件变更**：
+- 新增：`src/features/sidebar/` 目录（6 个子功能域，30+ 个文件）
+- 删除：`src/components/layout/` 中的 6 个 View 文件
+- 更新：`Sidebar.tsx` 和 `App.tsx` 的 import 路径
+
+**验证结果**：
+- ✅ TypeScript 类型检查通过
+- ✅ 所有功能保持正常工作
+- ✅ 架构边界清晰
+
+**下一步**：
+- Phase 2: 右侧边栏功能域迁移（4 个组件）
+- Phase 3: 设置功能域迁移（1 个组件）
+- Phase 4: 项目管理功能域迁移（2 个组件）
+
+---
+
 ## [v1.38.0] - 2026-04-17 🏗️ 架构重构完成 - 精简 Steering + 创建自动检测 Hook
 
 **重要里程碑**：完成架构重构，精简 steering 文件，创建自动检测 Hook，优化 token 消耗和维护成本。

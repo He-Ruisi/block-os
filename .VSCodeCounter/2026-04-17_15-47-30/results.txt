@@ -1,0 +1,378 @@
+Date : 2026-04-17 15:47:30
+Directory : e:\project_program\project_blockos\src
+Total : 252 files,  20762 codes, 1083 comments, 2995 blanks, all 24840 lines
+
+Languages
++----------------+------------+------------+------------+------------+------------+
+| language       | files      | code       | comment    | blank      | total      |
++----------------+------------+------------+------------+------------+------------+
+| TypeScript JSX |         97 |      9,950 |        179 |        898 |     11,027 |
+| TypeScript     |        141 |      6,746 |        607 |      1,224 |      8,577 |
+| CSS            |         11 |      3,175 |        297 |        625 |      4,097 |
+| Markdown       |          3 |        891 |          0 |        248 |      1,139 |
++----------------+------------+------------+------------+------------+------------+
+
+Directories
++--------------------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                                                                           | files      | code       | comment    | blank      | total      |
++--------------------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                                                                              |        252 |     20,762 |      1,083 |      2,995 |     24,840 |
+| . (Files)                                                                                                                      |          5 |        481 |         44 |         69 |        594 |
+| __tests__                                                                                                                      |          3 |        529 |         19 |        114 |        662 |
+| __tests__ (Files)                                                                                                              |          2 |        504 |         10 |        108 |        622 |
+| __tests__\unit                                                                                                                 |          1 |         25 |          9 |          6 |         40 |
+| __tests__\unit\utils                                                                                                           |          1 |         25 |          9 |          6 |         40 |
+| components                                                                                                                     |         33 |      3,850 |        110 |        466 |      4,426 |
+| components\layout                                                                                                              |          5 |        538 |         23 |         53 |        614 |
+| components\panel                                                                                                               |          4 |      1,260 |         29 |         86 |      1,375 |
+| components\project                                                                                                             |          1 |        189 |          8 |         23 |        220 |
+| components\shared                                                                                                              |          2 |        153 |         10 |         23 |        186 |
+| components\shells                                                                                                              |          8 |        805 |         40 |        172 |      1,017 |
+| components\ui                                                                                                                  |         13 |        905 |          0 |        109 |      1,014 |
+| constants                                                                                                                      |          5 |         83 |         18 |         19 |        120 |
+| features                                                                                                                       |        149 |      8,405 |        271 |        961 |      9,637 |
+| features\ai                                                                                                                    |         22 |      1,654 |         35 |        175 |      1,864 |
+| features\ai (Files)                                                                                                            |          1 |         11 |          3 |          3 |         17 |
+| features\ai\components                                                                                                         |         17 |      1,131 |          0 |         90 |      1,221 |
+| features\ai\components (Files)                                                                                                 |          7 |        337 |          0 |         35 |        372 |
+| features\ai\components\AIFloatPanel                                                                                            |          4 |        295 |          0 |         24 |        319 |
+| features\ai\components\AIImmersivePanel                                                                                        |          6 |        499 |          0 |         31 |        530 |
+| features\ai\hooks                                                                                                              |          2 |        178 |          3 |         27 |        208 |
+| features\ai\services                                                                                                           |          2 |        334 |         29 |         55 |        418 |
+| features\auth                                                                                                                  |          4 |        320 |         21 |         54 |        395 |
+| features\auth (Files)                                                                                                          |          1 |          3 |          3 |          3 |          9 |
+| features\auth\components                                                                                                       |          1 |        127 |          1 |         16 |        144 |
+| features\auth\hooks                                                                                                            |          1 |         98 |          8 |         11 |        117 |
+| features\auth\services                                                                                                         |          1 |         92 |          9 |         24 |        125 |
+| features\blocks                                                                                                                |         21 |      1,264 |         67 |        150 |      1,481 |
+| features\blocks (Files)                                                                                                        |          1 |          8 |          3 |          3 |         14 |
+| features\blocks\components                                                                                                     |         15 |        864 |         30 |         76 |        970 |
+| features\blocks\components\BlockDerivativeSelector                                                                             |          7 |        331 |         11 |         31 |        373 |
+| features\blocks\components\BlockDetailPanel                                                                                    |          8 |        533 |         19 |         45 |        597 |
+| features\blocks\hooks                                                                                                          |          2 |         51 |          2 |         13 |         66 |
+| features\blocks\services                                                                                                       |          3 |        341 |         32 |         58 |        431 |
+| features\editor                                                                                                                |         37 |      2,182 |         54 |        257 |      2,493 |
+| features\editor (Files)                                                                                                        |          1 |          4 |          2 |          2 |          8 |
+| features\editor\components                                                                                                     |         28 |      1,277 |          0 |        102 |      1,379 |
+| features\editor\components (Files)                                                                                             |          7 |         67 |          0 |         12 |         79 |
+| features\editor\components\Editor                                                                                              |          4 |        376 |          0 |          9 |        385 |
+| features\editor\components\EditorBreadcrumb                                                                                    |          1 |          6 |          0 |          1 |          7 |
+| features\editor\components\EditorBubbleMenu                                                                                    |          4 |        384 |          0 |         33 |        417 |
+| features\editor\components\EditorContentArea                                                                                   |          4 |        205 |          0 |         22 |        227 |
+| features\editor\components\EditorToolbar                                                                                       |          4 |        142 |          0 |         13 |        155 |
+| features\editor\components\SuggestionMenu                                                                                      |          4 |         97 |          0 |         12 |        109 |
+| features\editor\config                                                                                                         |          1 |         60 |         11 |          8 |         79 |
+| features\editor\extensions                                                                                                     |          6 |        512 |         20 |         83 |        615 |
+| features\editor\styles                                                                                                         |          1 |        329 |         21 |         62 |        412 |
+| features\right-sidebar                                                                                                         |         24 |      1,047 |         54 |        118 |      1,219 |
+| features\right-sidebar\block-space                                                                                             |          7 |        348 |         10 |         39 |        397 |
+| features\right-sidebar\document-blocks                                                                                         |          6 |        199 |          1 |         27 |        227 |
+| features\right-sidebar\preview                                                                                                 |          6 |        324 |         29 |         32 |        385 |
+| features\right-sidebar\preview (Files)                                                                                         |          5 |        271 |         21 |         22 |        314 |
+| features\right-sidebar\preview\hooks                                                                                           |          1 |         53 |          8 |         10 |         71 |
+| features\right-sidebar\session-history                                                                                         |          5 |        176 |         14 |         20 |        210 |
+| features\sidebar                                                                                                               |         41 |      1,938 |         40 |        207 |      2,185 |
+| features\sidebar\explorer                                                                                                      |          7 |        862 |          0 |         72 |        934 |
+| features\sidebar\explorer (Files)                                                                                              |          1 |          2 |          0 |          1 |          3 |
+| features\sidebar\explorer\components                                                                                           |          5 |        770 |          0 |         57 |        827 |
+| features\sidebar\explorer\hooks                                                                                                |          1 |         90 |          0 |         14 |        104 |
+| features\sidebar\extensions                                                                                                    |          7 |        184 |          7 |         22 |        213 |
+| features\sidebar\extensions (Files)                                                                                            |          1 |          2 |          0 |          1 |          3 |
+| features\sidebar\extensions\components                                                                                         |          5 |        160 |          6 |         15 |        181 |
+| features\sidebar\extensions\hooks                                                                                              |          1 |         22 |          1 |          6 |         29 |
+| features\sidebar\outline                                                                                                       |          7 |        187 |         11 |         29 |        227 |
+| features\sidebar\outline (Files)                                                                                               |          1 |          2 |          0 |          1 |          3 |
+| features\sidebar\outline\components                                                                                            |          5 |        117 |          7 |         15 |        139 |
+| features\sidebar\outline\hooks                                                                                                 |          1 |         68 |          4 |         13 |         85 |
+| features\sidebar\plugin-workspace                                                                                              |          6 |        198 |          4 |         20 |        222 |
+| features\sidebar\plugin-workspace (Files)                                                                                      |          1 |          2 |          0 |          1 |          3 |
+| features\sidebar\plugin-workspace\components                                                                                   |          5 |        196 |          4 |         19 |        219 |
+| features\sidebar\search                                                                                                        |          7 |        175 |          6 |         21 |        202 |
+| features\sidebar\search (Files)                                                                                                |          1 |          2 |          0 |          1 |          3 |
+| features\sidebar\search\components                                                                                             |          5 |        142 |          6 |         16 |        164 |
+| features\sidebar\search\hooks                                                                                                  |          1 |         31 |          0 |          4 |         35 |
+| features\sidebar\starred                                                                                                       |          7 |        332 |         12 |         43 |        387 |
+| features\sidebar\starred (Files)                                                                                               |          1 |          2 |          0 |          1 |          3 |
+| features\sidebar\starred\components                                                                                            |          5 |        176 |          6 |         15 |        197 |
+| features\sidebar\starred\hooks                                                                                                 |          1 |        154 |          6 |         27 |        187 |
+| hooks                                                                                                                          |          7 |        744 |         28 |        131 |        903 |
+| lib                                                                                                                            |          3 |        170 |          6 |         31 |        207 |
+| plugins                                                                                                                        |          9 |        956 |        105 |        162 |      1,223 |
+| plugins (Files)                                                                                                                |          1 |          2 |          9 |          3 |         14 |
+| plugins\built-in                                                                                                               |          5 |        931 |         40 |        147 |      1,118 |
+| plugins\built-in\ocr-plugin                                                                                                    |          5 |        931 |         40 |        147 |      1,118 |
+| plugins\core                                                                                                                   |          3 |         23 |         56 |         12 |         91 |
+| services                                                                                                                       |          7 |      1,291 |         79 |        225 |      1,595 |
+| services (Files)                                                                                                               |          1 |          6 |          2 |          2 |         10 |
+| services\core                                                                                                                  |          2 |        218 |         36 |         60 |        314 |
+| services\integration                                                                                                           |          4 |      1,067 |         41 |        163 |      1,271 |
+| storage                                                                                                                        |          9 |        948 |         49 |        180 |      1,177 |
+| styles                                                                                                                         |         10 |      2,836 |        274 |        560 |      3,670 |
+| styles (Files)                                                                                                                 |          2 |        107 |         55 |         40 |        202 |
+| styles\global                                                                                                                  |          3 |        796 |        152 |        172 |      1,120 |
+| styles\modules                                                                                                                 |          5 |      1,933 |         67 |        348 |      2,348 |
+| types                                                                                                                          |          8 |        355 |         67 |         62 |        484 |
+| types (Files)                                                                                                                  |          1 |         27 |          2 |          2 |         31 |
+| types\common                                                                                                                   |          3 |         69 |         14 |         16 |         99 |
+| types\models                                                                                                                   |          4 |        259 |         51 |         44 |        354 |
+| utils                                                                                                                          |          4 |        114 |         13 |         15 |        142 |
++--------------------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++--------------------------------------------------------------------------------------------------------------------------------+----------------+------------+------------+------------+------------+
+| filename                                                                                                                       | language       | code       | comment    | blank      | total      |
++--------------------------------------------------------------------------------------------------------------------------------+----------------+------------+------------+------------+------------+
+| e:\project_program\project_blockos\src\App.tsx                                                                                 | TypeScript JSX |        441 |         41 |         58 |        540 |
+| e:\project_program\project_blockos\src\__tests__\README.md                                                                     | Markdown       |        291 |          0 |         94 |        385 |
+| e:\project_program\project_blockos\src\__tests__\ShadcnTest.tsx                                                                | TypeScript JSX |        213 |         10 |         14 |        237 |
+| e:\project_program\project_blockos\src\__tests__\unit\utils\uuid.test.ts                                                       | TypeScript     |         25 |          9 |          6 |         40 |
+| e:\project_program\project_blockos\src\components\layout\ActivityBar.tsx                                                       | TypeScript JSX |         69 |          2 |          5 |         76 |
+| e:\project_program\project_blockos\src\components\layout\ResizeHandle.tsx                                                      | TypeScript JSX |         60 |          3 |         14 |         77 |
+| e:\project_program\project_blockos\src\components\layout\Sidebar.tsx                                                           | TypeScript JSX |        130 |          7 |         11 |        148 |
+| e:\project_program\project_blockos\src\components\layout\StatusBar.tsx                                                         | TypeScript JSX |        104 |          3 |          8 |        115 |
+| e:\project_program\project_blockos\src\components\layout\TabBar.tsx                                                            | TypeScript JSX |        175 |          8 |         15 |        198 |
+| e:\project_program\project_blockos\src\components\panel\PreviewPanel.tsx                                                       | TypeScript JSX |        225 |         10 |         15 |        250 |
+| e:\project_program\project_blockos\src\components\panel\RightPanel.tsx                                                         | TypeScript JSX |        727 |         19 |         47 |        793 |
+| e:\project_program\project_blockos\src\components\panel\SessionHistoryPanel.tsx                                                | TypeScript JSX |        102 |          0 |          7 |        109 |
+| e:\project_program\project_blockos\src\components\panel\SettingsPanel.tsx                                                      | TypeScript JSX |        206 |          0 |         17 |        223 |
+| e:\project_program\project_blockos\src\components\project\ProjectOverview.tsx                                                  | TypeScript JSX |        189 |          8 |         23 |        220 |
+| e:\project_program\project_blockos\src\components\shared\MarkdownRenderer.tsx                                                  | TypeScript JSX |         99 |         10 |         14 |        123 |
+| e:\project_program\project_blockos\src\components\shared\SyncStatusIndicator.tsx                                               | TypeScript JSX |         54 |          0 |          9 |         63 |
+| e:\project_program\project_blockos\src\components\shells\API.md                                                                | Markdown       |        341 |          0 |        103 |        444 |
+| e:\project_program\project_blockos\src\components\shells\BlockCardShell.tsx                                                    | TypeScript JSX |         58 |          6 |          4 |         68 |
+| e:\project_program\project_blockos\src\components\shells\EmptyState.tsx                                                        | TypeScript JSX |         45 |          6 |          3 |         54 |
+| e:\project_program\project_blockos\src\components\shells\PanelHeader.tsx                                                       | TypeScript JSX |         46 |          6 |          3 |         55 |
+| e:\project_program\project_blockos\src\components\shells\PanelShell.tsx                                                        | TypeScript JSX |         12 |          6 |          3 |         21 |
+| e:\project_program\project_blockos\src\components\shells\README.md                                                             | Markdown       |        259 |          0 |         51 |        310 |
+| e:\project_program\project_blockos\src\components\shells\SearchInput.tsx                                                       | TypeScript JSX |         39 |          6 |          3 |         48 |
+| e:\project_program\project_blockos\src\components\shells\index.ts                                                              | TypeScript     |          5 |         10 |          2 |         17 |
+| e:\project_program\project_blockos\src\components\ui\badge.tsx                                                                 | TypeScript JSX |         41 |          0 |          6 |         47 |
+| e:\project_program\project_blockos\src\components\ui\button.tsx                                                                | TypeScript JSX |         51 |          0 |          6 |         57 |
+| e:\project_program\project_blockos\src\components\ui\card.tsx                                                                  | TypeScript JSX |         71 |          0 |          9 |         80 |
+| e:\project_program\project_blockos\src\components\ui\dialog.tsx                                                                | TypeScript JSX |        108 |          0 |         13 |        121 |
+| e:\project_program\project_blockos\src\components\ui\dropdown-menu.tsx                                                         | TypeScript JSX |        181 |          0 |         18 |        199 |
+| e:\project_program\project_blockos\src\components\ui\input.tsx                                                                 | TypeScript JSX |         19 |          0 |          4 |         23 |
+| e:\project_program\project_blockos\src\components\ui\popover.tsx                                                               | TypeScript JSX |         24 |          0 |          6 |         30 |
+| e:\project_program\project_blockos\src\components\ui\scroll-area.tsx                                                           | TypeScript JSX |         53 |          0 |          6 |         59 |
+| e:\project_program\project_blockos\src\components\ui\select.tsx                                                                | TypeScript JSX |        145 |          0 |         14 |        159 |
+| e:\project_program\project_blockos\src\components\ui\tabs.tsx                                                                  | TypeScript JSX |         47 |          0 |          7 |         54 |
+| e:\project_program\project_blockos\src\components\ui\textarea.tsx                                                              | TypeScript JSX |         19 |          0 |          4 |         23 |
+| e:\project_program\project_blockos\src\components\ui\toast.tsx                                                                 | TypeScript JSX |        115 |          0 |         13 |        128 |
+| e:\project_program\project_blockos\src\components\ui\toaster.tsx                                                               | TypeScript JSX |         31 |          0 |          3 |         34 |
+| e:\project_program\project_blockos\src\constants\api.ts                                                                        | TypeScript     |         14 |          4 |          4 |         22 |
+| e:\project_program\project_blockos\src\constants\editor.ts                                                                     | TypeScript     |         17 |          4 |          4 |         25 |
+| e:\project_program\project_blockos\src\constants\index.ts                                                                      | TypeScript     |          4 |          1 |          2 |          7 |
+| e:\project_program\project_blockos\src\constants\storage.ts                                                                    | TypeScript     |         19 |          4 |          4 |         27 |
+| e:\project_program\project_blockos\src\constants\ui.ts                                                                         | TypeScript     |         29 |          5 |          5 |         39 |
+| e:\project_program\project_blockos\src\features\ai\components\AIFloatPanel.tsx                                                 | TypeScript JSX |          2 |          0 |          1 |          3 |
+| e:\project_program\project_blockos\src\features\ai\components\AIFloatPanel\AIFloatPanelContainer.tsx                           | TypeScript JSX |        115 |          0 |         13 |        128 |
+| e:\project_program\project_blockos\src\features\ai\components\AIFloatPanel\AIFloatPanelView.tsx                                | TypeScript JSX |        157 |          0 |          7 |        164 |
+| e:\project_program\project_blockos\src\features\ai\components\AIFloatPanel\index.ts                                            | TypeScript     |          2 |          0 |          1 |          3 |
+| e:\project_program\project_blockos\src\features\ai\components\AIFloatPanel\types.ts                                            | TypeScript     |         21 |          0 |          3 |         24 |
+| e:\project_program\project_blockos\src\features\ai\components\AIImmersivePanel.tsx                                             | TypeScript JSX |          1 |          0 |          1 |          2 |
+| e:\project_program\project_blockos\src\features\ai\components\AIImmersivePanel\AIImmersivePanelContainer.tsx                   | TypeScript JSX |        149 |          0 |         11 |        160 |
+| e:\project_program\project_blockos\src\features\ai\components\AIImmersivePanel\AIImmersivePanelView.tsx                        | TypeScript JSX |        189 |          0 |          7 |        196 |
+| e:\project_program\project_blockos\src\features\ai\components\AIImmersivePanel\SessionListView.tsx                             | TypeScript JSX |         62 |          0 |          4 |         66 |
+| e:\project_program\project_blockos\src\features\ai\components\AIImmersivePanel\index.ts                                        | TypeScript     |          2 |          0 |          1 |          3 |
+| e:\project_program\project_blockos\src\features\ai\components\AIImmersivePanel\mappers.ts                                      | TypeScript     |         58 |          0 |          6 |         64 |
+| e:\project_program\project_blockos\src\features\ai\components\AIImmersivePanel\types.ts                                        | TypeScript     |         39 |          0 |          2 |         41 |
+| e:\project_program\project_blockos\src\features\ai\components\ChatHeader.tsx                                                   | TypeScript JSX |         60 |          0 |          3 |         63 |
+| e:\project_program\project_blockos\src\features\ai\components\ChatInput.tsx                                                    | TypeScript JSX |        117 |          0 |         12 |        129 |
+| e:\project_program\project_blockos\src\features\ai\components\ChatLayout.tsx                                                   | TypeScript JSX |         17 |          0 |          3 |         20 |
+| e:\project_program\project_blockos\src\features\ai\components\MessageContent.tsx                                               | TypeScript JSX |        118 |          0 |         11 |        129 |
+| e:\project_program\project_blockos\src\features\ai\components\types.ts                                                         | TypeScript     |         22 |          0 |          4 |         26 |
+| e:\project_program\project_blockos\src\features\ai\hooks\useAIChat.ts                                                          | TypeScript     |         92 |          0 |         13 |        105 |
+| e:\project_program\project_blockos\src\features\ai\hooks\useSession.ts                                                         | TypeScript     |         86 |          3 |         14 |        103 |
+| e:\project_program\project_blockos\src\features\ai\index.ts                                                                    | TypeScript     |         11 |          3 |          3 |         17 |
+| e:\project_program\project_blockos\src\features\ai\services\aiService.ts                                                       | TypeScript     |        287 |         26 |         48 |        361 |
+| e:\project_program\project_blockos\src\features\ai\services\sessionService.ts                                                  | TypeScript     |         47 |          3 |          7 |         57 |
+| e:\project_program\project_blockos\src\features\auth\components\AuthPage.tsx                                                   | TypeScript JSX |        127 |          1 |         16 |        144 |
+| e:\project_program\project_blockos\src\features\auth\hooks\useAuth.ts                                                          | TypeScript     |         98 |          8 |         11 |        117 |
+| e:\project_program\project_blockos\src\features\auth\index.ts                                                                  | TypeScript     |          3 |          3 |          3 |          9 |
+| e:\project_program\project_blockos\src\features\auth\services\authService.ts                                                   | TypeScript     |         92 |          9 |         24 |        125 |
+| e:\project_program\project_blockos\src\features\blocks\components\BlockDerivativeSelector\BlockDerivativeSelectorContainer.tsx | TypeScript JSX |         67 |          4 |         13 |         84 |
+| e:\project_program\project_blockos\src\features\blocks\components\BlockDerivativeSelector\BlockDerivativeSelectorView.tsx      | TypeScript JSX |         91 |          0 |          5 |         96 |
+| e:\project_program\project_blockos\src\features\blocks\components\BlockDerivativeSelector\DerivativesSection.tsx               | TypeScript JSX |         77 |          0 |          4 |         81 |
+| e:\project_program\project_blockos\src\features\blocks\components\BlockDerivativeSelector\SourceBlockSection.tsx               | TypeScript JSX |         61 |          0 |          3 |         64 |
+| e:\project_program\project_blockos\src\features\blocks\components\BlockDerivativeSelector\index.ts                             | TypeScript     |          2 |          0 |          1 |          3 |
+| e:\project_program\project_blockos\src\features\blocks\components\BlockDerivativeSelector\mappers.ts                           | TypeScript     |         20 |          6 |          3 |         29 |
+| e:\project_program\project_blockos\src\features\blocks\components\BlockDerivativeSelector\types.ts                             | TypeScript     |         13 |          1 |          2 |         16 |
+| e:\project_program\project_blockos\src\features\blocks\components\BlockDetailPanel\BlockDetailPanelContainer.tsx               | TypeScript JSX |        103 |          3 |         15 |        121 |
+| e:\project_program\project_blockos\src\features\blocks\components\BlockDetailPanel\BlockDetailPanelView.tsx                    | TypeScript JSX |        116 |          0 |          8 |        124 |
+| e:\project_program\project_blockos\src\features\blocks\components\BlockDetailPanel\CurrentContentSection.tsx                   | TypeScript JSX |         53 |          0 |          3 |         56 |
+| e:\project_program\project_blockos\src\features\blocks\components\BlockDetailPanel\ReleasesSection.tsx                         | TypeScript JSX |        160 |          0 |          5 |        165 |
+| e:\project_program\project_blockos\src\features\blocks\components\BlockDetailPanel\UsagesSection.tsx                           | TypeScript JSX |         40 |          0 |          3 |         43 |
+| e:\project_program\project_blockos\src\features\blocks\components\BlockDetailPanel\index.ts                                    | TypeScript     |          2 |          0 |          1 |          3 |
+| e:\project_program\project_blockos\src\features\blocks\components\BlockDetailPanel\mappers.ts                                  | TypeScript     |         35 |         15 |          6 |         56 |
+| e:\project_program\project_blockos\src\features\blocks\components\BlockDetailPanel\types.ts                                    | TypeScript     |         24 |          1 |          4 |         29 |
+| e:\project_program\project_blockos\src\features\blocks\hooks\useBlockSearch.ts                                                 | TypeScript     |         17 |          0 |          6 |         23 |
+| e:\project_program\project_blockos\src\features\blocks\hooks\useBlocks.ts                                                      | TypeScript     |         34 |          2 |          7 |         43 |
+| e:\project_program\project_blockos\src\features\blocks\index.ts                                                                | TypeScript     |          8 |          3 |          3 |         14 |
+| e:\project_program\project_blockos\src\features\blocks\services\blockCaptureService.ts                                         | TypeScript     |        115 |          6 |         13 |        134 |
+| e:\project_program\project_blockos\src\features\blocks\services\blockReleaseService.ts                                         | TypeScript     |         63 |          0 |         15 |         78 |
+| e:\project_program\project_blockos\src\features\blocks\services\exportService.ts                                               | TypeScript     |        163 |         26 |         30 |        219 |
+| e:\project_program\project_blockos\src\features\editor\components\Editor.tsx                                                   | TypeScript JSX |          1 |          0 |          1 |          2 |
+| e:\project_program\project_blockos\src\features\editor\components\EditorBreadcrumb.tsx                                         | TypeScript JSX |         32 |          0 |          2 |         34 |
+| e:\project_program\project_blockos\src\features\editor\components\EditorBreadcrumb\types.ts                                    | TypeScript     |          6 |          0 |          1 |          7 |
+| e:\project_program\project_blockos\src\features\editor\components\EditorBubbleMenu.tsx                                         | TypeScript JSX |          1 |          0 |          1 |          2 |
+| e:\project_program\project_blockos\src\features\editor\components\EditorBubbleMenu\EditorBubbleMenuContainer.tsx               | TypeScript JSX |        256 |          0 |         24 |        280 |
+| e:\project_program\project_blockos\src\features\editor\components\EditorBubbleMenu\EditorBubbleMenuView.tsx                    | TypeScript JSX |        113 |          0 |          6 |        119 |
+| e:\project_program\project_blockos\src\features\editor\components\EditorBubbleMenu\index.ts                                    | TypeScript     |          1 |          0 |          1 |          2 |
+| e:\project_program\project_blockos\src\features\editor\components\EditorBubbleMenu\types.ts                                    | TypeScript     |         14 |          0 |          2 |         16 |
+| e:\project_program\project_blockos\src\features\editor\components\EditorContentArea.tsx                                        | TypeScript JSX |          1 |          0 |          1 |          2 |
+| e:\project_program\project_blockos\src\features\editor\components\EditorContentArea\EditorContentAreaContainer.tsx             | TypeScript JSX |        126 |          0 |         14 |        140 |
+| e:\project_program\project_blockos\src\features\editor\components\EditorContentArea\EditorContentAreaView.tsx                  | TypeScript JSX |         60 |          0 |          5 |         65 |
+| e:\project_program\project_blockos\src\features\editor\components\EditorContentArea\index.ts                                   | TypeScript     |          2 |          0 |          1 |          3 |
+| e:\project_program\project_blockos\src\features\editor\components\EditorContentArea\types.ts                                   | TypeScript     |         17 |          0 |          2 |         19 |
+| e:\project_program\project_blockos\src\features\editor\components\EditorToolbar.tsx                                            | TypeScript JSX |          1 |          0 |          1 |          2 |
+| e:\project_program\project_blockos\src\features\editor\components\EditorToolbar\EditorToolbarContainer.tsx                     | TypeScript JSX |         76 |          0 |          6 |         82 |
+| e:\project_program\project_blockos\src\features\editor\components\EditorToolbar\EditorToolbarView.tsx                          | TypeScript JSX |         53 |          0 |          3 |         56 |
+| e:\project_program\project_blockos\src\features\editor\components\EditorToolbar\index.ts                                       | TypeScript     |          2 |          0 |          1 |          3 |
+| e:\project_program\project_blockos\src\features\editor\components\EditorToolbar\types.ts                                       | TypeScript     |         11 |          0 |          3 |         14 |
+| e:\project_program\project_blockos\src\features\editor\components\Editor\EditorContainer.tsx                                   | TypeScript JSX |        297 |          0 |          2 |        299 |
+| e:\project_program\project_blockos\src\features\editor\components\Editor\EditorView.tsx                                        | TypeScript JSX |         60 |          0 |          3 |         63 |
+| e:\project_program\project_blockos\src\features\editor\components\Editor\index.ts                                              | TypeScript     |          2 |          0 |          1 |          3 |
+| e:\project_program\project_blockos\src\features\editor\components\Editor\types.ts                                              | TypeScript     |         17 |          0 |          3 |         20 |
+| e:\project_program\project_blockos\src\features\editor\components\SuggestionMenu.tsx                                           | TypeScript JSX |          1 |          0 |          1 |          2 |
+| e:\project_program\project_blockos\src\features\editor\components\SuggestionMenu\SuggestionMenuContainer.tsx                   | TypeScript JSX |         43 |          0 |          6 |         49 |
+| e:\project_program\project_blockos\src\features\editor\components\SuggestionMenu\SuggestionMenuView.tsx                        | TypeScript JSX |         46 |          0 |          3 |         49 |
+| e:\project_program\project_blockos\src\features\editor\components\SuggestionMenu\index.ts                                      | TypeScript     |          1 |          0 |          1 |          2 |
+| e:\project_program\project_blockos\src\features\editor\components\SuggestionMenu\types.ts                                      | TypeScript     |          7 |          0 |          2 |          9 |
+| e:\project_program\project_blockos\src\features\editor\components\types.ts                                                     | TypeScript     |         30 |          0 |          5 |         35 |
+| e:\project_program\project_blockos\src\features\editor\config\editorExtensions.ts                                              | TypeScript     |         60 |         11 |          8 |         79 |
+| e:\project_program\project_blockos\src\features\editor\extensions\blockLink.ts                                                 | TypeScript     |         39 |          1 |          8 |         48 |
+| e:\project_program\project_blockos\src\features\editor\extensions\blockReference.ts                                            | TypeScript     |         46 |          1 |         11 |         58 |
+| e:\project_program\project_blockos\src\features\editor\extensions\index.ts                                                     | TypeScript     |         16 |          0 |          1 |         17 |
+| e:\project_program\project_blockos\src\features\editor\extensions\inlineAI.ts                                                  | TypeScript     |        155 |         16 |         29 |        200 |
+| e:\project_program\project_blockos\src\features\editor\extensions\sourceBlock.ts                                               | TypeScript     |        193 |          0 |         27 |        220 |
+| e:\project_program\project_blockos\src\features\editor\extensions\suggestion.ts                                                | TypeScript     |         63 |          2 |          7 |         72 |
+| e:\project_program\project_blockos\src\features\editor\index.ts                                                                | TypeScript     |          4 |          2 |          2 |          8 |
+| e:\project_program\project_blockos\src\features\editor\styles\editor-wysiwyg.css                                               | CSS            |        329 |         21 |         62 |        412 |
+| e:\project_program\project_blockos\src\features\right-sidebar\block-space\BlockItemView.tsx                                    | TypeScript JSX |         62 |          0 |          4 |         66 |
+| e:\project_program\project_blockos\src\features\right-sidebar\block-space\BlockListView.tsx                                    | TypeScript JSX |         28 |          0 |          3 |         31 |
+| e:\project_program\project_blockos\src\features\right-sidebar\block-space\BlockSpacePanelContainer.tsx                         | TypeScript JSX |        109 |          0 |         18 |        127 |
+| e:\project_program\project_blockos\src\features\right-sidebar\block-space\BlockSpacePanelView.tsx                              | TypeScript JSX |        116 |          0 |          7 |        123 |
+| e:\project_program\project_blockos\src\features\right-sidebar\block-space\index.ts                                             | TypeScript     |          2 |          0 |          1 |          3 |
+| e:\project_program\project_blockos\src\features\right-sidebar\block-space\mappers.ts                                           | TypeScript     |         18 |          9 |          4 |         31 |
+| e:\project_program\project_blockos\src\features\right-sidebar\block-space\types.ts                                             | TypeScript     |         13 |          1 |          2 |         16 |
+| e:\project_program\project_blockos\src\features\right-sidebar\document-blocks\BlockItemView.tsx                                | TypeScript JSX |         49 |          0 |          6 |         55 |
+| e:\project_program\project_blockos\src\features\right-sidebar\document-blocks\BlockListView.tsx                                | TypeScript JSX |         14 |          0 |          3 |         17 |
+| e:\project_program\project_blockos\src\features\right-sidebar\document-blocks\DocumentBlocksPanelContainer.tsx                 | TypeScript JSX |         54 |          0 |         10 |         64 |
+| e:\project_program\project_blockos\src\features\right-sidebar\document-blocks\DocumentBlocksPanelView.tsx                      | TypeScript JSX |         69 |          0 |          5 |         74 |
+| e:\project_program\project_blockos\src\features\right-sidebar\document-blocks\index.ts                                         | TypeScript     |          2 |          0 |          1 |          3 |
+| e:\project_program\project_blockos\src\features\right-sidebar\document-blocks\types.ts                                         | TypeScript     |         11 |          1 |          2 |         14 |
+| e:\project_program\project_blockos\src\features\right-sidebar\preview\PreviewPanelContainer.tsx                                | TypeScript JSX |         50 |          3 |          7 |         60 |
+| e:\project_program\project_blockos\src\features\right-sidebar\preview\PreviewPanelView.tsx                                     | TypeScript JSX |        171 |          5 |          6 |        182 |
+| e:\project_program\project_blockos\src\features\right-sidebar\preview\hooks\usePreview.ts                                      | TypeScript     |         53 |          8 |         10 |         71 |
+| e:\project_program\project_blockos\src\features\right-sidebar\preview\index.ts                                                 | TypeScript     |          2 |          0 |          1 |          3 |
+| e:\project_program\project_blockos\src\features\right-sidebar\preview\mappers.ts                                               | TypeScript     |         28 |         12 |          5 |         45 |
+| e:\project_program\project_blockos\src\features\right-sidebar\preview\types.ts                                                 | TypeScript     |         20 |          1 |          3 |         24 |
+| e:\project_program\project_blockos\src\features\right-sidebar\session-history\SessionHistoryPanelContainer.tsx                 | TypeScript JSX |         46 |          4 |          7 |         57 |
+| e:\project_program\project_blockos\src\features\right-sidebar\session-history\SessionHistoryPanelView.tsx                      | TypeScript JSX |         90 |          0 |          5 |         95 |
+| e:\project_program\project_blockos\src\features\right-sidebar\session-history\index.ts                                         | TypeScript     |          2 |          0 |          1 |          3 |
+| e:\project_program\project_blockos\src\features\right-sidebar\session-history\mappers.ts                                       | TypeScript     |         26 |          9 |          5 |         40 |
+| e:\project_program\project_blockos\src\features\right-sidebar\session-history\types.ts                                         | TypeScript     |         12 |          1 |          2 |         15 |
+| e:\project_program\project_blockos\src\features\sidebar\explorer\components\ExplorerContainer.tsx                              | TypeScript JSX |        277 |          0 |         37 |        314 |
+| e:\project_program\project_blockos\src\features\sidebar\explorer\components\ExplorerView.tsx                                   | TypeScript JSX |        437 |          0 |         12 |        449 |
+| e:\project_program\project_blockos\src\features\sidebar\explorer\components\index.ts                                           | TypeScript     |          2 |          0 |          1 |          3 |
+| e:\project_program\project_blockos\src\features\sidebar\explorer\components\mappers.ts                                         | TypeScript     |         40 |          0 |          5 |         45 |
+| e:\project_program\project_blockos\src\features\sidebar\explorer\components\types.ts                                           | TypeScript     |         14 |          0 |          2 |         16 |
+| e:\project_program\project_blockos\src\features\sidebar\explorer\hooks\useExplorer.ts                                          | TypeScript     |         90 |          0 |         14 |        104 |
+| e:\project_program\project_blockos\src\features\sidebar\explorer\index.ts                                                      | TypeScript     |          2 |          0 |          1 |          3 |
+| e:\project_program\project_blockos\src\features\sidebar\extensions\components\ExtensionsContainer.tsx                          | TypeScript JSX |         22 |          0 |          5 |         27 |
+| e:\project_program\project_blockos\src\features\sidebar\extensions\components\ExtensionsView.tsx                               | TypeScript JSX |        111 |          0 |          5 |        116 |
+| e:\project_program\project_blockos\src\features\sidebar\extensions\components\index.ts                                         | TypeScript     |          2 |          0 |          1 |          3 |
+| e:\project_program\project_blockos\src\features\sidebar\extensions\components\mappers.ts                                       | TypeScript     |         16 |          6 |          3 |         25 |
+| e:\project_program\project_blockos\src\features\sidebar\extensions\components\types.ts                                         | TypeScript     |          9 |          0 |          1 |         10 |
+| e:\project_program\project_blockos\src\features\sidebar\extensions\hooks\useExtensions.ts                                      | TypeScript     |         22 |          1 |          6 |         29 |
+| e:\project_program\project_blockos\src\features\sidebar\extensions\index.ts                                                    | TypeScript     |          2 |          0 |          1 |          3 |
+| e:\project_program\project_blockos\src\features\sidebar\outline\components\OutlineContainer.tsx                                | TypeScript JSX |         25 |          1 |          6 |         32 |
+| e:\project_program\project_blockos\src\features\sidebar\outline\components\OutlineView.tsx                                     | TypeScript JSX |         73 |          0 |          4 |         77 |
+| e:\project_program\project_blockos\src\features\sidebar\outline\components\index.ts                                            | TypeScript     |          2 |          0 |          1 |          3 |
+| e:\project_program\project_blockos\src\features\sidebar\outline\components\mappers.ts                                          | TypeScript     |         12 |          6 |          3 |         21 |
+| e:\project_program\project_blockos\src\features\sidebar\outline\components\types.ts                                            | TypeScript     |          5 |          0 |          1 |          6 |
+| e:\project_program\project_blockos\src\features\sidebar\outline\hooks\useOutline.ts                                            | TypeScript     |         68 |          4 |         13 |         85 |
+| e:\project_program\project_blockos\src\features\sidebar\outline\index.ts                                                       | TypeScript     |          2 |          0 |          1 |          3 |
+| e:\project_program\project_blockos\src\features\sidebar\plugin-workspace\components\PluginWorkspaceContainer.tsx               | TypeScript JSX |         40 |          1 |          6 |         47 |
+| e:\project_program\project_blockos\src\features\sidebar\plugin-workspace\components\PluginWorkspaceView.tsx                    | TypeScript JSX |        130 |          0 |          9 |        139 |
+| e:\project_program\project_blockos\src\features\sidebar\plugin-workspace\components\index.ts                                   | TypeScript     |          2 |          0 |          1 |          3 |
+| e:\project_program\project_blockos\src\features\sidebar\plugin-workspace\components\mappers.ts                                 | TypeScript     |         14 |          3 |          2 |         19 |
+| e:\project_program\project_blockos\src\features\sidebar\plugin-workspace\components\types.ts                                   | TypeScript     |         10 |          0 |          1 |         11 |
+| e:\project_program\project_blockos\src\features\sidebar\plugin-workspace\index.ts                                              | TypeScript     |          2 |          0 |          1 |          3 |
+| e:\project_program\project_blockos\src\features\sidebar\search\components\SearchContainer.tsx                                  | TypeScript JSX |         27 |          0 |          6 |         33 |
+| e:\project_program\project_blockos\src\features\sidebar\search\components\SearchView.tsx                                       | TypeScript JSX |         96 |          0 |          5 |        101 |
+| e:\project_program\project_blockos\src\features\sidebar\search\components\index.ts                                             | TypeScript     |          2 |          0 |          1 |          3 |
+| e:\project_program\project_blockos\src\features\sidebar\search\components\mappers.ts                                           | TypeScript     |         12 |          6 |          3 |         21 |
+| e:\project_program\project_blockos\src\features\sidebar\search\components\types.ts                                             | TypeScript     |          5 |          0 |          1 |          6 |
+| e:\project_program\project_blockos\src\features\sidebar\search\hooks\useSearch.ts                                              | TypeScript     |         31 |          0 |          4 |         35 |
+| e:\project_program\project_blockos\src\features\sidebar\search\index.ts                                                        | TypeScript     |          2 |          0 |          1 |          3 |
+| e:\project_program\project_blockos\src\features\sidebar\starred\components\StarredContainer.tsx                                | TypeScript JSX |         57 |          0 |          6 |         63 |
+| e:\project_program\project_blockos\src\features\sidebar\starred\components\StarredView.tsx                                     | TypeScript JSX |         88 |          0 |          4 |         92 |
+| e:\project_program\project_blockos\src\features\sidebar\starred\components\index.ts                                            | TypeScript     |          2 |          0 |          1 |          3 |
+| e:\project_program\project_blockos\src\features\sidebar\starred\components\mappers.ts                                          | TypeScript     |         21 |          6 |          3 |         30 |
+| e:\project_program\project_blockos\src\features\sidebar\starred\components\types.ts                                            | TypeScript     |          8 |          0 |          1 |          9 |
+| e:\project_program\project_blockos\src\features\sidebar\starred\hooks\useStarred.ts                                            | TypeScript     |        154 |          6 |         27 |        187 |
+| e:\project_program\project_blockos\src\features\sidebar\starred\index.ts                                                       | TypeScript     |          2 |          0 |          1 |          3 |
+| e:\project_program\project_blockos\src\hooks\use-toast.ts                                                                      | TypeScript     |        160 |          3 |         32 |        195 |
+| e:\project_program\project_blockos\src\hooks\useAppLayout.ts                                                                   | TypeScript     |         93 |          3 |         18 |        114 |
+| e:\project_program\project_blockos\src\hooks\useAutoSync.ts                                                                    | TypeScript     |         17 |          1 |          4 |         22 |
+| e:\project_program\project_blockos\src\hooks\useLongPress.ts                                                                   | TypeScript     |         84 |          7 |         20 |        111 |
+| e:\project_program\project_blockos\src\hooks\useSwipeGesture.ts                                                                | TypeScript     |         77 |         10 |         14 |        101 |
+| e:\project_program\project_blockos\src\hooks\useTabs.ts                                                                        | TypeScript     |        269 |          0 |         36 |        305 |
+| e:\project_program\project_blockos\src\hooks\useViewport.ts                                                                    | TypeScript     |         44 |          4 |          7 |         55 |
+| e:\project_program\project_blockos\src\index.css                                                                               | CSS            |         14 |          2 |          4 |         20 |
+| e:\project_program\project_blockos\src\lib\gitIntegration.ts                                                                   | TypeScript     |        154 |          4 |         23 |        181 |
+| e:\project_program\project_blockos\src\lib\supabase.ts                                                                         | TypeScript     |         11 |          2 |          6 |         19 |
+| e:\project_program\project_blockos\src\lib\utils.ts                                                                            | TypeScript     |          5 |          0 |          2 |          7 |
+| e:\project_program\project_blockos\src\main.tsx                                                                                | TypeScript JSX |         11 |          0 |          2 |         13 |
+| e:\project_program\project_blockos\src\plugins\built-in\ocr-plugin\OCRPanel.tsx                                                | TypeScript JSX |        658 |          0 |         84 |        742 |
+| e:\project_program\project_blockos\src\plugins\built-in\ocr-plugin\index.tsx                                                   | TypeScript JSX |         83 |          6 |         15 |        104 |
+| e:\project_program\project_blockos\src\plugins\built-in\ocr-plugin\ocrService.tesseract.ts                                     | TypeScript     |         26 |         30 |          8 |         64 |
+| e:\project_program\project_blockos\src\plugins\built-in\ocr-plugin\ocrService.ts                                               | TypeScript     |         78 |          4 |         17 |         99 |
+| e:\project_program\project_blockos\src\plugins\built-in\ocr-plugin\ocrUtils.ts                                                 | TypeScript     |         86 |          0 |         23 |        109 |
+| e:\project_program\project_blockos\src\plugins\core\base.ts                                                                    | TypeScript     |         14 |         46 |          8 |         68 |
+| e:\project_program\project_blockos\src\plugins\core\index.ts                                                                   | TypeScript     |          2 |          5 |          2 |          9 |
+| e:\project_program\project_blockos\src\plugins\core\types.ts                                                                   | TypeScript     |          7 |          5 |          2 |         14 |
+| e:\project_program\project_blockos\src\plugins\index.ts                                                                        | TypeScript     |          2 |          9 |          3 |         14 |
+| e:\project_program\project_blockos\src\services\core\pluginAPI.ts                                                              | TypeScript     |        139 |         23 |         38 |        200 |
+| e:\project_program\project_blockos\src\services\core\pluginRegistry.ts                                                         | TypeScript     |         79 |         13 |         22 |        114 |
+| e:\project_program\project_blockos\src\services\index.ts                                                                       | TypeScript     |          6 |          2 |          2 |         10 |
+| e:\project_program\project_blockos\src\services\integration\autoSyncService.ts                                                 | TypeScript     |        426 |         27 |         64 |        517 |
+| e:\project_program\project_blockos\src\services\integration\gitIntegration.ts                                                  | TypeScript     |        225 |          0 |         34 |        259 |
+| e:\project_program\project_blockos\src\services\integration\ocrBlockService.ts                                                 | TypeScript     |        138 |          0 |         14 |        152 |
+| e:\project_program\project_blockos\src\services\integration\syncService.ts                                                     | TypeScript     |        278 |         14 |         51 |        343 |
+| e:\project_program\project_blockos\src\storage\blockStore.ts                                                                   | TypeScript     |        302 |         20 |         55 |        377 |
+| e:\project_program\project_blockos\src\storage\database.ts                                                                     | TypeScript     |         57 |          3 |         16 |         76 |
+| e:\project_program\project_blockos\src\storage\documentStore.ts                                                                | TypeScript     |        193 |          9 |         37 |        239 |
+| e:\project_program\project_blockos\src\storage\index.ts                                                                        | TypeScript     |         10 |          1 |          2 |         13 |
+| e:\project_program\project_blockos\src\storage\ocrPhotoStore.ts                                                                | TypeScript     |         77 |          0 |         24 |        101 |
+| e:\project_program\project_blockos\src\storage\pluginConfigStore.ts                                                            | TypeScript     |         34 |          7 |         10 |         51 |
+| e:\project_program\project_blockos\src\storage\projectStore.ts                                                                 | TypeScript     |        117 |          2 |         15 |        134 |
+| e:\project_program\project_blockos\src\storage\sessionStore.ts                                                                 | TypeScript     |         87 |          2 |         13 |        102 |
+| e:\project_program\project_blockos\src\storage\usageStore.ts                                                                   | TypeScript     |         71 |          5 |          8 |         84 |
+| e:\project_program\project_blockos\src\styles\css.d.ts                                                                         | TypeScript     |          4 |          0 |          1 |          5 |
+| e:\project_program\project_blockos\src\styles\global\design-tokens.css                                                         | CSS            |        250 |         44 |         55 |        349 |
+| e:\project_program\project_blockos\src\styles\global\responsive.css                                                            | CSS            |        294 |         47 |         67 |        408 |
+| e:\project_program\project_blockos\src\styles\global\touch-enhancements.css                                                    | CSS            |        252 |         61 |         50 |        363 |
+| e:\project_program\project_blockos\src\styles\modules\ai.css                                                                   | CSS            |        311 |          4 |         51 |        366 |
+| e:\project_program\project_blockos\src\styles\modules\blocks.css                                                               | CSS            |        438 |          8 |         76 |        522 |
+| e:\project_program\project_blockos\src\styles\modules\common-patterns.css                                                      | CSS            |        364 |         47 |         76 |        487 |
+| e:\project_program\project_blockos\src\styles\modules\editor.css                                                               | CSS            |        312 |          3 |         55 |        370 |
+| e:\project_program\project_blockos\src\styles\modules\panels.css                                                               | CSS            |        508 |          5 |         90 |        603 |
+| e:\project_program\project_blockos\src\styles\shadcn-theme.css                                                                 | CSS            |        103 |         55 |         39 |        197 |
+| e:\project_program\project_blockos\src\test.tsx                                                                                | TypeScript JSX |          9 |          0 |          2 |         11 |
+| e:\project_program\project_blockos\src\types\common\layout.ts                                                                  | TypeScript     |         17 |          3 |          3 |         23 |
+| e:\project_program\project_blockos\src\types\common\ocr.ts                                                                     | TypeScript     |         18 |          0 |          2 |         20 |
+| e:\project_program\project_blockos\src\types\common\plugin.ts                                                                  | TypeScript     |         34 |         11 |         11 |         56 |
+| e:\project_program\project_blockos\src\types\index.ts                                                                          | TypeScript     |         27 |          2 |          2 |         31 |
+| e:\project_program\project_blockos\src\types\models\block.ts                                                                   | TypeScript     |        203 |         44 |         37 |        284 |
+| e:\project_program\project_blockos\src\types\models\chat.ts                                                                    | TypeScript     |         17 |          3 |          3 |         23 |
+| e:\project_program\project_blockos\src\types\models\document.ts                                                                | TypeScript     |         18 |          2 |          2 |         22 |
+| e:\project_program\project_blockos\src\types\models\project.ts                                                                 | TypeScript     |         21 |          2 |          2 |         25 |
+| e:\project_program\project_blockos\src\utils\date.ts                                                                           | TypeScript     |         48 |          3 |          6 |         57 |
+| e:\project_program\project_blockos\src\utils\index.ts                                                                          | TypeScript     |          3 |          0 |          1 |          4 |
+| e:\project_program\project_blockos\src\utils\markdown.ts                                                                       | TypeScript     |         56 |          9 |          7 |         72 |
+| e:\project_program\project_blockos\src\utils\uuid.ts                                                                           | TypeScript     |          7 |          1 |          1 |          9 |
+| e:\project_program\project_blockos\src\vite-env.d.ts                                                                           | TypeScript     |          6 |          1 |          3 |         10 |
+| Total                                                                                                                          |                |     20,762 |      1,083 |      2,995 |     24,840 |
++--------------------------------------------------------------------------------------------------------------------------------+----------------+------------+------------+------------+------------+

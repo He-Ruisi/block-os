@@ -33,14 +33,14 @@
   - [x] 每个组件做 Container/View 拆分
   - [x] 更新所有 import 路径
   - [x] TypeScript 类型检查通过
-- [ ] Phase 2: 右侧边栏功能域（4 个组件）
-  - [ ] 迁移 PreviewPanel → features/right-sidebar/preview/
-  - [ ] 迁移 SessionHistoryPanel → features/right-sidebar/session-history/
-  - [ ] 迁移 DocumentBlocksPanel → features/right-sidebar/document-blocks/
-  - [ ] 迁移 BlockSpacePanel → features/right-sidebar/block-space/
-  - [ ] 每个组件做 Container/View 拆分（如需要）
-  - [ ] 更新所有 import 路径
-  - [ ] TypeScript 类型检查通过
+- [x] Phase 2: 右侧边栏功能域（4 个组件）- ✅ 完成（2026-04-17 23:30）
+  - [x] 迁移 PreviewPanel → features/right-sidebar/preview/
+  - [x] 迁移 SessionHistoryPanel → features/right-sidebar/session-history/
+  - [x] 迁移 DocumentBlocksPanel → features/right-sidebar/document-blocks/
+  - [x] 迁移 BlockSpacePanel → features/right-sidebar/block-space/
+  - [x] PreviewPanel 和 SessionHistoryPanel 做 Container/View 拆分
+  - [x] 更新所有 import 路径
+  - [x] TypeScript 类型检查通过
 - [ ] Phase 3: 设置功能域（1 个组件）
   - [ ] 迁移 SettingsPanel → features/settings/
   - [ ] Container/View 拆分

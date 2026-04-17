@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import type { Block, BlockRelease } from '@/types/models/block'
-import { useBlocks } from '../../hooks/useBlocks'
+import { useBlocks } from '@/features/blocks/hooks/useBlocks'
 import { BlockSpacePanelView } from './BlockSpacePanelView'
 import { toBlockViewModels } from './mappers'
 import type { BlockViewModel, BlockSpaceStats } from './types'

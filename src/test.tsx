@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import { ShadcnTest } from './components/test/ShadcnTest'
+import { ShadcnTest } from './__tests__/ShadcnTest'
 import './index.css'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
